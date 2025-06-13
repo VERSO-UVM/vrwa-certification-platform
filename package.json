@@ -1,0 +1,20 @@
+{
+  "name": "vrwa",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "backend",
+    "webapp"
+  ],
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "trustedDependencies": [
+    "@swc/core",
+    "@tailwindcss/oxide",
+    "esbuild"
+  ]
+}
