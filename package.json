@@ -1,0 +1,12 @@
+{
+  "name": "vrwa",
+  "private": true,
+  "type": "module",
+  "workspaces": [],
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
