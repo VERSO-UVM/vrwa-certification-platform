@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "backend"
+    "backend",
+    "webapp"
   ],
   "devDependencies": {
     "@types/bun": "latest"
@@ -12,6 +13,8 @@
     "typescript": "^5.0.0"
   },
   "trustedDependencies": [
-    "@swc/core"
+    "@swc/core",
+    "@tailwindcss/oxide",
+    "esbuild"
   ]
 }
