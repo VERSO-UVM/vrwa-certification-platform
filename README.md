@@ -9,4 +9,7 @@ For the last 10 or so years, records of who has taken what classes has been mana
 - Allow operators to log in and view their upcoming courses and past completed courses (specifically, number of credit hours earned)
 - Enable Vermont state officials to view the training history of operators, to smooth the process of official certification
 
+## Contribution & Development Instructions
 
+1. Install dependencies: `bun install`
+2. Run development servers: `bun --filter="*" dev`

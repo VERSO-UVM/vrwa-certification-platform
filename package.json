@@ -6,6 +6,7 @@
     "backend",
     "webapp"
   ],
+  "scripts": {},
   "devDependencies": {
     "@types/bun": "latest"
   },
