@@ -2,11 +2,16 @@
   "name": "vrwa",
   "private": true,
   "type": "module",
-  "workspaces": [],
+  "workspaces": [
+    "backend"
+  ],
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
-  }
+  },
+  "trustedDependencies": [
+    "@swc/core"
+  ]
 }
