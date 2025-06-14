@@ -6,7 +6,9 @@
     "backend",
     "webapp"
   ],
-  "scripts": {},
+  "scripts": {
+    "dev": "bun --filter=\"*\" run dev"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
