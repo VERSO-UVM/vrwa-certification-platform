@@ -34,6 +34,19 @@ $ bun run test:e2e
 $ bun run test:cov
 ```
 
+### Database
+
+```bash
+# Create migrations
+bun db:gen
+
+# Apply migrations
+bun db:migrate
+
+# View the data studio
+bun db:studio
+```
+
 ## Resources
 
 Check out a few resources that may come in handy when working with NestJS:

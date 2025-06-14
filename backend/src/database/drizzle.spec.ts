@@ -1,0 +1,18 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { drizzleProvider as Drizzle } from './drizzle.provider';
+
+describe('Drizzle', () => {
+  let provider: typeof Drizzle;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [Drizzle],
+    }).compile();
+
+    provider = module.get<typeof Drizzle>(Drizzle);
+  });
+
+  it('should be defined', () => {
+    expect(provider).toBeDefined();
+  });
+});
