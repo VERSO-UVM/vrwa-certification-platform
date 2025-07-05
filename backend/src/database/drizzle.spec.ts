@@ -9,7 +9,7 @@ describe('Drizzle', () => {
       providers: [Drizzle],
     }).compile();
 
-    // FIXME
+    // FIXME Maybe use `DrizzleProviderReturn` from provider file?
     // @ts-expect-error types don't match and idk why
     provider = module.get<typeof Drizzle>(Drizzle);
   });
