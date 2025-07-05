@@ -7,6 +7,11 @@ import { Provider } from '@nestjs/common';
 
 export const DrizzleAsyncProvider = 'DrizzleAsyncProvider';
 
+export type DrizzleProviderReturn = {
+  client: NodePgDatabase<typeof schema>;
+  schema: typeof schema;
+};
+
 export const drizzleProvider = {
   provide: DrizzleAsyncProvider,
   inject: [ConfigService],
@@ -17,6 +22,8 @@ export const drizzleProvider = {
       connectionString,
     });
 
-    return drizzle(pool, { schema }) as NodePgDatabase<typeof schema>;
+    const client = drizzle(pool, { schema }) as NodePgDatabase<typeof schema>;
+
+    return { client, schema } satisfies DrizzleProviderReturn;
   },
 } satisfies Provider;
