@@ -11,11 +11,13 @@ $ bun install
 ### Compile and run the project
 
 ```bash
-# development
+# run without watch
 $ bun start
 
 # watch mode
 $ bun start:dev
+# orrr...
+$ bun dev
 
 # production mode
 $ bun start:prod
@@ -36,6 +38,8 @@ $ bun run test:cov
 
 ### Database
 
+**DB Management Commands**
+
 ```bash
 # Create migrations
 bun db:gen
@@ -46,6 +50,15 @@ bun db:migrate
 # View the data studio
 bun db:studio
 ```
+
+#### Starting a development database with Docker Compose
+
+A connection string example is provided in `.env.example`.
+
+To start the db container: `docker compose -f compose.dev.yml up -d`
+To stop the db container: `docker compose -f compose.dev.yml down`
+
+Make sure to also apply migrations! If you need to reset/wipe the database: `rm -rf .tmp/db-data`
 
 ## Resources
 
