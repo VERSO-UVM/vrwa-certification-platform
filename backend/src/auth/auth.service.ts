@@ -4,6 +4,7 @@ import {
   type DrizzleProviderReturn,
 } from 'src/database/drizzle.provider';
 import { hash, verify } from '@node-rs/argon2';
+import { addDays } from 'date-fns';
 
 @Injectable()
 export class AuthService {
@@ -19,12 +20,28 @@ export class AuthService {
     });
 
     if (!user || !user.passwordHash) {
-      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+      return null;
     }
 
-    return AuthService.comparePasswordHashes(user.passwordHash, password);
+    if (await AuthService.comparePasswordHashes(user.passwordHash, password))
+      return user;
+
+    return null;
   }
 
+  async issueSessionToken(userId: string) {
+    // TODO: Figure out UTC and timezone stuff
+    const expiry = addDays(new Date(), 14);
+
+    const [session] = await this.db.client
+      .insert(this.db.schema.session)
+      .values({ userId, expiresAt: expiry })
+      .returning();
+
+    return session;
+  }
+
+  // Utility methods
   private static async comparePasswordHashes(hash: string, password: string) {
     return await verify(hash, password);
   }
