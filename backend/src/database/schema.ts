@@ -15,7 +15,7 @@ export type UserRole =
   | 'instructor'
   | 'vrwa-administrator';
 
-const user = pgTable(
+export const user = pgTable(
   'user',
   {
     id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('user')),
@@ -23,7 +23,7 @@ const user = pgTable(
     lastName: text().notNull(),
     hasRegistered: boolean(),
     email: text().notNull().unique(),
-    password: text(),
+    passwordHash: text(),
     role: varchar().notNull().$type<UserRole>(),
     orgId: varchar().references(() => organization.id),
   },
@@ -32,7 +32,7 @@ const user = pgTable(
 
 export type User = typeof user.$inferSelect;
 
-const session = pgTable('session', {
+export const session = pgTable('session', {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('session')),
   userId: varchar()
     .references(() => user.id)
@@ -41,12 +41,12 @@ const session = pgTable('session', {
   createdAt: timestamp({ withTimezone: true }).defaultNow(),
 });
 
-const organization = pgTable('organization', {
+export const organization = pgTable('organization', {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('organization')),
   orgName: text(),
 });
 
-const course = pgTable('course', {
+export const course = pgTable('course', {
   // This field may already exist as a different type in the VRWA db - it may change in the future
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('course')),
   courseName: text().notNull(),
@@ -59,7 +59,7 @@ const course = pgTable('course', {
 export type CourseLocation = 'in-person' | 'virtual' | 'hybrid';
 
 // A courseEvent is an instance where a course is being taught. `class` is a reserved keyword so it doesn't do well here
-const courseEvent = pgTable('courseEvent', {
+export const courseEvent = pgTable('courseEvent', {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('courseEvent')),
   courseId: varchar()
     .references(() => course.id)
@@ -70,5 +70,3 @@ const courseEvent = pgTable('courseEvent', {
   seats: integer(),
   classStartDatetime: timestamp({ withTimezone: true }),
 });
-
-export { user, session, organization, course, courseEvent };

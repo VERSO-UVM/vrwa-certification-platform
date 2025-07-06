@@ -6,6 +6,7 @@ describe('Drizzle', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      // @ts-expect-error types don't match and idk why
       providers: [Drizzle],
     }).compile();
 

@@ -22,7 +22,6 @@ export function generatePrefixedId(prefix: IdPrefixNames) {
     // If we're asked for a session id, make sure it is secure
     const tokenBytes = new Uint8Array(20);
     crypto.getRandomValues(tokenBytes);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     return `${ID_PREFIXES[prefix]}_${encodeBase32LowerCaseNoPadding(tokenBytes).toLowerCase()}`;
   }
 

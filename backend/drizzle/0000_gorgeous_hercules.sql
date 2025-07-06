@@ -34,7 +34,7 @@ CREATE TABLE "user" (
 	"lastName" text NOT NULL,
 	"hasRegistered" boolean,
 	"email" text NOT NULL,
-	"password" text,
+	"passwordHash" text,
 	"role" varchar NOT NULL,
 	"orgId" varchar,
 	CONSTRAINT "user_email_unique" UNIQUE("email")

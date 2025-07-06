@@ -12,18 +12,21 @@ export type DrizzleProviderReturn = {
   schema: typeof schema;
 };
 
-export const drizzleProvider = {
-  provide: DrizzleAsyncProvider,
-  inject: [ConfigService],
-  useFactory: (configService: ConfigService) => {
-    const connectionString = configService.get<string>('DATABASE_URL');
+export const drizzleProvider = [
+  {
+    provide: DrizzleAsyncProvider,
+    inject: [ConfigService],
+    // eslint-disable-next-line @typescript-eslint/require-await
+    useFactory: async (configService: ConfigService) => {
+      const connectionString = configService.get<string>('DATABASE_URL');
 
-    const pool = new Pool({
-      connectionString,
-    });
+      const pool = new Pool({
+        connectionString,
+      });
 
-    const client = drizzle(pool, { schema }) as NodePgDatabase<typeof schema>;
+      const client = drizzle(pool, { schema }) as NodePgDatabase<typeof schema>;
 
-    return { client, schema } satisfies DrizzleProviderReturn;
+      return { client, schema } satisfies DrizzleProviderReturn;
+    },
   },
-} satisfies Provider;
+] satisfies Provider[];
