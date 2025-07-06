@@ -38,7 +38,9 @@ $ bun run test:cov
 
 ### Database
 
-**DB Management Commands**
+The TrainingDB uses a vanilla PostgreSQL database. For development purposes, a docker compose environment is provided but you are free to provide your own credentials.
+
+#### DB Management Commands
 
 ```bash
 # Create migrations
