@@ -12,10 +12,12 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
-  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
+
   await app.register(fastifyCookie, {
     secret: process.env.COOKIE_SECRET, // for cookies signature
   });
   await app.register(helmet);
+
+  await app.listen(process.env.PORT ?? 3000);
 }
 void bootstrap();
