@@ -9,11 +9,14 @@ import {
 } from 'drizzle-orm/pg-core';
 import { prefixedIdGenerator } from 'src/utils/id';
 
-export type UserRole =
-  | 'trainee'
-  | 'billing-manager'
-  | 'instructor'
-  | 'vrwa-administrator';
+export const Roles = {
+  Trainee: 'trainee',
+  BillingManager: 'billing-manager',
+  Instructor: 'instructor',
+  Administrator: 'vrwa-administrator',
+} as const;
+
+export type UserRole = (typeof Roles)[keyof typeof Roles];
 
 export const user = pgTable(
   'user',
@@ -41,10 +44,16 @@ export const session = pgTable('session', {
   createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 });
 
+export type Session = typeof session.$inferSelect;
+
+export type SessionUser = { user: User; session: Session };
+
 export const organization = pgTable('organization', {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('organization')),
   orgName: text(),
 });
+
+export type Organization = typeof organization.$inferSelect;
 
 export const course = pgTable('course', {
   // This field may already exist as a different type in the VRWA db - it may change in the future
