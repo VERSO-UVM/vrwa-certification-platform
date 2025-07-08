@@ -21,7 +21,7 @@ export const user = pgTable(
     id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('user')),
     firstName: text().notNull(),
     lastName: text().notNull(),
-    hasRegistered: boolean(),
+    hasRegistered: boolean().notNull().default(false),
     email: text().notNull().unique(),
     passwordHash: text(),
     role: varchar().notNull().$type<UserRole>(),
@@ -37,8 +37,8 @@ export const session = pgTable('session', {
   userId: varchar()
     .references(() => user.id)
     .notNull(),
-  expiresAt: timestamp({ withTimezone: true }),
-  createdAt: timestamp({ withTimezone: true }).defaultNow(),
+  expiresAt: timestamp({ withTimezone: true }).notNull(),
+  createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 });
 
 export const organization = pgTable('organization', {
