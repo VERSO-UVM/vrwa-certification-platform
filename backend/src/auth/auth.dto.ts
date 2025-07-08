@@ -6,5 +6,13 @@ const LoginSchema = z.object({
   password: z.string(),
 });
 
-// class is required for using DTO as a type
 export class LoginDto extends createZodDto(LoginSchema) {}
+
+const RegisterSchema = z.object({
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  email: z.string().email(),
+  password: z.string(),
+});
+
+export class RegisterDto extends createZodDto(RegisterSchema) {}
