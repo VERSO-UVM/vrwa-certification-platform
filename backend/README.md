@@ -2,6 +2,24 @@
 
 ## Development Instructions
 
+### Docker quick start
+
+1. Create .env file in project root for secrets based on [.env.example](.env.example)
+
+2. Ensure [Docker Desktop](https://docs.docker.com/get-started/get-docker/) is installed and the daemon is running
+
+3. Run docker compose in project root
+
+```bash
+docker compose up --build --detach --watch
+```
+
+4. Shut down in project root
+
+```
+docker compose down
+```
+
 ### Project setup
 
 ```bash
