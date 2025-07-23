@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data 
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+  vrwa-app:
+    build: .
+    restart: always
+    ports:
+      - 3000:3000
+    develop:
+      watch:
+        - action: sync
+          path: ./webapp
+          target: ./webapp
+        - action: rebuild
+          path: ./backend
+          target: ./backend
+
+volumes:
+  pgdata:
