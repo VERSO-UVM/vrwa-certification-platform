@@ -16,18 +16,25 @@
     "db:drop": "drizzle-kit drop"
   },
   "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/helmet": "^13.0.1",
     "@node-rs/argon2": "^2.0.2",
     "@oslojs/encoding": "^1.1.0",
+    "@trpc/client": "^11.4.3",
+    "@trpc/server": "^11.4.3",
     "@types/pg": "^8.15.4",
     "@zxcvbn-ts/core": "^3.0.4",
     "@zxcvbn-ts/language-common": "^3.0.4",
     "@zxcvbn-ts/language-en": "^3.0.2",
     "argon2": "^0.43.0",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
     "drizzle-kit": "^0.31.1",
     "drizzle-orm": "^0.44.2",
     "nanoid": "^5.1.5",
-    "pg": "^8.16.0"
+    "nestjs-zod": "^4.3.1",
+    "pg": "^8.16.0",
+    "zod": "^3.25.74"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

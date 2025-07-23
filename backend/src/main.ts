@@ -1,21 +1,32 @@
-import { NestFactory } from '@nestjs/core';
-import type { NestFastifyApplication } from '@nestjs/platform-fastify';
-import { FastifyAdapter } from '@nestjs/platform-fastify';
-import { AppModule } from './app.module';
 import fastifyCookie from '@fastify/cookie';
 import helmet from '@fastify/helmet';
+import type { FastifyTRPCPluginOptions } from '@trpc/server/adapters/fastify';
+import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
 
-async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter(),
-  );
+import Fastify from 'fastify';
+import { createContext } from './utils/trpc/ctx';
+import type { AppRouter } from './trpc';
+import { appRouter } from './trpc';
+const app = Fastify({
+  logger: true,
+});
 
-  await app.register(fastifyCookie, {
-    secret: process.env.COOKIE_SECRET, // for cookies signature
-  });
-  await app.register(helmet);
+app.register(fastifyCookie, {
+  secret: process.env.COOKIE_SECRET, // for cookies signature
+});
+app.register(helmet);
 
-  await app.listen(process.env.PORT ?? 3000);
-}
-void bootstrap();
+// Set up tRPC
+app.register(fastifyTRPCPlugin, {
+  prefix: '/trpc',
+  trpcOptions: {
+    router: appRouter,
+    createContext,
+    onError({ path, error }) {
+      // report to error monitoring
+      console.error(`Error in tRPC handler on path '${path}':`, error);
+    },
+  } satisfies FastifyTRPCPluginOptions<AppRouter>['trpcOptions'],
+});
+
+void app.listen({ port: parseInt(process.env.PORT ?? '') ?? 3000 });
