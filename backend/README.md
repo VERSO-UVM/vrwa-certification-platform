@@ -11,7 +11,7 @@
 3. Run docker compose in project root
 
 ```bash
-docker compose up --build --detach --watch
+docker compose up --build --watch
 ```
 
 4. Shut down in project root
