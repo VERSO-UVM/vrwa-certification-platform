@@ -3,24 +3,41 @@ services:
     image: postgres
     restart: always
     volumes:
-      - pgdata:/var/lib/postgresql/data 
+      - postgres_data:/var/lib/postgresql/data 
+      - ./backend/db/init/:/docker-entrypoint-initdb.d
     environment:
-      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
 
   vrwa-app:
     build: .
     restart: always
     ports:
       - 3000:3000
+    depends_on:
+      db:
+        condition: service_healthy
     develop:
       watch:
         - action: sync
           path: ./webapp
-          target: ./webapp
-        - action: rebuild
+          # For some reason relative app path is not supported for target
+          target: /usr/src/app/webapp/ 
+        - action: sync
           path: ./backend
-          target: ./backend
+          target: /usr/src/app/backend/
+    environment:
+      PGHOST: "db"
+      PGPORT: 5432
+      PGUSER: ${DB_USER}
+      PGPASSWORD: ${DB_PASSWORD}
+      PGDATABASE: ${DB_NAME}
 
 volumes:
-  pgdata:
+  postgres_data:
