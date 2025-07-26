@@ -1,25 +1,25 @@
 CREATE TABLE Registrations (
-    FirstName VARCHAR(255),
-    LastName VARCHAR(255),
-    OrganizationName VARCHAR(255),
-    Address VARCHAR(255),
-    City VARCHAR(255),
-    State VARCHAR(255),
-    PostalCode VARCHAR(16),
-    EmergencyPhone VARCHAR(16),
-    Email VARCHAR(255),
-    IsMember BOOLEAN,
-    Payment VARCHAR(255),
-    CourseName VARCHAR(255),
-    ClassDate DATE,
-    ClassLocation VARCHAR(255),
-    StaffMember VARCHAR(255), -- was: NerwaStaff
-    ClassCode VARCHAR(16),
-    CreditHours INTEGER -- was: TCH
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    organization_name VARCHAR(255),
+    address VARCHAR(255),
+    city VARCHAR(255),
+    state VARCHAR(255),
+    postal_code VARCHAR(16),
+    emergency_phone VARCHAR(16),
+    email VARCHAR(255),
+    is_member BOOLEAN,
+    payment VARCHAR(255),
+    course_name VARCHAR(255),
+    class_date DATE,
+    class_location VARCHAR(255),
+    staff_member VARCHAR(255), -- was: NerwaStaff
+    class_code VARCHAR(16),
+    credit_hours INTEGER -- was: TCH
 );
 
 INSERT INTO Registrations
-    (FirstName, LastName, OrganizationName, Address, City, State, PostalCode, EmergencyPhone, Email, IsMember, Payment, CourseName, ClassDate, ClassLocation, StaffMember, ClassCode, CreditHours)
+    (first_name, last_name, organization_name, Address, city, state, postal_code, emergency_phone, email, is_member, payment, course_name, class_date, class_location, staff_member, class_code, credit_hours)
 VALUES
     ('Steven', 'Williams', 'Shelburne Wastewater', '53 Turtle Lane', 'Shelburne', 'VT', '05482-', '802-324-5307', 'swilliams@shelburnevt.org', TRUE, 'email registration - pd $24 6-20 ck#128596', 'Multimeters and Control Panels', DATE '2025-07-23', 'Montpelier, VT', 'Allison Smith', '072325MET', 3),
     ('Ethan', 'Graham', 'Town of St. Johnsbury', '799 Bay St', 'St. Johnsbury', 'VT', '05819-', '802-535-0521', 'egraham@stjvt.com', TRUE, 'order #20601 - pd $24 7-10 ck#98915', 'Multimeters and Control Panels', DATE '2025-07-23', 'Montpelier, VT', 'Allison Smith', '072325MET', 3),
