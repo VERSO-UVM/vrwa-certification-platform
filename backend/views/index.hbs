@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>App</title>
+  </head>
+  <body>
+    <table>
+      <thead>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Organization Name</th>
+        <th>Address</th>
+        <th>City</th>
+        <th>State</th>
+        <th>Postal Code</th>
+        <th>Emergency Phone</th>
+        <th>Email</th>
+        <th>Member?</th>
+        <th>Course Name</th>
+        <th>Class Location</th>
+        <th>Staff Member</th>
+        <th>Class Code</th>
+        <th>Credit Hours (TCH)</th>
+      </thead>
+      <tbody>
+        {{#each registrations}}
+        <tr>
+          <td>{{first_name}}</td>
+          <td>{{last_name}}</td>
+          <td>{{organization_name}}</td>
+          <td>{{address}}</td>
+          <td>{{city}}</td>
+          <td>{{state}}</td>
+          <td>{{postal_code}}</td>
+          <td>{{emergency_phone}}</td>
+          <td>{{email}}</td>
+          <td>{{is_member}}</td>
+          <td>{{course_name}}</td>
+          <td>{{class_location}}</td>
+          <td>{{staff_member}}</td>
+          <td>{{class_code}}</td>
+          <td>{{credit_hours}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </body>
+</html>
