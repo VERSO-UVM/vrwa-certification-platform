@@ -1,6 +1,7 @@
 import type { CreateFastifyContextOptions } from '@trpc/server/adapters/fastify';
+import db from '../../database';
+
 export function createContext({ req, res }: CreateFastifyContextOptions) {
-  // TODO: add some db and other stuff to this
-  return { req, res };
+  return { req, res, db };
 }
 export type Context = Awaited<ReturnType<typeof createContext>>;
