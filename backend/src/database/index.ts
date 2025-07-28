@@ -10,4 +10,5 @@ const pool = new Pool({
 const client = drizzle(pool, { schema }) as NodePgDatabase<typeof schema>;
 
 export const db = { client, schema };
+export type Database = typeof db;
 export default db;
