@@ -6,7 +6,9 @@
     "backend",
     "webapp"
   ],
-  "scripts": {},
+  "scripts": {
+    "dev": "bun --filter=\"*\" run dev"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
@@ -17,5 +19,12 @@
     "@swc/core",
     "@tailwindcss/oxide",
     "esbuild"
-  ]
+  ],
+  "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/helmet": "^13.0.1",
+    "date-fns": "^4.1.0",
+    "nestjs-zod": "^4.3.1",
+    "zod": "^3.25.74"
+  }
 }

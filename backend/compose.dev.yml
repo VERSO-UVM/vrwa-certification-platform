@@ -1,0 +1,10 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    ports:
+      - 15432:5432
+    environment:
+      - POSTGRES_PASSWORD=verso
+      - POSTGRES_DB=vrwa
+    volumes:
+      - ${PWD}/.tmp/db-data/:/var/lib/postgresql/data/
