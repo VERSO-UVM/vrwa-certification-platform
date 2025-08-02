@@ -1,22 +1,29 @@
 name: Add issues with tasks to the project board
 
 on:
-  issues:
-    types:
-      - opened
-      - labeled
+  workflow_dispatch:
+  # issues:
+  #   types:
+  #     - labeled
 
 jobs:
-  add-to-project:
-    name: Add issue to project
+  add-to-project-board:
+    name: Add issue to VRWA project
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
     steps:
       - uses: actions/add-to-project@v1.0.2
         with:
           project-url: https://github.com/orgs/VERSO-UVM/projects/26
           labeled: backend, frontend
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }} # TODO: Get and set token with correct permissions
+          label-operator: OR
+  add-to-team-board:
+    name: Add issue to RIP Project Board
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/orgs/VERSO-UVM/projects/25
+          labeled: backend, frontend
+          github-token: ${{ secrets.GITHUB_TOKEN }} # TODO: Get and set token with correct permissions
           label-operator: OR
