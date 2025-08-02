@@ -1,7 +1,7 @@
 name: Add issues with tasks to the project board
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # TODO: Re-enable workflow when token request is granted
   # issues:
   #   types:
   #     - labeled
@@ -15,7 +15,7 @@ jobs:
         with:
           project-url: https://github.com/orgs/VERSO-UVM/projects/26
           labeled: backend, frontend
-          github-token: ${{ secrets.GITHUB_TOKEN }} # TODO: Get and set token with correct permissions
+          github-token: ${{ secrets.RIP_PROJECT_TOKEN }}
           label-operator: OR
   add-to-team-board:
     name: Add issue to RIP Project Board
@@ -25,5 +25,5 @@ jobs:
         with:
           project-url: https://github.com/orgs/VERSO-UVM/projects/25
           labeled: backend, frontend
-          github-token: ${{ secrets.GITHUB_TOKEN }} # TODO: Get and set token with correct permissions
+          github-token: ${{ secrets.RIP_PROJECT_TOKEN }}
           label-operator: OR
