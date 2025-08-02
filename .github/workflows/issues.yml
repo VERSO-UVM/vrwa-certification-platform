@@ -1,0 +1,21 @@
+name: Add issues with tasks to the project board
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/orgs/VERSO-UVM/projects/26
+          labeled: backend, frontend
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          label-operator: OR
