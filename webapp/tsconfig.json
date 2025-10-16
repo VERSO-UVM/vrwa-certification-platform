@@ -4,7 +4,7 @@
     "**/.server/**/*",
     "**/.client/**/*",
     ".react-router/types/**/*"
-  ],
+, "../backend/src/pdf/pdf_certificate.tsx"  ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": ["node", "vite/client"],
