@@ -16,29 +16,38 @@ export const Roles = {
   Administrator: 'vrwa-administrator',
 } as const;
 
-export type UserRole = (typeof Roles)[keyof typeof Roles];
+export type AccountRole = (typeof Roles)[keyof typeof Roles];
 
-export const user = pgTable(
-  'user',
+export const account = pgTable(  
+  'account',
   {
-    id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('user')),
-    firstName: text().notNull(),
-    lastName: text().notNull(),
+    id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('user')), //removed first and last name in favor of profile table
     hasRegistered: boolean().notNull().default(false),
     email: text().notNull().unique(),
     passwordHash: text(),
-    role: varchar().notNull().$type<UserRole>(),
+    role: varchar().notNull().$type<AccountRole>(),
     orgId: varchar().references(() => organization.id),
   },
   (table) => [uniqueIndex('email_idx').on(table.email)],
 );
 
-export type User = typeof user.$inferSelect;
+export type Account = typeof account.$inferSelect;
+
+export const profile = pgTable(
+  'profile', {
+    userId: varchar().primaryKey().references(() => account.id),
+    firstName: text().notNull(),
+    lastName: text().notNull(),
+    //a display name perhaps?
+    //other profile specific fields? phone number, address, etc.
+  }
+);
+export type Profile = typeof profile.$inferSelect;
 
 export const session = pgTable('session', {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('session')),
   userId: varchar()
-    .references(() => user.id)
+    .references(() => account.id) 
     .notNull(),
   expiresAt: timestamp({ withTimezone: true }).notNull(),
   createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
@@ -46,7 +55,7 @@ export const session = pgTable('session', {
 
 export type Session = typeof session.$inferSelect;
 
-export type SessionUser = { user: User; session: Session };
+export type SessionUser = { user: Account; session: Session };
 
 export const organization = pgTable('organization', {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('organization')),
@@ -79,3 +88,4 @@ export const courseEvent = pgTable('courseEvent', {
   seats: integer(),
   classStartDatetime: timestamp({ withTimezone: true }),
 });
+
