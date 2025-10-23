@@ -20,6 +20,7 @@
     "@fastify/helmet": "^13.0.1",
     "@node-rs/argon2": "^2.0.2",
     "@oslojs/encoding": "^1.1.0",
+    "@react-pdf/renderer": "^4.3.1",
     "@trpc/client": "^11.4.3",
     "@trpc/server": "^11.4.3",
     "@types/pg": "^8.15.4",
