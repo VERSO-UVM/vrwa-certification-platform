@@ -1,12 +1,14 @@
 import { customAlphabet } from 'nanoid';
 import { encodeBase32LowerCaseNoPadding } from '@oslojs/encoding';
+import { profile } from 'console';
 
 // IDs are based off the Stripe convention, where each id has a descriptive prefix that describes what it corresponds to
 // https://dev.to/stripe/designing-apis-for-humans-object-ids-3o5a
 
 // Mapping readable prefix names : id prefixes
 const ID_PREFIXES = {
-  user: 'user',
+  account: 'account',
+  profile: 'profile',
   course: 'course',
   courseEvent: 'lecture',
   session: 'sid',

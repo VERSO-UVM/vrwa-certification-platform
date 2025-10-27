@@ -21,7 +21,7 @@ export type AccountRole = (typeof Roles)[keyof typeof Roles];
 export const account = pgTable(  
   'account',
   {
-    id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('user')), //removed first and last name in favor of profile table
+    id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('account')), 
     hasRegistered: boolean().notNull().default(false),
     email: text().notNull().unique(),
     passwordHash: text(),
@@ -35,6 +35,7 @@ export type Account = typeof account.$inferSelect;
 
 export const profile = pgTable(
   'profile', {
+    id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('profile')),
     userId: varchar().primaryKey().references(() => account.id),
     firstName: text().notNull(),
     lastName: text().notNull(),
