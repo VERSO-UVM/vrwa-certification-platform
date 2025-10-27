@@ -36,7 +36,7 @@ export type Account = typeof account.$inferSelect;
 export const profile = pgTable(
   'profile', {
     id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('profile')),
-    userId: varchar().primaryKey().references(() => account.id),
+    accountId: varchar().primaryKey().references(() => account.id),
     firstName: text().notNull(),
     lastName: text().notNull(),
     //a display name perhaps?
