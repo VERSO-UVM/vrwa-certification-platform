@@ -56,7 +56,7 @@ export const session = pgTable('session', {
 
 export type Session = typeof session.$inferSelect;
 
-export type SessionUser = { user: Account; session: Session };
+export type SessionUser = { account: Account; session: Session };
 
 export const organization = pgTable('organization', {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('organization')),
