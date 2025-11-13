@@ -92,7 +92,12 @@ export const courseEvent = pgTable('courseEvent', {
   classStartDatetime: timestamp({ withTimezone: true }),
 });
 
-export type PaymentStatus = 'paid' | 'unpaid';
+export const Status = {
+  Paid: 'paid',
+  Unpaid: 'unpaid'
+} as const;
+
+export type PaymentStatus = (typeof Status)[keyof typeof Status];
 
 export const reservation = pgTable('reservation', {
   profileId: varchar('profileId')
