@@ -6,8 +6,10 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { QueryClient } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { useState } from "react";
 
@@ -56,20 +58,24 @@ function getQueryClient() {
   }
 }
 
+ const asyncStoragePersister = createAsyncStoragePersister({
+    storage: typeof window !== "undefined" ? window.localStorage : undefined
+  });
+
 export function Layout({ children }: { children: React.ReactNode }) {
     const queryClient = getQueryClient();
     const [trpcClient] = useState(() =>
       createTRPCClient<AppRouter>({
         links: [
           httpBatchLink({
-            url: "http://localhost:38565",
+            url: "http://localhost:3000/trpc",
           }),
         ],
       }),
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider client={queryClient} persistOptions={{ persister: asyncStoragePersister }}>
       <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
         <html lang="en">
           <head>
@@ -86,7 +92,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </html>
       </TRPCProvider>
       <ReactQueryDevtools />
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }
 

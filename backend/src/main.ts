@@ -29,4 +29,4 @@ app.register(fastifyTRPCPlugin, {
   } satisfies FastifyTRPCPluginOptions<AppRouter>['trpcOptions'],
 });
 
-void app.listen({ port: parseInt(process.env.PORT ?? '') ?? 3000 });
+void app.listen({ port: parseInt(process.env.PORT || '') || 3000 });
