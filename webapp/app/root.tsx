@@ -68,7 +68,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       createTRPCClient<AppRouter>({
         links: [
           httpBatchLink({
-            url: "http://localhost:3000/trpc",
+            url: (import.meta.env.VITE_BACKEND || "http://localhost:3000") + "/trpc",
           }),
         ],
       }),
