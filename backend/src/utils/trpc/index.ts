@@ -23,17 +23,17 @@ const t = initTRPC.context<Context>().create({
 export const router = t.router;
 export const publicProcedure = t.procedure;
 
-const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.user || !ctx.session) {
+const enforceAcctIsAuthed = t.middleware(({ ctx, next }) => {
+  if (!ctx.account || !ctx.session) {
     throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
   return next({
     ctx: {
-      // infers the `user` and `session` as non-nullable
-      user: ctx.user,
+      // infers the `account` and `session` as non-nullable
+      account: ctx.account,
       session: ctx.session,
     },
   });
 });
 
-export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+export const protectedProcedure = t.procedure.use(enforceAcctIsAuthed);

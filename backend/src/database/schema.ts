@@ -49,7 +49,7 @@ export type Profile = typeof profile.$inferSelect;
 
 export const session = pgTable('session', {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('session')),
-  userId: varchar()
+  accountId: varchar()
     .references(() => account.id) 
     .notNull(),
   expiresAt: timestamp({ withTimezone: true }).notNull(),
