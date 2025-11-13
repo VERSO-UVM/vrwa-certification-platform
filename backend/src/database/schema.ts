@@ -6,6 +6,8 @@ import {
   timestamp,
   uniqueIndex,
   boolean,
+  primaryKey,
+  decimal,
 } from 'drizzle-orm/pg-core';
 import { prefixedIdGenerator } from 'src/utils/id';
 
@@ -36,7 +38,7 @@ export type Account = typeof account.$inferSelect;
 export const profile = pgTable(
   'profile', {
     id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('profile')),
-    accountId: varchar().primaryKey().references(() => account.id),
+    accountId: varchar().notNull().references(() => account.id),
     firstName: text().notNull(),
     lastName: text().notNull(),
     //a display name perhaps?
@@ -47,7 +49,7 @@ export type Profile = typeof profile.$inferSelect;
 
 export const session = pgTable('session', {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('session')),
-  userId: varchar()
+  accountId: varchar()
     .references(() => account.id) 
     .notNull(),
   expiresAt: timestamp({ withTimezone: true }).notNull(),
@@ -90,3 +92,22 @@ export const courseEvent = pgTable('courseEvent', {
   classStartDatetime: timestamp({ withTimezone: true }),
 });
 
+export const Status = {
+  Paid: 'paid',
+  Unpaid: 'unpaid'
+} as const;
+
+export type PaymentStatus = (typeof Status)[keyof typeof Status];
+
+export const reservation = pgTable('reservation', {
+  profileId: varchar('profileId')
+    .references(() => profile.id)
+    .notNull(),
+  courseEventId: varchar()
+    .references(() => courseEvent.id)
+    .notNull(),
+  creditHours: decimal().notNull(),
+  paymentStatus: varchar().notNull().$type<PaymentStatus>(),
+}, (table) => [
+  primaryKey({ name: 'id', columns: [table.profileId, table.courseEventId] }),
+]);
