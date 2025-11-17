@@ -11,10 +11,10 @@ import type { Context } from 'src/utils/trpc/ctx';
 
 export const authRouter = router({
   getMe: protectedProcedure.query(({ ctx }) => {
-    return ctx.user;
+    return ctx.account;
   }),
   getOrganization: protectedProcedure.query(async ({ ctx: { db, ...ctx } }) => {
-    if (ctx.user.orgId === null)
+    if (ctx.account.orgId === null)
       throw new TRPCError({
         code: 'NOT_FOUND',
         message: 'Organization not found',
@@ -24,12 +24,12 @@ export const authRouter = router({
       .select({
         orgDetails: db.schema.organization,
         memberCount: db.client.$count(
-          db.schema.user,
-          eq(db.schema.user.orgId, db.schema.organization.id),
+          db.schema.account,
+          eq(db.schema.account.orgId, db.schema.organization.id),
         ),
       })
       .from(db.schema.organization)
-      .where(eq(db.schema.organization.id, ctx.user.orgId));
+      .where(eq(db.schema.organization.id, ctx.account.orgId));
 
     if (!org)
       throw new TRPCError({
@@ -48,12 +48,12 @@ export const authRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const user = await ctx.db.client.query.user.findFirst({
+      const acct = await ctx.db.client.query.account.findFirst({
         where: (users, { eq, and }) =>
           and(eq(users.email, input.email), eq(users.hasRegistered, true)),
       });
 
-      if (!user || !user.passwordHash) {
+      if (!acct || !acct.passwordHash) {
         // FIXME: Setup logging
         // this.logger.warn(
         //   `Login User: could not find user ${email} or user has null password`,
@@ -65,8 +65,8 @@ export const authRouter = router({
       // this.logger.log(`Login User: user ${email} comparing passwords`);
 
       // FIXME: This damn thing never returns, even when I use a different argon2 implementation. Both impls are bindings to the rust version; is that one bad?
-      if (await comparePasswordHashes(user.passwordHash, input.password)) {
-        await issueSessionToken(ctx.db, user.id, ctx.res);
+      if (await comparePasswordHashes(acct.passwordHash, input.password)) {
+        await issueSessionToken(ctx.db, acct.id, ctx.res);
 
         return { success: true };
       }
@@ -88,8 +88,8 @@ export const authRouter = router({
     .mutation(async ({ input: details, ctx: { db, ...ctx } }) => {
       const [user] = await db.client
         .select()
-        .from(db.schema.user)
-        .where(eq(db.schema.user.email, details.email.trim()));
+        .from(db.schema.account)
+        .where(eq(db.schema.account.email, details.email.trim()));
 
       if (!user) {
         // FIXME: Setup logging
@@ -100,15 +100,15 @@ export const authRouter = router({
       }
 
       const [regUser] = await db.client
-        .update(db.schema.user)
+        .update(db.schema.account)
         .set({
-          firstName: details.firstName,
-          lastName: details.lastName,
+          //firstName: details.firstName,
+          //lastName: details.lastName,
           passwordHash: await hashPassword(details.password),
           role: Roles.Trainee,
           hasRegistered: true,
         })
-        .where(eq(db.schema.user.email, user.email))
+        .where(eq(db.schema.account.email, user.email))
         .returning();
 
       await issueSessionToken(db, regUser.id, ctx.res);
@@ -127,14 +127,14 @@ export const authRouter = router({
 
 async function issueSessionToken(
   db: Database,
-  userId: string,
+  accountId: string,
   res: Context['res'],
 ) {
   const expiry = addDays(new Date(), 14);
 
   const [session] = await db.client
     .insert(db.schema.session)
-    .values({ userId, expiresAt: expiry })
+    .values({ accountId, expiresAt: expiry })
     .returning();
 
   await res.setCookie(SESSION_COOKIE_NAME, session.id);
