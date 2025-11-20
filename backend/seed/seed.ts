@@ -90,11 +90,12 @@ async function main() {
   }
 
   //create course events
+  const courseEventIds : string[] = [];
   const locations: CourseLocation[] = ['in-person', 'virtual', 'hybrid'];
   const now = new Date();
   const num = 1;
 
-  
+
   for (const courseId of courseIds) {
     
     //past event
@@ -116,7 +117,8 @@ async function main() {
         classStartDatetime: thePast,
       })
       .returning();
-    
+      courseEventIds.push(pastEvent.id)
+
     //future event
     const theFuture = new Date(now);
     theFuture.setMonth(now.getMonth() + num);
@@ -136,15 +138,36 @@ async function main() {
         classStartDatetime: theFuture,
       })
       .returning()  
+      courseEventIds.push(futureEvent.id)
   }
 
   console.log(`Created ${courseIds.length * 2} course events!`)
   
   //create reservations + link to profiles 
-  for (let i = 0; i < )
+  for (let i = 0; i < courseEventIds.length; i++){
+    const courseEventId = courseEventIds[i];
+    const profileId = profileIds[i % profileIds.length];
 
+    await db.client
+    .insert(db.schema.reservation)
+    .values({
+      profileId,
+      courseEventId,
+      creditHours: '2.5',
+      paymentStatus: i % 2 === 0 ? 'paid' : 'unpaid',
+    });
 
-    
+    console.log(`Created reservations!`)
+  }
+
+  try {
+    main()
+    console.log('Seeding process complete!');
+    process.exit(0);
+  } catch (error) {
+    console.error('Error: ', error);
+    process.exit(1);
+  }
 }
 
 async function hashPassword(password: string) {
