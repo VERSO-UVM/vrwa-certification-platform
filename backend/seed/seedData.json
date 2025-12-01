@@ -1,4 +1,11 @@
 {
+    "organizations" : [
+        {
+            "orgName" : "ThisIsAnOrganization"
+
+        }
+    ],
+
     "accounts" : [
         {
             "email": "example1@gmail.com",
@@ -14,7 +21,7 @@
             "password" : "password2",
             "role" : "instructor",
             "profiles": [
-                {"firstName": "The", "lastName": "Intructor"}
+                {"firstName": "The", "lastName": "Instructor"}
             ]
         },
 
@@ -22,6 +29,7 @@
             "email": "founders@gmail.com",
             "password" : "america123",
             "role" : "trainee",
+            "orgId" : "",
             "profiles": [
                 {"firstName": "Alexander", "lastName": "Hamilton"},
                 {"firstName": "Thomas", "lastName": "Jefferson"},

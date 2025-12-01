@@ -3,29 +3,6 @@ import fs from "fs/promises";
 import path from "path";
 import * as argon2 from 'argon2';
 import type { CourseLocation } from '../src/database/schema';
-import * as schema from '../src/database/schema'
-
-interface SeedAccount {
-  email: string;
-  passward: string;
-  role: string;
-  profiles: Array<{
-    firstName: string;
-    lastName: string;
-  }>
-}
-
-interface SeedCourse {
-  courseName: string;
-  description: string;
-  creditHours: number;
-  priceCents: number;
-}
-
-interface SeedData{
-  accounts: SeedAccount[]
-  courses: SeedCourse[];
-}
 
 
 async function main() {
@@ -39,7 +16,25 @@ async function main() {
 
   //delete existing data?
 
+  //get organization(s)
+  const orgIds : string[] = [];
+
+  console.log("Creating organizations..");
+  for (const org of data.organizations) {
+    const [newOrg] = await db.client
+      .insert(db.schema.organization)
+      .values({
+        orgName : org.orgName
+      })
+    .returning();
+    orgIds.push(newOrg.id);
+    console.log(`Created ${newOrg.orgName}`);
+  }
+  
+  
+
   //create accounts + profiles
+  console.log("Creating accounts...");
   const profileIds: string[] = [];
 
   for (const acct of data.accounts) {
@@ -48,10 +43,11 @@ async function main() {
     const [newAccount] = await db.client
       .insert(db.schema.account)
       .values({
+        hasRegistered: true,
         email: acct.email,
         passwordHash: password,
         role: acct.role,
-        hasRegistered: true,
+        orgId : orgIds[0],
       })
       .returning();
 
@@ -66,14 +62,15 @@ async function main() {
             lastName: prof.lastName,
           })
           .returning();
-          profileIds.push(prof.id)
-          console.log.apply(`Created profile for ${prof.firstName} ${prof.lastName}`);
+          profileIds.push(newProfile.id)
+          console.log(`profile: ${prof.firstName} ${prof.lastName}`);
       }
   }
 
 
   //keep track of courses
   const courseIds: string[] = [];
+  console.log("Creating courses...");
   //create courses
   for (const courseInfo of data.courses) {
     const [newCourse] = await db.client
@@ -93,7 +90,7 @@ async function main() {
   const courseEventIds : string[] = [];
   const locations: CourseLocation[] = ['in-person', 'virtual', 'hybrid'];
   const now = new Date();
-  const num = 1;
+  let num = 1;
 
 
   for (const courseId of courseIds) {
@@ -138,12 +135,14 @@ async function main() {
         classStartDatetime: theFuture,
       })
       .returning()  
-      courseEventIds.push(futureEvent.id)
+      courseEventIds.push(futureEvent.id);
+      num++;
   }
 
   console.log(`Created ${courseIds.length * 2} course events!`)
   
   //create reservations + link to profiles 
+  console.log(`Creating reservations...`)
   for (let i = 0; i < courseEventIds.length; i++){
     const courseEventId = courseEventIds[i];
     const profileId = profileIds[i % profileIds.length];
@@ -153,23 +152,26 @@ async function main() {
     .values({
       profileId,
       courseEventId,
-      creditHours: '2.5',
+      creditHours: "2.5",
       paymentStatus: i % 2 === 0 ? 'paid' : 'unpaid',
     });
-
-    console.log(`Created reservations!`)
   }
 
-  try {
-    main()
-    console.log('Seeding process complete!');
-    process.exit(0);
-  } catch (error) {
-    console.error('Error: ', error);
-    process.exit(1);
-  }
 }
 
 async function hashPassword(password: string) {
   return argon2.hash(password);
 }
+
+
+main()
+  .then(() => {
+    console.log('Seeding process complete!');
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+    process.exit(1);
+  });
+
+
