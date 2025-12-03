@@ -36,8 +36,10 @@ async function main() {
   //create accounts + profiles
   console.log("Creating accounts...");
   const profileIds: string[] = [];
+  let acctNum = 0;
 
   for (const acct of data.accounts) {
+    ++acctNum;
     const password = await hashPassword(acct.password);
 
     const [newAccount] = await db.client
@@ -47,7 +49,7 @@ async function main() {
         email: acct.email,
         passwordHash: password,
         role: acct.role,
-        orgId : orgIds[0],
+        orgId : acctNum == 3 ? orgIds[0] : null,
       })
       .returning();
 
@@ -110,7 +112,7 @@ async function main() {
         physicalAddress: locations[num % locations.length] !== 'virtual'
           ? '67 Address Road'
           : null,
-        seats: 3,
+        seats: Math.trunc(profileIds.length / 2),
         classStartDatetime: thePast,
       })
       .returning();
@@ -131,7 +133,7 @@ async function main() {
         physicalAddress: locations[num % locations.length] !== 'virtual'
           ? '67 Address Road'
           : null,
-        seats: 3,
+        seats: Math.trunc(profileIds.length / 2),
         classStartDatetime: theFuture,
       })
       .returning()  
