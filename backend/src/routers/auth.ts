@@ -49,8 +49,8 @@ export const authRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       const acct = await ctx.db.client.query.account.findFirst({
-        where: (users, { eq, and }) =>
-          and(eq(users.email, input.email), eq(users.hasRegistered, true)),
+        where: (accounts, { eq, and }) =>
+          and(eq(accounts.email, input.email), eq(accounts.hasRegistered, true)),
       });
 
       if (!acct || !acct.passwordHash) {
@@ -86,12 +86,12 @@ export const authRouter = router({
       }),
     )
     .mutation(async ({ input: details, ctx: { db, ...ctx } }) => {
-      const [user] = await db.client
+      const [account] = await db.client
         .select()
         .from(db.schema.account)
         .where(eq(db.schema.account.email, details.email.trim()));
 
-      if (!user) {
+      if (!account) {
         // FIXME: Setup logging
         // this.logger.warn(
         //   `Register User: could not find user ${details.email} who isn't registered`,
@@ -99,7 +99,7 @@ export const authRouter = router({
         return null;
       }
 
-      const [regUser] = await db.client
+      const [regAcct] = await db.client
         .update(db.schema.account)
         .set({
           //firstName: details.firstName,
@@ -108,10 +108,10 @@ export const authRouter = router({
           role: Roles.Trainee,
           hasRegistered: true,
         })
-        .where(eq(db.schema.account.email, user.email))
+        .where(eq(db.schema.account.email, account.email))
         .returning();
 
-      await issueSessionToken(db, regUser.id, ctx.res);
+      await issueSessionToken(db, regAcct.id, ctx.res);
 
       return { success: true };
     }),

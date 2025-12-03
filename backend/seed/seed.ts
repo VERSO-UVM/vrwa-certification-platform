@@ -52,6 +52,7 @@ async function main() {
       .returning();
 
       console.log(`Created account under email ${acct.email}`);
+      console.log(`password: ${acct.password}`);
 
       for (const prof of acct.profiles) {
         const [newProfile] = await db.client
@@ -94,7 +95,6 @@ async function main() {
 
 
   for (const courseId of courseIds) {
-    
     //past event
     const thePast = new Date(now);
     thePast.setMonth(now.getMonth() - num);
@@ -110,7 +110,7 @@ async function main() {
         physicalAddress: locations[num % locations.length] !== 'virtual'
           ? '67 Address Road'
           : null,
-        seats: 33,
+        seats: 3,
         classStartDatetime: thePast,
       })
       .returning();
@@ -131,12 +131,12 @@ async function main() {
         physicalAddress: locations[num % locations.length] !== 'virtual'
           ? '67 Address Road'
           : null,
-        seats: 33,
+        seats: 3,
         classStartDatetime: theFuture,
       })
       .returning()  
       courseEventIds.push(futureEvent.id);
-      num++;
+      num++;  
   }
 
   console.log(`Created ${courseIds.length * 2} course events!`)
@@ -152,7 +152,7 @@ async function main() {
     .values({
       profileId,
       courseEventId,
-      creditHours: "2.5",
+      creditHours: i % 2 == 0 ? "2.5" : "0",
       paymentStatus: i % 2 === 0 ? 'paid' : 'unpaid',
     });
   }
