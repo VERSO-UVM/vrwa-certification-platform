@@ -51,6 +51,9 @@ bun db:migrate
 
 # View the data studio
 bun db:studio
+
+# Seed the database
+bun db:seed
 ```
 
 #### Starting a development database with Docker Compose
