@@ -13,7 +13,8 @@
     "db:gen": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "db:drop": "drizzle-kit drop"
+    "db:drop": "drizzle-kit drop",
+    "db:seed": "bun run seed/seed.ts"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",
