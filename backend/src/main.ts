@@ -1,5 +1,6 @@
 import fastifyCookie from '@fastify/cookie';
 import helmet from '@fastify/helmet';
+import cors from '@fastify/cors';
 import type { FastifyTRPCPluginOptions } from '@trpc/server/adapters/fastify';
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
 
@@ -9,6 +10,13 @@ import type { AppRouter } from './trpc';
 import { appRouter } from './trpc';
 const app = Fastify({
   logger: true,
+});
+
+// Keep up to date to not get CORB errors
+app.register(cors, {
+  origin: ['http://localhost:5173'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 });
 
 app.register(fastifyCookie, {
