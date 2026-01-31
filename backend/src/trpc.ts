@@ -5,22 +5,12 @@ import { authRouter } from './routers/auth';
 import { basicProcedure, router } from './utils/trpc';
 import db from './database';
 import { profile } from './database/schema';
+
 export const appRouter = router({
   authRouter,
   getProfiles: basicProcedure
-    .query(async (opts) => {
+    .query(async () => {
       return await db.client.select().from(profile).orderBy(asc(profile.lastName));
-    }),
-  hello: basicProcedure
-    .input(
-      z.object({
-        text: z.string(),
-      }),
-    )
-    .query((opts) => {
-      return {
-        greeting: `...${opts.input.text}!`,
-      };
     }),
 });
 
