@@ -34,6 +34,9 @@ export const account = pgTable(
 );
 
 export type Account = typeof account.$inferSelect;
+// Should only use AccountInfo, not Account, in API and Client.
+// Maybe create a separate types file?
+export type AccountInfo = Omit<Account, "passwordHash">
 
 export const profile = pgTable(
   'profile', {
@@ -92,6 +95,8 @@ export const courseEvent = pgTable('courseEvent', {
   classStartDatetime: timestamp({ withTimezone: true }),
 });
 
+export type CourseEvent = typeof courseEvent.$inferSelect;
+
 export const Status = {
   Paid: 'paid',
   Unpaid: 'unpaid'
@@ -111,3 +116,5 @@ export const reservation = pgTable('reservation', {
 }, (table) => [
   primaryKey({ name: 'id', columns: [table.profileId, table.courseEventId] }),
 ]);
+
+export type Reservation = typeof reservation.$inferSelect;

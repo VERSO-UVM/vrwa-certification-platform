@@ -45,6 +45,9 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     globalFilterFn: "includesString",
     onSortingChange: setSorting,
+    defaultColumn: {
+      cell: ({ getValue }) => getValue() ?? '-',
+    },
     state: {
       sorting,
       globalFilter,

@@ -1,17 +1,10 @@
-import { z } from 'zod';
-import { asc } from 'drizzle-orm';
-
+import { adminRouter } from './routers/admin';
 import { authRouter } from './routers/auth';
-import { basicProcedure, router } from './utils/trpc';
-import db from './database';
-import { profile } from './database/schema';
+import { router } from './utils/trpc';
 
 export const appRouter = router({
   authRouter,
-  getProfiles: basicProcedure
-    .query(async () => {
-      return await db.client.select().from(profile).orderBy(asc(profile.lastName));
-    }),
+  adminRouter,
 });
 
 // Export type router type signature,
