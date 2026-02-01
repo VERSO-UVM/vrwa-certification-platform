@@ -56,7 +56,7 @@ const reservationTabledef: ColumnDef<Reservation>[] = [
   },
 ];
 
-export function Welcome() {
+export function AdminDashboard() {
   const trpc = useTRPC();
   const profiles = useQuery(trpc.adminRouter.getProfiles.queryOptions());
   const courseEvents = useQuery(trpc.adminRouter.getCourseEvents.queryOptions());
