@@ -63,11 +63,20 @@ export function Welcome() {
   const reservations = useQuery(trpc.adminRouter.getReservations.queryOptions());
   
   return (
-    <main className="flex flex-wrap items-center justify-center py-4">
-      <Card className="min-w-lg">
-        <CardTitle className="text-center">Upcoming Classes</CardTitle>
+    <main className="flex flex-wrap items-center justify-center py-4 gap-4">
+      <div className="w-full flex justify-center">
+        <Card className="min-w-md">
+          <CardTitle className="text-center">Upcoming Classes</CardTitle>
+          <CardContent>
+            <DataTable columns={courseEventTableDef} data={courseEvents.data ?? []} />
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="min-w-md">
+        <CardTitle className="text-center">Profiles</CardTitle>
         <CardContent>
-          <DataTable columns={courseEventTableDef} data={courseEvents.data ?? []} />
+          <DataTable columns={profileTableDef} data={profiles.data ?? []} />
         </CardContent>
       </Card>
 
@@ -75,13 +84,6 @@ export function Welcome() {
         <CardTitle className="text-center">Reservations</CardTitle>
         <CardContent>
           <DataTable columns={reservationTabledef} data={reservations.data ?? []} />
-        </CardContent>
-      </Card>
-
-      <Card className="min-w-md">
-        <CardTitle className="text-center">Profiles</CardTitle>
-        <CardContent>
-          <DataTable columns={profileTableDef} data={profiles.data ?? []} />
         </CardContent>
       </Card>
 
