@@ -1,4 +1,4 @@
-# Vermont Rural Water Association - Training Database
+# Vermont Rural Water Association - Certification Platform
 
 ## Summary
 
