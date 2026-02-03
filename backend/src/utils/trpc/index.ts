@@ -37,3 +37,4 @@ const enforceAcctIsAuthed = t.middleware(({ ctx, next }) => {
 });
 
 export const protectedProcedure = t.procedure.use(enforceAcctIsAuthed);
+export const basicProcedure = t.procedure;
