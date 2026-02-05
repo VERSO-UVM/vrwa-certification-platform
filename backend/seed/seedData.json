@@ -12,7 +12,9 @@
             "password" : "password1",
             "role": "billing-manager",
             "profiles": [
-                {"firstName" : "John", "lastName" : "Doe"}
+                {"firstName" : "John", "lastName" : "Doe", "address": "123 Sesame Street",
+                "city": "Burlington", "state": "VT", "postalCode": "05405", "phoneNumber": "888-888-8888",
+                "isMember": false}
             ]
         },
 
@@ -21,7 +23,9 @@
             "password" : "password2",
             "role" : "instructor",
             "profiles": [
-                {"firstName": "The", "lastName": "Instructor"}
+                {"firstName": "The", "lastName": "Instructor", "address": "789 Lalala Street",
+                "city": "Burlington", "state": "VT", "postalCode": "05405", "phoneNumber": "667-667-6667",
+                "isMember": true}
             ]
         },
 
@@ -31,10 +35,18 @@
             "role" : "trainee",
             "orgId" : "",
             "profiles": [
-                {"firstName": "Alexander", "lastName": "Hamilton"},
-                {"firstName": "Thomas", "lastName": "Jefferson"},
-                {"firstName": "George", "lastName": "Washington"},
-                {"firstName": "Aaron", "lastName": "Burr"}
+                {"firstName": "Alexander", "lastName": "Hamilton", "address": "49 Seven Squared Ave",
+                "city": "Burlington", "state": "VT", "postalCode": "05405", "phoneNumber": "494-949-4949",
+                "isMember": true},
+                {"firstName": "Thomas", "lastName": "Jefferson", "address": "1776 Constitution Circle",
+                "city": "Burlington", "state": "VT", "postalCode": "05405", "phoneNumber": "123-456-7890",
+                "isMember": true},
+                {"firstName": "George", "lastName": "Washington", "address": "1 President Street",
+                "city": "Burlington", "state": "VT", "postalCode": "05405", "phoneNumber": "111-111-1111",
+                "isMember": true},
+                {"firstName": "Aaron", "lastName": "Burr", "address": "34 The Room Where it Happens",
+                "city": "Burlington", "state": "VT", "postalCode": "05405", "phoneNumber": "222-222-2222",
+                "isMember": true}
             ]
         }
     ],
