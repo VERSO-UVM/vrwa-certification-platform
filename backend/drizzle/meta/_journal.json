@@ -22,6 +22,13 @@
       "when": 1770133842260,
       "tag": "0002_fuzzy_kitty_pryde",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1770303959083,
+      "tag": "0003_left_zaladane",
+      "breakpoints": true
     }
   ]
 }
