@@ -44,8 +44,12 @@ export const profile = pgTable(
     accountId: varchar().notNull().references(() => account.id),
     firstName: text().notNull(),
     lastName: text().notNull(),
-    //a display name perhaps?
-    //other profile specific fields? phone number, address, etc.
+    address: text().notNull(),
+    city: text().notNull(),
+    state: text().notNull(),
+    postalCode: text().notNull(),
+    phoneNumber: text().notNull(),
+    isMember: boolean().notNull(),
   }
 );
 export type Profile = typeof profile.$inferSelect;

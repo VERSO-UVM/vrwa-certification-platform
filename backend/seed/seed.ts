@@ -63,6 +63,12 @@ async function main() {
             accountId: newAccount.id,
             firstName: prof.firstName,
             lastName: prof.lastName,
+            address: prof.address,
+            city: prof.city,
+            state: prof.state,
+            postalCode: prof.postalCode,
+            phoneNumber: prof.phoneNumber,
+            isMember: prof.isMember
           })
           .returning();
           profileIds.push(newProfile.id)
