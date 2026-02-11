@@ -23,16 +23,18 @@ import {
 } from "app/components/ui/table";
 import { Input } from "app/components/ui/input";
 import { Button } from "./button";
-import { ArrowUp, ArrowUpDown } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  showGlobalFilter?: boolean,
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  showGlobalFilter = true,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
@@ -57,17 +59,20 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-1">
-        <Input
-          placeholder="Filter table..."
-          value={globalFilter}
-          onChange={(event) =>
-            table.setGlobalFilter(String(event.target.value))
-          }
-          className="max-w-sm"
-        />
-      </div>
-      <div className="overflow-hidden rounded-md border">
+      {showGlobalFilter ? 
+        <div className="flex items-center pb-1">
+          <Input
+            placeholder="Filter table..."
+            value={globalFilter}
+            onChange={(event) =>
+              setGlobalFilter(String(event.target.value))
+            }
+            className="max-w-sm border-none"
+          />
+        </div>
+      : null}
+      
+      <div className="overflow-hidden rounded-md">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -101,7 +106,7 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} {...cell.column.columnDef.meta}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
