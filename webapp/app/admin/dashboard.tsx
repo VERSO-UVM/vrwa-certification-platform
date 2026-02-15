@@ -25,6 +25,7 @@ import {
 } from "~/components/ui/table";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
 import { FileText, MapPin, Users } from "lucide-react";
 
 const profileTableDef: ColumnDef<Profile>[] = [
@@ -183,23 +184,10 @@ export function AdminDashboard() {
 export function LocationTypeBadge({ value }: { value: CourseLocation }) {
   switch (value) {
     case "virtual":
-      return (
-        <span className="text-xs bg-blue-100 text-blue-800 rounded-full px-2 py-1">
-          Virtual
-        </span>
-      );
+      return <Badge variant="blue">Virtual</Badge>
     case "hybrid":
-      return (
-        <span className="text-xs bg-purple-100 text-purple-800 rounded-full px-2 py-1">
-          Hybrid
-        </span>
-      );
-
+      return <Badge variant="purple">Hybrid</Badge>
     case "in-person":
-      return (
-        <span className="text-xs bg-green-100 text-green-800 rounded-full px-2 py-1">
-          In Person
-        </span>
-      );
+      return <Badge variant="green">In Person</Badge>
   }
 }
