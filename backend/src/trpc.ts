@@ -1,6 +1,6 @@
 import { adminRouter } from './routers/admin';
 import { authRouter } from './routers/auth';
-import { courseManagerRouter } from './routers/auth'
+import { courseManagerRouter } from './routers/courseManager'
 import { router } from './utils/trpc';
 
 export const appRouter = router({
