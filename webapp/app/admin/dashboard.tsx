@@ -105,6 +105,8 @@ export function AdminDashboard() {
 
   return (
     <main className="container mx-auto p-6 space-y-8">
+      <h1 className="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
+
       <div className="grid gap-4 md:grid-cols-7">
       <div className="md:col-span-4 lg:col-span-5">
         <Card>
