@@ -24,9 +24,7 @@ import {
   TableCell,
 } from "~/components/ui/table";
 import { Link } from "react-router";
-import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
-import { FileText, MapPin, Users } from "lucide-react";
 
 const profileTableDef: ColumnDef<Profile>[] = [
   {
@@ -132,44 +130,6 @@ export function AdminDashboard() {
             </CardContent>
           </Card>
         </div>
-
-        <div className="md:col-span-3 lg:col-span-2">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Quick Links</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-2">
-              <Button
-                variant="ghost"
-                className="justify-start h-auto py-3 px-2"
-                asChild
-              >
-                <Link to="/admin/profiles">
-                  <Users className="mr-2 h-4 w-4" /> Manage Profiles
-                </Link>
-              </Button>
-              <Button
-                variant="ghost"
-                className="justify-start h-auto py-3 px-2"
-                asChild
-              >
-                <Link to="/admin/reports">
-                  <FileText className="mr-2 h-4 w-4" /> View Invoices
-                </Link>
-              </Button>
-              <Button
-                variant="ghost"
-                className="justify-start h-auto py-3 px-2"
-                asChild
-              >
-                <Link to="/admin/courses">
-                  <MapPin className="mr-2 h-4 w-4" /> Manage Courses
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
         {/*
       <Card className="min-w-md">
         <CardTitle className="text-center">Profiles</CardTitle>
