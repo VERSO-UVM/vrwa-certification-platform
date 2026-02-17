@@ -48,7 +48,14 @@ const courseEventTableDef: ColumnDef<CourseEvent>[] = [
     accessorKey: "courseName",
     header: "Name",
     cell: ({ row, getValue }) => (
-      <Link to={`/admin/class/${row.original.id}`}>{getValue() as string}</Link>
+      <Link
+        to={{
+          pathname: "/admin/course-manager",
+          search: `?class=${row.original.id}`,
+        }}
+      >
+        {getValue() as string}
+      </Link>
     ),
     meta: {
       className: "font-medium hover:underline",
@@ -108,62 +115,62 @@ export function AdminDashboard() {
       <h1 className="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
 
       <div className="grid gap-4 md:grid-cols-7">
-      <div className="md:col-span-4 lg:col-span-5">
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Classes</CardTitle>
-            <CardDescription>
-              Click on a class to see it in the course manager.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <DataTable
-              columns={courseEventTableDef}
-              data={courseEvents.data ?? []}
-              showGlobalFilter={false}
-            />
-          </CardContent>
-        </Card>
-      </div>
+        <div className="md:col-span-4 lg:col-span-5">
+          <Card>
+            <CardHeader>
+              <CardTitle>Upcoming Classes</CardTitle>
+              <CardDescription>
+                Click on a class to see it in the course manager.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DataTable
+                columns={courseEventTableDef}
+                data={courseEvents.data ?? []}
+                showGlobalFilter={false}
+              />
+            </CardContent>
+          </Card>
+        </div>
 
-      <div className="md:col-span-3 lg:col-span-2">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Quick Links</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-2">
-            <Button
-              variant="ghost"
-              className="justify-start h-auto py-3 px-2"
-              asChild
-            >
-              <Link to="/admin/profiles">
-                <Users className="mr-2 h-4 w-4" /> Manage Profiles
-              </Link>
-            </Button>
-            <Button
-              variant="ghost"
-              className="justify-start h-auto py-3 px-2"
-              asChild
-            >
-              <Link to="/admin/reports">
-                <FileText className="mr-2 h-4 w-4" /> View Invoices
-              </Link>
-            </Button>
-            <Button
-              variant="ghost"
-              className="justify-start h-auto py-3 px-2"
-              asChild
-            >
-              <Link to="/admin/courses">
-                <MapPin className="mr-2 h-4 w-4" /> Manage Courses
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+        <div className="md:col-span-3 lg:col-span-2">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Quick Links</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-2">
+              <Button
+                variant="ghost"
+                className="justify-start h-auto py-3 px-2"
+                asChild
+              >
+                <Link to="/admin/profiles">
+                  <Users className="mr-2 h-4 w-4" /> Manage Profiles
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                className="justify-start h-auto py-3 px-2"
+                asChild
+              >
+                <Link to="/admin/reports">
+                  <FileText className="mr-2 h-4 w-4" /> View Invoices
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                className="justify-start h-auto py-3 px-2"
+                asChild
+              >
+                <Link to="/admin/courses">
+                  <MapPin className="mr-2 h-4 w-4" /> Manage Courses
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
 
-      {/*
+        {/*
       <Card className="min-w-md">
         <CardTitle className="text-center">Profiles</CardTitle>
         <CardContent>
@@ -186,10 +193,10 @@ export function AdminDashboard() {
 export function LocationTypeBadge({ value }: { value: CourseLocation }) {
   switch (value) {
     case "virtual":
-      return <Badge variant="blue">Virtual</Badge>
+      return <Badge variant="blue">Virtual</Badge>;
     case "hybrid":
-      return <Badge variant="purple">Hybrid</Badge>
+      return <Badge variant="purple">Hybrid</Badge>;
     case "in-person":
-      return <Badge variant="green">In Person</Badge>
+      return <Badge variant="green">In Person</Badge>;
   }
 }
