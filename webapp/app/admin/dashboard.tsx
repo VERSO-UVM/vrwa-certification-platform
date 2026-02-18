@@ -109,44 +109,44 @@ export function AdminDashboard() {
   );
 
   return (
-    <main className="container mx-auto p-6 space-y-8">
+    <div className="container px-4 space-y-6">
       <h1 className="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
 
-      <div className="grid gap-4 md:grid-cols-7">
-        <div className="md:col-span-4 lg:col-span-5">
-          <Card>
-            <CardHeader>
-              <CardTitle>Upcoming Classes</CardTitle>
-              <CardDescription>
-                Click on a class to see it in the course manager.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <DataTable
-                columns={courseEventTableDef}
-                data={courseEvents.data ?? []}
-                showGlobalFilter={false}
-              />
-            </CardContent>
-          </Card>
-        </div>
-        {/*
-      <Card className="min-w-md">
-        <CardTitle className="text-center">Profiles</CardTitle>
-        <CardContent>
-          <DataTable columns={profileTableDef} data={profiles.data ?? []} />
-        </CardContent>
-      </Card>
+      <div className="grid gap-4 md:grid-cols-8">
+        <Card className="md:col-span-4 lg:col-span-5">
+          <CardHeader>
+            <CardTitle>Upcoming Classes</CardTitle>
+            <CardDescription>
+              Click on a class to see it in the course manager.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DataTable
+              columns={courseEventTableDef}
+              data={courseEvents.data ?? []}
+              showGlobalFilter={false}
+            />
+          </CardContent>
+        </Card>
 
-      <Card className="min-w-md">
-        <CardTitle className="text-center">Reservations</CardTitle>
-<CardContent>
-          <DataTable columns={reservationTabledef} data={reservations.data ?? []} />
-        </CardContent>
-      </Card>
-      */}
+        <Card className="md:col-span-4 lg:col-span-4">
+          <CardTitle className="text-center">Profiles</CardTitle>
+          <CardContent>
+            <DataTable columns={profileTableDef} data={profiles.data ?? []} />
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-4 lg:col-span-4">
+          <CardTitle className="text-center">Reservations</CardTitle>
+          <CardContent>
+            <DataTable
+              columns={reservationTabledef}
+              data={reservations.data ?? []}
+            />
+          </CardContent>
+        </Card>
       </div>
-    </main>
+    </div>
   );
 }
 
