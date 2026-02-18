@@ -97,3 +97,5 @@ export const reservation = pgTable(
 );
 
 export type Reservation = typeof reservation.$inferSelect;
+
+export * from './auth';
