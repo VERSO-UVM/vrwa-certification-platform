@@ -2,7 +2,7 @@
 
 ## Summary
 
-The Vermont Rural Water Association (VRWA) offers 3–12 training classes per month for water and wastewater treatment operators across Vermont. These classes provide continuing education credits required for certification. Currently, over 90% of class registrations are completed via the VRWA website, which uses WordPress with WooCommerce and Event Tickets Plus. However, registrations are manually entered into a Microsoft Access database—an error-prone and time-consuming process that also handles payment tracking, sign-in sheets, attendance, certificates, and regulatory reporting. This project seeks to replace the outdated database with a modern, integrated solution that automates registration syncing, enhances usability, and improves access for both operators and regulatory partners.
+The Vermont Rural Water Association (VRWA) offers 3–12 training classes per month for water and wastewater treatment operators across Vermont. These classes provide continuing education credits required for certification. Currently, over 90% of class registrations are completed via the VRWA website, which uses WordPress with WooCommerce and Event Tickets Plus. However, registrations are manually entered into a Microsoft Access database that also handles payment tracking, sign-in sheets, attendance, certificates, and regulatory reporting. This project seeks to replace the outdated database with a modern, integrated solution that automates registration syncing, enhances usability, and improves access for both operators and regulatory partners.
 
 ## Goal
 
