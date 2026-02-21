@@ -23,10 +23,7 @@ export const courseManagerRouter = router({
             const [newEvent] = await db.client
                 .insert(courseEvent)
                 .values({
-                    courseId: input.courseId,
-                    locationType: input.locationType,
-                    classStartDatetime: input.classStartDatetime,
-                    seats: input.seats,
+                    ...input,
                     virtualLink: input.virtualLink ?? null,
                     physicalAddress: input.physicalAddress ?? null,
                 }).returning()
@@ -39,17 +36,28 @@ export const courseManagerRouter = router({
         .input(
             z.object({
                 id: z.string(),
-                classStartDatetime: z.date().optional(),
-                seats: z.number().int().positive().optional(),
+                classStartDatetime: z.date().nullable().optional(),
+                seats: z.number().int().positive().nullable().optional(),
                 locationType: z.enum(["in-person", "virtual", "hybrid"]).optional(),
                 physicalAddress: z.string().nullable().optional(),
                 virtualLink: z.string().url().nullable().optional(),
             })
         ).mutation(async ({input}) => {
-            const {id, ...update} = input;
+            const { id, ...update } = input;
+
+            const cleanUpdate = Object.fromEntries(
+                Object.entries(update).filter(
+                    ([_, value]) => value !== undefined
+                 )
+            );
+
+            if (Object.keys(cleanUpdate).length === 0) {
+                throw new Error("No fields provided to update");
+            }
+
             const [updatedEvent] = await db.client
                 .update(courseEvent)
-                .set(update)
+                .set(cleanUpdate)
                 .where(eq(courseEvent.id, id))
                 .returning();
 
@@ -63,17 +71,15 @@ export const courseManagerRouter = router({
                 id: z.string(),
             })
         ).mutation( async ({input}) => {
-            const {id} = input;
-
             const deletedRows = await db.client
                 .delete(courseEvent)
-                .where(eq(courseEvent.id, id))
+                .where(eq(courseEvent.id, input.id))
                 .returning();
 
-            if (deletedRows.length == 0) {
+            if (deletedRows.length === 0) {
                 throw new Error("No matching Course Event found!")
             }
-            return { success: true, deletedEvent: deletedRows[0]}
+            return { success: true }
         })
     
     //addTrainee
