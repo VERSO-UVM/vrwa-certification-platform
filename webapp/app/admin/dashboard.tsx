@@ -15,22 +15,12 @@ import type {
   CourseLocation,
 } from "../../../backend/src/database/schema";
 import { DataTable } from "~/components/ui/data-table";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "~/components/ui/table";
 import { Link } from "react-router";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { MapPin, Trophy, Users } from "lucide-react";
 
 const profileTableDef: ColumnDef<Profile>[] = [
-  {
-    accessorKey: "accountId",
-    header: "Account ID",
-  },
   {
     accessorKey: "firstName",
     header: "First Name",
@@ -38,6 +28,15 @@ const profileTableDef: ColumnDef<Profile>[] = [
   {
     accessorKey: "lastName",
     header: "Last Name",
+  },
+  {
+    accessorKey: "city",
+    header: "City",
+  },
+  {
+    accessorKey: "isMember",
+    header: "Member",
+    cell: ({ getValue }) => getValue() == true ? "yes" : "no"
   },
 ];
 
@@ -100,7 +99,7 @@ const reservationTabledef: ColumnDef<Reservation>[] = [
 
 export function AdminDashboard() {
   const trpc = useTRPC();
-  const profiles = useQuery(trpc.adminRouter.getProfiles.queryOptions());
+  const profiles = useQuery(trpc.adminRouter.getTrainees.queryOptions());
   const courseEvents = useQuery(
     trpc.adminRouter.getCourseEvents.queryOptions(),
   );
@@ -109,40 +108,64 @@ export function AdminDashboard() {
   );
 
   return (
-    <div className="container p-3 pt-6 space-y-6 w-full">
+    <div className="container p-3 pt-6 space-y-6 flex-1">
       <h1 className="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
 
-      <div className="grid gap-4 md:grid-cols-8">
-        <Card className="md:col-span-5">
+      <div className="grid gap-4 lg:grid-cols-8">
+        <Card className="lg:col-span-5 col-span-8">
           <CardHeader>
             <CardTitle>Upcoming Classes</CardTitle>
             <CardDescription>
-              Click on a class to see it in the course manager.
+              Click on a class to see it in the&nbsp;
+              <Link className="text-blue-500 underline" to="admin/course-manager">course manager.</Link>
             </CardDescription>
           </CardHeader>
           <CardContent>
             <DataTable
               columns={courseEventTableDef}
               data={courseEvents.data ?? []}
-              showGlobalFilter={false}
+              showGlobalFilter={true}
             />
           </CardContent>
         </Card>
+        <Card className="space-y-4 md:col-span-3">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-center">Quick Links</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-2">
+              <Button variant="ghost" className="justify-start h-auto py-3 px-2" asChild>
+                <Link to="/admin/profiles">
+                  <Users className="mr-2 h-4 w-4" /> Allot credit hours
+                </Link>
+              </Button>
+
+              <Button variant="ghost" className="justify-start h-auto py-3 px-2" asChild>
+                <Link to="">
+                  <MapPin className="mr-2 h-4 w-4" /> View past courses
+                </Link>
+              </Button>
+
+              <Button variant="ghost" className="justify-start h-auto py-3 px-2" asChild>
+                <Link to="">
+                  <Trophy className="mr-2 h-4 w-4" /> Download certificates
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
 
         <Card className="md:col-span-3">
-          <CardTitle className="text-center">Profiles</CardTitle>
-          <CardContent>
-            <DataTable columns={profileTableDef} data={profiles.data ?? []} />
-          </CardContent>
-        </Card>
-
-        <Card className="md:col-span-4 lg:col-span-4">
-          <CardTitle className="text-center">Reservations</CardTitle>
+          <CardTitle className="text-center">Search Reservations</CardTitle>
           <CardContent>
             <DataTable
               columns={reservationTabledef}
               data={reservations.data ?? []}
             />
+          </CardContent>
+        </Card>
+        <Card className="md:col-span-5">
+          <CardTitle className="text-center">Search Trainees</CardTitle>
+          <CardContent>
+            <DataTable columns={profileTableDef} data={profiles.data ?? []} />
           </CardContent>
         </Card>
       </div>

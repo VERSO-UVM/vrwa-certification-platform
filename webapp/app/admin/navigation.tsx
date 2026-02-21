@@ -1,4 +1,4 @@
-import { House, Library, Scroll, Trophy, Users } from "lucide-react";
+import { BookOpenText, House, Library, Scroll, Swords, Trophy, Users } from "lucide-react";
 import { Link } from "react-router";
 import {
   Sidebar,
@@ -31,7 +31,7 @@ export function AdminSidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <Link to="/admin/course-manager">
-                  <Library />
+                  <BookOpenText />
                   Courses
                 </Link>
               </SidebarMenuButton>
@@ -40,7 +40,7 @@ export function AdminSidebar() {
               <SidebarMenuButton asChild>
                 <Link to="/admin/users">
                   <Users />
-                  Users
+                  Trainees
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

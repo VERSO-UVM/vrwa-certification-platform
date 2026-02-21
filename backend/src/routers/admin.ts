@@ -1,7 +1,7 @@
 import { asc, eq, getTableColumns } from "drizzle-orm";
 
 import db from "src/database";
-import { account, course, courseEvent, profile, reservation } from "src/database/schema";
+import { account, course, courseEvent, profile, reservation, Roles } from "src/database/schema";
 import type { AccountInfo, CourseEvent, Profile, Reservation } from "src/database/schema";
 import { basicProcedure, router } from "src/utils/trpc";
 
@@ -12,19 +12,16 @@ const adminProcedure = basicProcedure;
 const { passwordHash: _, ...accountInfo } = getTableColumns(account);
 
 export const adminRouter = router({
-  getProfiles: adminProcedure
+  getTrainees: adminProcedure
     .query((): Promise<Profile[]> => {
       return db.client
-        .select()
+        .select({
+          ...getTableColumns(profile),
+        })
         .from(profile)
-        .orderBy(asc(profile.lastName));
-    }),
-
-  getAccounts: adminProcedure
-    .query((): Promise<AccountInfo[]> => {
-      return db.client
-        .select(accountInfo)
-        .from(account)
+        .orderBy(asc(profile.lastName))
+        .leftJoin(account, eq(profile.accountId, account.id))
+        .where(eq(account.role, Roles.Trainee));
     }),
 
   getCourseEvents: adminProcedure
