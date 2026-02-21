@@ -7,10 +7,12 @@ export default function Admin() {
     <div>
       <SidebarProvider>
         <AdminSidebar />
-        <main className="flex-1">
-          <SidebarTrigger />
-          <Outlet />
-        </main>
+        <div>
+          <SidebarTrigger className="fixed" />
+          <main className="flex-1 flex pl-4">
+            <Outlet />
+          </main>
+        </div>
       </SidebarProvider>
     </div>
   );

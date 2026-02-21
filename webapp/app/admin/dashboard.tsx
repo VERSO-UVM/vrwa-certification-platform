@@ -109,11 +109,11 @@ export function AdminDashboard() {
   );
 
   return (
-    <div className="container px-4 space-y-6">
+    <div className="container p-3 pt-6 space-y-6 w-full">
       <h1 className="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
 
       <div className="grid gap-4 md:grid-cols-8">
-        <Card className="md:col-span-4 lg:col-span-5">
+        <Card className="md:col-span-5">
           <CardHeader>
             <CardTitle>Upcoming Classes</CardTitle>
             <CardDescription>
@@ -129,7 +129,7 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-4 lg:col-span-4">
+        <Card className="md:col-span-3">
           <CardTitle className="text-center">Profiles</CardTitle>
           <CardContent>
             <DataTable columns={profileTableDef} data={profiles.data ?? []} />
