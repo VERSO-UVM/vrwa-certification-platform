@@ -40,9 +40,20 @@ export const adminRouter = router({
     }),
 
   getReservations: adminProcedure
-    .query((): Promise<Reservation[]> => {
+    .query(() => {
       return db.client
-        .select()
+        .select({
+          creditHours: reservation.creditHours,
+          paymentStatus: reservation.paymentStatus,
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          isMember: profile.isMember,
+          courseName: course.courseName,
+          classStartDateTime: courseEvent.classStartDatetime,
+        })
         .from(reservation)
+        .leftJoin(profile, eq(reservation.profileId, profile.id))
+        .leftJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
+        .leftJoin(course, eq(course.id, courseEvent.id));
     }),
 });

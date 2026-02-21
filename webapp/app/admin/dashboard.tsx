@@ -8,11 +8,12 @@ import {
   CardHeader,
   CardTitle,
 } from "app/components/ui/card";
-import type {
-  Profile,
-  CourseEvent,
-  Reservation,
-  CourseLocation,
+import {
+  type Profile,
+  type CourseEvent,
+  type Reservation,
+  type CourseLocation,
+  reservation,
 } from "../../../backend/src/database/schema";
 import { DataTable } from "~/components/ui/data-table";
 import { Link } from "react-router";
@@ -40,6 +41,7 @@ const profileTableDef: ColumnDef<Profile>[] = [
   },
 ];
 
+//TODO: make dto for extended course event type
 const courseEventTableDef: ColumnDef<CourseEvent>[] = [
   {
     accessorKey: "courseName",
@@ -86,7 +88,21 @@ const courseEventTableDef: ColumnDef<CourseEvent>[] = [
   },
 ];
 
+//TODO: make dto for extended reservation type
 const reservationTabledef: ColumnDef<Reservation>[] = [
+  {
+    accessorKey: "firstName",
+    header: "First Name",
+  },
+  {
+    accessorKey: "lastName",
+    header: "Last Name",
+  },
+  {
+    accessorKey: "isMember",
+    header: "Member",
+    cell: ({ getValue }) => getValue() == true ? "yes" : "no"
+  },
   {
     accessorKey: "creditHours",
     header: "Credit Hours",
@@ -94,6 +110,15 @@ const reservationTabledef: ColumnDef<Reservation>[] = [
   {
     accessorKey: "paymentStatus",
     header: "Payment Status",
+  },
+  {
+    accessorKey: "courseName",
+    header: "Course Name",
+  },
+  {
+    accessorKey: "classStartDateTime",
+    header: "Course Date",
+    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
   },
 ];
 
@@ -106,6 +131,7 @@ export function AdminDashboard() {
   const reservations = useQuery(
     trpc.adminRouter.getReservations.queryOptions(),
   );
+  console.log(reservations.data)
 
   return (
     <div className="container p-3 pt-6 space-y-6 flex-1">
@@ -153,19 +179,13 @@ export function AdminDashboard() {
             </CardContent>
           </Card>
 
-        <Card className="md:col-span-3">
+        <Card className="md:col-span-8">
           <CardTitle className="text-center">Search Reservations</CardTitle>
           <CardContent>
             <DataTable
               columns={reservationTabledef}
               data={reservations.data ?? []}
             />
-          </CardContent>
-        </Card>
-        <Card className="md:col-span-5">
-          <CardTitle className="text-center">Search Trainees</CardTitle>
-          <CardContent>
-            <DataTable columns={profileTableDef} data={profiles.data ?? []} />
           </CardContent>
         </Card>
       </div>
