@@ -2,7 +2,7 @@
 // to be imported (`import type` only) in both the server and the client. (These are
 // called DTOs (Data Transfer Objects))
 
-import type { Course, CourseEvent, Profile, Reservation } from "./schema.dts";
+import type { Course, CourseEvent, Profile, Reservation } from "./schema.ts";
 
 export type ReservationDto =
   | Reservation
