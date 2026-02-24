@@ -18,6 +18,7 @@ import { Link } from "react-router";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Book, Trophy, Users } from "lucide-react";
+import { LocationTypeBadge } from "./location-type-badge";
 
 const courseEventTableDef: ColumnDef<CourseEvent>[] = [
   {
@@ -184,13 +185,3 @@ export function AdminDashboard() {
   );
 }
 
-export function LocationTypeBadge({ value }: { value: CourseLocation }) {
-  switch (value) {
-    case "virtual":
-      return <Badge variant="blue">Virtual</Badge>;
-    case "hybrid":
-      return <Badge variant="purple">Hybrid</Badge>;
-    case "in-person":
-      return <Badge variant="green">In Person</Badge>;
-  }
-}
