@@ -83,6 +83,8 @@ export const course = pgTable('course', {
   priceCents: integer().notNull(),
 });
 
+export type Course = typeof course.$inferSelect;
+
 // Using a type instead of a DB enum so that updates do not require a migration
 export type CourseLocation = 'in-person' | 'virtual' | 'hybrid';
 
