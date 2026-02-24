@@ -217,8 +217,10 @@ export function CourseManager() {
   ];
 
   return (
-    <main className="flex flex-wrap items-center justify-center py-4 gap-4">
-      <div className="w-full flex justify-center">
+    <main className="flex flex-col p-3 pt-6 space-y-6 flex-1 w-full gap-4">
+      <h1 className="text-2xl font-bold">Course Manager</h1>
+
+      <div className="">
         <Card className="min-w-md">
           <CardTitle className="text-center">Upcoming Classes</CardTitle>
           <CardContent>
