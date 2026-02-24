@@ -9,7 +9,7 @@ import {
   primaryKey,
   decimal,
 } from 'drizzle-orm/pg-core';
-import { prefixedIdGenerator } from 'src/utils/id';
+import { prefixedIdGenerator } from '~/utils/id';
 
 export const Roles = {
   Trainee: 'trainee',
