@@ -1,8 +1,8 @@
 import type { CreateFastifyContextOptions } from '@trpc/server/adapters/fastify';
-import db from '../../database';
-import { SESSION_COOKIE_NAME } from 'src/constants';
+import db from '~/database';
+import { SESSION_COOKIE_NAME } from '~/constants';
 import { eq } from 'drizzle-orm';
-import type { Session, Account } from 'src/database/schema';
+import type { Session, Account } from '~/database/schema';
 
 export async function createContext({ req, res }: CreateFastifyContextOptions) {
   const authCookie = req.cookies[SESSION_COOKIE_NAME];

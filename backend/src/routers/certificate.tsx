@@ -1,8 +1,8 @@
 import React from 'react';
-import { basicProcedure, router } from '../utils/trpc';
+import { basicProcedure, router } from '~/utils/trpc';
 import { pdf } from '@react-pdf/renderer';
 import z from 'zod';
-import { CertificateDocument } from '../pdf/pdf_template';
+import { CertificateDocument } from '~/pdf/pdf_template';
 import { eq } from 'drizzle-orm';
 
 export const certificateRouter = router({

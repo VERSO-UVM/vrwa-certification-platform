@@ -5,9 +5,9 @@ import type { FastifyTRPCPluginOptions } from '@trpc/server/adapters/fastify';
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
 
 import Fastify from 'fastify';
-import { createContext } from './utils/trpc/ctx';
-import type { AppRouter } from './trpc';
-import { appRouter } from './trpc';
+import { createContext } from '~/utils/trpc/ctx';
+import type { AppRouter } from '~/trpc';
+import { appRouter } from '~/trpc';
 const app = Fastify({
   logger: true,
 });

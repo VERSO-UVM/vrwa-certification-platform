@@ -1,4 +1,4 @@
-import db from "../src/database/index";
+import db from "~/database/index";
 import fs from "fs/promises";
 import path from "path";
 import * as argon2 from 'argon2';

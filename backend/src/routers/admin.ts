@@ -1,9 +1,9 @@
 import { asc, eq, getTableColumns } from "drizzle-orm";
 
-import db from "src/database";
-import { account, course, courseEvent, profile, reservation, Roles } from "src/database/schema";
-import type { AccountInfo, CourseEvent, Profile, Reservation } from "src/database/schema";
-import { basicProcedure, router } from "src/utils/trpc";
+import db from "~/database";
+import { account, course, courseEvent, profile, reservation, Roles } from "~/database/schema";
+import type {  Profile } from "~/database/schema";
+import { basicProcedure, router } from "~/utils/trpc";
 
 // IMPORTANT: change basicProcedure to protectedProcedure
 // once auth is fully implemented (before shipping).

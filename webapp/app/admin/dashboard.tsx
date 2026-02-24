@@ -1,19 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useTRPC } from "~/utils/trpc";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "app/components/ui/card";
-import {
-  type Profile,
-  type CourseEvent,
-  type Reservation,
-  type CourseLocation,
-} from "../../../backend/src/database/schema";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import type { Profile, CourseEvent, CourseLocation, Reservation } from "@backend/database/schema";
 import { DataTable } from "~/components/ui/data-table";
 import { Link } from "react-router";
 import { Badge } from "~/components/ui/badge";
@@ -103,7 +92,6 @@ const reservationTabledef: ColumnDef<Reservation>[] = [
 
 export function AdminDashboard() {
   const trpc = useTRPC();
-  const profiles = useQuery(trpc.adminRouter.getTrainees.queryOptions());
   const courseEvents = useQuery(
     trpc.adminRouter.getCourseEvents.queryOptions(),
   );
