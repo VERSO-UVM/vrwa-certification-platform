@@ -10,7 +10,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import { createTRPCClient, httpBatchStreamLink } from "@trpc/client";
 import { useState } from "react";
 
 import "./app.css";
@@ -68,7 +68,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     const [trpcClient] = useState(() =>
       createTRPCClient<AppRouter>({
         links: [
-          httpBatchLink({
+          httpBatchStreamLink({
             url: (import.meta.env.VITE_BACKEND || "http://localhost:3000") + "/trpc",
           }),
         ],
