@@ -111,8 +111,8 @@ export function AdminDashboard() {
     <div className="flex-1">
       <h1 className="text-2xl font-bold tracking-tight pb-6">Admin Dashboard</h1>
 
-      <div className="grid gap-4 grid-cols-1 lg:grid-cols-8">
-        <Card className="lg:col-span-5">
+      <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
+        <Card className="@xl:col-span-5">
           <CardHeader>
             <CardTitle>Upcoming Classes</CardTitle>
             <CardDescription>
@@ -133,7 +133,7 @@ export function AdminDashboard() {
             />
           </CardContent>
         </Card>
-        <Card className="space-y-4 lg:col-span-3">
+        <Card className="space-y-4 @xl:col-span-3">
           <CardHeader className="pb-3">
             <CardTitle className="text-center">Quick Links</CardTitle>
           </CardHeader>
