@@ -164,7 +164,7 @@ export function AdminDashboard() {
               asChild
             >
               <Link to="">
-                <Trophy className="mr-2 h-4 w-4" /> Sound out certificates
+                <Trophy className="mr-2 h-4 w-4" /> Send out certificates
               </Link>
             </Button>
           </CardContent>
