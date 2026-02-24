@@ -14,9 +14,9 @@ export const courseManagerRouter = router({
             z.object({
                 courseId: z.string(),
                 locationType: z.enum(["in-person", "virtual", "hybrid"]),
-                classStartDatetime: z.date(),
+                classStartDatetime: z.coerce.date(),
                 seats: z.number().int().positive(),
-                virtualLink: z.string().url().nullable().optional(),
+                virtualLink: z.string().url().optional().nullable(),
                 physicalAddress: z.string().nullable().optional(),
             })
         ).mutation(async ({ input }) => {
@@ -36,11 +36,11 @@ export const courseManagerRouter = router({
         .input(
             z.object({
                 id: z.string(),
-                classStartDatetime: z.date().nullable().optional(),
+                classStartDatetime: z.coerce.date().optional().nullable(),
                 seats: z.number().int().positive().nullable().optional(),
                 locationType: z.enum(["in-person", "virtual", "hybrid"]).optional(),
                 physicalAddress: z.string().nullable().optional(),
-                virtualLink: z.string().url().nullable().optional(),
+                virtualLink: z.string().url().optional().nullable(),
             })
         ).mutation(async ({input}) => {
             const { id, ...update } = input;

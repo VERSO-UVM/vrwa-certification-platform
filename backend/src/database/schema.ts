@@ -113,7 +113,8 @@ export const reservation = pgTable('reservation', {
     .references(() => profile.id)
     .notNull(),
   courseEventId: varchar()
-    .references(() => courseEvent.id)
+    //added cascading delete but we should maybe tie a notif to this in the future
+    .references(() => courseEvent.id, { onDelete: "cascade"})
     .notNull(),
   creditHours: decimal().notNull(),
   paymentStatus: varchar().notNull().$type<PaymentStatus>(),

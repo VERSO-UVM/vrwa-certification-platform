@@ -21,10 +21,12 @@
     "@trpc/tanstack-react-query": "^11.7.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "isbot": "^5.1.27",
     "lucide-react": "^0.546.0",
     "radix-ui": "^1.4.3",
     "react": "^19.1.0",
+    "react-day-picker": "^9.13.2",
     "react-dom": "^19.1.0",
     "react-router": "^7.5.3",
     "tailwind-merge": "^3.3.1"
