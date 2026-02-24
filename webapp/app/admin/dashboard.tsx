@@ -106,7 +106,6 @@ export function AdminDashboard() {
   const reservations = useQuery(
     trpc.adminRouter.getReservations.queryOptions(),
   );
-  console.log(reservations.data);
 
   return (
     <div className="p-3 pt-6 space-y-6 flex-1 w-full">
