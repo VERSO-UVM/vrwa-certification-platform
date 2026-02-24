@@ -15,7 +15,7 @@ export default function Home() {
         <CardContent>
           <a href="/login" className="block underline p-2">Log-in</a>
           <a href="/signup" className="block underline p-2">Sign up</a>
-          <a href="/admin/dashboard" className="block underline p-2">DEV - admin dashboard</a>
+          <a href="/admin" className="block underline p-2">DEV - admin dashboard</a>
         </CardContent>
       </Card>
     </main>
