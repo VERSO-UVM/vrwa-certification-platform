@@ -8,8 +8,8 @@ import {
   profile,
   reservation,
   Roles,
-} from "~/database/schema.ts";
-import type { Profile } from "~/database/schema.ts";
+} from "~/database/schema";
+import type { Profile } from "~/database/schema";
 import { basicProcedure, router } from "~/utils/trpc";
 
 // IMPORTANT: change basicProcedure to protectedProcedure
