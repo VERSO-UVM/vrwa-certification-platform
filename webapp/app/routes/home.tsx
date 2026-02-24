@@ -1,10 +1,13 @@
-import { Card, CardContent, CardDescription, CardTitle } from "~/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "~/components/ui/card";
 import type { Route } from "./+types/home";
 
 export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "VRWA Training Database" },
-  ];
+  return [{ title: "VRWA Training Database" }];
 }
 
 export default function Home() {
@@ -13,9 +16,15 @@ export default function Home() {
       <Card className="min-w-md">
         <CardTitle className="text-center">VRWA Training Database</CardTitle>
         <CardContent>
-          <a href="/login" className="block underline p-2">Log-in</a>
-          <a href="/signup" className="block underline p-2">Sign up</a>
-          <a href="/admin/dashboard" className="block underline p-2">DEV - admin dashboard</a>
+          <a href="/login" className="block underline p-2">
+            Log-in
+          </a>
+          <a href="/signup" className="block underline p-2">
+            Sign up
+          </a>
+          <a href="/admin/dashboard" className="block underline p-2">
+            DEV - admin dashboard
+          </a>
         </CardContent>
       </Card>
     </main>

@@ -45,7 +45,7 @@ function makeQueryClient() {
 let browserQueryClient: QueryClient | undefined = undefined;
 
 function getQueryClient() {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     // Server: always make a new query client
     return makeQueryClient();
   } else {
@@ -58,29 +58,36 @@ function getQueryClient() {
   }
 }
 
- const asyncStoragePersister = createAsyncStoragePersister({
-    storage: typeof window !== "undefined" ? window.localStorage : undefined
-  });
+const asyncStoragePersister = createAsyncStoragePersister({
+  storage: typeof window !== "undefined" ? window.localStorage : undefined,
+});
 
 export function Layout({ children }: { children: React.ReactNode }) {
-    const queryClient = getQueryClient();
-    const [trpcClient] = useState(() =>
-      createTRPCClient<AppRouter>({
-        links: [
-          httpBatchStreamLink({
-            url: (import.meta.env.VITE_BACKEND || "http://localhost:3000") + "/trpc",
-          }),
-        ],
-      }),
+  const queryClient = getQueryClient();
+  const [trpcClient] = useState(() =>
+    createTRPCClient<AppRouter>({
+      links: [
+        httpBatchStreamLink({
+          url:
+            (import.meta.env.VITE_BACKEND || "http://localhost:3000") + "/trpc",
+        }),
+      ],
+    }),
   );
 
   return (
-    <PersistQueryClientProvider client={queryClient} persistOptions={{ persister: asyncStoragePersister }}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{ persister: asyncStoragePersister }}
+    >
       <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
         <html lang="en">
           <head>
             <meta charSet="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta
+              name="viewport"
+              content="width=device-width, initial-scale=1"
+            />
             <Meta />
             <Links />
           </head>
