@@ -109,8 +109,8 @@ export function AdminDashboard() {
   );
 
   return (
-    <div className="p-3 pt-6 space-y-6 flex-1 w-full">
-      <h1 className="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
+    <div className="flex-1">
+      <h1 className="text-2xl font-bold tracking-tight pb-6">Admin Dashboard</h1>
 
       <div className="grid gap-4 lg:grid-cols-8">
         <Card className="lg:col-span-5 col-span-8">

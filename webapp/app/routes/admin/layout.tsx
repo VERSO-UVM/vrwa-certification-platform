@@ -9,7 +9,7 @@ export default function Admin() {
         <AdminSidebar />
         <div className="flex-1">
           <SidebarTrigger className="fixed" />
-          <main className="flex-1 flex pl-4">
+          <main className="flex-1 flex pl-7 pr-3 py-10">
             <Outlet />
           </main>
         </div>
