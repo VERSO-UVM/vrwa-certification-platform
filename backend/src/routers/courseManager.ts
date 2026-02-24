@@ -1,7 +1,7 @@
 import { asc, getTableColumns,eq } from "drizzle-orm";
-import db from "src/database";
-import { account, courseEvent, profile, reservation } from "src/database/schema";
-import { basicProcedure, router } from "src/utils/trpc";
+import db from "~/database";
+import { account, courseEvent, profile, reservation } from "~/database/schema";
+import { basicProcedure, router } from "~/utils/trpc";
 import { z } from "zod";
 
 
