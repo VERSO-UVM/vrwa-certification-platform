@@ -227,6 +227,11 @@ export function CourseManager() {
                 data={courseEvents.data ?? []}
                 />
             </CardContent>
+            <div className="flex justify-end mb-4 pr-4" >
+                <Button variant="secondary" size="lg">
+                    + Create New Course Event
+                </Button>
+            </div>
             </Card>
         </div>
         </main>
