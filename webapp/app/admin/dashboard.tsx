@@ -12,7 +12,7 @@ import type {
   CourseEvent,
   CourseLocation,
   Reservation,
-} from "@backend/database/schema.dts";
+} from "@backend/database/schema.ts";
 import { DataTable } from "~/components/ui/data-table";
 import { Link } from "react-router";
 import { Badge } from "~/components/ui/badge";
