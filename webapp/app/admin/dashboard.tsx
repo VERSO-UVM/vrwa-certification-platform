@@ -15,10 +15,9 @@ import type {
 } from "@backend/database/schema.ts";
 import { DataTable } from "~/components/ui/data-table";
 import { Link } from "react-router";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Book, Trophy, Users } from "lucide-react";
-import { LocationTypeBadge } from "./location-type-badge";
+import { LocationTypeBadge } from "~/components/location-type-badge";
 
 const courseEventTableDef: ColumnDef<CourseEvent>[] = [
   {
@@ -112,8 +111,8 @@ export function AdminDashboard() {
     <div className="flex-1">
       <h1 className="text-2xl font-bold tracking-tight pb-6">Admin Dashboard</h1>
 
-      <div className="grid gap-4 lg:grid-cols-8">
-        <Card className="lg:col-span-5 col-span-8">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-8">
+        <Card className="lg:col-span-5">
           <CardHeader>
             <CardTitle>Upcoming Classes</CardTitle>
             <CardDescription>
@@ -134,7 +133,7 @@ export function AdminDashboard() {
             />
           </CardContent>
         </Card>
-        <Card className="space-y-4 md:col-span-3">
+        <Card className="space-y-4 lg:col-span-3">
           <CardHeader className="pb-3">
             <CardTitle className="text-center">Quick Links</CardTitle>
           </CardHeader>
@@ -171,7 +170,7 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-8">
+        <Card className="col-span-full">
           <CardTitle className="text-center">Search Reservations</CardTitle>
           <CardContent>
             <DataTable
