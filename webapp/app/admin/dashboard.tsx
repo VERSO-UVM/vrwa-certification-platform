@@ -2,14 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useTRPC } from "~/utils/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import type { Profile, CourseEvent, CourseLocation, Reservation } from "@backend/database/schema";
+import type { CourseEvent, CourseLocation, Reservation } from "@backend/database/schema.dts";
 import { DataTable } from "~/components/ui/data-table";
 import { Link } from "react-router";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Book, Trophy, Users } from "lucide-react";
 
-//TODO: make dto for extended course event type
 const courseEventTableDef: ColumnDef<CourseEvent>[] = [
   {
     accessorKey: "courseName",
@@ -56,7 +55,6 @@ const courseEventTableDef: ColumnDef<CourseEvent>[] = [
   },
 ];
 
-//TODO: make dto for extended reservation type
 const reservationTabledef: ColumnDef<Reservation>[] = [
   {
     accessorKey: "firstName",
