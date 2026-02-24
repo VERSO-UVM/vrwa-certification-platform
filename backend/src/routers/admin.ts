@@ -48,12 +48,12 @@ export const adminRouter = router({
           firstName: profile.firstName,
           lastName: profile.lastName,
           isMember: profile.isMember,
-          courseName: course.courseName,
           classStartDateTime: courseEvent.classStartDatetime,
+          courseName: course.courseName,
         })
         .from(reservation)
         .leftJoin(profile, eq(reservation.profileId, profile.id))
         .leftJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
-        .leftJoin(course, eq(course.id, courseEvent.id));
+        .leftJoin(course, eq(course.id, courseEvent.courseId));
     }),
 });

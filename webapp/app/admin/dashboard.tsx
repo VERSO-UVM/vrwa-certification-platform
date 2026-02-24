@@ -13,33 +13,12 @@ import {
   type CourseEvent,
   type Reservation,
   type CourseLocation,
-  reservation,
 } from "../../../backend/src/database/schema";
 import { DataTable } from "~/components/ui/data-table";
 import { Link } from "react-router";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { MapPin, Trophy, Users } from "lucide-react";
-
-const profileTableDef: ColumnDef<Profile>[] = [
-  {
-    accessorKey: "firstName",
-    header: "First Name",
-  },
-  {
-    accessorKey: "lastName",
-    header: "Last Name",
-  },
-  {
-    accessorKey: "city",
-    header: "City",
-  },
-  {
-    accessorKey: "isMember",
-    header: "Member",
-    cell: ({ getValue }) => getValue() == true ? "yes" : "no"
-  },
-];
+import { Book, Trophy, Users } from "lucide-react";
 
 //TODO: make dto for extended course event type
 const courseEventTableDef: ColumnDef<CourseEvent>[] = [
@@ -134,7 +113,7 @@ export function AdminDashboard() {
   console.log(reservations.data)
 
   return (
-    <div className="container p-3 pt-6 space-y-6 flex-1">
+    <div className="p-3 pt-6 space-y-6 flex-1 w-full">
       <h1 className="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
 
       <div className="grid gap-4 lg:grid-cols-8">
@@ -167,7 +146,7 @@ export function AdminDashboard() {
 
               <Button variant="ghost" className="justify-start h-auto py-3 px-2" asChild>
                 <Link to="">
-                  <MapPin className="mr-2 h-4 w-4" /> View past courses
+                  <Book className="mr-2 h-4 w-4" /> View past courses
                 </Link>
               </Button>
 
