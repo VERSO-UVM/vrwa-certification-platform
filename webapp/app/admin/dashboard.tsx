@@ -2,9 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useTRPC } from "~/utils/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import type { Profile, CourseEvent, Reservation } from "@backend/database/schema";
+import type {
+  Profile,
+  CourseEvent,
+  Reservation,
+} from "@backend/database/schema";
 import { DataTable } from "~/components/ui/data-table";
-
 
 const profileTableDef: ColumnDef<Profile>[] = [
   {
@@ -59,16 +62,23 @@ const reservationTabledef: ColumnDef<Reservation>[] = [
 export function AdminDashboard() {
   const trpc = useTRPC();
   const profiles = useQuery(trpc.adminRouter.getProfiles.queryOptions());
-  const courseEvents = useQuery(trpc.adminRouter.getCourseEvents.queryOptions());
-  const reservations = useQuery(trpc.adminRouter.getReservations.queryOptions());
-  
+  const courseEvents = useQuery(
+    trpc.adminRouter.getCourseEvents.queryOptions(),
+  );
+  const reservations = useQuery(
+    trpc.adminRouter.getReservations.queryOptions(),
+  );
+
   return (
     <main className="flex flex-wrap items-center justify-center py-4 gap-4">
       <div className="w-full flex justify-center">
         <Card className="min-w-md">
           <CardTitle className="text-center">Upcoming Classes</CardTitle>
           <CardContent>
-            <DataTable columns={courseEventTableDef} data={courseEvents.data ?? []} />
+            <DataTable
+              columns={courseEventTableDef}
+              data={courseEvents.data ?? []}
+            />
           </CardContent>
         </Card>
       </div>
@@ -83,10 +93,12 @@ export function AdminDashboard() {
       <Card className="min-w-md">
         <CardTitle className="text-center">Reservations</CardTitle>
         <CardContent>
-          <DataTable columns={reservationTabledef} data={reservations.data ?? []} />
+          <DataTable
+            columns={reservationTabledef}
+            data={reservations.data ?? []}
+          />
         </CardContent>
       </Card>
-
     </main>
   );
 }

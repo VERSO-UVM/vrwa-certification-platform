@@ -1,8 +1,8 @@
-import type { CreateFastifyContextOptions } from '@trpc/server/adapters/fastify';
-import db from '~/database';
-import { SESSION_COOKIE_NAME } from '~/constants';
-import { eq } from 'drizzle-orm';
-import type { Session, Account } from '~/database/schema';
+import type { CreateFastifyContextOptions } from "@trpc/server/adapters/fastify";
+import db from "~/database";
+import { SESSION_COOKIE_NAME } from "~/constants";
+import { eq } from "drizzle-orm";
+import type { Session, Account } from "~/database/schema";
 
 export async function createContext({ req, res }: CreateFastifyContextOptions) {
   const authCookie = req.cookies[SESSION_COOKIE_NAME];
@@ -14,7 +14,7 @@ export async function createContext({ req, res }: CreateFastifyContextOptions) {
   and attaches those details to the request for later use. This does not block requests that aren't authenticated though - another middleware checks 
   the `account` and `session` context properties, rejecting requests where they are null.
    */
-  if (typeof authCookie === 'string') {
+  if (typeof authCookie === "string") {
     const [result] = await db.client
       .select({
         // Adjust account table here to tweak returned data

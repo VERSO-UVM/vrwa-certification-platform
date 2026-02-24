@@ -1,13 +1,13 @@
-import { TRPCError } from '@trpc/server';
-import { protectedProcedure, publicProcedure, router } from '~/utils/trpc';
-import { eq } from 'drizzle-orm';
-import z from 'zod';
-import * as argon2 from 'argon2';
-import { addDays } from 'date-fns/addDays';
-import { SESSION_COOKIE_NAME } from '~/constants';
-import { Roles } from '~/database/schema';
-import type { Database } from '~/database';
-import type { Context } from '~/utils/trpc/ctx';
+import { TRPCError } from "@trpc/server";
+import { protectedProcedure, publicProcedure, router } from "~/utils/trpc";
+import { eq } from "drizzle-orm";
+import z from "zod";
+import * as argon2 from "argon2";
+import { addDays } from "date-fns/addDays";
+import { SESSION_COOKIE_NAME } from "~/constants";
+import { Roles } from "~/database/schema";
+import type { Database } from "~/database";
+import type { Context } from "~/utils/trpc/ctx";
 
 export const authRouter = router({
   getMe: protectedProcedure.query(({ ctx }) => {
@@ -16,8 +16,8 @@ export const authRouter = router({
   getOrganization: protectedProcedure.query(async ({ ctx: { db, ...ctx } }) => {
     if (ctx.account.orgId === null)
       throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Organization not found',
+        code: "NOT_FOUND",
+        message: "Organization not found",
       });
 
     const [org] = await db.client
@@ -33,8 +33,8 @@ export const authRouter = router({
 
     if (!org)
       throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Organization not found',
+        code: "NOT_FOUND",
+        message: "Organization not found",
       });
 
     return org;
@@ -50,7 +50,10 @@ export const authRouter = router({
     .mutation(async ({ input, ctx }) => {
       const acct = await ctx.db.client.query.account.findFirst({
         where: (accounts, { eq, and }) =>
-          and(eq(accounts.email, input.email), eq(accounts.hasRegistered, true)),
+          and(
+            eq(accounts.email, input.email),
+            eq(accounts.hasRegistered, true),
+          ),
       });
 
       if (!acct || !acct.passwordHash) {
@@ -128,7 +131,7 @@ export const authRouter = router({
 async function issueSessionToken(
   db: Database,
   accountId: string,
-  res: Context['res'],
+  res: Context["res"],
 ) {
   const expiry = addDays(new Date(), 14);
 
