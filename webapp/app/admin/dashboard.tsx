@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useTRPC } from "~/utils/trpc";
-import { Card, CardContent, CardHeader, CardTitle } from "app/components/ui/card";
-import type { Profile, CourseEvent, Reservation } from "../../../backend/src/database/schema";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import type { Profile, CourseEvent, Reservation } from "@backend/database/schema";
 import { DataTable } from "~/components/ui/data-table";
 
 

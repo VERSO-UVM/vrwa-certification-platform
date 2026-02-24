@@ -20,8 +20,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "app/components/ui/table";
-import { Input } from "app/components/ui/input";
+} from "./table";
+import { Input } from "./input";
 import { Button } from "./button";
 import { ArrowUp, ArrowUpDown } from "lucide-react";
 

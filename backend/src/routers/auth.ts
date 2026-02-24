@@ -1,13 +1,13 @@
 import { TRPCError } from '@trpc/server';
-import { protectedProcedure, publicProcedure, router } from 'src/utils/trpc';
+import { protectedProcedure, publicProcedure, router } from '~/utils/trpc';
 import { eq } from 'drizzle-orm';
 import z from 'zod';
 import * as argon2 from 'argon2';
 import { addDays } from 'date-fns/addDays';
-import { SESSION_COOKIE_NAME } from 'src/constants';
-import { Roles } from 'src/database/schema';
-import type { Database } from 'src/database';
-import type { Context } from 'src/utils/trpc/ctx';
+import { SESSION_COOKIE_NAME } from '~/constants';
+import { Roles } from '~/database/schema';
+import type { Database } from '~/database';
+import type { Context } from '~/utils/trpc/ctx';
 
 export const authRouter = router({
   getMe: protectedProcedure.query(({ ctx }) => {
