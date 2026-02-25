@@ -16,6 +16,7 @@ import { useState } from "react";
 import "./app.css";
 import { TRPCProvider, type AppRouter } from "~/utils/trpc";
 import type { Route } from "./+types/root";
+import { TooltipProvider } from "./components/ui/tooltip";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -92,7 +93,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Links />
           </head>
           <body>
-            {children}
+            <TooltipProvider>{children}</TooltipProvider>
             <ScrollRestoration />
             <Scripts />
           </body>

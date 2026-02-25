@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "vrwa",
@@ -61,7 +60,7 @@
         "@trpc/tanstack-react-query": "^11.10.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
-        "isbot": "^5.1.35",
+        "isbot": "^5.1.27",
         "lucide-react": "^0.574.0",
         "radix-ui": "^1.4.3",
         "react": "catalog:",

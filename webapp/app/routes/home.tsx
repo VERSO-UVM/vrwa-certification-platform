@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from "~/components/ui/card";
+import { Card, CardContent, CardTitle } from "~/components/ui/card";
 import type { Route } from "./+types/home";
 
 export function meta({}: Route.MetaArgs) {
@@ -22,7 +17,7 @@ export default function Home() {
           <a href="/signup" className="block underline p-2">
             Sign up
           </a>
-          <a href="/admin/dashboard" className="block underline p-2">
+          <a href="/admin" className="block underline p-2">
             DEV - admin dashboard
           </a>
         </CardContent>
