@@ -46,7 +46,7 @@ export function DataTable<TData, TValue>({
     globalFilterFn: "includesString",
     onSortingChange: setSorting,
     defaultColumn: {
-      cell: ({ getValue }) => getValue() ?? '-',
+      cell: ({ getValue }) => getValue() ?? "-",
     },
     state: {
       sorting,
@@ -77,8 +77,12 @@ export function DataTable<TData, TValue>({
                     <TableHead key={header.id}>
                       <Button
                         variant="ghost"
-                        onClick={() => header.column.toggleSorting(header.column.getIsSorted() == "asc")}
-                        >
+                        onClick={() =>
+                          header.column.toggleSorting(
+                            header.column.getIsSorted() == "asc",
+                          )
+                        }
+                      >
                         {header.isPlaceholder
                           ? null
                           : flexRender(
