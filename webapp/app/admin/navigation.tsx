@@ -1,10 +1,4 @@
-import {
-  BookOpenText,
-  House,
-  Scroll,
-  Trophy,
-  Users,
-} from "lucide-react";
+import { BookOpenText, House, Scroll, Trophy, Users } from "lucide-react";
 import { Link } from "react-router";
 import {
   Sidebar,

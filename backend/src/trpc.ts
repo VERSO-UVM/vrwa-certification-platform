@@ -1,7 +1,7 @@
-import { adminRouter } from '~/routers/admin';
-import { authRouter } from '~/routers/auth';
-import { certificateRouter } from '~/routers/certificate';
-import { router } from '~/utils/trpc';
+import { adminRouter } from "~/routers/admin";
+import { authRouter } from "~/routers/auth";
+import { certificateRouter } from "~/routers/certificate";
+import { router } from "~/utils/trpc";
 
 export const appRouter = router({
   authRouter,

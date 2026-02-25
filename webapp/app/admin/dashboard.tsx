@@ -109,7 +109,9 @@ export function AdminDashboard() {
 
   return (
     <div className="flex-1">
-      <h1 className="text-2xl font-bold tracking-tight pb-6">Admin Dashboard</h1>
+      <h1 className="text-2xl font-bold tracking-tight pb-6">
+        Admin Dashboard
+      </h1>
 
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
         <Card className="@xl:col-span-5">
@@ -183,4 +185,3 @@ export function AdminDashboard() {
     </div>
   );
 }
-

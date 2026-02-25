@@ -28,7 +28,7 @@ import { ArrowUpDown } from "lucide-react";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  showGlobalFilter?: boolean,
+  showGlobalFilter?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -48,7 +48,7 @@ export function DataTable<TData, TValue>({
     globalFilterFn: "includesString",
     onSortingChange: setSorting,
     defaultColumn: {
-      cell: ({ getValue }) => getValue() ?? '-',
+      cell: ({ getValue }) => getValue() ?? "-",
     },
     state: {
       sorting,
@@ -59,19 +59,17 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      {showGlobalFilter ? 
+      {showGlobalFilter ? (
         <div className="flex items-center pb-1">
           <Input
             placeholder="Filter table..."
             value={globalFilter}
-            onChange={(event) =>
-              setGlobalFilter(String(event.target.value))
-            }
+            onChange={(event) => setGlobalFilter(String(event.target.value))}
             className="max-w-sm border-none"
           />
         </div>
-      : null}
-      
+      ) : null}
+
       <div className="overflow-hidden rounded-md">
         <Table>
           <TableHeader>
@@ -82,8 +80,12 @@ export function DataTable<TData, TValue>({
                     <TableHead key={header.id}>
                       <Button
                         variant="ghost"
-                        onClick={() => header.column.toggleSorting(header.column.getIsSorted() == "asc")}
-                        >
+                        onClick={() =>
+                          header.column.toggleSorting(
+                            header.column.getIsSorted() == "asc",
+                          )
+                        }
+                      >
                         {header.isPlaceholder
                           ? null
                           : flexRender(

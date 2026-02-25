@@ -1,6 +1,6 @@
-import { initTRPC, TRPCError } from '@trpc/server';
-import type { Context } from './ctx';
-import { ZodError } from 'zod';
+import { initTRPC, TRPCError } from "@trpc/server";
+import type { Context } from "./ctx";
+import { ZodError } from "zod";
 /**
  * Initialization of tRPC backend
  * Should be done only once per backend!
@@ -25,7 +25,7 @@ export const publicProcedure = t.procedure;
 
 const enforceAcctIsAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.account || !ctx.session) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' });
+    throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({
     ctx: {
