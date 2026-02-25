@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from "~/components/ui/card";
+import { Card, CardContent, CardTitle } from "~/components/ui/card";
 import type { Route } from "./+types/home";
 
 export function meta({}: Route.MetaArgs) {

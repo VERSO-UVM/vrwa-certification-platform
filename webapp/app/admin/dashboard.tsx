@@ -40,12 +40,14 @@ const courseEventTableDef: ColumnDef<CourseEvent>[] = [
   {
     accessorKey: "classStartDatetime",
     header: "Date",
-    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+    cell: ({ getValue }) => new Date(getValue() as string).toLocaleDateString(),
   },
   {
     accessorKey: "locationType",
     header: "Format",
-    cell: ({ getValue }) => <LocationTypeBadge value={getValue()} />,
+    cell: ({ getValue }) => (
+      <LocationTypeBadge value={getValue() as CourseLocation} />
+    ),
   },
   {
     accessorKey: "physicalAddress",
@@ -94,7 +96,7 @@ const reservationTabledef: ColumnDef<Reservation>[] = [
   {
     accessorKey: "classStartDateTime",
     header: "Course Date",
-    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+    cell: ({ getValue }) => new Date(getValue() as string).toLocaleDateString(),
   },
 ];
 
@@ -130,7 +132,7 @@ export function AdminDashboard() {
           <CardContent>
             <DataTable
               columns={courseEventTableDef}
-              data={courseEvents.data ?? []}
+              data={(courseEvents.data as CourseEvent[]) ?? []}
               showGlobalFilter={true}
             />
           </CardContent>
@@ -177,7 +179,7 @@ export function AdminDashboard() {
           <CardContent>
             <DataTable
               columns={reservationTabledef}
-              data={reservations.data ?? []}
+              data={(reservations.data as Reservation[]) ?? []}
             />
           </CardContent>
         </Card>
