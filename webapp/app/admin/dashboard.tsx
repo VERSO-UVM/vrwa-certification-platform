@@ -8,18 +8,18 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import type { CourseLocation } from "@backend/database/schema";
 import type {
-  CourseEvent,
-  CourseLocation,
-  Reservation,
-} from "@backend/database/schema.ts";
+  CourseEventDto,
+  ReservationDto,
+} from "@backend/database/dtos"
 import { DataTable } from "~/components/ui/data-table";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Book, Trophy, Users } from "lucide-react";
 import { LocationTypeBadge } from "~/components/location-type-badge";
 
-const courseEventTableDef: ColumnDef<CourseEvent>[] = [
+const courseEventTableDef: ColumnDef<CourseEventDto>[] = [
   {
     accessorKey: "courseName",
     header: "Name",
@@ -67,7 +67,7 @@ const courseEventTableDef: ColumnDef<CourseEvent>[] = [
   },
 ];
 
-const reservationTabledef: ColumnDef<Reservation>[] = [
+const reservationTabledef: ColumnDef<ReservationDto>[] = [
   {
     accessorKey: "firstName",
     header: "First Name",
@@ -132,7 +132,7 @@ export function AdminDashboard() {
           <CardContent>
             <DataTable
               columns={courseEventTableDef}
-              data={(courseEvents.data as CourseEvent[]) ?? []}
+              data={(courseEvents.data as CourseEventDto[]) ?? []}
               showGlobalFilter={true}
             />
           </CardContent>
@@ -179,7 +179,7 @@ export function AdminDashboard() {
           <CardContent>
             <DataTable
               columns={reservationTabledef}
-              data={(reservations.data as Reservation[]) ?? []}
+              data={(reservations.data as ReservationDto[]) ?? []}
             />
           </CardContent>
         </Card>
