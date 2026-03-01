@@ -4,18 +4,16 @@ import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
 
 export default function Admin() {
   return (
-    <div>
-      <SidebarProvider>
-        <AdminSidebar />
-        <div className="flex-1">
-          <SidebarTrigger className="fixed" />
-          {/* See https://tailwindcss.com/docs/responsive-design#container-queries
+    <SidebarProvider>
+      <AdminSidebar />
+      <div className="flex-1">
+        <SidebarTrigger className="fixed" />
+        {/* See https://tailwindcss.com/docs/responsive-design#container-queries
               Inside @container we can use @sm, @md, @lg, etc */}
-          <main className="flex-1 flex pl-7 pr-3 py-10 @container">
-            <Outlet />
-          </main>
-        </div>
-      </SidebarProvider>
-    </div>
+        <main className="flex-1 flex flex-col pl-7 pr-3 py-10 @container">
+          <Outlet />
+        </main>
+      </div>
+    </SidebarProvider>
   );
 }
