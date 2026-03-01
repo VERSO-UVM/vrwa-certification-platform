@@ -4,6 +4,7 @@ import {
   route,
   layout,
 } from "@react-router/dev/routes";
+import { redirect } from "react-router";
 
 export default [
   index("routes/home.tsx"),
@@ -12,8 +13,11 @@ export default [
     route("trainees", "routes/admin/trainees.tsx"),
     route("*", "routes/admin/notfound.tsx")
   ]),
+  route("trainee", "routes/trainee/layout.tsx", [
+    index("routes/trainee/home.tsx"),
+  ]),
   layout("routes/auth/layout.tsx", [
-    route("login/", "routes/auth/login.tsx"),
-    route("signup/", "routes/auth/signup.tsx"),
+    route("login", "routes/auth/login.tsx"),
+    route("signup", "routes/auth/signup.tsx"),
   ]),
 ] satisfies RouteConfig;

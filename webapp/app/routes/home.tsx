@@ -21,6 +21,9 @@ export default function Home() {
           <Link to="/admin" className="block underline p-2">
             DEV - admin dashboard
           </Link>
+          <Link to="/trainee" className="block underline p-2">
+            DEV - trainee home
+          </Link>
         </CardContent>
       </Card>
     </main>
