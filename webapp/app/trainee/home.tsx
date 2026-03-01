@@ -1,9 +1,9 @@
+import { PageHeader } from "~/components/page-header";
+
 export function TraineeHome() {
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-light pb-6">
-        VRWA Certifications Platform
-      </h1>
+      <PageHeader>VRWA Certifications Platform</PageHeader>
     </div>
   );
 }

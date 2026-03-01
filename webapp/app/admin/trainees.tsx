@@ -1,6 +1,7 @@
 import type { Profile } from "@backend/database/schema";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
+import { PageHeader } from "~/components/page-header";
 import { DataTable } from "~/components/ui/data-table";
 import { useTRPC } from "~/utils/trpc";
 
@@ -22,7 +23,7 @@ export function TraineeManager() {
 
   return (
     <div className="flex-1">
-      <h1 className="text-2xl font-bold tracking-tight pb-6">Trainees</h1>
+      <PageHeader>Trainees</PageHeader>
 
       <DataTable
         columns={profileTableDef}

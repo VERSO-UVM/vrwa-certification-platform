@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import type { Route } from "../+types/home";
+import { PageHeader } from "~/components/page-header";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Not found" }];
@@ -8,9 +9,7 @@ export function meta({}: Route.MetaArgs) {
 export default function () {
   return (
     <div className="flex-1">
-      <h1 className="text-2xl font-bold tracking-tight pb-6">
-        404 - Not found
-      </h1>
+      <PageHeader>404 - Not found</PageHeader>
       Page not found! Go to{" "}
       <Link to="/instructor/" className="underline">
         instructor home
