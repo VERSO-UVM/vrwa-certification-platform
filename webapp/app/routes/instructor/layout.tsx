@@ -1,19 +1,6 @@
-import { Outlet } from "react-router";
 import { InstructorSidebar } from "~/instructor/navigation";
-import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
+import { SidebarLayout } from "~/components/sidebar-layout";
 
-export default function User() {
-  return (
-    <SidebarProvider>
-      <InstructorSidebar />
-      <div className="flex-1">
-        <SidebarTrigger className="fixed" />
-        {/* See https://tailwindcss.com/docs/responsive-design#container-queries
-              Inside @container we can use @sm, @md, @lg, etc */}
-        <main className="flex-1 flex flex-col pl-7 pr-3 py-10 @container">
-          <Outlet />
-        </main>
-      </div>
-    </SidebarProvider>
-  );
+export default function Instructor() {
+  return <SidebarLayout sidebar={InstructorSidebar} />;
 }
