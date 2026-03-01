@@ -11,10 +11,11 @@ export default [
   route("admin", "routes/admin/layout.tsx", [
     index("routes/admin/dashboard.tsx"),
     route("trainees", "routes/admin/trainees.tsx"),
-    route("*", "routes/admin/notfound.tsx")
+    route("*", "routes/admin/not-found.tsx")
   ]),
   route("trainee", "routes/trainee/layout.tsx", [
     index("routes/trainee/home.tsx"),
+    route("*", "routes/trainee/not-found.tsx")
   ]),
   layout("routes/auth/layout.tsx", [
     route("login", "routes/auth/login.tsx"),
