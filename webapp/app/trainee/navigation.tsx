@@ -36,7 +36,11 @@ export function UserSidebar() {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter>
+        <SidebarMenuButton asChild>
+          <Link to="/" className="font-medium text-center">Exit</Link>
+        </SidebarMenuButton>
+      </SidebarFooter>
     </Sidebar>
   );
 }
