@@ -38,7 +38,7 @@ export function AdminSidebar() {
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link to="/admin/users">
+                <Link to="/admin/trainees">
                   <Users />
                   Trainees
                 </Link>
@@ -63,7 +63,11 @@ export function AdminSidebar() {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter>
+        <SidebarMenuButton asChild>
+          <Link to="/" className="font-medium">Exit</Link>
+        </SidebarMenuButton>
+      </SidebarFooter>
     </Sidebar>
   );
 }

@@ -9,15 +9,13 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import type { CourseLocation } from "@backend/database/schema";
-import type {
-  CourseEventDto,
-  ReservationDto,
-} from "@backend/database/dtos"
+import type { CourseEventDto, ReservationDto } from "@backend/database/dtos";
 import { DataTable } from "~/components/ui/data-table";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Book, Trophy, Users } from "lucide-react";
 import { LocationTypeBadge } from "~/components/location-type-badge";
+import { PageHeader } from "~/components/page-header";
 
 const courseEventTableDef: ColumnDef<CourseEventDto>[] = [
   {
@@ -111,9 +109,7 @@ export function AdminDashboard() {
 
   return (
     <div className="flex-1">
-      <h1 className="text-2xl font-bold tracking-tight pb-6">
-        Admin Dashboard
-      </h1>
+      <PageHeader>Admin Dashboard</PageHeader>
 
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
         <Card className="@xl:col-span-5">
