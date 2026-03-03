@@ -27,13 +27,11 @@ const courseEventTableDef: ColumnDef<CourseEventDto>[] = [
           pathname: "/admin/course-manager",
           search: `?class=${row.original.id}`,
         }}
+        className="font-medium hover:underline"
       >
         {getValue() as string}
       </Link>
     ),
-    meta: {
-      className: "font-medium hover:underline",
-    },
   },
   {
     accessorKey: "classStartDatetime",
@@ -50,18 +48,20 @@ const courseEventTableDef: ColumnDef<CourseEventDto>[] = [
   {
     accessorKey: "physicalAddress",
     header: "Location",
-    cell: ({ row, getValue }) =>
-      row.getValue("locationType") == "virtual" ? "Online" : getValue(),
-    meta: {
-      className: "text-muted-foreground",
-    },
+    cell: ({ row, getValue }) => (
+      <div className="text-muted-foreground">
+        {String(
+          row.getValue("locationType") == "virtual" ? "Online" : getValue(),
+        )}
+      </div>
+    ),
   },
   {
     accessorKey: "seats",
     header: "Seats",
-    meta: {
-      className: "text-right",
-    },
+    cell: ({ getValue }) => (
+      <div className="text-right">{String(getValue())}</div>
+    ),
   },
 ];
 

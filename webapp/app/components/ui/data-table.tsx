@@ -26,6 +26,7 @@ import { Input } from "./input";
 import { Button } from "./button";
 import { ArrowUpDown } from "lucide-react";
 import { DataTablePagination } from "./data-table-pagination";
+import { DataTableGlobalFilter } from "./data-table-global-filter";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -63,14 +64,7 @@ export function DataTable<TData, TValue>({
   return (
     <div>
       {showGlobalFilter ? (
-        <div className="flex items-center pb-1">
-          <Input
-            placeholder="Filter table..."
-            value={globalFilter}
-            onChange={(event) => table.setGlobalFilter(String(event.target.value))}
-            className="max-w-sm border-none"
-          />
-        </div>
+        <DataTableGlobalFilter table={table} filterContent={globalFilter} />
       ) : null}
 
       <div className="overflow-hidden rounded-md">
@@ -92,9 +86,9 @@ export function DataTable<TData, TValue>({
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
                         <ArrowUpDown className="h-4 w-4" />
                       </Button>
                     </TableHead>
@@ -133,7 +127,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table}/>
+      <DataTablePagination table={table} />
     </div>
   );
 }
