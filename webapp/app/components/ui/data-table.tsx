@@ -11,6 +11,7 @@ import {
   getFilteredRowModel,
   type SortingState,
   getSortedRowModel,
+  getPaginationRowModel,
 } from "@tanstack/react-table";
 
 import {
@@ -24,6 +25,7 @@ import {
 import { Input } from "./input";
 import { Button } from "./button";
 import { ArrowUpDown } from "lucide-react";
+import { DataTablePagination } from "./data-table-pagination";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -45,6 +47,7 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     globalFilterFn: "includesString",
     onSortingChange: setSorting,
     defaultColumn: {
@@ -64,7 +67,7 @@ export function DataTable<TData, TValue>({
           <Input
             placeholder="Filter table..."
             value={globalFilter}
-            onChange={(event) => setGlobalFilter(String(event.target.value))}
+            onChange={(event) => table.setGlobalFilter(String(event.target.value))}
             className="max-w-sm border-none"
           />
         </div>
@@ -89,9 +92,9 @@ export function DataTable<TData, TValue>({
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                         <ArrowUpDown className="h-4 w-4" />
                       </Button>
                     </TableHead>
@@ -130,6 +133,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+      <DataTablePagination table={table}/>
     </div>
   );
 }
