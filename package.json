@@ -16,7 +16,8 @@
   "scripts": {
     "dev": "bun --filter=\"*\" run dev",
     "lint": "eslint \"{backend,webapp}/{src,app}/**/*.ts*\" --fix",
-    "format": "prettier --write \"{backend,webapp}/{src,app}/**/*.ts*\""
+    "format": "prettier --write \"{backend,webapp}/{src,app}/**/*.ts*\"",
+    "db:dev": "bun --filter=backend run db:dev"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
