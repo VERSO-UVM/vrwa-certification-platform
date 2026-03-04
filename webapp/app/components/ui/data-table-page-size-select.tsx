@@ -34,7 +34,7 @@ export function DataTablePageSizeSelect<TData>({
           htmlFor="select-rows-per-page"
           className="text-muted-foreground"
         >
-          Rows per page
+          Rows shown
         </FieldLabel>
         <Select value={String(currentSize)} onValueChange={onSetPageSize}>
           <SelectTrigger className="w-20" id="select-rows-per-page">
