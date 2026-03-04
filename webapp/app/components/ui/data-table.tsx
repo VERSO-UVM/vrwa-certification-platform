@@ -27,6 +27,7 @@ import { Button } from "./button";
 import { ArrowUpDown } from "lucide-react";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableGlobalFilter } from "./data-table-global-filter";
+import { DataTablePageSizeSelect } from "./data-table-page-size-select";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -57,6 +58,11 @@ export function DataTable<TData, TValue>({
     state: {
       sorting,
       globalFilter,
+    },
+    initialState: {
+      pagination: {
+        pageSize: 5,
+      },
     },
     onGlobalFilterChange: setGlobalFilter,
   });
@@ -127,7 +133,15 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+
+      <div className="flex flex-wrap place-content-between">
+        <div>
+          <DataTablePagination table={table} />
+        </div>
+        <div>
+          <DataTablePageSizeSelect table={table} />
+        </div>
+      </div>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import {
 } from "lucide-react"
 
 import { cn } from "~/lib/utils"
-import { buttonVariants, type Button } from "~/components/ui/button"
+import { Button, buttonVariants } from "~/components/ui/button"
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   return (
@@ -37,19 +37,19 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
   return <li data-slot="pagination-item" {...props} />
 }
 
-type PaginationLinkProps = {
+type PaginationButtonProps = {
   isActive?: boolean
 } & Pick<React.ComponentProps<typeof Button>, "size"> &
-  React.ComponentProps<"a">
+  React.ComponentProps<"button">
 
-function PaginationLink({
+function PaginationButton({
   className,
   isActive,
   size = "icon",
   ...props
-}: PaginationLinkProps) {
+}: PaginationButtonProps) {
   return (
-    <a
+    <button
       aria-current={isActive ? "page" : undefined}
       data-slot="pagination-link"
       data-active={isActive}
@@ -64,13 +64,12 @@ function PaginationLink({
     />
   )
 }
-
 function PaginationPrevious({
   className,
   ...props
-}: React.ComponentProps<typeof PaginationLink>) {
+}: React.ComponentProps<typeof PaginationButton>) {
   return (
-    <PaginationLink
+    <PaginationButton
       aria-label="Go to previous page"
       size="default"
       className={cn("gap-1 px-2.5 sm:pl-2.5", className)}
@@ -78,16 +77,16 @@ function PaginationPrevious({
     >
       <ChevronLeftIcon />
       {/*<span className="hidden sm:block">Previous</span>*/}
-    </PaginationLink>
+    </PaginationButton>
   )
 }
 
 function PaginationNext({
   className,
   ...props
-}: React.ComponentProps<typeof PaginationLink>) {
+}: React.ComponentProps<typeof PaginationButton>) {
   return (
-    <PaginationLink
+    <PaginationButton
       aria-label="Go to next page"
       size="default"
       className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
@@ -95,7 +94,7 @@ function PaginationNext({
     >
     {/*<span className="hidden sm:block">Next</span>*/}
       <ChevronRightIcon />
-    </PaginationLink>
+    </PaginationButton>
   )
 }
 
@@ -119,7 +118,7 @@ function PaginationEllipsis({
 export {
   Pagination,
   PaginationContent,
-  PaginationLink,
+  PaginationButton,
   PaginationItem,
   PaginationPrevious,
   PaginationNext,
