@@ -1,13 +1,15 @@
-import { asc, getTableColumns } from "drizzle-orm";
+import { asc, eq, getTableColumns } from "drizzle-orm";
 
 import db from "~/database";
-import { account, courseEvent, profile, reservation } from "~/database/schema";
-import type {
-  AccountInfo,
-  CourseEvent,
-  Profile,
-  Reservation,
+import {
+  account,
+  course,
+  courseEvent,
+  profile,
+  reservation,
+  Roles,
 } from "~/database/schema";
+import type { Profile } from "~/database/schema";
 import { basicProcedure, router } from "~/utils/trpc";
 
 // IMPORTANT: change basicProcedure to protectedProcedure
@@ -17,22 +19,45 @@ const adminProcedure = basicProcedure;
 const { passwordHash: _, ...accountInfo } = getTableColumns(account);
 
 export const adminRouter = router({
-  getProfiles: adminProcedure.query((): Promise<Profile[]> => {
-    return db.client.select().from(profile).orderBy(asc(profile.lastName));
-  }),
-
-  getAccounts: adminProcedure.query((): Promise<AccountInfo[]> => {
-    return db.client.select(accountInfo).from(account);
-  }),
-
-  getCourseEvents: adminProcedure.query((): Promise<CourseEvent[]> => {
+  getTrainees: adminProcedure.query((): Promise<Profile[]> => {
     return db.client
-      .select()
-      .from(courseEvent)
-      .orderBy(asc(courseEvent.classStartDatetime));
+      .select({
+        ...getTableColumns(profile),
+      })
+      .from(profile)
+      .orderBy(asc(profile.lastName))
+      .leftJoin(account, eq(profile.accountId, account.id))
+      .where(eq(account.role, Roles.Trainee));
   }),
 
-  getReservations: adminProcedure.query((): Promise<Reservation[]> => {
-    return db.client.select().from(reservation);
+  getCourseEvents: adminProcedure.query(() => {
+    return db.client
+      .select({
+        ...getTableColumns(courseEvent),
+        courseName: course.courseName,
+        courseDescription: course.description,
+        courseCreditHours: course.creditHours,
+        coursePrice: course.priceCents,
+      })
+      .from(courseEvent)
+      .orderBy(asc(courseEvent.classStartDatetime))
+      .leftJoin(course, eq(courseEvent.courseId, course.id));
+  }),
+
+  getReservations: adminProcedure.query(() => {
+    return db.client
+      .select({
+        creditHours: reservation.creditHours,
+        paymentStatus: reservation.paymentStatus,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        isMember: profile.isMember,
+        classStartDateTime: courseEvent.classStartDatetime,
+        courseName: course.courseName,
+      })
+      .from(reservation)
+      .leftJoin(profile, eq(reservation.profileId, profile.id))
+      .leftJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
+      .leftJoin(course, eq(course.id, courseEvent.courseId));
   }),
 });
