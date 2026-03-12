@@ -2,12 +2,22 @@ import { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useTRPCClient, useTRPC } from "~/utils/trpc";
+import { NewCourseEventForm} from "~/components/courseEventForm";
+
 import { Card, CardContent, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { ButtonGroup } from "~/components/ui/button-group";
 import { DataTable } from "~/components/ui/data-table";
 import type { CourseEvent } from "../../../backend/src/database/schema";
 import { Calendar } from "~/components/ui/calendar";
+import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
+import { Popover, PopoverTrigger, PopoverContent} from "~/components/ui/popover";
+import { format } from "date-fns"
+import { ChevronDownIcon } from "lucide-react"
+import { Drawer, DrawerContent, DrawerTrigger, 
+        DrawerHeader, DrawerDescription, DrawerTitle,
+        DrawerClose, DrawerFooter } from "~/components/ui/drawer";
+
 
 function useCourseEvents() {
   const trpc = useTRPC();
@@ -27,6 +37,7 @@ export function CourseManager() {
   //for date picker
   const [editDate, setEditDate] = useState<Date | undefined>();
   const [editTime, setEditTime] = useState("12:00");
+  const [dateOpen, setDateOpen] = useState(false);
 
   function combineDateAndTime(date: Date | undefined, time: string) {
     if (!date) return null;
@@ -163,20 +174,43 @@ export function CourseManager() {
       header: "Start Date",
       cell: ({ row }) =>
         editingId === row.original.id ? (
-          <div className="flex flex-col gap-2">
-            <Calendar
-              mode="single"
-              selected={editDate}
-              onSelect={setEditDate}
-              className="rounded-md border"
-            />
-            <input
-              type="time"
-              value={editTime}
-              onChange={(e) => setEditTime(e.target.value)}
-              className="border p-1"
-            />
-          </div>
+          <FieldGroup className = "mx-auto max-w-xs flex-column">
+              <Field>
+                <Popover open={dateOpen} onOpenChange={setDateOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                    variant = "outline"
+                    id= "date-picker"
+                    className="w-full justify-between"
+                    >
+                      {editDate ? format(editDate, "P") : "Select date"}
+
+                      <ChevronDownIcon />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={editDate}
+                      onSelect={(d) => 
+                        {setEditDate(d);
+                        setDateOpen(false);
+                      }}
+                      captionLayout="dropdown"
+                      className="rounded-md border"
+                    /> 
+                    </PopoverContent>
+                </Popover>
+              </Field>
+              <Field>
+                <input
+                        type="time"
+                        value={editTime}
+                        onChange={(e) => setEditTime(e.target.value)}
+                        className="border p-2 rounded-md w-full text-sm"
+                      />    
+              </Field>        
+          </FieldGroup>
         ) : row.original.classStartDatetime ? (
           new Date(row.original.classStartDatetime).toLocaleString()
         ) : (
@@ -225,9 +259,27 @@ export function CourseManager() {
             <DataTable columns={columns} data={courseEvents.data ?? []} />
           </CardContent>
           <div className="flex justify-end mb-4 pr-4">
-            <Button variant="secondary" size="lg">
-              + Create New Course Event
-            </Button>
+            <Drawer direction="right">
+              <DrawerTrigger asChild>
+                <Button variant="secondary" size="lg">+ Create New Course Event</Button>
+              </DrawerTrigger>
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>New Course Event</DrawerTitle>
+                  <DrawerDescription>Create a new course event for an existing class</DrawerDescription>
+                </DrawerHeader>
+                <div className="no-scrollbar overflow-y-auto px-4">
+                <NewCourseEventForm
+                  onCreate={async (data) =>{
+                    await client.courseManagerRouter.createCourseEvent.mutate(data);
+                    await queryClient.invalidateQueries({
+                      queryKey: trpc.adminRouter.getCourseEvents.queryKey(),
+                    });
+                  }}
+                />
+              </div>
+              </DrawerContent>
+            </Drawer>
           </div>
         </Card>
       </div>

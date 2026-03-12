@@ -1,12 +1,18 @@
 import { asc, getTableColumns, eq } from "drizzle-orm";
 import db from "~/database";
-import { account, courseEvent, profile, reservation } from "~/database/schema";
+import { courseEvent, course } from "~/database/schema";
+import type {Course} from "~/database/schema";
 import { basicProcedure, router } from "~/utils/trpc";
 import { z } from "zod";
 
 const adminProcedure = basicProcedure;
 
 export const courseManagerRouter = router({
+  //getCourse
+  getCourses: adminProcedure.query((): Promise<Course[]> => {
+      return db.client.select().from(course).orderBy(asc(course.courseName));
+  }),
+
   //createCourseEvent
   createCourseEvent: adminProcedure
     .input(
@@ -15,7 +21,7 @@ export const courseManagerRouter = router({
         locationType: z.enum(["in-person", "virtual", "hybrid"]),
         classStartDatetime: z.coerce.date(),
         seats: z.number().int().positive(),
-        virtualLink: z.string().url().optional().nullable(),
+        virtualLink: z.url().optional().nullable(),
         physicalAddress: z.string().nullable().optional(),
       }),
     )
@@ -41,7 +47,7 @@ export const courseManagerRouter = router({
         seats: z.number().int().positive().nullable().optional(),
         locationType: z.enum(["in-person", "virtual", "hybrid"]).optional(),
         physicalAddress: z.string().nullable().optional(),
-        virtualLink: z.string().url().optional().nullable(),
+        virtualLink: z.url().optional().nullable(),
       }),
     )
     .mutation(async ({ input }) => {
