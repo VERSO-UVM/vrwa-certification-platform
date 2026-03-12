@@ -17,6 +17,7 @@ import { DataTableHeader } from "./data-table-header";
 import { DataTablePageSizeSelect } from "./data-table-page-size-select";
 import { DataTablePagination } from "./data-table-pagination";
 import { Table } from "./table";
+import { DataTableInfoText } from "./data-table-info-text";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -49,21 +50,26 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      {showGlobalFilter ? <DataTableGlobalFilter table={table} /> : null}
+      <div className="flex place-content-between">
+        {showGlobalFilter ? <DataTableGlobalFilter table={table} /> : <div></div>}
+        <div>
+          <DataTablePageSizeSelect table={table} />
+        </div>
+      </div>
 
       <div className="overflow-hidden rounded-md">
         <Table>
           <DataTableHeader table={table} />
-          <DataTableBody table={table}/>
+          <DataTableBody table={table} />
         </Table>
       </div>
 
       <div className="flex flex-wrap place-content-between">
-        <div>
+        <div className="flex">
           <DataTablePagination table={table} />
         </div>
-        <div>
-          <DataTablePageSizeSelect table={table} />
+        <div className="flex">
+          <DataTableInfoText table={table} />
         </div>
       </div>
     </div>

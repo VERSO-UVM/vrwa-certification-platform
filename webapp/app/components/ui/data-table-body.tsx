@@ -24,7 +24,6 @@ export function DataTableBody<TData>({ table }: DataTableBodyProps<TData>) {
       </TableBody>
     );
   }
-
   return (
     <TableBody>
       {table.getRowModel().rows.map((row) => (

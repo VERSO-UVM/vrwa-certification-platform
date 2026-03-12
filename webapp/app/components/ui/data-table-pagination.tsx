@@ -33,7 +33,6 @@ function pagination<T>(
   //     ^
   if (pageIndex <= 3) {
     // Only right ellipsis
-    console.log("Only right ellipsis");
     return [
       ...Array.from({ length: 5 }, (_, i) => pageButton(i)),
       ellipsis,
@@ -45,7 +44,7 @@ function pagination<T>(
   //         ^
   if (pageCount - 1 - pageIndex <= 3) {
     // Only left ellipsis
-    const start = pageCount - 1 - 5;
+    const start = pageCount - 5;
     return [
       pageButton(0),
       ellipsis,
@@ -73,7 +72,6 @@ export function DataTablePagination<TData>({
 }: DataTablePaginationProps<TData>) {
   const { pageSize, pageIndex } = table.getState().pagination;
   const pageCount = table.getPageCount();
-  console.log(pageCount);
   if (pageCount == 1) {
     return <div></div>;
   }
