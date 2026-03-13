@@ -27,6 +27,18 @@ export default function Home() {
           <Link to="/instructor" className="block underline p-2">
             DEV - instructor dashboard
           </Link>
+          <Link to="/admin/course-manager" className="block underline p-2">
+            DEV - course manager
+          </Link>
+          <a href="/login" className="block underline p-2">
+            Log-in
+          </a>
+          <a href="/signup" className="block underline p-2">
+            Sign up
+          </a>
+          <a href="/admin/dashboard" className="block underline p-2">
+            DEV - admin dashboard
+          </a>
         </CardContent>
       </Card>
     </main>
