@@ -8,10 +8,17 @@ import { z } from "zod";
 const adminProcedure = basicProcedure;
 
 export const courseManagerRouter = router({
-  //getCourse
+  //getCourses
   getCourses: adminProcedure.query((): Promise<Course[]> => {
       return db.client.select().from(course).orderBy(asc(course.courseName));
   }),
+
+  getCourseById: adminProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input }): Promise<Course | undefined> => {
+      const found = await db.client.select().from(course).where(eq(course.id, input.id));
+      return found[0];
+    }),
 
   //createCourseEvent
   createCourseEvent: adminProcedure
@@ -89,6 +96,49 @@ export const courseManagerRouter = router({
       return { success: true };
     }),
 
+  //createCourse
+  createCourse: adminProcedure
+  .input(
+    z.object({
+      courseName: z.string(),
+      description: z.string().nullable(),
+      creditHours: z.number().int().positive(),
+      priceCents: z.number().int().positive(),
+    }),
+  )
+  .mutation(async ({ input }) => {
+    const [newCourse] = await db.client
+      .insert(course)
+      .values({
+        ...input,
+        description: input.description ?? null,
+      })
+      .returning();
+
+    return newCourse;
+  }),
+
+  //deleteCourse
+  deleteCourse: adminProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const deletedRows = await db.client
+        .delete(course)
+        .where(eq(course.id, input.id))
+        .returning();
+
+      if (deletedRows.length === 0) {
+        throw new Error("No matching Course Event found!");
+      }
+      return { success: true };
+    }),
+
+  //updateCourse
+  
   //addTrainee
 
   //removeTrainee

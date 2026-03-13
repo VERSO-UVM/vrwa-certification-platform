@@ -3,12 +3,13 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useTRPCClient, useTRPC } from "~/utils/trpc";
 import { NewCourseEventForm} from "~/components/courseEventForm";
+import { NewCourseForm } from "~/components/courseForm";
 
-import { Card, CardContent, CardTitle } from "~/components/ui/card";
+import { Card, CardContent, CardTitle, CardHeader, CardDescription } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { ButtonGroup } from "~/components/ui/button-group";
 import { DataTable } from "~/components/ui/data-table";
-import type { CourseEvent } from "../../../backend/src/database/schema";
+import { courseEvent, type CourseEvent } from "../../../backend/src/database/schema";
 import { Calendar } from "~/components/ui/calendar";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Popover, PopoverTrigger, PopoverContent} from "~/components/ui/popover";
@@ -17,11 +18,20 @@ import { ChevronDownIcon } from "lucide-react"
 import { Drawer, DrawerContent, DrawerTrigger, 
         DrawerHeader, DrawerDescription, DrawerTitle,
         DrawerClose, DrawerFooter } from "~/components/ui/drawer";
+import { LocationTypeBadge } from "~/components/location-type-badge";
+import { Input } from "~/components/ui/input";
+import { PageHeader } from "~/components/page-header";
+import { Link } from "react-router";
 
 
 function useCourseEvents() {
   const trpc = useTRPC();
   return useQuery(trpc.adminRouter.getCourseEvents.queryOptions());
+}
+
+function useCourses() {
+  const trpc = useTRPC();
+  return useQuery(trpc.courseManagerRouter.getCourses.queryOptions());
 }
 
 export function CourseManager() {
@@ -30,6 +40,7 @@ export function CourseManager() {
   const queryClient = useQueryClient();
 
   const courseEvents = useCourseEvents();
+  const courses = useCourses();
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [edits, setEdits] = useState<Partial<CourseEvent>>({});
@@ -98,16 +109,20 @@ export function CourseManager() {
     });
   }
 
-  const columns: ColumnDef<CourseEvent>[] = [
-    { accessorKey: "id", header: "ID" },
+  const columnsCourseEvents: ColumnDef<CourseEvent>[] = [
+    { 
+      accessorKey: "courseName", 
+      header: "Course",
+    },
 
     {
       accessorKey: "physicalAddress",
       header: "Address",
       cell: ({ row }) =>
         editingId === row.original.id ? (
-          <input
+          <Input
             value={edits.physicalAddress ?? ""}
+            type="text"
             onChange={(e) =>
               setEdits((prev) => ({
                 ...prev,
@@ -118,12 +133,34 @@ export function CourseManager() {
           />
         ) : (
           (row.original.physicalAddress ?? "-")
-        ),
+        ), meta: {
+          className: "text-muted-foreground",
+        },
     },
-
+    {
+      accessorKey: "virtualLink",
+      header: "Link",
+      cell: ({ row }) =>
+        editingId === row.original.id ? (
+          <input
+            value={edits.virtualLink ?? ""}
+            onChange={(e) =>
+              setEdits((prev) => ({
+                ...prev,
+                virtualLink: e.target.value,
+              }))
+            }
+            className="border p-1"
+          />
+        ) : (
+          (row.original.virtualLink ?? "-")
+        ), meta: {
+          className: "text-muted-foreground",
+        },
+    },
     {
       accessorKey: "locationType",
-      header: "Class Type",
+      header: "Format",
       cell: ({ row }) =>
         editingId === row.original.id ? (
           <select
@@ -144,7 +181,7 @@ export function CourseManager() {
             <option value="hybrid">Hybrid</option>
           </select>
         ) : (
-          row.original.locationType
+          <LocationTypeBadge value={row.original.locationType} />
         ),
     },
 
@@ -171,7 +208,7 @@ export function CourseManager() {
 
     {
       accessorKey: "classStartDatetime",
-      header: "Start Date",
+      header: "Date",
       cell: ({ row }) =>
         editingId === row.original.id ? (
           <FieldGroup className = "mx-auto max-w-xs flex-column">
@@ -204,7 +241,7 @@ export function CourseManager() {
               </Field>
               <Field>
                 <input
-                        type="time"
+                        type="Time"
                         value={editTime}
                         onChange={(e) => setEditTime(e.target.value)}
                         className="border p-2 rounded-md w-full text-sm"
@@ -212,7 +249,7 @@ export function CourseManager() {
               </Field>        
           </FieldGroup>
         ) : row.original.classStartDatetime ? (
-          new Date(row.original.classStartDatetime).toLocaleString()
+          new Date(row.original.classStartDatetime).toLocaleDateString()
         ) : (
           "-"
         ),
@@ -220,7 +257,6 @@ export function CourseManager() {
 
     {
       id: "actions",
-      header: "Actions",
       cell: ({ row }) => {
         const isEditing = editingId === row.original.id;
 
@@ -250,16 +286,67 @@ export function CourseManager() {
     },
   ];
 
+  function getNumberOfClasses(courseId: string) {
+    let count = 0;
+    for (const event of courseEvents.data) {
+      if (event.courseId === courseId) {
+        ++count;
+      }
+    }
+    return count;
+  }
+
+  const columnsCourses: ColumnDef<CourseEvent>[] = [
+    { accessorKey: "courseName", 
+      header: "Course", 
+      cell: ({ row, getValue }) =>
+        <Link to={`/admin/course-details/${row.original.id}`}>
+          {getValue() as string}
+        </Link>
+    },
+    {
+      accessorKey: "description", 
+      header: "Class Description",
+      meta: {
+        className: "text-muted-foreground",
+      },
+    },
+    {
+      accessorKey: "creditHours",
+      header: "Credit Hours",
+    },
+    {
+      accessorKey: "priceCents",
+      header: "Tuition Fee",
+      cell: ({ getValue }) => `$${(Number(getValue()) / 100).toFixed(2)}`
+    },
+    {
+      accessorKey: "id",
+      header: "Upcoming Classes",
+      cell: ({ row }) => getNumberOfClasses(row.original.id)
+    },
+  ];
+
+  const [courseDrawerOpen, setCourseDrawerOpen] = useState(false);
+  const [courseEventDrawerOpen, setCourseEventDrawerOpen] = useState(false);
   return (
-    <main className="flex flex-wrap items-center justify-center py-4 gap-4">
-      <div className="w-full flex justify-center">
-        <Card className="min-w-md">
-          <CardTitle className="text-center">Upcoming Classes</CardTitle>
+    <div className = "flex-1">
+      <PageHeader>Course Manager</PageHeader>
+      <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
+        <Card className="@xl:col-span-8">
+          <CardHeader>
+            <CardTitle>Classes Overview</CardTitle>
+            <CardDescription>Quickly edit or remove existing course events.</CardDescription>
+          </CardHeader>
           <CardContent>
-            <DataTable columns={columns} data={courseEvents.data ?? []} />
+            <DataTable columns={columnsCourseEvents} data={courseEvents.data ?? []} />
           </CardContent>
           <div className="flex justify-end mb-4 pr-4">
-            <Drawer direction="right">
+            <Drawer 
+              direction="right"
+              open={courseEventDrawerOpen}
+              onOpenChange={setCourseEventDrawerOpen}
+            >
               <DrawerTrigger asChild>
                 <Button variant="secondary" size="lg">+ Create New Course Event</Button>
               </DrawerTrigger>
@@ -275,6 +362,44 @@ export function CourseManager() {
                     await queryClient.invalidateQueries({
                       queryKey: trpc.adminRouter.getCourseEvents.queryKey(),
                     });
+                    setCourseEventDrawerOpen(false);
+                  }}
+                />
+              </div>
+              </DrawerContent>
+            </Drawer>
+          </div>
+        </Card>
+        <Card className="@xl:col-span-8">
+          <CardHeader>
+            <CardTitle>Courses Overview</CardTitle>
+            <CardDescription>Click on a course to see more details!</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DataTable columns={columnsCourses} data={courses.data ?? []} />
+          </CardContent>
+          <div className="flex justify-end mb-4 pr-4">
+            <Drawer 
+              direction="right"
+              open={courseDrawerOpen}
+              onOpenChange={setCourseDrawerOpen}
+            >
+              <DrawerTrigger asChild>
+                <Button variant="secondary" size="lg">+ Create New Course </Button>
+              </DrawerTrigger>
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>New Course</DrawerTitle>
+                  <DrawerDescription>Create a new course</DrawerDescription>
+                </DrawerHeader>
+                <div className="no-scrollbar overflow-y-auto px-4">
+                <NewCourseForm
+                  onCreate={async (data) =>{
+                    await client.courseManagerRouter.createCourse.mutate(data);
+                    await queryClient.invalidateQueries({
+                      queryKey: trpc.adminRouter.getCourses.queryKey(),
+                    });
+                    setCourseDrawerOpen(false);
                   }}
                 />
               </div>
@@ -283,6 +408,6 @@ export function CourseManager() {
           </div>
         </Card>
       </div>
-    </main>
+    </div>
   );
 }

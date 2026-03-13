@@ -31,9 +31,6 @@ function useCourses() {
 
 export function NewCourseEventForm({ onCreate }) {
     const courses = useCourses();
-    console.log("courses:", courses.data);
-    console.log("status:", courses.status); 
-    console.log("error:", courses.error);
 
     const [values, setValues] = useState({ 
         courseId: "",

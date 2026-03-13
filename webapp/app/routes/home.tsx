@@ -4,7 +4,6 @@ import { Link } from "react-router";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "VRWA Training Database" }];
-  return [{ title: "VRWA Training Database" }];
 }
 
 export default function Home() {
@@ -27,6 +26,9 @@ export default function Home() {
           </Link>
           <Link to="/instructor" className="block underline p-2">
             DEV - instructor dashboard
+          </Link>
+          <Link to="/admin/course-manager" className="block underline p-2">
+            DEV - course manager
           </Link>
           <a href="/login" className="block underline p-2">
             Log-in
