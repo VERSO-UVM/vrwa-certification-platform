@@ -5,10 +5,10 @@
 import { courseEvent, type Course, type CourseEvent, type Profile, type Reservation } from "./schema";
 
 export type ReservationDto =
-  | Reservation
-  | Pick<Profile, "firstName" | "lastName" | "isMember">
-  | Pick<Course, "courseName" | "creditHours">
-  | Pick<CourseEvent, "classStartDatetime">;
+  Reservation &
+  Pick<Profile, "firstName" | "lastName" | "isMember"> &
+  Pick<Course, "courseName" | "creditHours" | "id"> &
+  Pick<CourseEvent, "classStartDatetime">;
 
 export type CourseEventDto =
   | CourseEvent
