@@ -1,6 +1,6 @@
-import { asc, getTableColumns, eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import db from "~/database";
-import { courseEvent, course } from "~/database/schema";
+import { courseEvent, course, reservation, profile } from "~/database/schema";
 import type {Course} from "~/database/schema";
 import { basicProcedure, router } from "~/utils/trpc";
 import { z } from "zod";
@@ -18,6 +18,30 @@ export const courseManagerRouter = router({
     .query(async ({ input }): Promise<Course | undefined> => {
       const found = await db.client.select().from(course).where(eq(course.id, input.id));
       return found[0];
+  }),
+
+  getReservationsByCourse: adminProcedure
+    .input(z.object({ courseId: z.string() }))
+    .query(async ({ input }) => {
+      const reservations = await db.client
+        .select({
+          profileId: reservation.profileId,
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          isMember: profile.isMember,
+          creditHours: reservation.creditHours,
+          paymentStatus: reservation.paymentStatus,
+          classStartDatetime: courseEvent.classStartDatetime,
+          courseEventId: courseEvent.id,
+        })
+        .from(reservation)
+        .leftJoin(profile, eq(reservation.profileId, profile.id))
+        .leftJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
+        .leftJoin(course, eq(courseEvent.courseId, course.id))
+        .where(eq(course.id, input.courseId))
+        .orderBy(courseEvent.classStartDatetime);
+
+      return reservations;
     }),
 
   //createCourseEvent
@@ -140,8 +164,42 @@ export const courseManagerRouter = router({
   //updateCourse
   
   //addTrainee
+  addReservation: adminProcedure
+  .input(
+    z.object({
+      profileId: z.string(),
+      courseEventId: z.string(),
+      creditHours: z.number().positive(),
+      paymentStatus: z.enum(["paid", "unpaid"])
+    }),
+  )
+  .mutation(async ({ input }) => {
+    const [newReservation] = await db.client
+      .insert(reservation)
+      .values({ 
+        ...input,
+        creditHours: input.creditHours.toString()
+      })
+      .returning();
+
+    return newReservation;
+  }),
 
   //removeTrainee
+  deleteReservation: adminProcedure
+    .input(
+      z.object({
+        courseEventId: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const deletedRows = await db.client
+        .delete(reservation)
+        .where(eq(reservation.courseEventId, input.courseEventId))
+        .returning();
+        
+      return { success: true };
+    }),
 
   //getCourseRoster
 

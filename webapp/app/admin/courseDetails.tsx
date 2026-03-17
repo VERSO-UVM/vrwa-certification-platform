@@ -1,12 +1,18 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import type { Course, Profile } from "@backend/database/schema";
 import { useParams } from "react-router";
 import { type ColumnDef } from "@tanstack/react-table";
 import type { ReservationDto } from "@backend/database/dtos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { PageHeader } from "~/components/page-header";
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
-import { useTRPC } from "~/utils/trpc";
+import { useTRPC, useTRPCClient } from "~/utils/trpc";
 import { DataTable } from "~/components/ui/data-table";
+import { Button } from "~/components/ui/button";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription} from "~/components/ui/dialog";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectGroup } from "~/components/ui/select";
+
 
 const rosterTableDef: ColumnDef<ReservationDto>[] = [
     {
@@ -29,21 +35,47 @@ const rosterTableDef: ColumnDef<ReservationDto>[] = [
     
 ]
 
+
+
 export function CourseDetails() {
+    
     const trpc = useTRPC();
     const { courseId } = useParams();
-    const course = useQuery(
+    const course = useQuery<Course>(
         trpc.courseManagerRouter.getCourseById.queryOptions({ id: courseId!})
     )
     
-    const reservations = useQuery(
-        trpc.adminRouter.getReservations.queryOptions(),
+    const reservations = useQuery<ReservationDto[]>(
+        trpc.courseManagerRouter.getReservationsByCourse.queryOptions({ courseId: courseId!, }),
     )
 
-    const classDates = (reservations.data as ReservationDto[])?.filter(
-        (res): res is ReservationDto & { classStartDatetime: Date } =>
-            "classStartDatetime" in res && res.classStartDatetime instanceof Date
-        ).map((res) => res.classStartDatetime)   ?? []; 
+    const trainees = useQuery<Profile[]>(
+        trpc.adminRouter.getTrainees.queryOptions()
+    )
+
+    //grouping reservations by courseEventId to easily access rosters
+    const reservationsList = reservations.data ?? [];
+    const reservationsByEvent = reservationsList.reduce<Record<string, ReservationDto[]>>(
+        (rosters, reservation) => {
+            const key = reservation.courseEventId;
+            if (!rosters[key]) {
+                rosters[key] = [];
+            }
+            rosters[key].push(reservation);
+            return rosters;    
+        }, {}
+    );
+
+    //getting courseEvents for tabs
+    const eventIds = Object.keys(reservationsByEvent);
+
+    //for adding to roster
+    const [selectedTrainee, setSelectedTrainee] = useState<string | null>(null);
+    const [selectedTab, setSelectedTab] = useState<string | null>(null);
+    const [traineePopupOpen, setTraineePopupOpen] = useState<boolean |false>(false);
+
+    const client = useTRPCClient();
+    const queryClient = useQueryClient();
 
 
 
@@ -74,23 +106,85 @@ export function CourseDetails() {
                         <CardTitle>Class Rosters</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <Tabs defaultValue={classDates[0]?.toISOString()}>
+                        <Tabs defaultValue={eventIds[0]}>
                             <TabsList variant="line">
-                                {classDates.map((date) => (
-                                    <TabsTrigger value={date.toISOString()}>{date.toLocaleDateString()}</TabsTrigger>
-                                ))}
+                                {eventIds.map((eventId) => {
+                                    const eventReservations = reservationsByEvent[eventId];
+                                    const dateString = eventReservations?.[0]?.classStartDatetime;
+                                    const date = dateString ? new Date(dateString) : null;
+                                    return (
+                                        <TabsTrigger key={eventId} value={eventId} onSelect={() => setSelectedTab(eventId)}>
+                                            {date ? date.toLocaleDateString() : "-"}
+                                        </TabsTrigger>
+                                );
+                            })}
                             </TabsList>
-                            <TabsContent value="class">
-                                <Card>
-                                    <CardContent>
-                                        <DataTable 
-                                            columns={rosterTableDef}
-                                            data={(reservations.data as ReservationDto[]) ?? []}
-                                        />  
-                                    </CardContent>
-                                </Card>
-                            </TabsContent>
+                            {eventIds.map((eventId) => (
+                                <TabsContent key ={eventId} value={eventId}>
+                                    <Card>
+                                        <CardContent>
+                                            <DataTable 
+                                                columns={rosterTableDef}
+                                                data={(reservationsByEvent[eventId] as ReservationDto[]) ?? []}
+                                            />  
+                                        </CardContent>
+                                    </Card>
+                                </TabsContent>
+                            ))}
                         </Tabs>
+                        <Dialog open={traineePopupOpen} onOpenChange={setTraineePopupOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="secondary" size="lg">+ Add Trainee To Roster</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>
+                                        New Enrollment
+                                    </DialogTitle>
+                                </DialogHeader>
+                                <DialogDescription>
+                                    select a trainee to add to the roster
+                                </DialogDescription>
+                                    <Select 
+                                        required
+                                        onValueChange={(value)=>setSelectedTrainee(value)}>
+                                        <SelectTrigger id="trainees" className="w-full max-w-48">
+                                            <SelectValue placeholder="Select a Trainee"/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {trainees.data?.map((trainee: Profile) => (
+                                                    <SelectItem key={trainee.id} value={trainee.id}>
+                                                        {trainee.firstName} {trainee.lastName}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <Button
+                                        onClick={async () => {
+                                            if (!selectedTrainee) return;
+
+                                            await client.courseManagerRouter.addReservation.mutate({
+                                                profileId: selectedTrainee,
+                                                courseEventId: selectedTab,
+                                                creditHours: course.data?.creditHours ?? 0,
+                                                paymentStatus: "unpaid",
+                                            });
+
+                                            await queryClient.invalidateQueries(
+                                                trpc.courseManagerRouter.getReservationsByCourse.queryKey({
+                                                  courseId: courseId!,
+                                                })
+                                            );
+                                            
+                                            setTraineePopupOpen(false);
+                                        }}
+                                    >
+                                        add to roster
+                                    </Button>
+                            </DialogContent>
+                        </Dialog>    
                     </CardContent>
                 </Card>
             </div>

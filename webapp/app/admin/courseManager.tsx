@@ -9,7 +9,7 @@ import { Card, CardContent, CardTitle, CardHeader, CardDescription } from "~/com
 import { Button } from "~/components/ui/button";
 import { ButtonGroup } from "~/components/ui/button-group";
 import { DataTable } from "~/components/ui/data-table";
-import { courseEvent, type CourseEvent } from "../../../backend/src/database/schema";
+import { type CourseEvent } from "../../../backend/src/database/schema";
 import { Calendar } from "~/components/ui/calendar";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Popover, PopoverTrigger, PopoverContent} from "~/components/ui/popover";
@@ -26,7 +26,7 @@ import { Link } from "react-router";
 
 function useCourseEvents() {
   const trpc = useTRPC();
-  return useQuery(trpc.adminRouter.getCourseEvents.queryOptions());
+  return useQuery<CourseEvent[]>(trpc.adminRouter.getCourseEvents.queryOptions());
 }
 
 function useCourses() {
@@ -241,11 +241,11 @@ export function CourseManager() {
               </Field>
               <Field>
                 <input
-                        type="Time"
-                        value={editTime}
-                        onChange={(e) => setEditTime(e.target.value)}
-                        className="border p-2 rounded-md w-full text-sm"
-                      />    
+                  type="Time"
+                  value={editTime}
+                  onChange={(e) => setEditTime(e.target.value)}
+                  className="border p-2 rounded-md w-full text-sm"
+                />    
               </Field>        
           </FieldGroup>
         ) : row.original.classStartDatetime ? (
@@ -287,13 +287,8 @@ export function CourseManager() {
   ];
 
   function getNumberOfClasses(courseId: string) {
-    let count = 0;
-    for (const event of courseEvents.data) {
-      if (event.courseId === courseId) {
-        ++count;
-      }
-    }
-    return count;
+    return (courseEvents.data ?? []).filter(
+      (event) => event.courseId === courseId).length;
   }
 
   const columnsCourses: ColumnDef<CourseEvent>[] = [
