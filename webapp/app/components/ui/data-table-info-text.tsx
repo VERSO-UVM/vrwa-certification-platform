@@ -10,8 +10,6 @@ export function DataTableInfoText<TData>({
   const rows = table.getRowModel().rows;
   const totalCount = table.getPreFilteredRowModel().rows.length;
   const filteredCount = table.getFilteredRowModel().rows.length;
-  console.log(totalCount);
-
 
   if (rows.length == 0) {
     return <div></div>;
@@ -25,7 +23,8 @@ export function DataTableInfoText<TData>({
       Showing {first + 1} to {last + 1} of {filteredCount} entries
       {totalCount === filteredCount ? null : (
         <span> (filtered from {totalCount} entries)</span>
-      )}.
+      )}
+      .
     </div>
   );
 }

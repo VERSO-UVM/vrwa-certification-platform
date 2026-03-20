@@ -51,7 +51,11 @@ export function DataTable<TData, TValue>({
   return (
     <div>
       <div className="flex place-content-between">
-        {showGlobalFilter ? <DataTableGlobalFilter table={table} /> : <div></div>}
+        {showGlobalFilter ? (
+          <DataTableGlobalFilter table={table} />
+        ) : (
+          <div></div>
+        )}
         <div>
           <DataTablePageSizeSelect table={table} />
         </div>

@@ -1,11 +1,7 @@
 import { flexRender, type Table } from "@tanstack/react-table";
 import { TableHead, TableHeader, TableRow } from "./table";
 import { Button } from "./button";
-import {
-  ArrowDownZA,
-  ArrowUpAZ,
-  ArrowUpDown,
-} from "lucide-react";
+import { ArrowDownZA, ArrowUpAZ, ArrowUpDown } from "lucide-react";
 
 interface DataTableHeaderProps<TData> {
   table: Table<TData>;

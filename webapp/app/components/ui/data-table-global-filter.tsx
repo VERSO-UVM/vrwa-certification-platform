@@ -3,7 +3,7 @@ import { Input } from "./input";
 import React from "react";
 
 interface DataTableGlobalFilterProps<TData> {
-  table: Table<TData>,
+  table: Table<TData>;
 }
 
 export function DataTableGlobalFilter<TData>({
