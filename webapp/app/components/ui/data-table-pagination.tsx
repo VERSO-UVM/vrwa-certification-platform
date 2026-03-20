@@ -42,7 +42,7 @@ function pagination(pageIndex: number, pageCount: number): (string | number)[] {
     return [
       0,
       "leftEllipsis",
-      ...Array.from({ length: 5 }, (_, i) => i),
+      ...Array.from({ length: 5 }, (_, i) => start + i),
     ];
   }
 
