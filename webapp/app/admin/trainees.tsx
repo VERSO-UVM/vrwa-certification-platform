@@ -1,20 +1,16 @@
 import type { Profile } from "@backend/database/schema";
 import { useQuery } from "@tanstack/react-query";
 import {
-  type Table,
   type ColumnDef,
   type RowSelectionState,
-  RowSelection,
+  type Updater,
 } from "@tanstack/react-table";
-import { useRef, useState } from "react";
-import { Badge } from "~/components/ui/badge";
-import { PageHeader } from "~/components/page-header";
-import { DataTable } from "~/components/ui/data-table";
-import { useTRPC } from "~/utils/trpc";
-import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
-import { Divide } from "lucide-react";
+import { DataTable } from "~/components/ui/data-table";
+import { PageHeader } from "~/components/page-header";
 import { TraineeReservations } from "./trainee-reservations";
+import { useState } from "react";
+import { useTRPC } from "~/utils/trpc";
 
 const profileTableDef: ColumnDef<Profile>[] = [
   {
@@ -32,34 +28,37 @@ export function TraineeManager() {
   const traineesQuery = useQuery(trpc.adminRouter.getTrainees.queryOptions());
   const trainees = (traineesQuery.data ?? []) as Profile[];
 
-  const [rowSelection, setRowSelection] = useState<number>(0);
-  const reactTableRowSelection = { [rowSelection.toString()]: true };
-  const selectedIndex = rowSelection;
-  const selectedTrainee =
-    selectedIndex != null ? trainees[selectedIndex] : null;
+  const [selectedRow, setSelectedRow] = useState<number>(0);
+
+  // Manually handle react table selection state
+  const reactTableRowSelection = { [selectedRow.toString()]: true } as RowSelectionState;
+  const reactTableSelectionChange = (updater: Updater<RowSelectionState>) => {
+    const newSelectionState =
+      updater instanceof Function ? updater(reactTableRowSelection) : updater;
+
+    const [selection, ...rest] = Object.entries(newSelectionState)
+      .filter(([_, selected]) => selected)
+      .map(([id, _]) => parseInt(id));
+
+    // Require a row to be selected always
+    if (selection != null && rest.length == 0) {
+      setSelectedRow(selection);
+    }
+  };
+
+  const selectedTrainee = selectedRow != null ? trainees[selectedRow] : null;
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1">
       <PageHeader>Trainees</PageHeader>
 
-      <div className="flex flex-col space-y-1">
+      <div className="flex flex-col space-y-1 max-w-5xl ">
         <div className="flex-1 border rounded p-3">
           <DataTable
             columns={profileTableDef}
             data={trainees}
             table={{
-              onRowSelectionChange: (newState) => {
-                const [selection, ...additionalSelections] = Object.entries(
-                  typeof newState == "function"
-                    ? newState(reactTableRowSelection)
-                    : newState,
-                )
-                  .filter(([_, selected]) => selected)
-                  .map(([id, _]) => parseInt(id));
-                if (selection != null && additionalSelections.length == 0) {
-                  setRowSelection(selection);
-                }
-              },
+              onRowSelectionChange: reactTableSelectionChange,
               state: {
                 rowSelection: reactTableRowSelection,
               },
@@ -68,13 +67,18 @@ export function TraineeManager() {
         </div>
         {selectedTrainee != null ? (
           <div className="bg-gray-50 p-5 rounded">
-            <h2 className="text-xl font-medium pb-4">{selectedTrainee.firstName} {selectedTrainee.lastName}</h2>
+            <h2 className="text-xl font-medium pb-4">
+              {selectedTrainee.firstName} {selectedTrainee.lastName}
+            </h2>
             <ul className="flex flex-col space-y-2 pb-2">
               <li>
                 <b>First Name(s):</b> {selectedTrainee.firstName}
               </li>
               <li>
                 <b>Last Name(s):</b> {selectedTrainee.lastName}
+              </li>
+              <li>
+                <b>Address:</b> {selectedTrainee.address}
               </li>
               <li>
                 <b>City:</b> {selectedTrainee.city}
@@ -89,7 +93,7 @@ export function TraineeManager() {
                 <b>Is Member:</b> {selectedTrainee.isMember ? "Yes" : "No"}
               </li>
             </ul>
-            <h2 className="text-lg font-medium py-4">Reservations</h2>
+            <h2 className="text-lg font-medium py-4">Classes</h2>
             <TraineeReservations profileId={selectedTrainee.id} />
 
             <Button>Edit</Button>

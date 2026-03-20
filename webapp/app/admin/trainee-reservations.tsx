@@ -16,7 +16,7 @@ const reservationTableDef: ColumnDef<ReservationDto>[] = [
   },
   {
     accessorKey: "creditHours",
-    header: "Credit Hours",
+    header: "Credit Hours Received",
   },
   {
     accessorKey: "paymentStatus",
