@@ -16,16 +16,26 @@ interface DataTablePageSizeSelectProps<
   table: Table<TData>;
 }
 
+export const PAGE_SIZE_SHOW_ALL = {
+  label: "All",
+  // It might not be a good idea to render more than 10_000 anyways
+  value: 10_000,
+} as PageSizeValues;
+export type PageSizeValues = { label: string; value: number };
+
 export function DataTablePageSizeSelect<TData>({
   table,
   className,
   ...props
 }: DataTablePageSizeSelectProps<TData>) {
-  const MAX_PAGE_SIZE = 10000;
   const onSetPageSize = (value: string) => {
     table.setPageSize(Number(value));
   };
   const currentSize = table.getState().pagination.pageSize;
+  const pageSizeOptions = table.options.meta?.pageSizeOptions;
+  if (!pageSizeOptions) {
+    return <div></div>;
+  }
 
   return (
     <div className={cn("flex", className)} {...props}>
@@ -42,11 +52,9 @@ export function DataTablePageSizeSelect<TData>({
           </SelectTrigger>
           <SelectContent align="start">
             <SelectGroup>
-              <SelectItem value="5">5</SelectItem>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="25">25</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-              <SelectItem value={MAX_PAGE_SIZE.toString()}>All</SelectItem>
+              {pageSizeOptions?.map(({ label, value }) => (
+                <SelectItem key={value} value={value.toString()}>{label}</SelectItem>
+              ))}
             </SelectGroup>
           </SelectContent>
         </Select>

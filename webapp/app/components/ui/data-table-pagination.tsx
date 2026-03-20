@@ -1,5 +1,4 @@
 import { type Table } from "@tanstack/react-table";
-import { cn } from "~/lib/utils";
 import {
   Pagination,
   PaginationContent,
@@ -16,17 +15,12 @@ interface DataTablePaginationProps<
   table: Table<TData>;
 }
 
-function pagination<T>(
-  pageIndex: number,
-  pageCount: number,
-  ellipsis: T,
-  pageButton: (i: number) => T,
-): T[] {
+function pagination(pageIndex: number, pageCount: number): (string | number)[] {
   const numButtons = 7;
 
   if (pageCount <= numButtons) {
     // No ellipsis needed
-    return Array.from({ length: pageCount }, (_, i) => pageButton(i));
+    return Array.from({ length: pageCount }, (_, i) => i);
   }
 
   // 0 1 2 3 4 ... 8
@@ -34,9 +28,9 @@ function pagination<T>(
   if (pageIndex <= 3) {
     // Only right ellipsis
     return [
-      ...Array.from({ length: 5 }, (_, i) => pageButton(i)),
-      ellipsis,
-      pageButton(pageCount - 1),
+      ...Array.from({ length: 5 }, (_, i) => i),
+      "rightEllipsis",
+      pageCount - 1,
     ];
   }
 
@@ -46,9 +40,9 @@ function pagination<T>(
     // Only left ellipsis
     const start = pageCount - 5;
     return [
-      pageButton(0),
-      ellipsis,
-      ...Array.from({ length: 5 }, (_, i) => pageButton(i + start)),
+      0,
+      "leftEllipsis",
+      ...Array.from({ length: 5 }, (_, i) => i),
     ];
   }
 
@@ -56,13 +50,13 @@ function pagination<T>(
   //         ^
   // Left and right ellipsis
   return [
-    pageButton(0),
-    ellipsis,
-    pageButton(pageIndex - 1),
-    pageButton(pageIndex),
-    pageButton(pageIndex + 1),
-    ellipsis,
-    pageButton(pageCount - 1),
+    0,
+    "leftEllipsis",
+    pageIndex - 1,
+    pageIndex,
+    pageIndex + 1,
+    "rightEllipsis",
+    pageCount - 1,
   ];
 }
 
@@ -70,35 +64,32 @@ export function DataTablePagination<TData>({
   table,
   ...props
 }: DataTablePaginationProps<TData>) {
-  const { pageSize, pageIndex } = table.getState().pagination;
+  const { pageIndex } = table.getState().pagination;
   const pageCount = table.getPageCount();
   if (pageCount == 1) {
     return <div></div>;
   }
-  const ellipsesThreshhold = 6;
-  const buttons = pagination(
-    pageIndex,
-    pageCount,
-    <PaginationEllipsis />,
-    (i) => (
-      <PaginationButton
-        isActive={i == pageIndex}
-        onClick={() => table.setPageIndex(i)}
-      >
-        {i + 1}
-      </PaginationButton>
-    ),
-  );
+  const items = pagination(pageIndex, pageCount);
 
   return (
-    <Pagination {...props}>
+    <Pagination className="justify-left w-fit mx-0" {...props}>
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious onClick={() => table.previousPage()} />
         </PaginationItem>
-        {buttons.map((item) => (
-          <PaginationItem>{item}</PaginationItem>
-        ))}
+        {items.map((item, i) =>
+          typeof item == "number" ? (
+            <PaginationButton
+              isActive={item == pageIndex}
+              onClick={(ev) => table.setPageIndex(item)}
+              key={item.toString()}
+            >
+              {item + 1}
+            </PaginationButton>
+          ) : (
+            <PaginationEllipsis key={item} />
+          ),
+        )}
         <PaginationItem>
           <PaginationNext onClick={() => table.nextPage()} />
         </PaginationItem>

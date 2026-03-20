@@ -129,7 +129,6 @@ export function AdminDashboard() {
             <DataTable
               columns={courseEventTableDef}
               data={(courseEvents.data as CourseEventDto[]) ?? []}
-              showGlobalFilter={true}
             />
           </CardContent>
         </Card>
