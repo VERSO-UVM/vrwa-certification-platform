@@ -1,4 +1,5 @@
 import { asc, eq, getTableColumns } from "drizzle-orm";
+import z from "zod";
 
 import db from "~/database";
 import {
@@ -17,6 +18,23 @@ import { basicProcedure, router } from "~/utils/trpc";
 const adminProcedure = basicProcedure;
 
 const { passwordHash: _, ...accountInfo } = getTableColumns(account);
+
+const getReserverations = () => {
+  return db.client
+    .select({
+      creditHours: reservation.creditHours,
+      paymentStatus: reservation.paymentStatus,
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      isMember: profile.isMember,
+      classStartDateTime: courseEvent.classStartDatetime,
+      courseName: course.courseName,
+    })
+    .from(reservation)
+    .leftJoin(profile, eq(reservation.profileId, profile.id))
+    .leftJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
+    .leftJoin(course, eq(course.id, courseEvent.courseId));
+};
 
 export const adminRouter = router({
   getTrainees: adminProcedure.query((): Promise<Profile[]> => {
@@ -44,20 +62,17 @@ export const adminRouter = router({
       .leftJoin(course, eq(courseEvent.courseId, course.id));
   }),
 
-  getReservations: adminProcedure.query(() => {
-    return db.client
-      .select({
-        creditHours: reservation.creditHours,
-        paymentStatus: reservation.paymentStatus,
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        isMember: profile.isMember,
-        classStartDateTime: courseEvent.classStartDatetime,
-        courseName: course.courseName,
-      })
-      .from(reservation)
-      .leftJoin(profile, eq(reservation.profileId, profile.id))
-      .leftJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
-      .leftJoin(course, eq(course.id, courseEvent.courseId));
-  }),
+  getReservations: adminProcedure.query(getReserverations),
+
+  getTraineeReservations: adminProcedure
+    .input(
+      z.object({
+        profileId: z.string(),
+      }),
+    )
+    .query(({ input }) => {
+      return getReserverations().where(
+        eq(reservation.profileId, input.profileId),
+      );
+    }),
 });
