@@ -42,7 +42,7 @@ interface DataTableProps<TData> {
   topDecorations?: React.ComponentType<DataTableDecorationProps<TData>>[];
   bottomDecorations?: React.ComponentType<DataTableDecorationProps<TData>>[];
 
-  table?: TableOptions<TData>,
+  table?: Partial<TableOptions<TData>>,
 }
 
 export function DataTable<TData>({
@@ -63,6 +63,7 @@ export function DataTable<TData>({
     data,
     columns,
     globalFilterFn: "includesString",
+    enableMultiRowSelection: false,
     defaultColumn: {
       cell: ({ getValue }) => getValue() ?? "-",
     },
