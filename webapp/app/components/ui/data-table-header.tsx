@@ -9,7 +9,7 @@ interface DataTableHeaderProps<TData> {
 
 export function DataTableHeader<TData>({ table }: DataTableHeaderProps<TData>) {
   return (
-    <TableHeader>
+    <TableHeader className="sticky background top-0 z-10">
       {table.getHeaderGroups().map((headerGroup) => (
         <TableRow key={headerGroup.id}>
           {headerGroup.headers.map((header) => {

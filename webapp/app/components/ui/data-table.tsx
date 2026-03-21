@@ -93,7 +93,7 @@ export function DataTable<TData>({
         ))}
       </div>
 
-      <div className="overflow-hidden rounded-md">
+      <div className="rounded-md">
         <Table>
           <DataTableHeader table={table} />
           <DataTableBody table={table} />
