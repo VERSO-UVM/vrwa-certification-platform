@@ -1,27 +1,25 @@
 import type { ReservationDto } from "@backend/database/dtos";
-import type { PaymentStatus, Reservation } from "@backend/database/schema";
+import type { PaymentStatus } from "@backend/database/schema";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { Button } from "~/components/ui/button";
 import { Field, FieldGroup, FieldLabel, FieldSet } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import {
   NativeSelect,
   NativeSelectOption,
 } from "~/components/ui/native-select";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
+import { useTRPC, useTRPCClient } from "~/utils/trpc";
 
 export function EditTraineeReservation({
   reservation,
 }: {
   reservation: ReservationDto;
 }) {
+  const trpc = useTRPC();
+  const client = useTRPCClient();
+  const queryClient = useQueryClient();
+
   const initialValue = {
     creditHours: parseFloat(reservation.creditHours),
     paymentStatus: reservation.paymentStatus,
@@ -32,17 +30,23 @@ export function EditTraineeReservation({
     [reservation.courseEventId, reservation.profileId],
   );
 
-  // const saveChanges = () => {
-  //   setChanges({
-  //     creditHours: creditHours.toString(),
-  //     ...changes,
-  //   });
-  // }
+  const updateData = async () => {
+    await client.reservationRouter.update.mutate({
+      profileId: reservation.profileId,
+      courseEventId: reservation.courseEventId,
+      creditHours: state.creditHours.toString(),
+      paymentStatus: state.paymentStatus,
+    });
+    console.log(`invalidating queries for ${trpc.adminRouter.getTraineeReservations.queryKey()}`);
+    await queryClient.invalidateQueries({
+      queryKey: trpc.adminRouter.getTraineeReservations.queryKey(),
+    });
+  };
 
   return (
     <>
       <h3 className="text-lg font-medium py-3">
-        {reservation.course.courseName}
+        {reservation.firstName} - {reservation.lastName} {reservation.course.courseName}
       </h3>
       <FieldSet className="pb-2">
         <FieldGroup>
@@ -81,6 +85,7 @@ export function EditTraineeReservation({
             </NativeSelect>
           </Field>
         </FieldGroup>
+        <Button onClick={() => updateData()}>Save changes</Button>
       </FieldSet>
     </>
   );
