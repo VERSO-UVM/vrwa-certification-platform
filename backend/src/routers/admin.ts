@@ -1,7 +1,11 @@
+import type { Select } from "@react-pdf/renderer";
 import { asc, eq, getTableColumns } from "drizzle-orm";
+import type { PgSelectBase } from "drizzle-orm/pg-core";
+import type { Query } from "pg";
 import z from "zod";
 
 import db from "~/database";
+import type { ReservationDto } from "~/database/dtos";
 import {
   account,
   course,
@@ -22,18 +26,23 @@ const { passwordHash: _, ...accountInfo } = getTableColumns(account);
 const getReserverations = () => {
   return db.client
     .select({
+      profileId: reservation.profileId,
+      courseEventId: reservation.courseEventId,
       creditHours: reservation.creditHours,
       paymentStatus: reservation.paymentStatus,
       firstName: profile.firstName,
       lastName: profile.lastName,
       isMember: profile.isMember,
       classStartDateTime: courseEvent.classStartDatetime,
-      courseName: course.courseName,
+      course: {
+        courseName: course.courseName,
+        creditHours: course.creditHours,
+      },
     })
     .from(reservation)
-    .leftJoin(profile, eq(reservation.profileId, profile.id))
-    .leftJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
-    .leftJoin(course, eq(course.id, courseEvent.courseId));
+    .innerJoin(profile, eq(reservation.profileId, profile.id))
+    .innerJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
+    .innerJoin(course, eq(course.id, courseEvent.courseId));
 };
 
 export const adminRouter = router({
@@ -62,7 +71,9 @@ export const adminRouter = router({
       .leftJoin(course, eq(courseEvent.courseId, course.id));
   }),
 
-  getReservations: adminProcedure.query(getReserverations),
+  getReservations: adminProcedure.query(
+    getReserverations as () => Promise<ReservationDto[]>,
+  ),
 
   getTraineeReservations: adminProcedure
     .input(
@@ -70,7 +81,7 @@ export const adminRouter = router({
         profileId: z.string(),
       }),
     )
-    .query(({ input }) => {
+    .query(({ input }): Promise<ReservationDto[]> => {
       return getReserverations().where(
         eq(reservation.profileId, input.profileId),
       );

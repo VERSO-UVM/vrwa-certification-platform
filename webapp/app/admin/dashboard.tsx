@@ -88,7 +88,7 @@ const reservationTabledef: ColumnDef<ReservationDto>[] = [
     header: "Payment Status",
   },
   {
-    accessorKey: "courseName",
+    accessorKey: "course.courseName",
     header: "Course Name",
   },
   {

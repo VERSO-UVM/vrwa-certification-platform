@@ -54,7 +54,7 @@ export function TraineeManager() {
           />
         </div>
         {selectedTrainee != null ? (
-          <div className="bg-gray-50 p-5 rounded">
+          <div className="p-5 rounded">
             <h2 className="text-xl font-medium pb-4">
               {selectedTrainee.firstName} {selectedTrainee.lastName}
             </h2>
@@ -81,10 +81,11 @@ export function TraineeManager() {
                 <b>Is Member:</b> {selectedTrainee.isMember ? "Yes" : "No"}
               </li>
             </ul>
-            <h2 className="text-lg font-medium py-4">Classes</h2>
-            <TraineeReservations profileId={selectedTrainee.id} />
 
             <Button>Edit</Button>
+
+            <h2 className="text-lg font-medium py-4">Classes</h2>
+            <TraineeReservations profileId={selectedTrainee.id} />
           </div>
         ) : (
           <div></div>
