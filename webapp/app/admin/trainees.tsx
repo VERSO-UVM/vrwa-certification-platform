@@ -1,9 +1,9 @@
 import type { Profile } from "@backend/database/schema";
 import { useQuery } from "@tanstack/react-query";
-import {
-  type ColumnDef,
-  type RowSelectionState,
-  type Updater,
+import type {
+  ColumnDef,
+  RowSelectionState,
+  Updater,
 } from "@tanstack/react-table";
 import { Button } from "~/components/ui/button";
 import { DataTable } from "~/components/ui/data-table";
@@ -11,6 +11,7 @@ import { PageHeader } from "~/components/page-header";
 import { TraineeReservations } from "./trainee-reservations";
 import { useState } from "react";
 import { useTRPC } from "~/utils/trpc";
+import { useReactTableRowSelect } from "~/hooks/use-row-select";
 
 const profileTableDef: ColumnDef<Profile>[] = [
   {
@@ -28,25 +29,12 @@ export function TraineeManager() {
   const traineesQuery = useQuery(trpc.adminRouter.getTrainees.queryOptions());
   const trainees = (traineesQuery.data ?? []) as Profile[];
 
-  const [selectedRow, setSelectedRow] = useState<number>(0);
+  const [
+    [selectedRow, _],
+    [reactTableRowSelection, reactTableSelectionChange],
+  ] = useReactTableRowSelect();
 
-  // Manually handle react table selection state
-  const reactTableRowSelection = { [selectedRow.toString()]: true } as RowSelectionState;
-  const reactTableSelectionChange = (updater: Updater<RowSelectionState>) => {
-    const newSelectionState =
-      updater instanceof Function ? updater(reactTableRowSelection) : updater;
-
-    const [selection, ...rest] = Object.entries(newSelectionState)
-      .filter(([_, selected]) => selected)
-      .map(([id, _]) => parseInt(id));
-
-    // Require a row to be selected always
-    if (selection != null && rest.length == 0) {
-      setSelectedRow(selection);
-    }
-  };
-
-  const selectedTrainee = selectedRow != null ? trainees[selectedRow] : null;
+  const selectedTrainee = trainees[selectedRow] ?? null;
 
   return (
     <div className="flex-1">
