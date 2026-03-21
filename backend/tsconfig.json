@@ -3,7 +3,8 @@
   "compilerOptions": {
     "paths": {
       "~/*": ["./src/*"],
-      "@webapp/*": ["../webapp/app/*"],
+      "@webapp/*": ["../webapp/app/*"]
     },
-  },
+    "outDir": "./dist"
+  }
 }

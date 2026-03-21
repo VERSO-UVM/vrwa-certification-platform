@@ -6,10 +6,12 @@
 
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "outDir": "dist/",
 
     "paths": {
       "~/*": ["./app/*"],
-      "@backend/*": ["../backend/src/*"],
-    },
+      "@backend/*": ["../backend/src/*"]
+    }
   },
+  "references": [{ "path": "../backend" }]
 }
