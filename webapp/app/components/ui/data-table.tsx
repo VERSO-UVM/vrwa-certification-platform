@@ -1,134 +1,109 @@
-/**
- * See https://ui.shadcn.com/docs/components/base/data-table#datatable--component
- */
-
-import React from "react";
 import {
   type ColumnDef,
-  flexRender,
   getCoreRowModel,
   useReactTable,
   getFilteredRowModel,
-  type SortingState,
   getSortedRowModel,
+  getPaginationRowModel,
+  type TableOptions,
+  type Table as ReactTable,
+  type RowData,
 } from "@tanstack/react-table";
 
+import { DataTableBody } from "./data-table-body";
+import { DataTableGlobalFilter } from "./data-table-global-filter";
+import { DataTableHeader } from "./data-table-header";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./table";
-import { Input } from "./input";
-import { Button } from "./button";
-import { ArrowUpDown } from "lucide-react";
+  DataTablePageSizeSelect,
+  PAGE_SIZE_SHOW_ALL,
+  type PageSizeValues,
+} from "./data-table-page-size-select";
+import { DataTablePagination } from "./data-table-pagination";
+import { Table } from "./table";
+import { DataTableInfoText } from "./data-table-info-text";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  showGlobalFilter?: boolean;
+export type DataTableDecorationProps<TData> = {
+  table: ReactTable<TData>;
+};
+
+/* We can define values to go in the `meta` field of table options */
+declare module "@tanstack/table-core" {
+  interface TableMeta<TData extends RowData> {
+    pageSizeOptions: PageSizeValues[];
+    _?: undefined & TData; /* ignore unused warning */
+  }
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-  showGlobalFilter = true,
-}: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = React.useState("");
+interface DataTableProps<TData> {
+  data: TData[],
+  columns: ColumnDef<TData>[],
 
+  pageSizeValues?: PageSizeValues[];
+  topDecorations?: React.ComponentType<DataTableDecorationProps<TData>>[];
+  bottomDecorations?: React.ComponentType<DataTableDecorationProps<TData>>[];
+
+  table?: Partial<TableOptions<TData>>,
+}
+
+export function DataTable<TData>({
+  data,
+  columns,
+  pageSizeValues = [
+    { label: "5", value: 5 },
+    { label: "10", value: 10 },
+    { label: "25", value: 25 },
+    { label: "50", value: 50 },
+    PAGE_SIZE_SHOW_ALL,
+  ],
+  topDecorations = [ DataTableGlobalFilter, DataTablePageSizeSelect ],
+  bottomDecorations = [ DataTablePagination, DataTableInfoText ],
+  table: tableOptions,
+}: DataTableProps<TData>) {
   const table = useReactTable({
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     globalFilterFn: "includesString",
-    onSortingChange: setSorting,
+    enableMultiRowSelection: false,
     defaultColumn: {
       cell: ({ getValue }) => getValue() ?? "-",
     },
-    state: {
-      sorting,
-      globalFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 5,
+        ...tableOptions?.initialState?.pagination,
+      },
+      ...tableOptions?.initialState,
     },
-    onGlobalFilterChange: setGlobalFilter,
+    meta: {
+      pageSizeOptions: pageSizeValues,
+      ...tableOptions?.meta,
+    },
+    ...tableOptions
   });
 
   return (
     <div>
-      {showGlobalFilter ? (
-        <div className="flex items-center pb-1">
-          <Input
-            placeholder="Filter table..."
-            value={globalFilter}
-            onChange={(event) => setGlobalFilter(String(event.target.value))}
-            className="max-w-sm border-none"
-          />
-        </div>
-      ) : null}
+      <div className="flex place-content-between">
+        {topDecorations.map((Item, i) => (
+          <Item key={i} table={table} />
+        ))}
+      </div>
 
       <div className="overflow-hidden rounded-md">
         <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      <Button
-                        variant="ghost"
-                        onClick={() =>
-                          header.column.toggleSorting(
-                            header.column.getIsSorted() == "asc",
-                          )
-                        }
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                        <ArrowUpDown className="h-4 w-4" />
-                      </Button>
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} {...cell.column.columnDef.meta}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
+          <DataTableHeader table={table} />
+          <DataTableBody table={table} />
         </Table>
+      </div>
+
+      <div className="flex flex-wrap place-content-between">
+        {bottomDecorations.map((Item, i) => (
+          <Item key={i} table={table} />
+        ))}
       </div>
     </div>
   );

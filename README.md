@@ -66,4 +66,5 @@ To build a new training and credential tracking system that:
 ## Contribution & Development Instructions
 
 1. Install dependencies: `bun install`
-2. Run development servers: `bun --filter="*" dev`
+2. Set-up development database: With [docker](https://docs.docker.com/get-started/get-docker/) running use `bun db:dev`, or see [backend/README.md](backend/README.md)
+3. Run development servers: `bun dev`

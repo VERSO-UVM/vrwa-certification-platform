@@ -11,5 +11,5 @@ export type ReservationDto =
   Pick<CourseEvent, "classStartDatetime">;
 
 export type CourseEventDto =
-  | CourseEvent
-  | Pick<Course, "courseName" | "description" | "creditHours" | "priceCents">;
+  & CourseEvent
+  & Pick<Course, "courseName" | "description" | "creditHours" | "priceCents">;

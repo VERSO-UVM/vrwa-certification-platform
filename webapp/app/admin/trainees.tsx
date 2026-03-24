@@ -28,7 +28,6 @@ export function TraineeManager() {
       <DataTable
         columns={profileTableDef}
         data={trainees}
-        showGlobalFilter={true}
         className="flex-1"
       />
     </div>
