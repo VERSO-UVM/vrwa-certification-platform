@@ -14,33 +14,23 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectGroup } from "~/components/ui/select";
 
 
-const rosterTableDef: ColumnDef<ReservationDto>[] = [
-    {
-        accessorKey: "firstName",
-        header: "First Name"
-    },
-    {
-        accessorKey: "lastName",
-        header: "Last Name"
-    },
-    {
-        accessorKey: "isMember",
-        header: "Member Status",
-        cell: ({ getValue }) => (getValue() == true ? "Member" : "Non-Member"),
-    },
-    {
-        accessorKey: "paymentStatus",
-        header: "Payment Status",
-    },
-    
-]
-
-
 
 export function CourseDetails() {
-    
     const trpc = useTRPC();
+    const client = useTRPCClient();
+    const queryClient = useQueryClient();
     const { courseId } = useParams();
+
+    async function deleteRow(profileId: string, courseEventId: string) {
+    
+        await client.courseManagerRouter.deleteReservation.mutate({ profileId, courseEventId});
+    
+    
+        await queryClient.invalidateQueries({
+            queryKey: trpc.adminRouter.getReservationsByCourse.queryKey({courseId: courseId!}),
+        });
+    }
+    
     const course = useQuery<Course>(
         trpc.courseManagerRouter.getCourseById.queryOptions({ id: courseId!})
     )
@@ -53,6 +43,37 @@ export function CourseDetails() {
         trpc.adminRouter.getTrainees.queryOptions()
     )
 
+    const rosterTableDef: ColumnDef<ReservationDto>[] = [
+        {
+            accessorKey: "firstName",
+            header: "First Name"
+        },
+        {
+            accessorKey: "lastName",
+            header: "Last Name"
+        },
+        {
+            accessorKey: "isMember",
+            header: "Member Status",
+            cell: ({ getValue }) => (getValue() == true ? "Member" : "Non-Member"),
+        },
+        {
+            accessorKey: "paymentStatus",
+            header: "Payment Status",
+        },
+        {
+            id: "actions",
+            cell: ({ row }) => {
+                return (
+                    <Button variant="destructive" onClick={() => deleteRow(row.original.profileId, row.original.courseEventId)}>    
+                        Remove Trainee
+                    </Button>
+                );
+            }
+        }
+        
+    ]
+    
     //grouping reservations by courseEventId to easily access rosters
     const reservationsList = reservations.data ?? [];
     const reservationsByEvent = reservationsList.reduce<Record<string, ReservationDto[]>>(
@@ -74,10 +95,12 @@ export function CourseDetails() {
     const [selectedTab, setSelectedTab] = useState<string | null>(null);
     const [traineePopupOpen, setTraineePopupOpen] = useState<boolean |false>(false);
 
-    const client = useTRPCClient();
-    const queryClient = useQueryClient();
+    const openRoster = selectedTab ? reservationsByEvent[selectedTab] ?? [] : [];
+    const rosterIds = new Set(openRoster.map((r) => r.profileId));
+    const availableTrainees = trainees.data?.filter((t) => !rosterIds.has(t.id)) ?? [];
 
-
+    
+    
 
     return (
         <div className="flex-1">
@@ -97,6 +120,16 @@ export function CourseDetails() {
                             </div>
                             <div>
                                 <p><b>Credit Hours: </b> {course.data?.creditHours}</p>
+                            </div>
+                            <div>
+                                <Button variant="secondary" size="lg" className="w-full">
+                                    Edit Course
+                                </Button>
+                            </div>
+                            <div>
+                                <Button variant="destructive" size="lg" className='w-full'>
+                                    Delete Course
+                                </Button>
                             </div>
                         </div>
                     </CardContent>
@@ -132,59 +165,61 @@ export function CourseDetails() {
                                 </TabsContent>
                             ))}
                         </Tabs>
-                        <Dialog open={traineePopupOpen} onOpenChange={setTraineePopupOpen}>
-                            <DialogTrigger asChild>
-                                <Button variant="secondary" size="lg">+ Add Trainee To Roster</Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>
-                                        New Enrollment
-                                    </DialogTitle>
-                                </DialogHeader>
-                                <DialogDescription>
-                                    select a trainee to add to the roster
-                                </DialogDescription>
-                                    <Select 
-                                        required
-                                        onValueChange={(value)=>setSelectedTrainee(value)}>
-                                        <SelectTrigger id="trainees" className="w-full max-w-48">
-                                            <SelectValue placeholder="Select a Trainee"/>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                {trainees.data?.map((trainee: Profile) => (
-                                                    <SelectItem key={trainee.id} value={trainee.id}>
-                                                        {trainee.firstName} {trainee.lastName}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
-                                    <Button
-                                        onClick={async () => {
-                                            if (!selectedTrainee) return;
+                        <div className="flex justify-end mt-4 pr-4">
+                            <Dialog open={traineePopupOpen} onOpenChange={setTraineePopupOpen}>
+                                <DialogTrigger asChild>
+                                    <Button variant="secondary" size="lg">+ Add Trainee To Roster</Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>
+                                            New Enrollment
+                                        </DialogTitle>
+                                    </DialogHeader>
+                                    <DialogDescription>
+                                        select a trainee to add to the roster
+                                    </DialogDescription>
+                                        <Select 
+                                            required
+                                            onValueChange={(value)=>setSelectedTrainee(value)}>
+                                            <SelectTrigger id="trainees" className="w-full max-w-48">
+                                                <SelectValue placeholder="Select a Trainee"/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    {availableTrainees.map((trainee: Profile) => (
+                                                        <SelectItem key={trainee.id} value={trainee.id}>
+                                                            {trainee.firstName} {trainee.lastName}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        <Button
+                                            onClick={async () => {
+                                                if (!selectedTrainee) return;
 
-                                            await client.courseManagerRouter.addReservation.mutate({
-                                                profileId: selectedTrainee,
-                                                courseEventId: selectedTab,
-                                                creditHours: course.data?.creditHours ?? 0,
-                                                paymentStatus: "unpaid",
-                                            });
+                                                await client.courseManagerRouter.addReservation.mutate({
+                                                    profileId: selectedTrainee,
+                                                    courseEventId: selectedTab,
+                                                    creditHours: course.data?.creditHours ?? 0,
+                                                    paymentStatus: "unpaid",
+                                                });
 
-                                            await queryClient.invalidateQueries(
-                                                trpc.courseManagerRouter.getReservationsByCourse.queryKey({
-                                                  courseId: courseId!,
-                                                })
-                                            );
-                                            
-                                            setTraineePopupOpen(false);
-                                        }}
-                                    >
-                                        add to roster
-                                    </Button>
-                            </DialogContent>
-                        </Dialog>    
+                                                await queryClient.invalidateQueries(
+                                                    trpc.courseManagerRouter.getReservationsByCourse.queryKey({
+                                                    courseId: courseId!,
+                                                    })
+                                                );
+                                                
+                                                setTraineePopupOpen(false);
+                                            }}
+                                        >
+                                            add to roster
+                                        </Button>
+                                </DialogContent>
+                            </Dialog>  
+                        </div>
                     </CardContent>
                 </Card>
             </div>

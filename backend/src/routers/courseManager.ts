@@ -1,4 +1,4 @@
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, and } from "drizzle-orm";
 import db from "~/database";
 import { courseEvent, course, reservation, profile } from "~/database/schema";
 import type {Course} from "~/database/schema";
@@ -163,6 +163,7 @@ export const courseManagerRouter = router({
 
   //updateCourse
   
+  
   //addTrainee
   addReservation: adminProcedure
   .input(
@@ -189,13 +190,17 @@ export const courseManagerRouter = router({
   deleteReservation: adminProcedure
     .input(
       z.object({
+        profileId: z.string(),
         courseEventId: z.string(),
       }),
     )
     .mutation(async ({ input }) => {
       const deletedRows = await db.client
         .delete(reservation)
-        .where(eq(reservation.courseEventId, input.courseEventId))
+        .where(and(
+          eq(reservation.courseEventId, input.courseEventId), 
+          eq(reservation.profileId, input.profileId))
+        )
         .returning();
         
       return { success: true };
