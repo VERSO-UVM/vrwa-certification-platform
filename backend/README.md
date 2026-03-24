@@ -40,6 +40,14 @@ $ bun run test:cov
 
 The TrainingDB uses a vanilla PostgreSQL database. For development purposes, a docker compose environment is provided but you are free to provide your own credentials.
 
+#### DB Quickstart
+
+To (re)start the development DB container and create and seed database:
+```bash
+bun db:dev
+```
+Any previous database content will be archived in `.tmp/db-data-OLD` and a new one will be created.
+
 #### DB Management Commands
 
 ```bash
@@ -64,10 +72,3 @@ To start the db container: `docker compose -f compose.dev.yml up -d`
 To stop the db container: `docker compose -f compose.dev.yml down`
 
 Make sure to also apply migrations! If you need to reset/wipe the database: `rm -rf .tmp/db-data`
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
