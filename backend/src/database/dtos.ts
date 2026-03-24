@@ -2,11 +2,18 @@
 // to be imported (`import type` only) in both the server and the client. (These are
 // called DTOs (Data Transfer Objects))
 
-import type { Course, CourseEvent, Profile, Reservation } from "./schema";
+import {
+  courseEvent,
+  type Course,
+  type CourseEvent,
+  type Profile,
+  type Reservation,
+} from "./schema";
 
 export type ReservationDto = Reservation &
-  Pick<Profile, "firstName" | "lastName" | "isMember"> & {
-    course: Pick<Course, "courseName" | "creditHours">;
+  Pick<Profile, "firstName" | "lastName" | "isMember"> &
+  Pick<CourseEvent, "classStartDatetime"> & {
+    course: Pick<Course, "courseName" | "creditHours" | "id">;
   };
 
 export type CourseEventDto = CourseEvent &

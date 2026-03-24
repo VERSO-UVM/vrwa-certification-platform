@@ -119,7 +119,7 @@ export function AdminDashboard() {
               Click on a class to see it in the&nbsp;
               <Link
                 className="text-blue-500 underline"
-                to="admin/course-manager"
+                to="/admin/course-manager"
               >
                 course manager.
               </Link>

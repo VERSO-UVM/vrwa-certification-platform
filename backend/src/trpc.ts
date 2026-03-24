@@ -3,12 +3,15 @@ import { authRouter } from "~/routers/auth";
 import { certificateRouter } from "~/routers/certificate";
 import { reservationRouter } from "~/routers/reservation";
 import { router } from "~/utils/trpc";
+import { courseManagerRouter } from "./routers/courseManager";
+import { router } from "./utils/trpc";
 
 export const appRouter = router({
   authRouter,
   adminRouter,
   certificateRouter,
   reservationRouter,
+  courseManagerRouter,
 });
 
 // Export type router type signature,

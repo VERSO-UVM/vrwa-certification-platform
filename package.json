@@ -33,5 +33,8 @@
     "@swc/core",
     "@tailwindcss/oxide",
     "esbuild"
-  ]
+  ],
+  "dependencies": {
+    "vaul": "^1.1.2"
+  }
 }
