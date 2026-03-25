@@ -70,9 +70,9 @@ export const profileColumnDefs = {
 
 export const profileColumnSets = {
   /**
-   * Done out like this just to make it visible how ProfileColumnDefs can
+   * Done out like this just to make it visible how `profileColumnDefs` can
    * be customized nicely following a similar structure. You can put anything
-   * in the self-executing lambda, it's nice for scoping, and it's important
+   * in the IIFE function expression, it's nice for scoping, and it's important
    * to define ColumnDefs outside of the render function (though it is OK to
    * define them in the render function if you memoize with useMemo())
    */
