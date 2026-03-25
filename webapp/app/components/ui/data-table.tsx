@@ -34,9 +34,10 @@ declare module "@tanstack/table-core" {
   }
 }
 
-interface DataTableProps<TData> {
+export interface DataTableProps<TData> {
   data: TData[],
-  columns: ColumnDef<TData>[],
+  // <TData, any> matches the type used in useReactTable options
+  columns: ColumnDef<TData, any>[],
 
   pageSizeValues?: PageSizeValues[];
   topDecorations?: React.ComponentType<DataTableDecorationProps<TData>>[];
