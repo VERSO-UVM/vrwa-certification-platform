@@ -5,25 +5,11 @@
  * ones, or take or customize the ones that are suitable for that view.
  */
 import type { Profile } from "@backend/database/schema";
-import { createColumnHelper, type RowData } from "@tanstack/react-table";
+import { createColumnHelper } from "@tanstack/react-table";
 import {
-  type ColumnEditor,
   textInputEditor,
   selectOptionsEditor,
-} from "~/components/field-editors";
-
-declare module "@tanstack/react-table" {
-  interface ColumnMeta<TData extends RowData, TValue> {
-    editor?: ColumnEditor<TData, TValue>;
-  }
-}
-
-declare module "@tanstack/table-core" {
-  interface TableMeta<TData extends RowData> {
-    updateData?: (rowIndex: number, columnId: string, value: unknown) => void;
-    _?: undefined & TData; /* ignore unused warning */
-  }
-}
+} from "~/utils/column-editors";
 
 // createColumnHelper just provides a stronger typed API to define ColumnDefs
 // Note that assigning the result type becomes difficult https://github.com/TanStack/table/issues/4382
