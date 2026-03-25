@@ -4,6 +4,7 @@ import {
   useReactTable,
   type ColumnDef,
 } from "@tanstack/react-table";
+import { useMemo } from "react";
 
 export function DetailsDisplay<TData>({
   item,
@@ -12,9 +13,11 @@ export function DetailsDisplay<TData>({
   item: TData;
   columns: ColumnDef<TData, any>[];
 }) {
+  // careful: even wrapping an item into a list makes it an unstable reference
+  const data = useMemo(() => [item], [item]);
   const table = useReactTable<TData>({
     columns,
-    data: [item],
+    data,
     getCoreRowModel: getCoreRowModel(),
   });
   const row = table.getRow("0");
