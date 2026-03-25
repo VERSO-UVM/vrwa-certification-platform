@@ -12,17 +12,8 @@ import { TraineeReservations } from "./trainee-reservations";
 import { useState } from "react";
 import { useTRPC } from "~/utils/trpc";
 import { useReactTableRowSelect } from "~/hooks/use-row-select";
-
-const profileTableDef: ColumnDef<Profile>[] = [
-  {
-    accessorKey: "firstName",
-    header: "First Name",
-  },
-  {
-    accessorKey: "lastName",
-    header: "Last Name",
-  },
-];
+import { profileColumnSets } from "~/utils/column-defs/profile";
+import { DetailsDisplay } from "~/components/ui/details-display";
 
 export function TraineeManager() {
   const trpc = useTRPC();
