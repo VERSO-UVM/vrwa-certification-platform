@@ -14,7 +14,8 @@ import type { PropsWithChildren } from "react";
 export type StandardDrawerProps = PropsWithChildren<{
   buttonText: string;
   title: string;
-  description?: string;
+  // We always need a description for `aria-describedby`
+  description: string;
 }> &
   React.ComponentProps<typeof Drawer>;
 
@@ -35,9 +36,7 @@ export function StandardDrawer({
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>{title}</DrawerTitle>
-          {description ? (
-            <DrawerDescription>{description}</DrawerDescription>
-          ) : null}
+          <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
         {children}
         <DrawerClose asChild>
