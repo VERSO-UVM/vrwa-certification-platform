@@ -7,7 +7,9 @@ import { TraineeReservations } from "./trainee-reservations";
 import { useTRPC } from "~/utils/trpc";
 import { useReactTableRowSelect } from "~/hooks/use-row-select";
 import { profileColumnSets } from "~/utils/column-defs/profile";
-import { DetailsDisplay } from "~/components/ui/details-display";
+import { DetailsDisplay } from "~/components/details-display";
+import { EditDrawer } from "~/components/edit-drawer";
+import { EditForm } from "~/components/edit-form";
 
 export function TraineeManager() {
   const trpc = useTRPC();
@@ -25,10 +27,10 @@ export function TraineeManager() {
     <div className="flex-1">
       <PageHeader>Trainees</PageHeader>
 
-      <div className="flex flex-col space-y-1 max-w-5xl ">
+      <div className="flex flex-col space-y-1 ">
         <div className="flex-1 border rounded p-3">
           <DataTable
-            columns={profileColumnSets.default}
+            columns={profileColumnSets.complete}
             data={trainees}
             table={{
               onRowSelectionChange: reactTableSelectionChange,
@@ -43,8 +45,15 @@ export function TraineeManager() {
             <h2 className="text-xl font-medium pb-4">
               {selectedTrainee.firstName} {selectedTrainee.lastName}
             </h2>
-            <DetailsDisplay item={selectedTrainee} columns={profileColumnSets.complete} />
-            <Button>Edit</Button>
+            <EditDrawer title="Update Trainee Details">
+              <div className="no-scrollbar overflow-y-auto px-4">
+                <EditForm
+                  item={selectedTrainee}
+                  columns={profileColumnSets.complete}
+                  onSave={console.log}
+                />
+              </div>
+            </EditDrawer>
 
             <h2 className="text-lg font-medium py-4">Classes</h2>
             <TraineeReservations profileId={selectedTrainee.id} />
