@@ -47,7 +47,7 @@ export function selectOptionsEditor<T, U extends { toString: () => string }>({
         }
       >
         {options.map(({ label, value }) => (
-          <NativeSelectOption value={value.toString()}>
+          <NativeSelectOption value={value.toString()} key={value.toString()}>
             {label}
           </NativeSelectOption>
         ))}
