@@ -15,7 +15,8 @@ export type StandardDrawerProps = PropsWithChildren<{
   buttonText: string;
   title: string;
   description?: string;
-}> & React.ComponentProps<typeof Drawer>;
+}> &
+  React.ComponentProps<typeof Drawer>;
 
 export function StandardDrawer({
   buttonText,
@@ -39,10 +40,10 @@ export function StandardDrawer({
           ) : null}
         </DrawerHeader>
         {children}
+        <DrawerClose asChild>
+          <Button variant="outline">Cancel</Button>
+        </DrawerClose>
       </DrawerContent>
-      <DrawerClose asChild>
-        <Button variant="outline">Cancel</Button>
-      </DrawerClose>
     </Drawer>
   );
 }
