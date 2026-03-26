@@ -13,48 +13,48 @@ import {
 
 // createColumnHelper just provides a stronger typed API to define ColumnDefs
 // Note that assigning the result type becomes difficult https://github.com/TanStack/table/issues/4382
-const columnHelper = createColumnHelper<Profile>();
+export const profileColumnHelper = createColumnHelper<Profile>();
 
-export const profileColumnDefs = {
+export const profileColumnDefMap = {
   // The keys are arbitary and don't have to match `accessorKey`, which is
   // also an optional field as we can also use `accessorFn`
-  firstName: columnHelper.accessor("firstName", {
+  firstName: profileColumnHelper.accessor("firstName", {
     header: "First Name",
     meta: {
       editor: textInputEditor(),
     },
   }),
-  lastName: columnHelper.accessor("lastName", {
+  lastName: profileColumnHelper.accessor("lastName", {
     header: "Last Name",
     meta: {
       editor: textInputEditor(),
     },
   }),
-  address: columnHelper.accessor("address", {
+  address: profileColumnHelper.accessor("address", {
     header: "Address",
     meta: {
       editor: textInputEditor(),
     },
   }),
-  city: columnHelper.accessor("city", {
+  city: profileColumnHelper.accessor("city", {
     header: "City",
     meta: {
       editor: textInputEditor(),
     },
   }),
-  postalCode: columnHelper.accessor("postalCode", {
+  postalCode: profileColumnHelper.accessor("postalCode", {
     header: "Postal Code",
     meta: {
       editor: textInputEditor(),
     },
   }),
-  phoneNumber: columnHelper.accessor("phoneNumber", {
+  phoneNumber: profileColumnHelper.accessor("phoneNumber", {
     header: "Phone Number",
     meta: {
       editor: textInputEditor(),
     },
   }),
-  isMember: columnHelper.accessor("isMember", {
+  isMember: profileColumnHelper.accessor("isMember", {
     header: "Member",
     cell: ({ getValue }) => (getValue() == true ? "yes" : "no"),
     meta: {
@@ -68,7 +68,7 @@ export const profileColumnDefs = {
   }),
 };
 
-export const profileColumnSets = {
+export const profileColumns = {
   /**
    * Done out like this just to make it visible how `profileColumnDefs` can
    * be customized nicely following a similar structure. You can put anything
@@ -77,10 +77,10 @@ export const profileColumnSets = {
    * define them in the render function if you memoize with useMemo())
    */
   default: (() => {
-    const { firstName, lastName, isMember } = profileColumnDefs;
+    const { firstName, lastName, isMember } = profileColumnDefMap;
     return [firstName, lastName, isMember];
   })(),
 
   // Object.values() is required to produce values in insertion order for String keys
-  complete: Object.values(profileColumnDefs),
+  all: Object.values(profileColumnDefMap),
 };

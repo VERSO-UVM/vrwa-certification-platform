@@ -29,7 +29,7 @@ export function StandardDrawer({
   return (
     <Drawer direction="right" {...props}>
       <DrawerTrigger asChild>
-        <Button variant="secondary" size="lg">
+        <Button variant="secondary">
           {buttonText}
         </Button>
       </DrawerTrigger>

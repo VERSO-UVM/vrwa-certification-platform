@@ -5,25 +5,59 @@ import { PageHeader } from "~/components/page-header";
 import { TraineeReservations } from "./trainee-reservations";
 import { useTRPC } from "~/utils/trpc";
 import { useReactTableRowSelect } from "~/hooks/use-row-select";
-import { profileColumnSets } from "~/utils/column-defs/profile";
+import {
+  profileColumnHelper,
+  profileColumns,
+} from "~/utils/column-defs/profile";
 import { EditForm } from "~/components/edit-form";
 import { StandardDrawer } from "~/components/standard-drawer";
 import { useState } from "react";
 
+const columnDefs = [
+  ...profileColumns.all,
+  profileColumnHelper.display({
+    header: "Actions",
+    cell: ({ row }) => {
+      const trpc = useTRPC();
+      const queryClient = useQueryClient();
+      const [editDrawerOpen, setEditDrawerOpen] = useState(false);
+      const updateQuery = useMutation(
+        trpc.profile.update.mutationOptions({
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: trpc.adminRouter.getTrainees.queryKey(),
+            });
+            setEditDrawerOpen(false);
+          },
+        }),
+      );
+      const onTraineeUpdated = async (changes: Partial<Profile>) => {
+        await updateQuery.mutateAsync({
+          ...changes,
+          id: row.original.id,
+        });
+      };
+      return (
+        <StandardDrawer
+          buttonText="Edit"
+          title="Update Trainee Details"
+          description="Save changes to go through with the edit."
+          open={editDrawerOpen}
+          onOpenChange={setEditDrawerOpen}
+        >
+          <EditForm
+            item={row.original}
+            columns={profileColumns.all}
+            onSave={onTraineeUpdated}
+          />
+        </StandardDrawer>
+      );
+    },
+  }),
+];
+
 export function TraineeManager() {
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
-  const [editDrawerOpen, setEditDrawerOpen] = useState(false);
-  const updateQuery = useMutation(
-    trpc.profile.update.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.adminRouter.getTrainees.queryKey(),
-        });
-        setEditDrawerOpen(false);
-      },
-    }),
-  );
   const traineesQuery = useQuery(trpc.adminRouter.getTrainees.queryOptions());
   const trainees = traineesQuery.data ?? [];
   const [
@@ -33,14 +67,6 @@ export function TraineeManager() {
 
   const selectedTrainee = trainees[selectedRow] ?? null;
 
-  const onTraineeUpdated = async (changes: Partial<Profile>) => {
-    if (selectedTrainee == null) throw new Error("No trainee selected");
-    await updateQuery.mutateAsync({
-      ...changes,
-      id: selectedTrainee.id,
-    });
-  };
-
   return (
     <div className="flex-1">
       <PageHeader>Trainees</PageHeader>
@@ -48,7 +74,7 @@ export function TraineeManager() {
       <div className="flex flex-col space-y-1 ">
         <div className="flex-1 border rounded p-3">
           <DataTable
-            columns={profileColumnSets.complete}
+            columns={columnDefs}
             data={trainees}
             table={{
               onRowSelectionChange: reactTableSelectionChange,
@@ -63,19 +89,6 @@ export function TraineeManager() {
             <h2 className="text-xl font-medium pb-4">
               {selectedTrainee.firstName} {selectedTrainee.lastName}
             </h2>
-            <StandardDrawer
-              buttonText="Edit"
-              title="Update Trainee Details"
-              description="Save changes to go through with the edit."
-              open={editDrawerOpen}
-              onOpenChange={setEditDrawerOpen}
-            >
-              <EditForm
-                item={selectedTrainee}
-                columns={profileColumnSets.complete}
-                onSave={onTraineeUpdated}
-              />
-            </StandardDrawer>
 
             <h2 className="text-lg font-medium py-4">Classes</h2>
             <TraineeReservations profileId={selectedTrainee.id} />
