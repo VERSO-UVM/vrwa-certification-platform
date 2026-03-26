@@ -1,5 +1,5 @@
 import type { CellContext } from "@tanstack/react-table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "~/components/ui/input";
 import {
   NativeSelect,
@@ -9,18 +9,22 @@ import {
 export type ColumnEditor<TData, TValue> = (item: {
   ctx: CellContext<TData, TValue>;
   forId: string;
-  onUpdate: (value: TValue) => void;
+  onChange: (value: TValue) => void;
+  onBlur: (value: TValue) => void;
 }) => React.ReactNode;
 
 export function textInputEditor<T>(): ColumnEditor<T, string> {
-  return ({ forId, onUpdate, ctx: { getValue } }) => {
+  return ({ forId, onChange, onBlur: onUpdate, ctx: { getValue } }) => {
     const [value, setValue] = useState(getValue());
     return (
       <Input
         id={forId}
         value={value}
         type="text"
-        onChange={(event) => setValue(event.target.value)}
+        onChange={(event) => {
+          setValue(event.target.value);
+          onChange(event.target.value);
+        }}
         onBlur={() => onUpdate(value)}
       />
     );
@@ -36,8 +40,12 @@ export function selectOptionsEditor<T, U extends { toString: () => string }>({
   const stringToValue = Object.fromEntries(
     options.map(({ value }) => [value.toString(), value]),
   );
-  return ({ forId, onUpdate, ctx: { getValue } }) => {
-    const [value, setValue] = useState(getValue());
+  return ({ forId, onChange, onBlur: onUpdate, ctx: { getValue } }) => {
+    const [value, _setValue] = useState(getValue());
+    const setValue = (value: U) => {
+      _setValue(value);
+      onChange(value);
+    };
     return (
       <NativeSelect
         id={forId}

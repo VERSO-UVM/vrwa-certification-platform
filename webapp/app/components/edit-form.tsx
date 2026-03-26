@@ -47,7 +47,8 @@ export function EditForm<T>({ item, columns, onSave }: EditFormProps<T>) {
                   {cell.column.columnDef.meta.editor({
                     ctx: cell.getContext(),
                     forId: htmlId,
-                    onUpdate: (value) => setUpdated({
+                    onBlur: (_value) => {},
+                    onChange: (value) => setUpdated({
                       ...updated,
                       [cell.column.id]: value,
                     })
@@ -58,7 +59,7 @@ export function EditForm<T>({ item, columns, onSave }: EditFormProps<T>) {
           })}
         </Field>
       </FieldGroup>
-      <Button onClick={() => onSave(updated)}>Save changes</Button>
+      <Button disabled={Object.keys(updated).length == 0} onClick={() => onSave(updated)}>Save changes</Button>
     </FieldSet>
   );
 }
