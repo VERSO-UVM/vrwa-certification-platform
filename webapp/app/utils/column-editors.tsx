@@ -14,7 +14,7 @@ export type ColumnEditor<TData, TValue> = (item: {
 }) => React.ReactNode;
 
 export function textInputEditor<T>(): ColumnEditor<T, string> {
-  return ({ forId, onChange, onBlur: onUpdate, ctx: { getValue } }) => {
+  return ({ forId, onChange, onBlur, ctx: { getValue } }) => {
     const [value, setValue] = useState(getValue());
     return (
       <Input
@@ -25,7 +25,7 @@ export function textInputEditor<T>(): ColumnEditor<T, string> {
           setValue(event.target.value);
           onChange(event.target.value);
         }}
-        onBlur={() => onUpdate(value)}
+        onBlur={() => onBlur(value)}
       />
     );
   };
@@ -40,7 +40,7 @@ export function selectOptionsEditor<T, U extends { toString: () => string }>({
   const stringToValue = Object.fromEntries(
     options.map(({ value }) => [value.toString(), value]),
   );
-  return ({ forId, onChange, onBlur: onUpdate, ctx: { getValue } }) => {
+  return ({ forId, onChange, onBlur, ctx: { getValue } }) => {
     const [value, _setValue] = useState(getValue());
     const setValue = (value: U) => {
       _setValue(value);
@@ -49,7 +49,8 @@ export function selectOptionsEditor<T, U extends { toString: () => string }>({
     return (
       <NativeSelect
         id={forId}
-        onBlur={() => onUpdate(value)}
+        onBlur={() => onBlur(value)}
+        value={value.toString()}
         onChange={(event) =>
           setValue(stringToValue[event.target.value] ?? value)
         }

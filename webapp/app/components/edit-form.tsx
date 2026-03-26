@@ -6,16 +6,17 @@ import {
 } from "@tanstack/react-table";
 import { FieldSet, FieldGroup, FieldLabel, Field } from "./ui/field";
 import { Input } from "./ui/input";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "./ui/button";
 import { DrawerClose } from "./ui/drawer";
+import { shallowEqual } from "~/utils/utils";
 
 export type EditFormProps<T> = {
   item: T;
   columns: ColumnDef<T, any>[];
   onSave: (updated: Partial<T>) => void;
 };
-export function EditForm<T>({ item, columns, onSave }: EditFormProps<T>) {
+export function EditForm<T extends object>({ item, columns, onSave }: EditFormProps<T>) {
   const data = useMemo(() => [item], [item]);
   const table = useReactTable<T>({
     columns,
@@ -24,7 +25,7 @@ export function EditForm<T>({ item, columns, onSave }: EditFormProps<T>) {
   });
   const row = table.getRow("0");
   const headers = table.getFlatHeaders();
-  const [updated, setUpdated] = useState<Partial<T>>({})
+  const [updated, setUpdated] = useState<T>(row.original);
 
   return (
     <FieldSet className="pb-2">
@@ -36,7 +37,7 @@ export function EditForm<T>({ item, columns, onSave }: EditFormProps<T>) {
             if (cell.column.columnDef.meta?.editor == null) return null;
             const htmlId = cell.column.id + "_input";
             return (
-              <div key={cell.id}> 
+              <div key={cell.id}>
                 <dt className="text-sm font-semibold">
                   {flexRender(
                     cell.column.columnDef.header,
@@ -48,18 +49,24 @@ export function EditForm<T>({ item, columns, onSave }: EditFormProps<T>) {
                     ctx: cell.getContext(),
                     forId: htmlId,
                     onBlur: (_value) => {},
-                    onChange: (value) => setUpdated({
-                      ...updated,
-                      [cell.column.id]: value,
-                    })
+                    onChange: (value) =>
+                      setUpdated({
+                        ...updated,
+                        [cell.column.id]: value,
+                      }),
                   })}
                 </dd>
-              </div> 
+              </div>
             );
           })}
         </Field>
       </FieldGroup>
-      <Button disabled={Object.keys(updated).length == 0} onClick={() => onSave(updated)}>Save changes</Button>
+      <Button
+        disabled={shallowEqual(updated, row.original)}
+        onClick={() => onSave(updated)}
+      >
+        Save changes
+      </Button>
     </FieldSet>
   );
 }

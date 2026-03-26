@@ -1,6 +1,6 @@
 import type { ReservationDto } from "@backend/database/dtos";
 import type { PaymentStatus } from "@backend/database/schema";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Field, FieldGroup, FieldLabel, FieldSet } from "~/components/ui/field";
@@ -17,7 +17,6 @@ export function EditTraineeReservation({
   reservation: ReservationDto;
 }) {
   const trpc = useTRPC();
-  const client = useTRPCClient();
   const queryClient = useQueryClient();
   const reservationUpdater = useMutation(
     trpc.reservation.update.mutationOptions(),
@@ -34,13 +33,15 @@ export function EditTraineeReservation({
   );
 
   const updateData = async () => {
-    await client.reservationRouter.update.mutate({
+    await reservationUpdater.mutateAsync({
       profileId: reservation.profileId,
       courseEventId: reservation.courseEventId,
       creditHours: state.creditHours.toString(),
       paymentStatus: state.paymentStatus,
     });
-    console.log(`invalidating queries for ${trpc.adminRouter.getTraineeReservations.queryKey()}`);
+    console.log(
+      `invalidating queries for ${trpc.adminRouter.getTraineeReservations.queryKey()}`,
+    );
     await queryClient.invalidateQueries({
       queryKey: trpc.adminRouter.getTraineeReservations.queryKey(),
     });
@@ -49,7 +50,8 @@ export function EditTraineeReservation({
   return (
     <>
       <h3 className="text-lg font-medium py-3">
-        {reservation.firstName} - {reservation.lastName} {reservation.course.courseName}
+        {reservation.firstName} - {reservation.lastName}{" "}
+        {reservation.course.courseName}
       </h3>
       <FieldSet className="pb-2">
         <FieldGroup>
