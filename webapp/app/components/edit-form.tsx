@@ -36,7 +36,7 @@ export function EditForm<T>({ item, columns, onSave }: EditFormProps<T>) {
             if (cell.column.columnDef.meta?.editor == null) return null;
             const htmlId = cell.column.id + "_input";
             return (
-              <>
+              <div key={cell.id}> 
                 <dt className="text-sm font-semibold">
                   {flexRender(
                     cell.column.columnDef.header,
@@ -53,15 +53,12 @@ export function EditForm<T>({ item, columns, onSave }: EditFormProps<T>) {
                     })
                   })}
                 </dd>
-              </>
+              </div> 
             );
           })}
         </Field>
       </FieldGroup>
       <Button onClick={() => onSave(updated)}>Save changes</Button>
-      <DrawerClose asChild>
-        <Button variant="outline">Cancel</Button>
-      </DrawerClose>
     </FieldSet>
   );
 }
