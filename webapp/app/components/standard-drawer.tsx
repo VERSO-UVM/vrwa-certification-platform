@@ -38,7 +38,7 @@ export function StandardDrawer({
           <DrawerTitle>{title}</DrawerTitle>
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
-        {children}
+        <div className="no-scrollbar overflow-y-auto px-4">{children}</div>
         <DrawerClose asChild>
           <Button variant="outline">Cancel</Button>
         </DrawerClose>

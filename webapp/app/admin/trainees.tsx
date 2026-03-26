@@ -69,13 +69,11 @@ export function TraineeManager() {
               open={editDrawerOpen}
               onOpenChange={setEditDrawerOpen}
             >
-              <div className="no-scrollbar overflow-y-auto px-4">
-                <EditForm
-                  item={selectedTrainee}
-                  columns={profileColumnSets.complete}
-                  onSave={onTraineeUpdated}
-                />
-              </div>
+              <EditForm
+                item={selectedTrainee}
+                columns={profileColumnSets.complete}
+                onSave={onTraineeUpdated}
+              />
             </StandardDrawer>
 
             <h2 className="text-lg font-medium py-4">Classes</h2>
