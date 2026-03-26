@@ -13,6 +13,8 @@ import { EditForm } from "~/components/edit-form";
 
 export function TraineeManager() {
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const updateQuery = useMutation(trpc.profile.update.mutationOptions());
   const traineesQuery = useQuery(trpc.adminRouter.getTrainees.queryOptions());
   const trainees = (traineesQuery.data ?? []) as Profile[];
 

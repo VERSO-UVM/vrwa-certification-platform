@@ -4,13 +4,14 @@ import { certificateRouter } from "~/routers/certificate";
 import { reservationRouter } from "~/routers/reservation";
 import { router } from "~/utils/trpc";
 import { courseManagerRouter } from "./routers/courseManager";
-import { router } from "./utils/trpc";
+import { profileRouter } from "./routers/profile";
 
 export const appRouter = router({
   authRouter,
   adminRouter,
   certificateRouter,
-  reservationRouter,
+  reservation: reservationRouter,
+  profile: profileRouter,
   courseManagerRouter,
 });
 

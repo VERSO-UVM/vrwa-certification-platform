@@ -19,6 +19,9 @@ export function EditTraineeReservation({
   const trpc = useTRPC();
   const client = useTRPCClient();
   const queryClient = useQueryClient();
+  const reservationUpdater = useMutation(
+    trpc.reservation.update.mutationOptions(),
+  );
 
   const initialValue = {
     creditHours: parseFloat(reservation.creditHours),
