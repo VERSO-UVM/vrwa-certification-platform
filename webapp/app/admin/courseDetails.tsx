@@ -27,19 +27,19 @@ export function CourseDetails() {
     
     
         await queryClient.invalidateQueries({
-            queryKey: trpc.adminRouter.getReservationsByCourse.queryKey({courseId: courseId!}),
+            queryKey: trpc.courseManagerRouter.getReservationsByCourse.queryKey({courseId: courseId!}),
         });
     }
     
-    const course = useQuery<Course>(
+    const course = useQuery(
         trpc.courseManagerRouter.getCourseById.queryOptions({ id: courseId!})
     )
     
-    const reservations = useQuery<ReservationDto[]>(
+    const reservations = useQuery(
         trpc.courseManagerRouter.getReservationsByCourse.queryOptions({ courseId: courseId!, }),
     )
 
-    const trainees = useQuery<Profile[]>(
+    const trainees = useQuery(
         trpc.adminRouter.getTrainees.queryOptions()
     )
 
@@ -79,11 +79,14 @@ export function CourseDetails() {
     const reservationsByEvent = reservationsList.reduce<Record<string, ReservationDto[]>>(
         (rosters, reservation) => {
             const key = reservation.courseEventId;
+            if (!key) return rosters;
+
             if (!rosters[key]) {
                 rosters[key] = [];
             }
-            rosters[key].push(reservation);
-            return rosters;    
+
+            rosters[key]!.push(reservation as ReservationDto);
+            return rosters;
         }, {}
     );
 
