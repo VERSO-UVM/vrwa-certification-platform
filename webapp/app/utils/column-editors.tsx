@@ -13,9 +13,13 @@ export type ColumnEditor<TData, TValue> = (item: {
   onBlur: (value: TValue) => void;
 }) => React.ReactNode;
 
-export function textInputEditor<T>(): ColumnEditor<T, string> {
+export function textInputEditor<T>(
+  props?: React.ComponentProps<"input">,
+): ColumnEditor<T, string> {
   return ({ forId, onChange, onBlur, ctx: { getValue } }) => {
     const [value, setValue] = useState(getValue());
+    // if the value's been taken out from under us
+    useEffect(() => setValue(getValue()), [getValue()]);
     return (
       <Input
         id={forId}
@@ -26,6 +30,7 @@ export function textInputEditor<T>(): ColumnEditor<T, string> {
           onChange(event.target.value);
         }}
         onBlur={() => onBlur(value)}
+        {...props}
       />
     );
   };
@@ -42,6 +47,8 @@ export function selectOptionsEditor<T, U extends { toString: () => string }>({
   );
   return ({ forId, onChange, onBlur, ctx: { getValue } }) => {
     const [value, _setValue] = useState(getValue());
+    // if the value's been taken out from under us
+    useEffect(() => _setValue(getValue()), [getValue()]);
     const setValue = (value: U) => {
       _setValue(value);
       onChange(value);

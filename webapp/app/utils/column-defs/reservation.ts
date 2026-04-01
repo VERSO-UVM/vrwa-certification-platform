@@ -15,7 +15,10 @@ export const reservationColumnDefs = {
   creditHours: reservationColumnHelper.accessor("creditHours", {
     header: "Credit Hours",
     meta: {
-      editor: textInputEditor(),
+      editor: textInputEditor({
+        type: "number",
+        step: 0.1,
+      }),
     },
   }),
   paymentStatus: reservationColumnHelper.accessor("paymentStatus", {

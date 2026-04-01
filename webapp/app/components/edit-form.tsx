@@ -16,8 +16,16 @@ export type EditFormProps<T> = {
   columns: ColumnDef<T, any>[];
   onSave: (updated: Partial<T>) => void;
 };
-export function EditForm<T extends object>({ item, columns, onSave }: EditFormProps<T>) {
+export function EditForm<T extends object>({
+  item,
+  columns,
+  onSave,
+}: EditFormProps<T>) {
   const data = useMemo(() => [item], [item]);
+  const [updates, setUpdates] = useState<Partial<T>>({});
+  // If data is swiped out from under us
+  useEffect(() => setUpdates({}), [data]);
+
   const table = useReactTable<T>({
     columns,
     data,
@@ -25,7 +33,6 @@ export function EditForm<T extends object>({ item, columns, onSave }: EditFormPr
   });
   const row = table.getRow("0");
   const headers = table.getFlatHeaders();
-  const [updated, setUpdated] = useState<T>(row.original);
 
   return (
     <FieldSet className="pb-2">
@@ -50,8 +57,8 @@ export function EditForm<T extends object>({ item, columns, onSave }: EditFormPr
                     forId: htmlId,
                     onBlur: (_value) => {},
                     onChange: (value) =>
-                      setUpdated({
-                        ...updated,
+                      setUpdates({
+                        ...updates,
                         [cell.column.id]: value,
                       }),
                   })}
@@ -62,8 +69,8 @@ export function EditForm<T extends object>({ item, columns, onSave }: EditFormPr
         </Field>
       </FieldGroup>
       <Button
-        disabled={shallowEqual(updated, row.original)}
-        onClick={() => onSave(updated)}
+        disabled={shallowEqual({ ...row.original, ...updates }, row.original)}
+        onClick={() => onSave(updates)}
       >
         Save changes
       </Button>

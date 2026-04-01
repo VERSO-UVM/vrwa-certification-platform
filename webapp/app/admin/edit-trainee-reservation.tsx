@@ -2,6 +2,7 @@ import type { ReservationDto } from "@backend/database/dtos";
 import type { PaymentStatus } from "@backend/database/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { EditForm } from "~/components/edit-form";
 import { Button } from "~/components/ui/button";
 import { Field, FieldGroup, FieldLabel, FieldSet } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
@@ -9,7 +10,10 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "~/components/ui/native-select";
-import { useTRPC, useTRPCClient } from "~/utils/trpc";
+import {
+  reservationColumnDefLists,
+} from "~/utils/column-defs/reservation";
+import { useTRPC } from "~/utils/trpc";
 
 export function EditTraineeReservation({
   reservation,
@@ -22,22 +26,12 @@ export function EditTraineeReservation({
     trpc.reservation.update.mutationOptions(),
   );
 
-  const initialValue = {
-    creditHours: parseFloat(reservation.creditHours),
-    paymentStatus: reservation.paymentStatus,
-  };
-  const [state, setState] = useState(initialValue);
-  useEffect(
-    () => setState(initialValue),
-    [reservation.courseEventId, reservation.profileId],
-  );
-
-  const updateData = async () => {
+  const updateData = async (updates: Partial<ReservationDto>) => {
     await reservationUpdater.mutateAsync({
       profileId: reservation.profileId,
       courseEventId: reservation.courseEventId,
-      creditHours: state.creditHours.toString(),
-      paymentStatus: state.paymentStatus,
+      creditHours: updates.creditHours?.toString(),
+      paymentStatus: updates.paymentStatus,
     });
     console.log(
       `invalidating queries for ${trpc.adminRouter.getTraineeReservations.queryKey()}`,
@@ -53,45 +47,11 @@ export function EditTraineeReservation({
         {reservation.firstName} - {reservation.lastName}{" "}
         {reservation.course.courseName}
       </h3>
-      <FieldSet className="pb-2">
-        <FieldGroup>
-          <Field>
-            <FieldLabel htmlFor="creditHours">Credit Hours Received</FieldLabel>
-            <Input
-              id="creditHours"
-              className="max-w-30"
-              type="number"
-              autoComplete="off"
-              value={state.creditHours}
-              step={0.1}
-              onChange={(event) =>
-                setState({
-                  ...state,
-                  creditHours: parseFloat(event.target.value),
-                })
-              }
-            />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="paymentStatus">Payment Status</FieldLabel>
-            <NativeSelect
-              id="paymentStatus"
-              className="max-w-60"
-              value={state.paymentStatus}
-              onChange={(event) =>
-                setState({
-                  ...state,
-                  paymentStatus: event.target.value as PaymentStatus,
-                })
-              }
-            >
-              <NativeSelectOption value="paid">Paid</NativeSelectOption>
-              <NativeSelectOption value="unpaid">Unpaid</NativeSelectOption>
-            </NativeSelect>
-          </Field>
-        </FieldGroup>
-        <Button onClick={() => updateData()}>Save changes</Button>
-      </FieldSet>
+      <EditForm
+        item={reservation}
+        columns={reservationColumnDefLists.basic}
+        onSave={updateData}
+      />
     </>
   );
 }
