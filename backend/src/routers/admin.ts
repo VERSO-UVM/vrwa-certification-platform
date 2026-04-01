@@ -33,8 +33,9 @@ const getReserverations = () => {
       firstName: profile.firstName,
       lastName: profile.lastName,
       isMember: profile.isMember,
-      classStartDateTime: courseEvent.classStartDatetime,
+      classStartDatetime: courseEvent.classStartDatetime,
       course: {
+        id: course.id,
         courseName: course.courseName,
         creditHours: course.creditHours,
       },
