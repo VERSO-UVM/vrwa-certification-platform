@@ -6,6 +6,7 @@ import { useReactTableRowSelect } from "~/hooks/use-row-select";
 import { useTRPC } from "~/utils/trpc";
 import { EditTraineeReservation } from "./edit-trainee-reservation";
 import { reservation } from "@backend/database/schema";
+import { reservationColumnDefLists } from "~/utils/column-defs/reservation";
 
 const reservationTableDef: ColumnDef<ReservationDto>[] = [
   {
@@ -43,7 +44,7 @@ export function TraineeReservations({ profileId }: { profileId: string }) {
   return (
     <>
       <DataTable
-        columns={reservationTableDef}
+        columns={reservationColumnDefLists.basic}
         data={reservations}
         table={{
           onRowSelectionChange,
