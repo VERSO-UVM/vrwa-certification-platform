@@ -6,26 +6,14 @@ import { useReactTableRowSelect } from "~/hooks/use-row-select";
 import { useTRPC } from "~/utils/trpc";
 import { EditTraineeReservation } from "./edit-trainee-reservation";
 import { reservation } from "@backend/database/schema";
-import { reservationColumnDefLists } from "~/utils/column-defs/reservation";
+import { reservationColumnDefLists, reservationColumnHelper } from "~/utils/column-defs/reservation";
 
-const reservationTableDef: ColumnDef<ReservationDto>[] = [
-  {
-    accessorKey: "course.courseName",
-    header: "Course Name",
-  },
-  {
-    accessorKey: "classStartDateTime",
-    header: "Course Date",
-    cell: ({ getValue }) => new Date(getValue() as string).toLocaleDateString(),
-  },
-  {
-    accessorKey: "creditHours",
-    header: "Credit Hours Received",
-  },
-  {
-    accessorKey: "paymentStatus",
-    header: "Payment Status",
-  },
+const columnDefs = [
+  ...reservationColumnDefLists.basic,
+  reservationColumnHelper.display({
+    header: "Actions",
+    cell: ({ row }) => <EditTraineeReservation reservation={row.original} />
+  })
 ];
 
 export function TraineeReservations({ profileId }: { profileId: string }) {
@@ -44,7 +32,7 @@ export function TraineeReservations({ profileId }: { profileId: string }) {
   return (
     <>
       <DataTable
-        columns={reservationColumnDefLists.basic}
+        columns={columnDefs}
         data={reservations}
         table={{
           onRowSelectionChange,

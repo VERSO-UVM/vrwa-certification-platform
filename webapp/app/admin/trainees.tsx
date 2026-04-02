@@ -9,48 +9,41 @@ import {
   profileColumnHelper,
   profileColumns,
 } from "~/utils/column-defs/profile";
-import { EditForm } from "~/components/edit-form";
-import { StandardDrawer } from "~/components/standard-drawer";
-import { useState } from "react";
+import { EditDrawer } from "~/components/edit-drawer";
 
 const columnDefs = [
   ...profileColumns.all,
+
   profileColumnHelper.display({
     header: "Actions",
     cell: ({ row }) => {
       const trpc = useTRPC();
       const queryClient = useQueryClient();
-      const [editDrawerOpen, setEditDrawerOpen] = useState(false);
       const updateQuery = useMutation(
         trpc.profile.update.mutationOptions({
           onSuccess: () => {
             queryClient.invalidateQueries({
               queryKey: trpc.adminRouter.getTrainees.queryKey(),
             });
-            setEditDrawerOpen(false);
           },
         }),
       );
-      const onTraineeUpdated = async (changes: Partial<Profile>) => {
-        await updateQuery.mutateAsync({
-          ...changes,
-          id: row.original.id,
-        });
-      };
       return (
-        <StandardDrawer
-          buttonText="Edit"
-          title="Update Trainee Details"
-          description="Save changes to go through with the edit."
-          open={editDrawerOpen}
-          onOpenChange={setEditDrawerOpen}
-        >
-          <EditForm
-            item={row.original}
-            columns={profileColumns.all}
-            onSave={onTraineeUpdated}
-          />
-        </StandardDrawer>
+        <EditDrawer
+          drawer={{
+            buttonText: "Edit",
+            title: "Update Trainee Details",
+            description: "Save changes to go through with the edit.",
+          }}
+          item={row.original}
+          columns={profileColumns.all}
+          onSave={async (changes) => {
+            await updateQuery.mutateAsync({
+              ...changes,
+              id: row.original.id,
+            });
+          }}
+        />
       );
     },
   }),

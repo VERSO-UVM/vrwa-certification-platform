@@ -4,11 +4,9 @@ import {
   useReactTable,
   type ColumnDef,
 } from "@tanstack/react-table";
-import { FieldSet, FieldGroup, FieldLabel, Field } from "./ui/field";
-import { Input } from "./ui/input";
+import { FieldSet, FieldGroup, Field } from "./ui/field";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "./ui/button";
-import { DrawerClose } from "./ui/drawer";
 import { shallowEqual } from "~/utils/utils";
 
 export type EditFormProps<T> = {
