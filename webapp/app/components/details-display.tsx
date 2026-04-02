@@ -6,12 +6,12 @@ import {
 } from "@tanstack/react-table";
 import { useMemo } from "react";
 
-export function DetailsDisplay<TData>({
+export function DetailsDisplay<TData, TValue>({
   item,
   columns,
 }: {
   item: TData;
-  columns: ColumnDef<TData, any>[];
+  columns: ColumnDef<TData, TValue>[];
 }) {
   // careful: even wrapping an item into a list makes it an unstable reference
   const data = useMemo(() => [item], [item]);

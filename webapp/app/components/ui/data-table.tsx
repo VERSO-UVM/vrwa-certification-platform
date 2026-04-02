@@ -34,10 +34,9 @@ declare module "@tanstack/table-core" {
   }
 }
 
-export interface DataTableProps<TData> {
+export interface DataTableProps<TData, TValue> {
   data: TData[],
-  // <TData, any> matches the type used in useReactTable options
-  columns: ColumnDef<TData, any>[],
+  columns: ColumnDef<TData, TValue>[],
 
   pageSizeValues?: PageSizeValues[];
   topDecorations?: React.ComponentType<DataTableDecorationProps<TData>>[];
@@ -46,7 +45,7 @@ export interface DataTableProps<TData> {
   table?: Partial<TableOptions<TData>>,
 }
 
-export function DataTable<TData>({
+export function DataTable<TData, TValue>({
   data,
   columns,
   pageSizeValues = [
@@ -59,7 +58,7 @@ export function DataTable<TData>({
   topDecorations = [ DataTableGlobalFilter, DataTablePageSizeSelect ],
   bottomDecorations = [ DataTablePagination, DataTableInfoText ],
   table: tableOptions,
-}: DataTableProps<TData>) {
+}: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
