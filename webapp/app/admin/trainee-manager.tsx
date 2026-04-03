@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
 import type { Profile } from "@backend/database/schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DataTable } from "~/components/data-table";
 import { PageHeader } from "~/components/page-header";
-import { TraineeReservations } from "./trainee-manager/reservations";
 import { useTRPC } from "~/utils/trpc";
 import {
   profileDefs,
@@ -11,19 +9,13 @@ import {
   profileDefPresets,
 } from "~/utils/field-defs/profile";
 import { EditDrawer } from "~/components/entry-views/edit-drawer";
-import { DetailsDisplay } from "~/components/entry-views/details-display";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
 import { useSearchParamEntry } from "~/hooks/use-search-param-entry";
 import {
   getOnRowSelectionChange,
   getRowSelectionState,
 } from "~/utils/single-row-select";
+import { Trainee } from "./trainee-manager/trainee";
+import { useHashString } from "~/hooks/use-hash-string";
 
 const columnDefs = (() => {
   const { firstName, lastName, city, postalCode, isMember } = profileDefs;
@@ -47,7 +39,7 @@ export function TraineeManager() {
   const traineesQuery = useQuery(trpc.adminRouter.getTrainees.queryOptions());
   const trainees = traineesQuery.data ?? [];
 
-  const [selectedId, setSelectedId] = useSearchParamEntry("id", null);
+  const [selectedId, setSelectedId] = useHashString(null);
   const match = trainees.findIndex((x) => x.id == selectedId);
   const selectedRow = match !== -1 ? match : 0;
   const setSelectedRow = (index: number) =>
@@ -75,43 +67,7 @@ export function TraineeManager() {
             }}
           />
         </div>
-        {selectedTrainee != null ? (
-          <div className="p-5 rounded">
-            <h2 className="text-xl font-medium text-center p-4 my-0 bg-accent rounded-xl">
-              {selectedTrainee.firstName} {selectedTrainee.lastName}
-            </h2>
-
-            <div className="flex place-content-between space-x-5 flex-wrap">
-              <Card className="flex-1 border-none shadow-none">
-                <CardHeader>
-                  <CardTitle>Classes</CardTitle>
-                  <CardDescription>
-                    Manage alloted credit hours for past classes.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <TraineeReservations profileId={selectedTrainee.id} />
-                </CardContent>
-              </Card>
-              <Card className="w-[250px] border-none shadow-none">
-                <CardHeader>
-                  <CardTitle>Profile Details</CardTitle>
-                  <CardDescription>
-                    {selectedTrainee.firstName + " " + selectedTrainee.lastName}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <TraineeEditButton label="Edit" trainee={selectedTrainee} />
-                  <div className="pt-4"></div>
-                  <DetailsDisplay
-                    item={selectedTrainee}
-                    columns={profileDefPresets.all}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        ) : null}
+        {selectedTrainee ? <Trainee trainee={selectedTrainee} /> : null}
       </div>
     </div>
   );
