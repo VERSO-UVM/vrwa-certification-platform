@@ -3,9 +3,9 @@ import { StandardDrawer, type StandardDrawerProps } from "./standard-drawer";
 import { EditForm } from "./edit-form";
 import { useState } from "react";
 
-export interface EditDrawerProps<T, TValue> {
+export interface EditDrawerProps<T> {
   item: T;
-  columns: ColumnDef<T, TValue>[];
+  columns: ColumnDef<T, any>[]; // See comment in data-table.tsx
   onSave: (updates: Partial<T>) => Promise<void>;
   drawer: StandardDrawerProps;
 }
@@ -15,12 +15,12 @@ export interface EditDrawerProps<T, TValue> {
  * open/closed state to close the drawer after onSave, which
  * should be async and return a Promise when it is saved succesfully.
  */
-export function EditDrawer<T extends object, TValue>({
+export function EditDrawer<T extends object>({
   item,
   columns,
   onSave,
   drawer,
-}: EditDrawerProps<T, TValue>) {
+}: EditDrawerProps<T>) {
   const [open, setOpen] = useState(false);
 
   return (

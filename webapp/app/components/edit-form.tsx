@@ -9,16 +9,16 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "./ui/button";
 import { shallowEqual } from "~/utils/utils";
 
-export type EditFormProps<T, TValue> = {
+export type EditFormProps<T> = {
   item: T;
-  columns: ColumnDef<T, TValue>[];
+  columns: ColumnDef<T, any>[]; // See comment in data-table.tsx
   onSave: (updated: Partial<T>) => void;
 };
-export function EditForm<T extends object, TValue>({
+export function EditForm<T extends object>({
   item,
   columns,
   onSave,
-}: EditFormProps<T, TValue>) {
+}: EditFormProps<T>) {
   const data = useMemo(() => [item], [item]);
   const [updates, setUpdates] = useState<Partial<T>>({});
   // If data is swiped out from under us
