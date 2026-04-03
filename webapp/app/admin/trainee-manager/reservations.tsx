@@ -1,6 +1,6 @@
 import type { ReservationDto } from "@backend/database/dtos";
 import { useQuery } from "@tanstack/react-query";
-import { DataTable } from "~/components/ui/data-table";
+import { DataTable } from "~/components/data-table";
 import { useTRPC } from "~/utils/trpc";
 import { EditTraineeReservation } from "./edit-reservation";
 import {

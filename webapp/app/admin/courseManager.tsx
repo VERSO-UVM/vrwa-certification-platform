@@ -8,7 +8,7 @@ import { NewCourseForm } from "~/components/courseForm";
 import { Card, CardContent, CardTitle, CardHeader, CardDescription } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { ButtonGroup } from "~/components/ui/button-group";
-import { DataTable } from "~/components/ui/data-table";
+import { DataTable } from "~/components/data-table";
 import { type CourseEvent } from "../../../backend/src/database/schema";
 import { Calendar } from "~/components/ui/calendar";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";

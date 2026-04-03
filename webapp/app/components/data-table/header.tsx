@@ -10,7 +10,7 @@ interface DataTableHeaderProps<TData> {
 export function DataTableHeader<TData>({ table }: DataTableHeaderProps<TData>) {
   return (
     // Fix header at top while scrolling!
-    <TableHeader className="sticky bg-white top-0 z-10">
+    <TableHeader className="sticky bg-background top-0 z-10">
       {table.getHeaderGroups().map((headerGroup) => (
         <TableRow key={headerGroup.id}>
           {headerGroup.headers.map((header) => {

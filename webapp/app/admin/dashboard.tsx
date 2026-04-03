@@ -10,7 +10,7 @@ import {
 } from "~/components/ui/card";
 import type { CourseLocation } from "@backend/database/schema";
 import type { CourseEventDto, ReservationDto } from "@backend/database/dtos";
-import { DataTable } from "~/components/ui/data-table";
+import { DataTable } from "~/components/data-table";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Book, Trophy, Users } from "lucide-react";

@@ -1,8 +1,8 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { StandardDrawer } from "./standard-drawer";
+import { StandardDrawer } from "../standard-drawer";
 import { EditForm } from "./edit-form";
 import { useState } from "react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { SquarePen } from "lucide-react";
 
 export interface EditDrawerProps<T> {
