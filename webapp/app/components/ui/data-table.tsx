@@ -10,17 +10,17 @@ import {
   type RowData,
 } from "@tanstack/react-table";
 
-import { DataTableBody } from "./data-table-body";
-import { DataTableGlobalFilter } from "./data-table-global-filter";
-import { DataTableHeader } from "./data-table-header";
+import { DataTableBody } from "./data-table/body";
+import { DataTableGlobalFilter } from "./data-table/global-filter";
+import { DataTableHeader } from "./data-table/header";
 import {
   DataTablePageSizeSelect,
   PAGE_SIZE_SHOW_ALL,
   type PageSizeValues,
-} from "./data-table-page-size-select";
-import { DataTablePagination } from "./data-table-pagination";
+} from "./data-table/page-size-select";
+import { DataTablePagination } from "./data-table/pagination";
 import { Table } from "./table";
-import { DataTableInfoText } from "./data-table-info-text";
+import { DataTableInfoText } from "./data-table/info-text";
 
 export type DataTableDecorationProps<TData> = {
   table: ReactTable<TData>;
