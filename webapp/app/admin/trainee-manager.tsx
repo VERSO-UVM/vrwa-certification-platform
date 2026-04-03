@@ -12,10 +12,16 @@ import {
 } from "~/utils/column-defs/profile";
 import { EditDrawer } from "~/components/edit-drawer";
 import { DetailsDisplay } from "~/components/details-display";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 
 const columnDefs = (() => {
-  const { firstName, lastName, city, postalCode, isMember } =
-    profileColumnDefs;
+  const { firstName, lastName, city, postalCode, isMember } = profileColumnDefs;
   return [
     firstName,
     lastName,
@@ -47,7 +53,7 @@ export function TraineeManager() {
       <PageHeader>Trainees</PageHeader>
 
       <div className="flex flex-col space-y-1 ">
-        <div className="flex-1 border rounded p-3">
+        <div className="flex-1 rounded p-3">
           <DataTable
             columns={columnDefs}
             data={trainees}
@@ -61,22 +67,39 @@ export function TraineeManager() {
         </div>
         {selectedTrainee != null ? (
           <div className="p-5 rounded">
-            <h2 className="text-xl font-medium pb-4">
+            <h2 className="text-xl font-medium text-center p-4 my-0 bg-accent rounded-xl">
               {selectedTrainee.firstName} {selectedTrainee.lastName}
             </h2>
-            <h2 className="text-lg font-medium py-4">Classes</h2>
-            <TraineeReservations profileId={selectedTrainee.id} />
 
-            <h2 className="text-lg font-medium py-4">Trainee Details</h2>
-            <TraineeEditButton
-              label="Edit"
-              trainee={selectedTrainee}
-            />
-            <div className="pt-4"></div>
-            <DetailsDisplay
-              item={selectedTrainee}
-              columns={profileColumnPresets.all}
-            />
+            <div className="flex place-content-between space-x-5 flex-wrap">
+              <Card className="flex-1 border-none shadow-none">
+                <CardHeader>
+                  <CardTitle>Classes</CardTitle>
+                  <CardDescription>
+                    Manage alloted credit hours for past classes.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <TraineeReservations profileId={selectedTrainee.id} />
+                </CardContent>
+              </Card>
+              <Card className="w-[250px] border-none shadow-none">
+                <CardHeader>
+                  <CardTitle>Profile Details</CardTitle>
+                  <CardDescription>
+                  {selectedTrainee.firstName + " " + selectedTrainee.lastName}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                <TraineeEditButton label="Edit" trainee={selectedTrainee} />
+                <div className="pt-4"></div>
+                <DetailsDisplay
+                  item={selectedTrainee}
+                  columns={profileColumnPresets.all}
+                />
+                </CardContent>
+              </Card>
+            </div>
           </div>
         ) : null}
       </div>
