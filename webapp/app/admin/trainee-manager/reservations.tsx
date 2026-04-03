@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "~/components/ui/data-table";
 import { useReactTableRowSelect } from "~/hooks/use-row-select";
 import { useTRPC } from "~/utils/trpc";
-import { EditTraineeReservation } from "./edit-trainee-reservation";
+import { EditTraineeReservation } from "./edit-reservation";
 import {
   reservationColumnDefLists,
   reservationColumnHelper,

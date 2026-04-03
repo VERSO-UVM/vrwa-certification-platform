@@ -2,7 +2,7 @@ import type { Profile } from "@backend/database/schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DataTable } from "~/components/ui/data-table";
 import { PageHeader } from "~/components/page-header";
-import { TraineeReservations } from "./trainee-reservations";
+import { TraineeReservations } from "./trainee-manager/reservations";
 import { useTRPC } from "~/utils/trpc";
 import { useReactTableRowSelect } from "~/hooks/use-row-select";
 import {
