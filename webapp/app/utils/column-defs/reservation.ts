@@ -49,7 +49,7 @@ export const reservationColumnDefs = {
   }),
 };
 
-export const reservationColumnDefLists = {
+export const reservationColumnPresets = {
   all: Object.values(reservationColumnDefs),
   basic: [
     reservationColumnDefs.courseName,

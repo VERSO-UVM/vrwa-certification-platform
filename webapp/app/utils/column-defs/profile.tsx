@@ -15,7 +15,7 @@ import {
 // Note that assigning the result type becomes difficult https://github.com/TanStack/table/issues/4382
 export const profileColumnHelper = createColumnHelper<Profile>();
 
-export const profileColumnDefMap = {
+export const profileColumnDefs = {
   // The keys are arbitary and don't have to match `accessorKey`, which is
   // also an optional field as we can also use `accessorFn`
   firstName: profileColumnHelper.accessor("firstName", {
@@ -68,7 +68,7 @@ export const profileColumnDefMap = {
   }),
 };
 
-export const profileColumns = {
+export const profileColumnPresets = {
   /**
    * Done out like this just to make it visible how `profileColumnDefs` can
    * be customized nicely following a similar structure. You can put anything
@@ -77,10 +77,10 @@ export const profileColumns = {
    * define them in the render function if you memoize with useMemo())
    */
   default: (() => {
-    const { firstName, lastName, isMember } = profileColumnDefMap;
+    const { firstName, lastName, isMember } = profileColumnDefs;
     return [firstName, lastName, isMember];
   })(),
 
   // Object.values() is required to produce values in insertion order for String keys
-  all: Object.values(profileColumnDefMap),
+  all: Object.values(profileColumnDefs),
 };

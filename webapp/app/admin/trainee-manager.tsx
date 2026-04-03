@@ -6,16 +6,16 @@ import { TraineeReservations } from "./trainee-manager/reservations";
 import { useTRPC } from "~/utils/trpc";
 import { useReactTableRowSelect } from "~/hooks/use-row-select";
 import {
-  profileColumnDefMap,
+  profileColumnDefs,
   profileColumnHelper,
-  profileColumns,
+  profileColumnPresets,
 } from "~/utils/column-defs/profile";
 import { EditDrawer } from "~/components/edit-drawer";
 import { DetailsDisplay } from "~/components/details-display";
 
 const columnDefs = (() => {
   const { firstName, lastName, city, postalCode, isMember } =
-    profileColumnDefMap;
+    profileColumnDefs;
   return [
     firstName,
     lastName,
@@ -75,7 +75,7 @@ export function TraineeManager() {
             <div className="pt-4"></div>
             <DetailsDisplay
               item={selectedTrainee}
-              columns={profileColumns.all}
+              columns={profileColumnPresets.all}
             />
           </div>
         ) : null}
@@ -110,7 +110,7 @@ function TraineeEditButton({
         description: "Save changes to go through with the edit.",
       }}
       item={trainee}
-      columns={profileColumns.all}
+      columns={profileColumnPresets.all}
       onSave={async (changes) => {
         await updateQuery.mutateAsync({
           ...changes,
