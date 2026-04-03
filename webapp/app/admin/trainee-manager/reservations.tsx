@@ -11,8 +11,6 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { PaymentStatus } from "@backend/database/schema";
 
 const columnDefs = [
-  reservationColumnDefs.firstName,
-  reservationColumnDefs.lastName,
   reservationColumnDefs.courseName,
   {
     ...reservationColumnDefs.creditHours,
