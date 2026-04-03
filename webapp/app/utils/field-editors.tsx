@@ -6,7 +6,7 @@ import {
   NativeSelectOption,
 } from "~/components/ui/native-select";
 
-export type ColumnEditor<TData, TValue> = (item: {
+export type FieldEditor<TData, TValue> = (item: {
   ctx: CellContext<TData, TValue>;
   forId: string;
   onChange: (value: TValue) => void;
@@ -15,7 +15,7 @@ export type ColumnEditor<TData, TValue> = (item: {
 
 export function textInputEditor<T>(
   props?: React.ComponentProps<"input">,
-): ColumnEditor<T, string> {
+): FieldEditor<T, string> {
   return ({ forId, onChange, onBlur, ctx: { getValue } }) => {
     const [value, setValue] = useState(getValue());
     // if the value's been taken out from under us
@@ -40,7 +40,7 @@ export function selectOptionsEditor<T, U extends { toString: () => string }>({
   options,
 }: {
   options: { label: string; value: U }[];
-}): ColumnEditor<T, U> {
+}): FieldEditor<T, U> {
   // Native <select> requires string values, but we want this function to be generic
   const stringToValue = Object.fromEntries(
     options.map(({ value }) => [value.toString(), value]),

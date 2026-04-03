@@ -4,31 +4,31 @@ import { DataTable } from "~/components/data-table";
 import { useTRPC } from "~/utils/trpc";
 import { EditTraineeReservation } from "./edit-reservation";
 import {
-  reservationColumnHelper,
-  reservationColumnDefs,
-} from "~/utils/column-defs/reservation";
+  reservationFieldHelper,
+  reservationDefs,
+} from "~/utils/field-defs/reservation";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { PaymentStatus } from "@backend/database/schema";
 
 const columnDefs = [
-  reservationColumnDefs.courseName,
+  reservationDefs.courseName,
   {
-    ...reservationColumnDefs.creditHours,
+    ...reservationDefs.creditHours,
     cell: ({ renderValue }) => (
       <span className="font-bold">{renderValue()}</span>
     ),
   } satisfies ColumnDef<ReservationDto, string>,
   {
-    ...reservationColumnDefs.paymentStatus,
+    ...reservationDefs.paymentStatus,
     cell: ({ renderValue }) => (
       <span className="font-bold">{renderValue()}</span>
     ),
   } satisfies ColumnDef<ReservationDto, PaymentStatus>,
-  reservationColumnHelper.display({
+  reservationFieldHelper.display({
     header: "Actions",
     cell: ({ row }) => <EditTraineeReservation reservation={row.original} />,
   }),
-  reservationColumnDefs.classStartDateTime,
+  reservationDefs.classStartDateTime,
 ];
 
 export function TraineeReservations({ profileId }: { profileId: string }) {

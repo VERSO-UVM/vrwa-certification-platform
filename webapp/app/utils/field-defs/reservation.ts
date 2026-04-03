@@ -1,18 +1,18 @@
 import type { ReservationDto } from "@backend/database/dtos";
 import { createColumnHelper } from "@tanstack/react-table";
-import { selectOptionsEditor, textInputEditor } from "../column-editors";
+import { selectOptionsEditor, textInputEditor } from "../field-editors";
 import { Status as PaymentStatus } from "@backend/database/schema";
 
-export const reservationColumnHelper = createColumnHelper<ReservationDto>();
+export const reservationFieldHelper = createColumnHelper<ReservationDto>();
 
-export const reservationColumnDefs = {
-  firstName: reservationColumnHelper.accessor("firstName", {
+export const reservationDefs = {
+  firstName: reservationFieldHelper.accessor("firstName", {
     header: "First Name",
   }),
-  lastName: reservationColumnHelper.accessor("lastName", {
+  lastName: reservationFieldHelper.accessor("lastName", {
     header: "Last Name",
   }),
-  creditHours: reservationColumnHelper.accessor("creditHours", {
+  creditHours: reservationFieldHelper.accessor("creditHours", {
     header: "Credit Hours",
     meta: {
       editor: textInputEditor({
@@ -21,7 +21,7 @@ export const reservationColumnDefs = {
       }),
     },
   }),
-  paymentStatus: reservationColumnHelper.accessor("paymentStatus", {
+  paymentStatus: reservationFieldHelper.accessor("paymentStatus", {
     header: "Payment Status",
     meta: {
       editor: selectOptionsEditor({
@@ -32,7 +32,7 @@ export const reservationColumnDefs = {
       }),
     },
   }),
-  classStartDateTime: reservationColumnHelper.accessor("classStartDatetime", {
+  classStartDateTime: reservationFieldHelper.accessor("classStartDatetime", {
     header: "Course Date",
     cell: ({ getValue }) => {
       const value = getValue();
@@ -40,21 +40,21 @@ export const reservationColumnDefs = {
       return new Date(value).toLocaleDateString();
     },
   }),
-  courseName: reservationColumnHelper.accessor("course.courseName", {
+  courseName: reservationFieldHelper.accessor("course.courseName", {
     header: "Course Name",
   }),
-  isMember: reservationColumnHelper.accessor("isMember", {
+  isMember: reservationFieldHelper.accessor("isMember", {
     header: "Member",
     cell: ({ getValue }) => (getValue() == true ? "yes" : "no"),
   }),
 };
 
-export const reservationColumnPresets = {
-  all: Object.values(reservationColumnDefs),
+export const reservationDefPresets = {
+  all: Object.values(reservationDefs),
   basic: [
-    reservationColumnDefs.courseName,
-    reservationColumnDefs.classStartDateTime,
-    reservationColumnDefs.creditHours,
-    reservationColumnDefs.paymentStatus,
+    reservationDefs.courseName,
+    reservationDefs.classStartDateTime,
+    reservationDefs.creditHours,
+    reservationDefs.paymentStatus,
   ],
 };

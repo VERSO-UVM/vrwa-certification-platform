@@ -6,10 +6,10 @@ import { PageHeader } from "~/components/page-header";
 import { TraineeReservations } from "./trainee-manager/reservations";
 import { useTRPC } from "~/utils/trpc";
 import {
-  profileColumnDefs,
-  profileColumnHelper,
-  profileColumnPresets,
-} from "~/utils/column-defs/profile";
+  profileDefs,
+  profileFieldHelper,
+  profileDefPresets,
+} from "~/utils/field-defs/profile";
 import { EditDrawer } from "~/components/edit-drawer";
 import { DetailsDisplay } from "~/components/details-display";
 import {
@@ -20,17 +20,20 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { useSearchParamEntry } from "~/hooks/use-search-param-entry";
-import { getOnRowSelectionChange, getRowSelectionState } from "~/utils/single-row-select";
+import {
+  getOnRowSelectionChange,
+  getRowSelectionState,
+} from "~/utils/single-row-select";
 
 const columnDefs = (() => {
-  const { firstName, lastName, city, postalCode, isMember } = profileColumnDefs;
+  const { firstName, lastName, city, postalCode, isMember } = profileDefs;
   return [
     firstName,
     lastName,
     city,
     postalCode,
     isMember,
-    profileColumnHelper.display({
+    profileFieldHelper.display({
       header: "Actions",
       cell: ({ row }) => {
         return <TraineeEditButton trainee={row.original} label="Edit" />;
@@ -62,7 +65,10 @@ export function TraineeManager() {
             columns={columnDefs}
             data={trainees}
             table={{
-              onRowSelectionChange: getOnRowSelectionChange(selectedRow, setSelectedRow),
+              onRowSelectionChange: getOnRowSelectionChange(
+                selectedRow,
+                setSelectedRow,
+              ),
               state: {
                 rowSelection: getRowSelectionState(selectedRow),
               },
@@ -99,7 +105,7 @@ export function TraineeManager() {
                   <div className="pt-4"></div>
                   <DetailsDisplay
                     item={selectedTrainee}
-                    columns={profileColumnPresets.all}
+                    columns={profileDefPresets.all}
                   />
                 </CardContent>
               </Card>
@@ -137,7 +143,7 @@ function TraineeEditButton({
         description: "Save changes to go through with the edit.",
       }}
       item={trainee}
-      columns={profileColumnPresets.all}
+      columns={profileDefPresets.all}
       onSave={async (changes) => {
         await updateQuery.mutateAsync({
           ...changes,

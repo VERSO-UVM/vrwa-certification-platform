@@ -9,52 +9,52 @@ import { createColumnHelper } from "@tanstack/react-table";
 import {
   textInputEditor,
   selectOptionsEditor,
-} from "~/utils/column-editors";
+} from "~/utils/field-editors";
 
 // createColumnHelper just provides a stronger typed API to define ColumnDefs
 // Note that assigning the result type becomes difficult https://github.com/TanStack/table/issues/4382
-export const profileColumnHelper = createColumnHelper<Profile>();
+export const profileFieldHelper = createColumnHelper<Profile>();
 
-export const profileColumnDefs = {
+export const profileDefs = {
   // The keys are arbitary and don't have to match `accessorKey`, which is
   // also an optional field as we can also use `accessorFn`
-  firstName: profileColumnHelper.accessor("firstName", {
+  firstName: profileFieldHelper.accessor("firstName", {
     header: "First Name",
     meta: {
       editor: textInputEditor(),
     },
   }),
-  lastName: profileColumnHelper.accessor("lastName", {
+  lastName: profileFieldHelper.accessor("lastName", {
     header: "Last Name",
     meta: {
       editor: textInputEditor(),
     },
   }),
-  address: profileColumnHelper.accessor("address", {
+  address: profileFieldHelper.accessor("address", {
     header: "Address",
     meta: {
       editor: textInputEditor(),
     },
   }),
-  city: profileColumnHelper.accessor("city", {
+  city: profileFieldHelper.accessor("city", {
     header: "City",
     meta: {
       editor: textInputEditor(),
     },
   }),
-  postalCode: profileColumnHelper.accessor("postalCode", {
+  postalCode: profileFieldHelper.accessor("postalCode", {
     header: "Postal Code",
     meta: {
       editor: textInputEditor(),
     },
   }),
-  phoneNumber: profileColumnHelper.accessor("phoneNumber", {
+  phoneNumber: profileFieldHelper.accessor("phoneNumber", {
     header: "Phone Number",
     meta: {
       editor: textInputEditor(),
     },
   }),
-  isMember: profileColumnHelper.accessor("isMember", {
+  isMember: profileFieldHelper.accessor("isMember", {
     header: "Member",
     cell: ({ getValue }) => (getValue() == true ? "yes" : "no"),
     meta: {
@@ -68,19 +68,13 @@ export const profileColumnDefs = {
   }),
 };
 
-export const profileColumnPresets = {
-  /**
-   * Done out like this just to make it visible how `profileColumnDefs` can
-   * be customized nicely following a similar structure. You can put anything
-   * in the IIFE function expression, it's nice for scoping, and it's important
-   * to define ColumnDefs outside of the render function (though it is OK to
-   * define them in the render function if you memoize with useMemo())
-   */
-  default: (() => {
-    const { firstName, lastName, isMember } = profileColumnDefs;
-    return [firstName, lastName, isMember];
-  })(),
+export const profileDefPresets = {
+  basic: [
+    profileDefs.firstName,
+    profileDefs.lastName,
+    profileDefs.isMember,
+  ],
 
   // Object.values() is required to produce values in insertion order for String keys
-  all: Object.values(profileColumnDefs),
+  all: Object.values(profileDefs),
 };

@@ -1,7 +1,7 @@
 import type { ReservationDto } from "@backend/database/dtos";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EditDrawer } from "~/components/edit-drawer";
-import { reservationColumnPresets } from "~/utils/column-defs/reservation";
+import { reservationDefPresets } from "~/utils/field-defs/reservation";
 import { useTRPC } from "~/utils/trpc";
 
 export function EditTraineeReservation({
@@ -35,7 +35,7 @@ export function EditTraineeReservation({
         description: "Update credit hours and payment status",
       }}
       item={reservation}
-      columns={reservationColumnPresets.basic}
+      columns={reservationDefPresets.basic}
       onSave={updateData}
     />
   );

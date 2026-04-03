@@ -4,11 +4,11 @@
  */
 
 import type { RowData } from "@tanstack/react-table";
-import type { ColumnEditor } from "../column-editors";
+import type { FieldEditor } from "../field-editors";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
-    editor?: ColumnEditor<TData, TValue>;
+    editor?: FieldEditor<TData, TValue>;
   }
 }
 

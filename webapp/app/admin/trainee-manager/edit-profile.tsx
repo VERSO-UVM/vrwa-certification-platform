@@ -1,7 +1,7 @@
 import type { Profile } from "@backend/database/schema";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { EditDrawer } from "~/components/edit-drawer";
-import { profileColumnPresets } from "~/utils/column-defs/profile";
+import { profileDefPresets } from "~/utils/field-defs/profile";
 import { useTRPC } from "~/utils/trpc";
 
 export function TraineeEditButton({
@@ -30,7 +30,7 @@ export function TraineeEditButton({
         description: "Save changes to go through with the edit.",
       }}
       item={trainee}
-      columns={profileColumnPresets.all}
+      columns={profileDefPresets.all}
       onSave={async (changes) => {
         await updateQuery.mutateAsync({
           ...changes,
