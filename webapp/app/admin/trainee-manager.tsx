@@ -20,7 +20,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router";
+import { useSearchParamEntry } from "~/hooks/use-search-param-entry";
 
 const columnDefs = (() => {
   const { firstName, lastName, city, postalCode, isMember } = profileColumnDefs;
@@ -44,15 +44,11 @@ export function TraineeManager() {
   const traineesQuery = useQuery(trpc.adminRouter.getTrainees.queryOptions());
   const trainees = traineesQuery.data ?? [];
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const selectedId = searchParams.get("id");
+  const [selectedId, setSelectedId] = useSearchParamEntry("id", null);
   const match = trainees.findIndex((x) => x.id == selectedId);
-  const selectedRow = match == -1 ? 0 : match;
+  const selectedRow = match !== -1 ? match : 0;
   const setSelectedRow = (index: number) =>
-    setSearchParams((old) => {
-      old.set("id", trainees[index]?.id ?? "");
-      return old;
-    });
+    setSelectedId(trainees[index]?.id ?? null);
 
   const [reactTableRowSelection, reactTableSelectionChange] =
     useReactTableRowSelect(selectedRow, setSelectedRow);
