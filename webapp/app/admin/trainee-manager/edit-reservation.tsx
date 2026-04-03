@@ -1,6 +1,6 @@
 import type { ReservationDto } from "@backend/database/dtos";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { EditDrawer } from "~/components/edit-drawer";
+import { EditDrawer } from "~/components/entry-views/edit-drawer";
 import { reservationDefPresets } from "~/utils/field-defs/reservation";
 import { useTRPC } from "~/utils/trpc";
 

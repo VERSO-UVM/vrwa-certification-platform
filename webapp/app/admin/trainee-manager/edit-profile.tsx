@@ -1,6 +1,6 @@
 import type { Profile } from "@backend/database/schema";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { EditDrawer } from "~/components/edit-drawer";
+import { EditDrawer } from "~/components/entry-views/edit-drawer";
 import { profileDefPresets } from "~/utils/field-defs/profile";
 import { useTRPC } from "~/utils/trpc";
 

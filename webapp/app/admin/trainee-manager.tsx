@@ -10,8 +10,8 @@ import {
   profileFieldHelper,
   profileDefPresets,
 } from "~/utils/field-defs/profile";
-import { EditDrawer } from "~/components/edit-drawer";
-import { DetailsDisplay } from "~/components/details-display";
+import { EditDrawer } from "~/components/entry-views/edit-drawer";
+import { DetailsDisplay } from "~/components/entry-views/details-display";
 import {
   Card,
   CardContent,

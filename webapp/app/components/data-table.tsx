@@ -10,17 +10,17 @@ import {
   type RowData,
 } from "@tanstack/react-table";
 
-import { DataTableBody } from "./ui/data-table/bodyy";
-import { DataTableGlobalFilter } from "./ui/data-table/global-filterr";
-import { DataTableHeader } from "./ui/data-table/headerr";
+import { DataTableBody } from "./data-table/body";
+import { DataTableGlobalFilter } from "./data-table/global-filter";
+import { DataTableHeader } from "./data-table/header";
 import {
   DataTablePageSizeSelect,
   PAGE_SIZE_SHOW_ALL,
   type PageSizeValues,
-} from "./ui/data-table/page-size-selectt";
-import { DataTablePagination } from "./ui/data-table/paginationn";
-import { Table } from "./ui/table";
-import { DataTableInfoText } from "./ui/data-table/info-textt";
+} from "./data-table/page-size-select";
+import { DataTablePagination } from "./data-table/pagination";
+import { Table } from "~/components/ui/table";
+import { DataTableInfoText } from "./data-table/info-text";
 
 export type DataTableDecorationProps<TData> = {
   table: ReactTable<TData>;
