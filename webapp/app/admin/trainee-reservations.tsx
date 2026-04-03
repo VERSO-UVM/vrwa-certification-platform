@@ -1,19 +1,20 @@
 import type { ReservationDto } from "@backend/database/dtos";
 import { useQuery } from "@tanstack/react-query";
-import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "~/components/ui/data-table";
 import { useReactTableRowSelect } from "~/hooks/use-row-select";
 import { useTRPC } from "~/utils/trpc";
 import { EditTraineeReservation } from "./edit-trainee-reservation";
-import { reservation } from "@backend/database/schema";
-import { reservationColumnDefLists, reservationColumnHelper } from "~/utils/column-defs/reservation";
+import {
+  reservationColumnDefLists,
+  reservationColumnHelper,
+} from "~/utils/column-defs/reservation";
 
 const columnDefs = [
   ...reservationColumnDefLists.basic,
   reservationColumnHelper.display({
     header: "Actions",
-    cell: ({ row }) => <EditTraineeReservation reservation={row.original} />
-  })
+    cell: ({ row }) => <EditTraineeReservation reservation={row.original} />,
+  }),
 ];
 
 export function TraineeReservations({ profileId }: { profileId: string }) {
@@ -30,20 +31,15 @@ export function TraineeReservations({ profileId }: { profileId: string }) {
   const selectedReservation = reservations[index] ?? null;
 
   return (
-    <>
-      <DataTable
-        columns={columnDefs}
-        data={reservations}
-        table={{
-          onRowSelectionChange,
-          state: {
-            rowSelection,
-          },
-        }}
-      />
-      {selectedReservation != null ? (
-        <EditTraineeReservation reservation={selectedReservation} />
-      ) : null}
-    </>
+    <DataTable
+      columns={columnDefs}
+      data={reservations}
+      table={{
+        onRowSelectionChange,
+        state: {
+          rowSelection,
+        },
+      }}
+    />
   );
 }

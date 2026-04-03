@@ -6,48 +6,30 @@ import { TraineeReservations } from "./trainee-reservations";
 import { useTRPC } from "~/utils/trpc";
 import { useReactTableRowSelect } from "~/hooks/use-row-select";
 import {
+  profileColumnDefMap,
   profileColumnHelper,
   profileColumns,
 } from "~/utils/column-defs/profile";
 import { EditDrawer } from "~/components/edit-drawer";
+import { DetailsDisplay } from "~/components/details-display";
 
-const columnDefs = [
-  ...profileColumns.all,
-
-  profileColumnHelper.display({
-    header: "Actions",
-    cell: ({ row }) => {
-      const trpc = useTRPC();
-      const queryClient = useQueryClient();
-      const updateQuery = useMutation(
-        trpc.profile.update.mutationOptions({
-          onSuccess: () => {
-            queryClient.invalidateQueries({
-              queryKey: trpc.adminRouter.getTrainees.queryKey(),
-            });
-          },
-        }),
-      );
-      return (
-        <EditDrawer
-          drawer={{
-            buttonText: "Edit",
-            title: "Update Trainee Details",
-            description: "Save changes to go through with the edit.",
-          }}
-          item={row.original}
-          columns={profileColumns.all}
-          onSave={async (changes) => {
-            await updateQuery.mutateAsync({
-              ...changes,
-              id: row.original.id,
-            });
-          }}
-        />
-      );
-    },
-  }),
-];
+const columnDefs = (() => {
+  const { firstName, lastName, city, postalCode, isMember } =
+    profileColumnDefMap;
+  return [
+    firstName,
+    lastName,
+    city,
+    postalCode,
+    isMember,
+    profileColumnHelper.display({
+      header: "Actions",
+      cell: ({ row }) => {
+        return <TraineeEditButton trainee={row.original} label="Edit" />;
+      },
+    }),
+  ];
+})();
 
 export function TraineeManager() {
   const trpc = useTRPC();
@@ -82,14 +64,59 @@ export function TraineeManager() {
             <h2 className="text-xl font-medium pb-4">
               {selectedTrainee.firstName} {selectedTrainee.lastName}
             </h2>
-
             <h2 className="text-lg font-medium py-4">Classes</h2>
             <TraineeReservations profileId={selectedTrainee.id} />
+
+            <h2 className="text-lg font-medium py-4">Trainee Details</h2>
+            <TraineeEditButton
+              label="Edit"
+              trainee={selectedTrainee}
+            />
+            <div className="pt-4"></div>
+            <DetailsDisplay
+              item={selectedTrainee}
+              columns={profileColumns.all}
+            />
           </div>
-        ) : (
-          <div></div>
-        )}
+        ) : null}
       </div>
     </div>
+  );
+}
+
+function TraineeEditButton({
+  trainee,
+  label,
+}: {
+  trainee: Profile;
+  label: string;
+}) {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const updateQuery = useMutation(
+    trpc.profile.update.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.adminRouter.getTrainees.queryKey(),
+        });
+      },
+    }),
+  );
+  return (
+    <EditDrawer
+      drawer={{
+        buttonText: label,
+        title: "Update Trainee Details",
+        description: "Save changes to go through with the edit.",
+      }}
+      item={trainee}
+      columns={profileColumns.all}
+      onSave={async (changes) => {
+        await updateQuery.mutateAsync({
+          ...changes,
+          id: trainee.id,
+        });
+      }}
+    />
   );
 }
