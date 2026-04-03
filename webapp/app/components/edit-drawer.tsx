@@ -1,13 +1,19 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { StandardDrawer, type StandardDrawerProps } from "./standard-drawer";
+import { StandardDrawer } from "./standard-drawer";
 import { EditForm } from "./edit-form";
 import { useState } from "react";
+import { Button } from "./ui/button";
+import { SquarePen } from "lucide-react";
 
 export interface EditDrawerProps<T> {
   item: T;
   columns: ColumnDef<T, any>[]; // See comment in data-table.tsx
   onSave: (updates: Partial<T>) => Promise<void>;
-  drawer: StandardDrawerProps;
+  drawer: {
+    buttonText: string;
+    title: string,
+    description: string,
+  }
 }
 
 /**
@@ -19,12 +25,22 @@ export function EditDrawer<T extends object>({
   item,
   columns,
   onSave,
-  drawer,
+  drawer: { buttonText, ...drawer },
 }: EditDrawerProps<T>) {
   const [open, setOpen] = useState(false);
 
   return (
-    <StandardDrawer {...drawer} open={open} onOpenChange={setOpen}>
+    <StandardDrawer
+      {...drawer}
+      openButton={
+        <Button variant="secondary">
+          <SquarePen />
+          {buttonText}
+        </Button>
+      }
+      open={open}
+      onOpenChange={setOpen}
+    >
       <EditForm
         item={item}
         columns={columns}

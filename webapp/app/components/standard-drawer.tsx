@@ -10,9 +10,10 @@ import {
   DrawerClose,
 } from "./ui/drawer";
 import type { PropsWithChildren } from "react";
+import { SquarePen } from "lucide-react";
 
 export type StandardDrawerProps = PropsWithChildren<{
-  buttonText: string;
+  openButton: React.ReactNode;
   title: string;
   // We always need a description for `aria-describedby`
   description: string;
@@ -20,7 +21,7 @@ export type StandardDrawerProps = PropsWithChildren<{
   React.ComponentProps<typeof Drawer>;
 
 export function StandardDrawer({
-  buttonText,
+  openButton,
   title,
   description,
   children,
@@ -29,9 +30,7 @@ export function StandardDrawer({
   return (
     <Drawer direction="right" {...props}>
       <DrawerTrigger asChild>
-        <Button variant="secondary">
-          {buttonText}
-        </Button>
+      {openButton}
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
