@@ -24,13 +24,9 @@ import type {
  * ```
  * 
  */
-export function useReactTableRowSelect(): [
-  [number, OnChangeFn<number>],
-  [RowSelectionState, OnChangeFn<RowSelectionState>],
-] {
-  // TODO: cache default/initial row selection in browser storage
-  const [selectedRow, setSelectedRow] = useState<number>(0);
-
+export function useReactTableRowSelect(selectedRow: number, setSelectedRow: (row: number) => void):
+  [RowSelectionState, OnChangeFn<RowSelectionState>]
+{
   const reactTableSelectionState = {
     [selectedRow.toString()]: true,
   } as RowSelectionState;
@@ -51,8 +47,5 @@ export function useReactTableRowSelect(): [
     }
   };
 
-  return [
-    [selectedRow, setSelectedRow],
-    [reactTableSelectionState, reactTableOnSelectionChange],
-  ];
+  return [reactTableSelectionState, reactTableOnSelectionChange];
 }

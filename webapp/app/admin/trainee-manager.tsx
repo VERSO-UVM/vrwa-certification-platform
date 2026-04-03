@@ -19,6 +19,8 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
 
 const columnDefs = (() => {
   const { firstName, lastName, city, postalCode, isMember } = profileColumnDefs;
@@ -41,10 +43,19 @@ export function TraineeManager() {
   const trpc = useTRPC();
   const traineesQuery = useQuery(trpc.adminRouter.getTrainees.queryOptions());
   const trainees = traineesQuery.data ?? [];
-  const [
-    [selectedRow, _],
-    [reactTableRowSelection, reactTableSelectionChange],
-  ] = useReactTableRowSelect();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedId = searchParams.get("id");
+  const match = trainees.findIndex((x) => x.id == selectedId);
+  const selectedRow = match == -1 ? 0 : match;
+  const setSelectedRow = (index: number) =>
+    setSearchParams((old) => {
+      old.set("id", trainees[index]?.id ?? "");
+      return old;
+    });
+
+  const [reactTableRowSelection, reactTableSelectionChange] =
+    useReactTableRowSelect(selectedRow, setSelectedRow);
 
   const selectedTrainee = trainees[selectedRow] ?? null;
 
@@ -87,16 +98,16 @@ export function TraineeManager() {
                 <CardHeader>
                   <CardTitle>Profile Details</CardTitle>
                   <CardDescription>
-                  {selectedTrainee.firstName + " " + selectedTrainee.lastName}
+                    {selectedTrainee.firstName + " " + selectedTrainee.lastName}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                <TraineeEditButton label="Edit" trainee={selectedTrainee} />
-                <div className="pt-4"></div>
-                <DetailsDisplay
-                  item={selectedTrainee}
-                  columns={profileColumnPresets.all}
-                />
+                  <TraineeEditButton label="Edit" trainee={selectedTrainee} />
+                  <div className="pt-4"></div>
+                  <DetailsDisplay
+                    item={selectedTrainee}
+                    columns={profileColumnPresets.all}
+                  />
                 </CardContent>
               </Card>
             </div>
