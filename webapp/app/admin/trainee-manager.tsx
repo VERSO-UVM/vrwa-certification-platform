@@ -1,10 +1,10 @@
+import { useEffect, useState } from "react";
 import type { Profile } from "@backend/database/schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DataTable } from "~/components/ui/data-table";
 import { PageHeader } from "~/components/page-header";
 import { TraineeReservations } from "./trainee-manager/reservations";
 import { useTRPC } from "~/utils/trpc";
-import { useReactTableRowSelect } from "~/hooks/use-row-select";
 import {
   profileColumnDefs,
   profileColumnHelper,
@@ -19,8 +19,8 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { useEffect, useState } from "react";
 import { useSearchParamEntry } from "~/hooks/use-search-param-entry";
+import { getOnRowSelectionChange, getRowSelectionState } from "~/utils/single-row-select";
 
 const columnDefs = (() => {
   const { firstName, lastName, city, postalCode, isMember } = profileColumnDefs;
@@ -50,9 +50,6 @@ export function TraineeManager() {
   const setSelectedRow = (index: number) =>
     setSelectedId(trainees[index]?.id ?? null);
 
-  const [reactTableRowSelection, reactTableSelectionChange] =
-    useReactTableRowSelect(selectedRow, setSelectedRow);
-
   const selectedTrainee = trainees[selectedRow] ?? null;
 
   return (
@@ -65,9 +62,9 @@ export function TraineeManager() {
             columns={columnDefs}
             data={trainees}
             table={{
-              onRowSelectionChange: reactTableSelectionChange,
+              onRowSelectionChange: getOnRowSelectionChange(selectedRow, setSelectedRow),
               state: {
-                rowSelection: reactTableRowSelection,
+                rowSelection: getRowSelectionState(selectedRow),
               },
             }}
           />
