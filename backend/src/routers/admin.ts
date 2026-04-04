@@ -5,7 +5,7 @@ import type { Query } from "pg";
 import z from "zod";
 
 import db from "~/database";
-import type { ReservationDto } from "~/database/dtos";
+import type { CourseEventDto, ReservationDto } from "~/database/dtos";
 import {
   account,
   course,
@@ -58,18 +58,18 @@ export const adminRouter = router({
       .where(eq(account.role, Roles.Trainee));
   }),
 
-  getCourseEvents: adminProcedure.query(() => {
+  getCourseEvents: adminProcedure.query((): Promise<CourseEventDto[]> => {
     return db.client
       .select({
         ...getTableColumns(courseEvent),
         courseName: course.courseName,
-        courseDescription: course.description,
-        courseCreditHours: course.creditHours,
-        coursePrice: course.priceCents,
+        description: course.description,
+        creditHours: course.creditHours,
+        priceCents: course.priceCents,
       })
       .from(courseEvent)
       .orderBy(asc(courseEvent.classStartDatetime))
-      .leftJoin(course, eq(courseEvent.courseId, course.id));
+      .innerJoin(course, eq(courseEvent.courseId, course.id));
   }),
 
   getReservations: adminProcedure.query(

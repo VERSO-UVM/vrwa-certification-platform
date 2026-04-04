@@ -17,9 +17,10 @@ export interface EditDrawerProps<T> {
 }
 
 /**
- * A wrapper around StandardDrawer and EditDrawer that handles
+ * A wrapper around StandardDrawer and EditForm that handles
  * open/closed state to close the drawer after onSave, which
- * should be async and return a Promise when it is saved succesfully.
+ * should be async (to know it is saved successfully when Promise
+ * resolves)
  */
 export function EditDrawer<T extends object>({
   item,

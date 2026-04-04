@@ -2,15 +2,22 @@ import type { ReservationDto } from "@backend/database/dtos";
 import { createColumnHelper } from "@tanstack/react-table";
 import { selectOptionsEditor, textInputEditor } from "../field-editors";
 import { Status as PaymentStatus } from "@backend/database/schema";
+import { Badge } from "~/components/ui/badge";
 
 export const reservationFieldHelper = createColumnHelper<ReservationDto>();
 
 export const reservationDefs = {
   firstName: reservationFieldHelper.accessor("firstName", {
     header: "First Name",
+    cell: ({ renderValue }) => (
+      <span className="italic">{renderValue()}</span>
+    ),
   }),
   lastName: reservationFieldHelper.accessor("lastName", {
     header: "Last Name",
+    cell: ({ renderValue }) => (
+      <span className="italic">{renderValue()}</span>
+    ),
   }),
   creditHours: reservationFieldHelper.accessor("creditHours", {
     header: "Credit Hours",
@@ -23,6 +30,14 @@ export const reservationDefs = {
   }),
   paymentStatus: reservationFieldHelper.accessor("paymentStatus", {
     header: "Payment Status",
+    cell: ({ getValue }) => {
+      switch (getValue()) {
+        case PaymentStatus.Paid:
+          return <Badge variant="outline">Paid</Badge>;
+        case PaymentStatus.Unpaid:
+          return <Badge variant="default">Unpaid</Badge>;
+      }
+    },
     meta: {
       editor: selectOptionsEditor({
         options: [

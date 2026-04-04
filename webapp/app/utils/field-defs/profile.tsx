@@ -1,11 +1,15 @@
 /**
  * This is an experiment to come up with a clean simple way
- * to make reusable table views. Simply expose the normal
- * column definitions and the view can either just use the standard
- * ones, or take or customize the ones that are suitable for that view.
+ * to make highly modular and reusable CRUD interfaces. In
+ * this file, we just expose a set of ColumnDefs in an
+ * easy to access way. Anyone can use one of the "presets",
+ * or choose their own order and selection from `profileDefs`,
+ * or build off any of these structures using JS array and
+ * object manipulations.
  */
 import type { Profile } from "@backend/database/schema";
 import { createColumnHelper } from "@tanstack/react-table";
+import { Badge } from "~/components/ui/badge";
 import {
   textInputEditor,
   selectOptionsEditor,
@@ -16,8 +20,6 @@ import {
 export const profileFieldHelper = createColumnHelper<Profile>();
 
 export const profileDefs = {
-  // The keys are arbitary and don't have to match `accessorKey`, which is
-  // also an optional field as we can also use `accessorFn`
   firstName: profileFieldHelper.accessor("firstName", {
     header: "First Name",
     meta: {
@@ -55,8 +57,15 @@ export const profileDefs = {
     },
   }),
   isMember: profileFieldHelper.accessor("isMember", {
-    header: "Member",
-    cell: ({ getValue }) => (getValue() == true ? "yes" : "no"),
+    header: "Member?",
+    cell: ({ getValue }) => {
+      switch (getValue()) {
+        case true:
+          return <Badge variant="outline">Yes</Badge>;
+        case false:
+          return <Badge variant="default">No</Badge>;
+      }
+    },
     meta: {
       editor: selectOptionsEditor({
         options: [

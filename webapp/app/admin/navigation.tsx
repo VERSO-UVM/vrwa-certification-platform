@@ -46,6 +46,14 @@ export function AdminSidebar() {
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
+                <Link to="/admin/instructors">
+                  <Users />
+                  Instructors
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
                 <Link to="/admin/certifications">
                   <Trophy />
                   Certifications

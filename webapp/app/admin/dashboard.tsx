@@ -11,92 +11,13 @@ import {
 import type { CourseLocation } from "@backend/database/schema";
 import type { CourseEventDto, ReservationDto } from "@backend/database/dtos";
 import { DataTable } from "~/components/data-table";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Book, Trophy, Users } from "lucide-react";
 import { LocationTypeBadge } from "~/components/location-type-badge";
 import { PageHeader } from "~/components/page-header";
-
-const courseEventTableDef: ColumnDef<CourseEventDto>[] = [
-  {
-    accessorKey: "courseName",
-    header: "Name",
-    cell: ({ row, getValue }) => (
-      <Link
-        to={{
-          pathname: "/admin/course-manager",
-          search: `?class=${row.original.id}`,
-        }}
-        className="font-medium hover:underline"
-      >
-        {getValue() as string}
-      </Link>
-    ),
-  },
-  {
-    accessorKey: "classStartDatetime",
-    header: "Date",
-    cell: ({ getValue }) => new Date(getValue() as string).toLocaleDateString(),
-  },
-  {
-    accessorKey: "locationType",
-    header: "Format",
-    cell: ({ getValue }) => (
-      <LocationTypeBadge value={getValue() as CourseLocation} />
-    ),
-  },
-  {
-    accessorKey: "physicalAddress",
-    header: "Location",
-    cell: ({ row, getValue }) => (
-      <div className="text-muted-foreground">
-        {String(
-          row.getValue("locationType") == "virtual" ? "Online" : getValue(),
-        )}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "seats",
-    header: "Seats",
-    cell: ({ getValue }) => (
-      <div className="text-right">{String(getValue())}</div>
-    ),
-  },
-];
-
-const reservationTabledef: ColumnDef<ReservationDto>[] = [
-  {
-    accessorKey: "firstName",
-    header: "First Name",
-  },
-  {
-    accessorKey: "lastName",
-    header: "Last Name",
-  },
-  {
-    accessorKey: "isMember",
-    header: "Member",
-    cell: ({ getValue }) => (getValue() == true ? "yes" : "no"),
-  },
-  {
-    accessorKey: "creditHours",
-    header: "Credit Hours",
-  },
-  {
-    accessorKey: "paymentStatus",
-    header: "Payment Status",
-  },
-  {
-    accessorKey: "course.courseName",
-    header: "Course Name",
-  },
-  {
-    accessorKey: "classStartDateTime",
-    header: "Course Date",
-    cell: ({ getValue }) => new Date(getValue() as string).toLocaleDateString(),
-  },
-];
+import { courseEventDefPresets, courseEventDefs } from "~/utils/field-defs/course-event";
+import { reservationDefPresets } from "~/utils/field-defs/reservation";
 
 export function AdminDashboard() {
   const trpc = useTRPC();
@@ -106,6 +27,7 @@ export function AdminDashboard() {
   const reservations = useQuery(
     trpc.adminRouter.getReservations.queryOptions(),
   );
+  const navigate = useNavigate();
 
   return (
     <div className="flex-1">
@@ -127,8 +49,11 @@ export function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <DataTable
-              columns={courseEventTableDef}
+              columns={courseEventDefPresets.default}
               data={(courseEvents.data as CourseEventDto[]) ?? []}
+              table={{
+                enableRowSelection: false,
+              }}
             />
           </CardContent>
         </Card>
@@ -173,8 +98,19 @@ export function AdminDashboard() {
           <CardTitle className="text-center">Search Reservations</CardTitle>
           <CardContent>
             <DataTable
-              columns={reservationTabledef}
+              columns={reservationDefPresets.all}
               data={(reservations.data as ReservationDto[]) ?? []}
+              table={{
+                onRowSelectionChange: (selection) => {
+                  const value = selection instanceof Function ? selection({}) : selection;
+                  const id = Object.keys(value)?.[0];
+                  if (!id) return null;
+                  const row = parseInt(id);
+                  if (reservations.data?.[row]) {
+                    navigate("/admin/trainees#"+reservations.data[row].profileId);
+                  }
+                }
+              }}
             />
           </CardContent>
         </Card>

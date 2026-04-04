@@ -15,15 +15,10 @@ const columnDefs = [
   {
     ...reservationDefs.creditHours,
     cell: ({ renderValue }) => (
-      <span className="font-bold">{renderValue()}</span>
+      <span className="font-medium">{renderValue()}</span>
     ),
   } satisfies ColumnDef<ReservationDto, string>,
-  {
-    ...reservationDefs.paymentStatus,
-    cell: ({ renderValue }) => (
-      <span className="font-bold">{renderValue()}</span>
-    ),
-  } satisfies ColumnDef<ReservationDto, PaymentStatus>,
+  reservationDefs.paymentStatus,
   reservationFieldHelper.display({
     header: "Actions",
     cell: ({ row }) => <EditTraineeReservation reservation={row.original} />,
