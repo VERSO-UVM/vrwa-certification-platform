@@ -1,4 +1,3 @@
-import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "./ui/button";
 import {
   Drawer,
@@ -10,8 +9,11 @@ import {
   DrawerClose,
 } from "./ui/drawer";
 import type { PropsWithChildren } from "react";
-import { SquarePen } from "lucide-react";
 
+/**
+ * I just got sick of the number of <DrawerXxxx> components cluttering
+ * imports and the JSX.
+ */
 export type StandardDrawerProps = PropsWithChildren<{
   openButton: React.ReactNode;
   title: string;
@@ -29,9 +31,7 @@ export function StandardDrawer({
 }: StandardDrawerProps) {
   return (
     <Drawer direction="right" {...props}>
-      <DrawerTrigger asChild>
-      {openButton}
-      </DrawerTrigger>
+      <DrawerTrigger asChild>{openButton}</DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>{title}</DrawerTitle>

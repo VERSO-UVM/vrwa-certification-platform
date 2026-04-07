@@ -1,5 +1,8 @@
 import { useLocation, useNavigate } from "react-router";
 
+/**
+ * useState<string> but value is pulled and updated from the hash string!
+ */
 export function useHashString(
   init: string | null,
 ): [string | null, (val: string | null) => void] {

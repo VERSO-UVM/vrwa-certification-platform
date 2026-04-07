@@ -1,7 +1,7 @@
 import type { RowSelectionState, Updater } from "@tanstack/react-table";
 
 /**
- * Very simple utility but meant to pair with
+ * Meant to pair with
  * @see getReactTableOnSelectionChange
  */
 export function getRowSelectionState(selectedIndex: number) {

@@ -1,3 +1,15 @@
+/**
+ * Customizable generic editors to use in the meta.editor ColumnDef
+ * property. 
+ * The idea is for these functions to be highly re-usable and we don't need many. 
+ *
+ * Currently still missing:
+ *
+ * - [ ] Checkbox
+ * - [ ] Radio
+ * - [ ] Date input
+ */
+
 import type { CellContext } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { Input } from "~/components/ui/input";
@@ -7,12 +19,27 @@ import {
 } from "~/components/ui/native-select";
 
 export type FieldEditor<TData, TValue> = (item: {
+  /**
+   * `ctx` is the same as the object pass to table `cell` ColumnDef funciton.
+   */
   ctx: CellContext<TData, TValue>;
+
   forId: string;
+
   onChange: (value: TValue) => void;
+
+  /**
+   * Use onBlur for things like querying or updating the
+   * database or validating or sending messages to the user.
+   * I loathe when apps show me error messages before I've finished
+   * typing.
+   */
   onBlur: (value: TValue) => void;
 }) => React.ReactNode;
 
+/**
+ * Can override `props` for, e.g. type="number".
+ */
 export function textInputEditor<T>(
   props?: React.ComponentProps<"input">,
 ): FieldEditor<T, string> {

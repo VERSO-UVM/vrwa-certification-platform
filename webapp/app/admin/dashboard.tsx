@@ -102,6 +102,8 @@ export function AdminDashboard() {
               data={(reservations.data as ReservationDto[]) ?? []}
               table={{
                 onRowSelectionChange: (selection) => {
+                  // For now let's just make clicking a row
+                  // try to go the profile details in the trainee page
                   const value = selection instanceof Function ? selection({}) : selection;
                   const id = Object.keys(value)?.[0];
                   if (!id) return null;

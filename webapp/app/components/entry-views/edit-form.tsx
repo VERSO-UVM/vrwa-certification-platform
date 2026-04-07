@@ -9,9 +9,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { shallowEqual } from "~/utils/utils";
 
+/**
+ * Generate an edit form using column defs!
+ */
 export type EditFormProps<T> = {
   item: T;
-  columns: ColumnDef<T, any>[]; // See comment in data-table.tsx
+  columns: ColumnDef<T, any>[]; // any: see comment in data-table.tsx
   onSave: (updated: Partial<T>) => void;
 };
 export function EditForm<T extends object>({
@@ -32,6 +35,7 @@ export function EditForm<T extends object>({
   const row = table.getRow("0");
   const headers = table.getFlatHeaders();
 
+ // TODO: this should really be wrapped in an actual <form> shouldn't it...
   return (
     <FieldSet className="pb-2">
       <FieldGroup>

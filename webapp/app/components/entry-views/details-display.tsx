@@ -6,6 +6,11 @@ import {
 } from "@tanstack/react-table";
 import { useMemo } from "react";
 
+/**
+ * This is a minimal field : value display of an entry. But
+ * it can be combined with EditForm and button to toggle between
+ * "view" mode and "edit" mode, for example.
+ */
 export function DetailsDisplay<TData>({
   item,
   columns,

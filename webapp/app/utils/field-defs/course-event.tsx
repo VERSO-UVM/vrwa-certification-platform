@@ -1,5 +1,5 @@
 import type { CourseEventDto } from "@backend/database/dtos";
-import { course, type CourseLocation } from "@backend/database/schema";
+import type { CourseLocation } from "@backend/database/schema";
 import { createColumnHelper, type ColumnDef } from "@tanstack/react-table";
 import { Link } from "react-router";
 import { LocationTypeBadge } from "~/components/location-type-badge";
