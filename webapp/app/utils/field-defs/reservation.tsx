@@ -9,15 +9,11 @@ export const reservationFieldHelper = createColumnHelper<ReservationDto>();
 export const reservationDefs = {
   firstName: reservationFieldHelper.accessor("firstName", {
     header: "First Name",
-    cell: ({ renderValue }) => (
-      <span className="italic">{renderValue()}</span>
-    ),
+    cell: ({ renderValue }) => <span className="italic">{renderValue()}</span>,
   }),
   lastName: reservationFieldHelper.accessor("lastName", {
     header: "Last Name",
-    cell: ({ renderValue }) => (
-      <span className="italic">{renderValue()}</span>
-    ),
+    cell: ({ renderValue }) => <span className="italic">{renderValue()}</span>,
   }),
   creditHours: reservationFieldHelper.accessor("creditHours", {
     header: "Credit Hours",

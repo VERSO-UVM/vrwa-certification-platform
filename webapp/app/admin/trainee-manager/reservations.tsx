@@ -8,7 +8,6 @@ import {
   reservationDefs,
 } from "~/utils/field-defs/reservation";
 import type { ColumnDef } from "@tanstack/react-table";
-import type { PaymentStatus } from "@backend/database/schema";
 
 const columnDefs = [
   reservationDefs.courseName,

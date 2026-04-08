@@ -2,10 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "~/components/data-table";
 import { PageHeader } from "~/components/page-header";
 import { useTRPC } from "~/utils/trpc";
-import {
-  profileDefs,
-  profileFieldHelper,
-} from "~/utils/field-defs/profile";
+import { profileDefs, profileFieldHelper } from "~/utils/field-defs/profile";
 import {
   getOnRowSelectionChange,
   getRowSelectionState,

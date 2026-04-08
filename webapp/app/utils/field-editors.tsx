@@ -1,7 +1,7 @@
 /**
  * Customizable generic editors to use in the meta.editor ColumnDef
- * property. 
- * The idea is for these functions to be highly re-usable and we don't need many. 
+ * property.
+ * The idea is for these functions to be highly re-usable and we don't need many.
  *
  * Currently still missing:
  *

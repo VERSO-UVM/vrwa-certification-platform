@@ -10,10 +10,7 @@
 import type { Profile } from "@backend/database/schema";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Badge } from "~/components/ui/badge";
-import {
-  textInputEditor,
-  selectOptionsEditor,
-} from "~/utils/field-editors";
+import { textInputEditor, selectOptionsEditor } from "~/utils/field-editors";
 
 // createColumnHelper just provides a stronger typed API to define ColumnDefs
 // Note that assigning the result type becomes difficult https://github.com/TanStack/table/issues/4382
@@ -71,18 +68,14 @@ export const profileDefs = {
         options: [
           { label: "yes", value: true },
           { label: "no", value: false },
-        ]
+        ],
       }),
-    }
+    },
   }),
 };
 
 export const profileDefPresets = {
-  basic: [
-    profileDefs.firstName,
-    profileDefs.lastName,
-    profileDefs.isMember,
-  ],
+  basic: [profileDefs.firstName, profileDefs.lastName, profileDefs.isMember],
 
   // Object.values() is required to produce values in insertion order for String keys
   all: Object.values(profileDefs),
