@@ -9,14 +9,14 @@ import z from "zod";
 
 // IMPORTANT: change basicProcedure to protectedProcedure
 // once auth is fully implemented (before shipping).
-const adminProcedure = basicProcedure;
+const procedure = basicProcedure;
 
 const updateSchema = createUpdateSchema(profile, {
   id: z.string(),
 });
 
 export const profileRouter = router({
-  update: adminProcedure.input(updateSchema).mutation(({ input }) => {
+  update: procedure.input(updateSchema).mutation(({ input }) => {
     const { id, ...changes } = input;
     return db.client
       .update(profile)

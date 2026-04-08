@@ -16,35 +16,13 @@ import {
 } from "~/database/schema";
 import type { Profile } from "~/database/schema";
 import { basicProcedure, router } from "~/utils/trpc";
+import { reservationDtoSelect } from "./reservation";
 
 // IMPORTANT: change basicProcedure to protectedProcedure
 // once auth is fully implemented (before shipping).
 const adminProcedure = basicProcedure;
 
 const { passwordHash: _, ...accountInfo } = getTableColumns(account);
-
-const getReserverations = () => {
-  return db.client
-    .select({
-      profileId: reservation.profileId,
-      courseEventId: reservation.courseEventId,
-      creditHours: reservation.creditHours,
-      paymentStatus: reservation.paymentStatus,
-      firstName: profile.firstName,
-      lastName: profile.lastName,
-      isMember: profile.isMember,
-      classStartDatetime: courseEvent.classStartDatetime,
-      course: {
-        id: course.id,
-        courseName: course.courseName,
-        creditHours: course.creditHours,
-      },
-    })
-    .from(reservation)
-    .innerJoin(profile, eq(reservation.profileId, profile.id))
-    .innerJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
-    .innerJoin(course, eq(course.id, courseEvent.courseId));
-};
 
 export const adminRouter = router({
   getTrainees: adminProcedure.query((): Promise<Profile[]> => {
@@ -73,7 +51,7 @@ export const adminRouter = router({
   }),
 
   getReservations: adminProcedure.query(
-    getReserverations as () => Promise<ReservationDto[]>,
+    reservationDtoSelect as () => Promise<ReservationDto[]>,
   ),
 
   getTraineeReservations: adminProcedure
