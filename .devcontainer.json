@@ -1,0 +1,46 @@
+{
+  "name": "VRWA Certification Platform",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+  "runArgs": [
+    "--ipc=host" 
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "enableNonRootDocker": true,
+      "moby": false
+    }
+  },
+  "onCreateCommand": "npm install -g bun",
+  "postCreateCommand": "bun install && bunx playwright install --with-deps",
+  "forwardPorts": [3000, 5173, 5432],
+  "portsAttributes": {
+    "5173": {
+      "label": "Webapp (Vite)",
+      "onAutoForward": "notify"
+    },
+    "3000": {
+      "label": "Backend API",
+      "onAutoForward": "notify"
+    },
+    "5432": {
+      "label": "PostgreSQL DB",
+      "onAutoForward": "silent"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+      },
+      "extensions": [
+        "oven.bun-vscode",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-playwright.playwright"
+      ]
+    }
+  }
+}
