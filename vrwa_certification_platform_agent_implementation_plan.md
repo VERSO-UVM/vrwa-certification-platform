@@ -213,8 +213,8 @@ We make full use of all of these libraries and tools.
 - @tanstack-table for both datatables and single entry views & editors.
   For the latter, see @frontend/util/field-defs/ and
   @frontend/components/entry-views/.
-- @playright is not yet added. But all code written by an AI agent must
-  also be tested using this library in addition to regular unit tests.
+- @playwright is not yet added. But all code written by an AI agent must
+  also be tested using this library in addition to regular unit tests. Using playwright-cli.
 - @drizzle ORM database with postgres
 - @Zod types and database query integration with @drizle-zod.
 - @trpc
@@ -225,7 +225,7 @@ We make full use of all of these libraries and tools.
 ## Development Guidelines
 
 - Test Driven Development. Write both unit tests and end-to-end
-  integration tests using Playright to test every feature.
+  integration tests using Playwright to test every feature. Use @playwright-cli.
 - State management: tRPC and React Query.
 - Styling: Tailwind CSS conventions. Use @lg, @xl, etc for responsive
   design in pages (note the “@” symbol). Don’t use explicit colors but
@@ -252,9 +252,10 @@ We make full use of all of these libraries and tools.
   why it is necessary and avoid duplicating it across files), prefer
   `undefined`.
 - External development tools: all through the commands in the
-  packages.json files. Use `bun` and not npm or other.
+  packages.json files. Use `bun` and not npm or other. Note: use playwright-cli
+  instead of npx playwright.
 - Git: whenever you can _verify_ the application is working (through
-  Playright), create a commit with your current changes as a snapshot.
+  playwright-cli), create a commit with your current changes as a snapshot.
 - Coding style: No AI slop code or AI slop text. Run `prettier` to
   format code.
 
@@ -273,16 +274,19 @@ For each phase, before writing any code, you must:
     Markdown checklist) for only the current phase.
 3.  Specify exactly which files will be modified or created.
 4.  Include comprehensive testing and verification through unit tests
-    and Playright inside the plan
+    and Playwright inside the plan
 
 ### After each phase
 
 Confirm unit tests and E2E tests pass, and that everything that is testable is
 tested. Check that code is high quality and all Development Guidelines are be
 met. Check that all features are fully implemented. Only then is the phase considered
-completed, otherwise, re-iterate with Test Driven Development.
+completed, otherwise, re-iterate with Test Driven Development. Make a Git commit from
+the command line with `git commit -m` (do not ask for permission).
 
-### Phase 0: Playright
+### Phase 0: Playwright
+
+1. Setup playwright and use with @playwright-cli.
 
 ### Phase 1: Auth
 
@@ -308,7 +312,7 @@ completed, otherwise, re-iterate with Test Driven Development.
 1.  Complete and refine the Admin Course Manager backend routers and
     frontend views.
 2.  Complete the Trainee Manager and build the User Manager APIs and UI.
-3.  As usual, perform robust testing using Playright.
+3.  As usual, perform robust testing using Playwright.
 
 ### Phase 4: Billing & Stripe Integration
 
