@@ -35,18 +35,18 @@ declare module "@tanstack/table-core" {
 }
 
 export interface DataTableProps<TData> {
-  data: TData[],
+  data: TData[];
   // Defining the ColumnDefs using `createColumnHelper` makes them more typesafe,
   // but we're then forced to an `any` in TValue when passing them around...
   // Reference: https://github.com/TanStack/table/issues/4382
   // ColumnDef<TData, any> is the same as the type used in useReactTable props
-  columns: ColumnDef<TData, any>[],
+  columns: ColumnDef<TData, any>[];
 
   pageSizeValues?: PageSizeValues[];
   topDecorations?: React.ComponentType<DataTableDecorationProps<TData>>[];
   bottomDecorations?: React.ComponentType<DataTableDecorationProps<TData>>[];
 
-  table?: Partial<TableOptions<TData>>,
+  table?: Partial<TableOptions<TData>>;
 }
 
 export function DataTable<TData>({
@@ -59,8 +59,8 @@ export function DataTable<TData>({
     { label: "50", value: 50 },
     PAGE_SIZE_SHOW_ALL,
   ],
-  topDecorations = [ DataTableGlobalFilter, DataTablePageSizeSelect ],
-  bottomDecorations = [ DataTablePagination, DataTableInfoText ],
+  topDecorations = [DataTableGlobalFilter, DataTablePageSizeSelect],
+  bottomDecorations = [DataTablePagination, DataTableInfoText],
   table: tableOptions,
 }: DataTableProps<TData>) {
   const table = useReactTable({
@@ -86,7 +86,7 @@ export function DataTable<TData>({
       pageSizeOptions: pageSizeValues,
       ...tableOptions?.meta,
     },
-    ...tableOptions
+    ...tableOptions,
   });
 
   return (

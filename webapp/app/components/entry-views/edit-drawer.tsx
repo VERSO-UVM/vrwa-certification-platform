@@ -11,9 +11,9 @@ export interface EditDrawerProps<T> {
   onSave: (updates: Partial<T>) => Promise<void>;
   drawer: {
     buttonText: string;
-    title: string,
-    description: string,
-  }
+    title: string;
+    description: string;
+  };
 }
 
 /**

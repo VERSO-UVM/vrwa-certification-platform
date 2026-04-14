@@ -16,7 +16,10 @@ import { Button } from "~/components/ui/button";
 import { Book, Trophy, Users } from "lucide-react";
 import { LocationTypeBadge } from "~/components/location-type-badge";
 import { PageHeader } from "~/components/page-header";
-import { courseEventDefPresets, courseEventDefs } from "~/utils/field-defs/course-event";
+import {
+  courseEventDefPresets,
+  courseEventDefs,
+} from "~/utils/field-defs/course-event";
 import { reservationDefPresets } from "~/utils/field-defs/reservation";
 
 export function AdminDashboard() {
@@ -104,14 +107,17 @@ export function AdminDashboard() {
                 onRowSelectionChange: (selection) => {
                   // For now let's just make clicking a row
                   // try to go the profile details in the trainee page
-                  const value = selection instanceof Function ? selection({}) : selection;
+                  const value =
+                    selection instanceof Function ? selection({}) : selection;
                   const id = Object.keys(value)?.[0];
                   if (!id) return null;
                   const row = parseInt(id);
                   if (reservations.data?.[row]) {
-                    navigate("/admin/trainees#"+reservations.data[row].profileId);
+                    navigate(
+                      "/admin/trainees#" + reservations.data[row].profileId,
+                    );
                   }
-                }
+                },
               }}
             />
           </CardContent>

@@ -11,7 +11,7 @@ import { TraineeEditButton } from "./edit-profile";
 import { DetailsDisplay } from "~/components/entry-views/details-display";
 import { profileDefPresets } from "~/utils/field-defs/profile";
 
-export function Trainee({ trainee } : { trainee: Profile }) {
+export function Trainee({ trainee }: { trainee: Profile }) {
   return (
     <div id={trainee.id}>
       <h2 className="text-xl font-medium text-center p-4 bg-accent rounded-xl">
@@ -40,10 +40,7 @@ export function Trainee({ trainee } : { trainee: Profile }) {
           <CardContent>
             <TraineeEditButton label="Edit" trainee={trainee} />
             <div className="pt-4"></div>
-            <DetailsDisplay
-              item={trainee}
-              columns={profileDefPresets.all}
-            />
+            <DetailsDisplay item={trainee} columns={profileDefPresets.all} />
           </CardContent>
         </Card>
       </div>

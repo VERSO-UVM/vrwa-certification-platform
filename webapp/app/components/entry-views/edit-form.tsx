@@ -35,7 +35,7 @@ export function EditForm<T extends object>({
   const row = table.getRow("0");
   const headers = table.getFlatHeaders();
 
- // TODO: this should really be wrapped in an actual <form> shouldn't it...
+  // TODO: this should really be wrapped in an actual <form> shouldn't it...
   return (
     <FieldSet className="pb-2">
       <FieldGroup>

@@ -1,7 +1,13 @@
 import { and, eq } from "drizzle-orm";
 
 import db from "~/database";
-import { course, courseEvent, profile, reservation, type PaymentStatus } from "~/database/schema";
+import {
+  course,
+  courseEvent,
+  profile,
+  reservation,
+  type PaymentStatus,
+} from "~/database/schema";
 import { basicProcedure, router } from "~/utils/trpc";
 
 import { createUpdateSchema } from "drizzle-zod";
@@ -56,6 +62,5 @@ export const reservationRouter = router({
         ),
       )
       .returning();
-      ;
   }),
 });
