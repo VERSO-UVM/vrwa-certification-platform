@@ -94,7 +94,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </head>
           <body>
             <TooltipProvider>{children}</TooltipProvider>
-            <ScrollRestoration />
+            {/* customize getKey to prevent scroll reset when URLSearchParams changes*/}
+            <ScrollRestoration getKey={(location) => location.pathname} />
             <Scripts />
           </body>
         </html>

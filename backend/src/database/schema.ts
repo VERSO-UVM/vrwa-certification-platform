@@ -92,7 +92,7 @@ export type CourseLocation = "in-person" | "virtual" | "hybrid";
 export const courseEvent = pgTable("courseEvent", {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("courseEvent")),
   courseId: varchar()
-    .references(() => course.id, { onDelete: "cascade"})
+    .references(() => course.id, { onDelete: "cascade" })
     .notNull(),
   locationType: varchar().notNull().$type<CourseLocation>(),
   virtualLink: text(),
@@ -117,7 +117,7 @@ export const reservation = pgTable(
       .references(() => profile.id)
       .notNull(),
     courseEventId: varchar()
-      .references(() => courseEvent.id, { onDelete: "cascade"})
+      .references(() => courseEvent.id, { onDelete: "cascade" })
       .notNull(),
     creditHours: decimal().notNull(),
     paymentStatus: varchar().notNull().$type<PaymentStatus>(),

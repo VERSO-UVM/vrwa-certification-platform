@@ -20,6 +20,5 @@ export default function SignupPage() {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }
-

@@ -35,7 +35,9 @@ export function InstructorSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenuButton asChild>
-          <Link to="/" className="font-medium">Exit</Link>
+          <Link to="/" className="font-medium">
+            Exit
+          </Link>
         </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>

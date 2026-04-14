@@ -7,8 +7,8 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-} from "./select";
-import { Field, FieldLabel } from "./field";
+} from "~/components/ui/select";
+import { Field, FieldLabel } from "~/components/ui/field";
 
 interface DataTablePageSizeSelectProps<
   TData,
@@ -53,7 +53,9 @@ export function DataTablePageSizeSelect<TData>({
           <SelectContent align="start">
             <SelectGroup>
               {pageSizeOptions?.map(({ label, value }) => (
-                <SelectItem key={value} value={value.toString()}>{label}</SelectItem>
+                <SelectItem key={value} value={value.toString()}>
+                  {label}
+                </SelectItem>
               ))}
             </SelectGroup>
           </SelectContent>
