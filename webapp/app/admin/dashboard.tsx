@@ -53,7 +53,7 @@ export function AdminDashboard() {
           <CardContent>
             <DataTable
               columns={courseEventDefPresets.default}
-              data={(courseEvents.data as CourseEventDto[]) ?? []}
+              data={courseEvents.data ?? []}
               table={{
                 enableRowSelection: false,
               }}

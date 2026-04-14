@@ -30,10 +30,10 @@ import {
 
 function useCourses() {
   const trpc = useTRPC();
-  return useQuery<Course[]>(trpc.courseManagerRouter.getCourses.queryOptions());
+  return useQuery(trpc.courseManagerRouter.getCourses.queryOptions());
 }
 
-export function NewCourseEventForm({ onCreate }) {
+export function NewCourseEventForm({ onCreate }: { onCreate: (data: any) => Promise<void> }) {
   const courses = useCourses();
 
   const [values, setValues] = useState({
@@ -49,13 +49,13 @@ export function NewCourseEventForm({ onCreate }) {
   function combineDateAndTime(date: Date, time: string) {
     const [hours, mins] = time.split(":").map(Number);
     const combo = new Date(date);
-    combo.setHours(hours);
-    combo.setMinutes(mins);
+    combo.setHours(hours ?? 0);
+    combo.setMinutes(mins ?? 0);
     combo.setSeconds(0);
     return combo;
   }
 
-  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const classStartDatetime = combineDateAndTime(values.date, values.time);

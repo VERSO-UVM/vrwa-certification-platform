@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { PageHeader } from "~/components/page-header";
+import type { Route } from "./+types/not-found";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Not found" }];

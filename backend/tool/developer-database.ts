@@ -17,6 +17,7 @@ if (existsSync(".tmp/db-data")) {
 }
 
 await verbose`docker compose -f compose.dev.yml up -d --wait`;
+await verbose`sleep 1`; // RZ: db is not always ready immediately even with --wait
 await verbose`bun db:gen`;
 await verbose`bun db:migrate`;
 await verbose`bun db:seed`;

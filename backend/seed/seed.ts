@@ -3,10 +3,9 @@ import fs from "fs/promises";
 import path from "path";
 import * as argon2 from 'argon2';
 import type { CourseLocation } from '../src/database/schema';
-
+import { generatePrefixedId } from "~/utils/id";
 
 async function main() {
-
   console.log("Seeding database..");
 
   //load in data
@@ -14,9 +13,6 @@ async function main() {
   const file = await fs.readFile(filePath, "utf-8");
   const data = JSON.parse(file);
 
-  //delete existing data?
-
-  //get organization(s)
   const orgIds : string[] = [];
 
   console.log("Creating organizations..");
@@ -24,14 +20,15 @@ async function main() {
     const [newOrg] = await db.client
       .insert(db.schema.organization)
       .values({
-        orgName : org.orgName
+        id: generatePrefixedId("organization"),
+        name : org.orgName,
+        slug : org.orgName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+        createdAt: new Date(),
       })
-    .returning();
-    orgIds.push(newOrg.id);
-    console.log(`Created ${newOrg.orgName}`);
+      .returning();
+    orgIds.push(newOrg!.id);
+    console.log(`Created ${newOrg!.name}`);
   }
-  
-  
 
   //create accounts + profiles
   console.log("Creating accounts...");
@@ -40,18 +37,33 @@ async function main() {
 
   for (const acct of data.accounts) {
     ++acctNum;
-    const password = await hashPassword(acct.password);
 
-    const [newAccount] = await db.client
-      .insert(db.schema.account)
+    // insert into user table
+    const [newUser] = await db.client
+      .insert(db.schema.user)
       .values({
-        hasRegistered: true,
+        id: generatePrefixedId("user"),
+        name: acct.email,
         email: acct.email,
-        passwordHash: password,
-        role: acct.role,
-        orgId : acctNum == 3 ? orgIds[0] : null,
+        role: acct.role === 'vrwa-administrator' ? 'admin' : acct.role === 'trainee' ? 'user' : acct.role,
+        createdAt: new Date(),
+        updatedAt: new Date()
       })
       .returning();
+
+    const password = await hashPassword(acct.password);
+
+    await db.client
+      .insert(db.schema.account)
+      .values({
+        id: generatePrefixedId("account"),
+        accountId: newUser!.id,
+        providerId: "credential",
+        userId: newUser!.id,
+        password: password,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
 
       console.log(`Created account under email ${acct.email}`);
       console.log(`password: ${acct.password}`);
@@ -60,7 +72,7 @@ async function main() {
         const [newProfile] = await db.client
           .insert(db.schema.profile)
           .values({
-            accountId: newAccount.id,
+            accountId: newUser!.id,
             firstName: prof.firstName,
             lastName: prof.lastName,
             address: prof.address,
@@ -71,11 +83,10 @@ async function main() {
             isMember: prof.isMember
           })
           .returning();
-          profileIds.push(newProfile.id)
+          profileIds.push(newProfile!.id)
           console.log(`profile: ${prof.firstName} ${prof.lastName}`);
       }
   }
-
 
   //keep track of courses
   const courseIds: string[] = [];
@@ -91,7 +102,7 @@ async function main() {
       priceCents: courseInfo.priceCents,
     })
     .returning();
-    courseIds.push(newCourse.id);
+    courseIds.push(newCourse!.id);
     console.log(`${courseInfo.courseName} created`);
   }
 
@@ -100,7 +111,6 @@ async function main() {
   const locations: CourseLocation[] = ['in-person', 'virtual', 'hybrid'];
   const now = new Date();
   let num = 1;
-
 
   for (const courseId of courseIds) {
     //past event
@@ -111,7 +121,7 @@ async function main() {
       .insert(db.schema.courseEvent)
       .values({
         courseId,
-        locationType: locations[num % locations.length],
+        locationType: locations[num % locations.length]!,
         virtualLink: locations[num % locations.length] !== 'in-person'
           ? 'www.zoom.com'
           : null,
@@ -122,7 +132,7 @@ async function main() {
         classStartDatetime: thePast,
       })
       .returning();
-      courseEventIds.push(pastEvent.id)
+      courseEventIds.push(pastEvent!.id)
 
     //future event
     const theFuture = new Date(now);
@@ -132,7 +142,7 @@ async function main() {
       .insert(db.schema.courseEvent)
       .values({
         courseId,
-        locationType: locations[num % locations.length],
+        locationType: locations[num % locations.length]!,
         virtualLink: locations[num % locations.length] !== 'in-person'
           ? 'www.zoom.com'
           : null,
@@ -143,17 +153,17 @@ async function main() {
         classStartDatetime: theFuture,
       })
       .returning()  
-      courseEventIds.push(futureEvent.id);
+      courseEventIds.push(futureEvent!.id);
       num++;  
   }
 
   console.log(`Created ${courseIds.length * 2} course events!`)
-  
+
   //create reservations + link to profiles 
   console.log(`Creating reservations...`)
   for (let i = 0; i < courseEventIds.length; i++){
-    const courseEventId = courseEventIds[i];
-    const profileId = profileIds[i % profileIds.length];
+    const courseEventId = courseEventIds[i]!;
+    const profileId = profileIds[i % profileIds.length]!;
 
     await db.client
     .insert(db.schema.reservation)
@@ -170,7 +180,6 @@ async function main() {
 async function hashPassword(password: string) {
   return argon2.hash(password);
 }
-
 
 main()
   .then(() => {

@@ -31,7 +31,7 @@ import { Textarea } from "./ui/textarea";
 
 function useCourses() {
   const trpc = useTRPC();
-  return useQuery<Course[]>(trpc.courseManagerRouter.getCourses.queryOptions());
+  return useQuery(trpc.courseManagerRouter.getCourses.queryOptions());
 }
 
 //for input validation of tuition fee
@@ -43,7 +43,7 @@ function textToDollars(userInput: string) {
   return Number(dollarAmt) * 100;
 }
 
-export function NewCourseForm({ onCreate }) {
+export function NewCourseForm({ onCreate }: { onCreate: (data: any) => Promise<void> }) {
   const courses = useCourses();
 
   const [values, setValues] = useState({
@@ -53,7 +53,7 @@ export function NewCourseForm({ onCreate }) {
     price: "",
   });
 
-  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     onCreate({

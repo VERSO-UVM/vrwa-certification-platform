@@ -13,5 +13,6 @@
       "@backend/*": ["../backend/src/*"]
     }
   },
-  "references": [{ "path": "../backend" }]
+  "references": [{ "path": "../backend" }],
+  "include": ["app", ".react-router/types"]
 }

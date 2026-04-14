@@ -6,12 +6,16 @@ import { encodeBase32LowerCaseNoPadding } from "@oslojs/encoding";
 
 // Mapping readable prefix names : id prefixes
 const ID_PREFIXES = {
+  user: "user",
   account: "acct",
   profile: "profile",
   course: "course",
   courseEvent: "lecture",
   session: "sid",
   organization: "org",
+  verification: "veri",
+  member: "memb",
+  invitation: "inv",
 } as const;
 
 type IdPrefixNames = keyof typeof ID_PREFIXES;

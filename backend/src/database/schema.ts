@@ -8,41 +8,19 @@ import {
   boolean,
   primaryKey,
   decimal,
-} from "drizzle-orm/pg-core";
-import { prefixedIdGenerator } from "~/utils/id";
+  index,
+} from 'drizzle-orm/pg-core';
+import { prefixedIdGenerator } from '../utils/id';
+import { session, organization, account, user } from './auth';
+export { session, organization, account, user } from './auth';
+export { roles as Roles } from "~/auth/permissions"
 
-export const Roles = {
-  Trainee: "trainee",
-  BillingManager: "billing-manager",
-  Instructor: "instructor",
-  Administrator: "vrwa-administrator",
-} as const;
-
-export type AccountRole = (typeof Roles)[keyof typeof Roles];
-
-export const account = pgTable(
-  "account",
-  {
-    id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("account")),
-    hasRegistered: boolean().notNull().default(false),
-    email: text().notNull().unique(),
-    passwordHash: text(),
-    role: varchar().notNull().$type<AccountRole>(),
-    orgId: varchar().references(() => organization.id),
-  },
-  (table) => [uniqueIndex("email_idx").on(table.email)],
-);
-
-export type Account = typeof account.$inferSelect;
-// Should only use AccountInfo, not Account, in API and Client.
-// Maybe create a separate types file?
-export type AccountInfo = Omit<Account, "passwordHash">;
-
-export const profile = pgTable("profile", {
-  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("profile")),
+export const profile = pgTable('profile', {
+  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('profile')),
+  // refactor: rename to userId
   accountId: varchar()
     .notNull()
-    .references(() => account.id),
+    .references(() => user.id),
   firstName: text().notNull(),
   lastName: text().notNull(),
   address: text().notNull(),
@@ -54,23 +32,9 @@ export const profile = pgTable("profile", {
 });
 export type Profile = typeof profile.$inferSelect;
 
-export const session = pgTable("session", {
-  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("session")),
-  accountId: varchar()
-    .references(() => account.id)
-    .notNull(),
-  expiresAt: timestamp({ withTimezone: true }).notNull(),
-  createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
-});
-
 export type Session = typeof session.$inferSelect;
 
-export type SessionUser = { account: Account; session: Session };
-
-export const organization = pgTable("organization", {
-  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("organization")),
-  orgName: text(),
-});
+// export type SessionUser = { account: Account; session: Session };
 
 export type Organization = typeof organization.$inferSelect;
 
@@ -92,7 +56,7 @@ export type CourseLocation = "in-person" | "virtual" | "hybrid";
 export const courseEvent = pgTable("courseEvent", {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("courseEvent")),
   courseId: varchar()
-    .references(() => course.id, { onDelete: "cascade" })
+    .references(() => course.id)
     .notNull(),
   locationType: varchar().notNull().$type<CourseLocation>(),
   virtualLink: text(),
@@ -117,7 +81,7 @@ export const reservation = pgTable(
       .references(() => profile.id)
       .notNull(),
     courseEventId: varchar()
-      .references(() => courseEvent.id, { onDelete: "cascade" })
+      .references(() => courseEvent.id)
       .notNull(),
     creditHours: decimal().notNull(),
     paymentStatus: varchar().notNull().$type<PaymentStatus>(),

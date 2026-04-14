@@ -15,7 +15,7 @@ import {
 import { Button } from "~/components/ui/button";
 import { ButtonGroup } from "~/components/ui/button-group";
 import { DataTable } from "~/components/data-table";
-import { type CourseEvent } from "../../../backend/src/database/schema";
+import { type CourseEvent } from "@backend/database/schema";
 import { Calendar } from "~/components/ui/calendar";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import {
@@ -42,7 +42,7 @@ import { Link } from "react-router";
 
 function useCourseEvents() {
   const trpc = useTRPC();
-  return useQuery<CourseEvent[]>(
+  return useQuery(
     trpc.adminRouter.getCourseEvents.queryOptions(),
   );
 }
@@ -73,8 +73,8 @@ export function CourseManager() {
 
     const [hours, mins] = time.split(":").map(Number);
     const combo = new Date(date);
-    combo.setHours(hours);
-    combo.setMinutes(mins);
+    combo.setHours(hours ?? 0);
+    combo.setMinutes(mins ?? 0);
     combo.setSeconds(0);
     console.log(combo);
     return combo;
@@ -127,7 +127,7 @@ export function CourseManager() {
     });
   }
 
-  const columnsCourseEvents: ColumnDef<CourseEvent>[] = [
+  const columnsCourseEvents: ColumnDef<any>[] = [
     {
       accessorKey: "courseName",
       header: "Course",
@@ -152,9 +152,6 @@ export function CourseManager() {
         ) : (
           (row.original.physicalAddress ?? "-")
         ),
-      meta: {
-        className: "text-muted-foreground",
-      },
     },
     {
       accessorKey: "virtualLink",
@@ -174,9 +171,6 @@ export function CourseManager() {
         ) : (
           (row.original.virtualLink ?? "-")
         ),
-      meta: {
-        className: "text-muted-foreground",
-      },
     },
     {
       accessorKey: "locationType",
@@ -315,7 +309,7 @@ export function CourseManager() {
     ).length;
   }
 
-  const columnsCourses: ColumnDef<CourseEvent>[] = [
+  const columnsCourses: ColumnDef<any>[] = [
     {
       accessorKey: "courseName",
       header: "Course",
@@ -328,9 +322,6 @@ export function CourseManager() {
     {
       accessorKey: "description",
       header: "Class Description",
-      meta: {
-        className: "text-muted-foreground",
-      },
     },
     {
       accessorKey: "creditHours",
@@ -435,7 +426,7 @@ export function CourseManager() {
                         data,
                       );
                       await queryClient.invalidateQueries({
-                        queryKey: trpc.adminRouter.getCourses.queryKey(),
+                        queryKey: trpc.courseManagerRouter.getCourses.queryKey(),
                       });
                       setCourseDrawerOpen(false);
                     }}

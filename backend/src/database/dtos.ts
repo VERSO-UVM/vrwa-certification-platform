@@ -12,9 +12,9 @@ import {
 
 export type ReservationDto = Reservation &
   Pick<Profile, "firstName" | "lastName" | "isMember"> &
-  Pick<CourseEvent, "classStartDatetime"> & {
+  { classStartDatetime: Date | string | null } & {
     course: Pick<Course, "courseName" | "creditHours" | "id">;
   };
 
-export type CourseEventDto = CourseEvent &
+export type CourseEventDto = Omit<CourseEvent, "classStartDatetime"> & { classStartDatetime: Date | string | null } &
   Pick<Course, "courseName" | "description" | "creditHours" | "priceCents">;

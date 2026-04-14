@@ -40,23 +40,23 @@ export function CourseDetails() {
     });
 
     await queryClient.invalidateQueries({
-      queryKey: trpc.adminRouter.getReservationsByCourse.queryKey({
+      queryKey: trpc.courseManagerRouter.getReservationsByCourse.queryKey({
         courseId: courseId!,
       }),
     });
   }
 
-  const course = useQuery<Course>(
+  const course = useQuery(
     trpc.courseManagerRouter.getCourseById.queryOptions({ id: courseId! }),
   );
 
-  const reservations = useQuery<ReservationDto[]>(
+  const reservations = useQuery(
     trpc.courseManagerRouter.getReservationsByCourse.queryOptions({
       courseId: courseId!,
     }),
   );
 
-  const trainees = useQuery<Profile[]>(
+  const trainees = useQuery(
     trpc.adminRouter.getTrainees.queryOptions(),
   );
 
@@ -96,11 +96,12 @@ export function CourseDetails() {
   ];
 
   //grouping reservations by courseEventId to easily access rosters
-  const reservationsList = reservations.data ?? [];
+  const reservationsList = (reservations.data as any[]) ?? [];
   const reservationsByEvent = reservationsList.reduce<
-    Record<string, ReservationDto[]>
+    Record<string, any[]>
   >((rosters, reservation) => {
     const key = reservation.courseEventId;
+    if (!key) return rosters;
     if (!rosters[key]) {
       rosters[key] = [];
     }
@@ -121,13 +122,15 @@ export function CourseDetails() {
   const openRoster = selectedTab
     ? (reservationsByEvent[selectedTab] ?? [])
     : [];
-  const rosterIds = new Set(openRoster.map((r) => r.profileId));
+  const rosterIds = new Set(openRoster.map((r: any) => r.profileId));
   const availableTrainees =
-    trainees.data?.filter((t) => !rosterIds.has(t.id)) ?? [];
+    (trainees.data as any[])?.filter((t: any) => !rosterIds.has(t.id)) ?? [];
+
+  const courseData = course.data as any;
 
   return (
     <div className="flex-1">
-      <PageHeader>{course.data?.courseName}</PageHeader>
+      <PageHeader>{courseData?.courseName}</PageHeader>
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
         <Card className="@xl:col-span-2">
           <CardHeader className="pb-3">
@@ -137,17 +140,17 @@ export function CourseDetails() {
             <div className="flex flex-col gap-4">
               <div>
                 <p>
-                  <b>Description:</b> {course.data?.description}
+                  <b>Description:</b> {courseData?.description}
                 </p>
               </div>
               <div>
                 <p>
-                  <b>Enrollment Fee:</b> ${course.data?.priceCents / 100}
+                  <b>Enrollment Fee:</b> ${(courseData?.priceCents ?? 0) / 100}
                 </p>
               </div>
               <div>
                 <p>
-                  <b>Credit Hours: </b> {course.data?.creditHours}
+                  <b>Credit Hours: </b> {courseData?.creditHours}
                 </p>
               </div>
               <div>
@@ -241,18 +244,18 @@ export function CourseDetails() {
 
                       await client.courseManagerRouter.addReservation.mutate({
                         profileId: selectedTrainee,
-                        courseEventId: selectedTab,
-                        creditHours: course.data?.creditHours ?? 0,
+                        courseEventId: selectedTab!,
+                        creditHours: courseData?.creditHours ?? 0,
                         paymentStatus: "unpaid",
                       });
 
-                      await queryClient.invalidateQueries(
-                        trpc.courseManagerRouter.getReservationsByCourse.queryKey(
+                      await queryClient.invalidateQueries({
+                        queryKey: trpc.courseManagerRouter.getReservationsByCourse.queryKey(
                           {
                             courseId: courseId!,
                           },
-                        ),
-                      );
+                        ) as any,
+                      });
 
                       setTraineePopupOpen(false);
                     }}
