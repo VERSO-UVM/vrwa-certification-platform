@@ -61,7 +61,7 @@ export const adminRouter = router({
       }),
     )
     .query(({ input }): Promise<ReservationDto[]> => {
-      return getReserverations().where(
+      return reservationDtoSelect().where(
         eq(reservation.profileId, input.profileId),
       );
     }),
