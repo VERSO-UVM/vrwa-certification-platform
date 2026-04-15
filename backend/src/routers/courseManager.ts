@@ -1,10 +1,8 @@
 import { asc, eq, and } from "drizzle-orm";
 import db from "~/database";
 import { courseEvent, course, reservation, profile } from "~/database/schema";
-import { basicProcedure, router } from "~/utils/trpc";
+import { adminProcedure, router } from "~/utils/trpc";
 import { z } from "zod";
-
-const adminProcedure = basicProcedure;
 
 export const courseManagerRouter = router({
   //getCourses

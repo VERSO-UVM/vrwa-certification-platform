@@ -6,6 +6,10 @@ import { router } from "~/utils/trpc";
 import { courseManagerRouter } from "./routers/courseManager";
 import { profileRouter } from "./routers/profile";
 
+import { instructorRouter } from "./routers/instructor";
+
+import { traineeRouter } from "./routers/trainee";
+
 export const appRouter = router({
   authRouter,
   adminRouter,
@@ -13,6 +17,8 @@ export const appRouter = router({
   reservation: reservationRouter,
   profile: profileRouter,
   courseManagerRouter,
+  instructor: instructorRouter,
+  trainee: traineeRouter,
 });
 
 // Export type router type signature,

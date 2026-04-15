@@ -11,12 +11,8 @@ import {
   reservation,
 } from "~/database/schema";
 import type { Profile } from "~/database/schema";
-import { basicProcedure, router } from "~/utils/trpc";
+import { adminProcedure, router } from "~/utils/trpc";
 import { reservationDtoSelect } from "./reservation";
-
-// IMPORTANT: change basicProcedure to protectedProcedure
-// once auth is fully implemented (before shipping).
-const adminProcedure = basicProcedure;
 
 export const adminRouter = router({
   getTrainees: adminProcedure.query(() => {

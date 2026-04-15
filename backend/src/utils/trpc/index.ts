@@ -1,6 +1,8 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import type { Context } from "./ctx";
 import { ZodError } from "zod";
+import { checkRolePermission } from "~/auth/permissions";
+
 /**
  * Initialization of tRPC backend
  * Should be done only once per backend!
@@ -37,4 +39,26 @@ const enforceAcctIsAuthed = t.middleware(({ ctx, next }) => {
 });
 
 export const protectedProcedure = t.procedure.use(enforceAcctIsAuthed);
+
+export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (!ctx.account.role || !checkRolePermission({ roles: ctx.account.role, permissions: { admin: ["admin"] } })) {
+    throw new TRPCError({ code: "FORBIDDEN" });
+  }
+  return next({ ctx });
+});
+
+export const instructorProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (!ctx.account.role || !checkRolePermission({ roles: ctx.account.role, permissions: { classes: ["update"] } })) {
+    throw new TRPCError({ code: "FORBIDDEN" });
+  }
+  return next({ ctx });
+});
+
+export const traineeProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (!ctx.account.role || !checkRolePermission({ roles: ctx.account.role, permissions: { classes: ["register"] } })) {
+    throw new TRPCError({ code: "FORBIDDEN" });
+  }
+  return next({ ctx });
+});
+
 export const basicProcedure = t.procedure;

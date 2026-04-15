@@ -11,9 +11,11 @@ import {
   index,
 } from 'drizzle-orm/pg-core';
 import { prefixedIdGenerator } from '../utils/id';
-import { session, organization, account, user } from './auth';
-export { session, organization, account, user } from './auth';
+import * as authSchema from './auth';
+export * from './auth';
 export { roles as Roles } from "~/auth/permissions"
+
+const { user } = authSchema;
 
 export const profile = pgTable('profile', {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('profile')),
@@ -63,6 +65,8 @@ export const courseEvent = pgTable("courseEvent", {
   physicalAddress: text(),
   seats: integer(),
   classStartDatetime: timestamp({ withTimezone: true }),
+  instructorId: varchar()
+    .references(() => user.id),
 });
 
 export type CourseEvent = typeof courseEvent.$inferSelect;
@@ -73,6 +77,8 @@ export const Status = {
 } as const;
 
 export type PaymentStatus = (typeof Status)[keyof typeof Status];
+
+export type ReservationStatus = "registered" | "waitlisted";
 
 export const reservation = pgTable(
   "reservation",
@@ -85,6 +91,8 @@ export const reservation = pgTable(
       .notNull(),
     creditHours: decimal().notNull(),
     paymentStatus: varchar().notNull().$type<PaymentStatus>(),
+    status: varchar().notNull().$type<ReservationStatus>().default("registered"),
+    createdAt: timestamp().defaultNow().notNull(),
   },
   (table) => [
     primaryKey({ name: "id", columns: [table.profileId, table.courseEventId] }),

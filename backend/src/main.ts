@@ -9,6 +9,7 @@ import { createContext } from "~/utils/trpc/ctx";
 import type { AppRouter } from "~/trpc";
 import { appRouter } from "~/trpc";
 import { auth } from "~/auth/server";
+import { toNodeHandler } from "better-auth/node";
 
 const app = Fastify({
   logger: true,
@@ -28,7 +29,6 @@ app.register(helmet);
 
 // Mount better-auth
 app.all("/api/auth/*", async (request, reply) => {
-  // We can pass the raw node req/res directly or build a standard Request
   const protocol = request.protocol;
   const host = request.headers.host;
   const url = new URL(request.url, `${protocol}://${host}`);
@@ -42,12 +42,14 @@ app.all("/api/auth/*", async (request, reply) => {
     }
   }
 
+  const body = (request.method === "POST" || request.method === "PATCH" || request.method === "PUT") 
+    ? (typeof request.body === 'string' ? request.body : JSON.stringify(request.body))
+    : undefined;
+
   const req = new Request(url.toString(), {
     method: request.method,
     headers,
-    body: request.method === "GET" || request.method === "HEAD" ? undefined : request.body as any,
-    // @ts-ignore
-    duplex: "half",
+    body,
   });
 
   const res = await auth.handler(req);
@@ -57,10 +59,7 @@ app.all("/api/auth/*", async (request, reply) => {
     reply.header(key, value);
   });
   
-  if (res.body) {
-    return reply.send(res.body);
-  }
-  return reply.send();
+  return reply.send(await res.text());
 });
 
 // Set up tRPC
@@ -76,5 +75,5 @@ app.register(fastifyTRPCPlugin, {
   } satisfies FastifyTRPCPluginOptions<AppRouter>["trpcOptions"],
 });
 
-void app.listen({ port: parseInt(process.env.PORT || "") || 3000 });
+void app.listen({ host: "0.0.0.0", port: parseInt(process.env.PORT || "") || 3000 });
 

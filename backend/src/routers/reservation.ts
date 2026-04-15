@@ -8,16 +8,12 @@ import {
   reservation,
   type PaymentStatus,
 } from "~/database/schema";
-import { basicProcedure, router } from "~/utils/trpc";
+import { protectedProcedure, router } from "~/utils/trpc";
 
 import { createUpdateSchema } from "drizzle-zod";
 import z from "zod";
 import type { ReservationDto } from "~/database/dtos";
 import type { PgSelect } from "drizzle-orm/pg-core";
-
-// IMPORTANT: change basicProcedure to protectedProcedure
-// once auth is fully implemented (before shipping).
-const procedure = basicProcedure;
 
 const updateSchema = createUpdateSchema(reservation, {
   courseEventId: z.string(),
@@ -48,7 +44,7 @@ export const reservationDtoSelect = () => {
 };
 
 export const reservationRouter = router({
-  update: procedure.input(updateSchema).mutation(({ input }) => {
+  update: protectedProcedure.input(updateSchema).mutation(({ input }) => {
     return db.client
       .update(reservation)
       .set({

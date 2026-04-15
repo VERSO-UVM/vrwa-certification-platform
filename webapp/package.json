@@ -17,8 +17,8 @@
     "@tanstack/react-query-devtools": "^5.91.3",
     "@tanstack/react-query-persist-client": "^5.90.22",
     "@tanstack/react-table": "^8.21.3",
-    "@trpc/client": "^11.10.0",
-    "@trpc/tanstack-react-query": "^11.10.0",
+    "@trpc/client": "^11.16.0",
+    "@trpc/tanstack-react-query": "^11.16.0",
     "better-auth": "^1.6.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -30,6 +30,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-router": "^7.13.1",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
     "vaul": "^1.1.2",
     "zod": "^4.3.6"

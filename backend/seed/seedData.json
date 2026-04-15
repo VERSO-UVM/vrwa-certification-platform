@@ -10,7 +10,7 @@
         {
             "email": "example1@gmail.com",
             "password" : "password1",
-            "role": "billing-manager",
+            "role": "user",
             "profiles": [
                 {"firstName" : "John", "lastName" : "Doe", "address": "123 Sesame Street",
                 "city": "Burlington", "state": "VT", "postalCode": "05405", "phoneNumber": "888-888-8888",
@@ -32,7 +32,7 @@
         {
             "email": "founders@gmail.com",
             "password" : "america123",
-            "role" : "trainee",
+            "role" : "admin",
             "orgId" : "",
             "profiles": [
                 {"firstName": "Alexander", "lastName": "Hamilton", "address": "49 Seven Squared Ave",
