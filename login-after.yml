@@ -1,0 +1,25 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e5]: Login
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - generic [ref=e9]: Email
+          - textbox "Email" [ref=e10]:
+            - /placeholder: operator@example.com
+            - text: founders@gmail.com
+        - generic [ref=e11]:
+          - generic [ref=e12]: Password
+          - textbox "Password" [ref=e13]: america123
+        - button "Logging in..." [disabled]
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - text: Don't have an account?
+          - link "Sign up" [ref=e17] [cursor=pointer]:
+            - /url: /signup
+        - link "Home" [ref=e18] [cursor=pointer]:
+          - /url: /
+  - generic [ref=e19]:
+    - img [ref=e21]
+    - button "Open Tanstack query devtools" [ref=e69] [cursor=pointer]:
+      - img [ref=e70]

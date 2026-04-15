@@ -14,6 +14,7 @@ const updateSchema = createUpdateSchema(profile, {
 
 export const profileRouter = router({
   getMyProfiles: protectedProcedure.query(async ({ ctx }) => {
+    console.log("%%%%", ctx.account.id);
     const profiles = await db.client
       .select()
       .from(profile)
