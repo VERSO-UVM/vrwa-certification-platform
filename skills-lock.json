@@ -1,11 +1,6 @@
 {
   "version": 1,
   "skills": {
-    "bun": {
-      "source": "bun.sh",
-      "sourceType": "well-known",
-      "computedHash": "c20fe20eb84bb56fd5a96eae6e36c5fd8d38f989818a4944f8a08140fe5e7a5b"
-    },
     "auth": {
       "source": "trpc/trpc",
       "sourceType": "github",
@@ -15,6 +10,11 @@
       "source": "better-auth/skills",
       "sourceType": "github",
       "computedHash": "a4c830509e85557b59339d8d93a4e243e9e59c686e7678854d39230e12c2a6dc"
+    },
+    "bun": {
+      "source": "bun.sh",
+      "sourceType": "well-known",
+      "computedHash": "c20fe20eb84bb56fd5a96eae6e36c5fd8d38f989818a4944f8a08140fe5e7a5b"
     },
     "caching": {
       "source": "trpc/trpc",
@@ -70,6 +70,11 @@
       "source": "shadcn/ui",
       "sourceType": "github",
       "computedHash": "873c67922d80775a9fdf596db7964b579f0408c30ec6e3d11989f6055bbec89f"
+    },
+    "stripe-best-practices": {
+      "source": "stripe/ai",
+      "sourceType": "github",
+      "computedHash": "ae5889d45a1e29668b672290ca8d3d833fa30ff0634be85c30918ca0385dd1c6"
     },
     "subscriptions": {
       "source": "trpc/trpc",
