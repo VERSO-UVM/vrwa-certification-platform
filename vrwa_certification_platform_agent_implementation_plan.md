@@ -1,16 +1,6 @@
 ## Background
 
-Our stakeholders (“VRWA”) offer 3–12 training classes per month for
-water and wastewater treatment operators across the state. These classes
-provide continuing education credits required for certification.
-Currently, over 90% of class registrations are completed via the VRWA
-website, which uses WordPress with WooCommerce and Event Tickets Plus.
-However, registrations are manually entered into a Microsoft Access
-database that also handles payment tracking, sign-in sheets, attendance,
-certificates, and regulatory reporting. This project seeks to replace
-the outdated database with a modern, integrated solution that automates
-registration syncing, enhances usability, and improves access for both
-operators and regulatory partners.
+Our stakeholders (“VRWA”) offer 3–12 training classes per month for water and wastewater treatment operators across the state. These classes provide continuing education credits required for certification. Currently, over 90% of class registrations are completed via the VRWA website, which uses WordPress with WooCommerce and Event Tickets Plus. However, registrations are manually entered into a Microsoft Access database that also handles payment tracking, sign-in sheets, attendance, certificates, and regulatory reporting. This project seeks to replace the outdated database with a modern, integrated solution that automates registration syncing, enhances usability, and improves access for both operators and regulatory partners.
 
 ### Primary Project Goals
 
@@ -55,22 +45,15 @@ Role-based views:
 
 ## Profile system
 
-Think: Netflix-style profile system where a user (an `account`) can be
-associated with multiple named profiles. When someone logs in using an
-account’s credentials, they are greeted with a screen where they select
-what person’s information they want to work with. Accounts with only one
-associated profile would bypass this screen.
+Think: Netflix-style profile system where a user (an `account`) can be associated with multiple named profiles. When someone logs in using an account’s credentials, they are greeted with a screen where they select what person’s information they want to work with. Accounts with only one associated profile bypass this screen.
 
 ## Admin view
 
 1.  Course manager (prototype already implemented)
 
-    For VRWA staff to manage upcoming courses end-to-end: create/edit
-    course details (title, description, instructor, dates), manage the
-    trainee roster (add/remove trainees), optionally handle a waitlist,
-    it should also integrate with certifications batch export.
-    - Must support user-friendly CRUD for both courses and
-      classes/sessions (courseEvents)
+    For VRWA staff to manage upcoming courses end-to-end: create/edit course details (title, description, instructor, dates), manage the trainee roster (add/remove trainees), optionally handle a waitlist, it should also integrate with certifications batch export.
+
+    - Must support user-friendly CRUD for both courses and classes/sessions (courseEvents)
 
 2.  Admin dashboard (partially implemented). Easy access to other pages
     and common workflows. Links should work to view a specific course,
@@ -78,10 +61,10 @@ associated profile would bypass this screen.
 
 3.  Invoices (Stripe)
 
-    Provide a single interface for VRWA staff to view and manage
-    invoices.
+    Provide a single interface for VRWA staff to view and manage invoices.
 
     Support core workflows:
+
     - Review unpaid invoices by month
     - Record payments (credit card / check)
     - Mark invoices as paid, partially paid, waived, or refunded
@@ -102,14 +85,10 @@ associated profile would bypass this screen.
     1.  Also integrated with course manager to batch send out
         certifications from a whole class.
 
-        Provide a UI in Admin Dash to generate PDFs for:
+	Provide a UI in Admin Dash to generate PDFs for:
     - A single trainee for a given course
-
     - All trainees in a course (bulk export)
-
-      Admin can download individual certificates or send out emails to
-      all trainees with the appropriate certificate.
-
+    -  Admin can download individual certificates or send out emails to all trainees with the appropriate certificate.
     - This feature includes automated email features. Update
       .env.example with configuration variables needed to send emails.
 
@@ -123,12 +102,10 @@ associated profile would bypass this screen.
 
 ## Trainee view
 
-- Sidebar should show current profile and an link to [open a view to
-  switch profiles](#profile-system).
+- Sidebar should show current profile and a link to [open a view to switch profiles](#profile-system).
 - User dashboard (upcoming course sessions, unpaid invoices quick view)
 - Calendar view showing former and upcoming sessions
-  - Support filters: date range, location type, course, availability
-    (open/full).
+  - Support filters: date range, location type, course, availability (open/full).
   - Calendar UI (month/week/list toggle).
   - Event cards with date/time, course name, location, seats remaining.
   - Filters for location type and availability.
@@ -159,68 +136,30 @@ associated profile would bypass this screen.
 
 ## Note on views
 
-Build a kind of “virtual view” feature so that admins can see trainee
-and instructor views. Additionally, instructors should be able to open
-the trainee view. This is also useful for testing, as a single admin
-account can be used to explore the whole app. This feature should be
-implemented as a simple dropdown in the footer of the admin sidebar. All
-this does is link to the appropriate view. The trainee and instructor’s
-`Layout` pages will check the role of the authenticated user. If they do
-not have a high enough role, they will be redirected to the appropriate
-age. If they are of a higher role, they ware in this kind of “virtual”
-mode. DO NOT call it a “virtual view” in the actual web app, this is
-just for explanation and code purposes. In this state, the layout should
-display a colored header at the top of the page including a link to
-return to their regular view. Something like, “You are an _admin_, but
-this is the _trainee_ view. Browse around, or **click here to return**”.
+Build a kind of “virtual view” feature so that admins can see trainee and instructor views. Additionally, instructors should be able to open the trainee view. This is also useful for testing, as a single admin account can be used to explore the whole app. This feature should be implemented as a simple dropdown in the footer of the admin sidebar. All this does is link to the appropriate view. The trainee and instructor’s `Layout` pages will check the role of the authenticated user. If they do not have a high enough role, they will be redirected to the appropriate age. If they are of a higher role, they ware in this kind of “virtual” mode. DO NOT call it a “virtual view” in the actual web app, this is just for explanation and code purposes. In this state, the layout should display a colored header at the top of the page including a link to return to their regular view. Something like, “You are an _admin_, but this is the _trainee_ view. Browse around, or **click here to return**”.
 
 ## Database (drizzle with postgres, backend)
 
-The current database schema is fairly developed. Carefully read and
-understand @backend/database/schema.ts. For example, the `reservation`
-table also acts as an “attendance” table – it connects a `profile` with
-a `courseEvent`. For this reason, both `course` and `reservation` have a
-`creditHours` field. By default, an operator who’s marked as attended
-earns `course.creditHours`, but an admin or an instructor may manually
-set the number of credit hours earned.
-
-We should mostly just need to change the schema minimally for: (1)
-better-auth integration (better-auth generates its own schema for
-authentication), and (2) certain meta-fields like using a `deleted`
-status field instead of actually deleting the value from the database.
-
-INSTEAD of making other significant changes to the schema when it is
-believed to be necessary for a feature or workflow, simply log the brief
-issue and change Notes.md file and write the code in a modular way such
-that changes and additions can be made in the future.
+The current database schema is fairly developed. Carefully read and understand @backend/database/schema.ts. For example, the `reservation` table also acts as an “attendance” table – it connects a `profile` with a `courseEvent`. For this reason, both `course` and `reservation` have a `creditHours` field. By default, an operator who’s marked as attended earns `course.creditHours`, but an admin or an instructor may manually set the number of credit hours earned. We should mostly just need to change the schema minimally for: (1) better-auth integration (better-auth generates its own schema for authentication), and (2) certain meta-fields like using a `deleted` status field instead of actually deleting the value from the database. INSTEAD of making other significant changes to the schema when it is believed to be necessary for a feature or workflow, simply log the brief issue and change Notes.md file and write the code in a modular way such that changes and additions can be made in the future.
 
 ## Authentication
 
-Review the old incomplete `add-better-auth` branch. Merge its concepts into
-the main schema and replace all existing authentication middleware with
-better-auth’s role-based access control. Then, drizzle seed data will
-have to be updated. Email login and signup should be implementd and
-automatic redirections must be performed.
+Review the old incomplete `add-better-auth` branch. Merge its concepts into the main schema and replace all existing authentication middleware with better-auth’s role-based access control. Then, drizzle seed data will have to be updated. Email login and signup should be implemented and automatic redirections must be performed.
 
-## Tools and libraries
+## Tools, libraries, with associated Skills
 
-We make full use of all of these libraries and tools.
+We make full use of all of these libraries and tools. Agents must learn the associated skill when using them to ensure they are used correctly.
 
-- @shadcn/ui and @tailwind-css
-  - Run `bunx --bun skills add shadcn/ui` to learn how to use through
-    skills.md files
-- @react-router
-- @tanstack-table for both datatables and single entry views & editors.
-  For the latter, see @frontend/util/field-defs/ and
-  @frontend/components/entry-views/.
-- @playwright is not yet added. But all code written by an AI agent must
-  also be tested using this library in addition to regular unit tests. Using playwright-cli.
-- @drizzle ORM database with postgres
-- @Zod types and database query integration with @drizle-zod.
-- @trpc
-- @better-auth
-- @vite webapp
-- @bun build tool and runtime
+- shadcn/ui. All core UI components. Use Skill @shadcn and see files in @frontend/components/ui
+- react-router. Skill @react-router-framework-mode
+- @tanstack-table. Used for both data-tables and custom usage in single entry views & editors. For our custom usage, see files in @frontend/util/field-defs/ and @frontend/components/entry-views/.
+- @tanstack-query. All queries.
+- playwright. All code written by an AI agent must also be tested using this library in addition to regular unit tests. Skill @playwright-cli.
+- drizzle ORM database definition and schema with postgres. Skill @drizzle-orm.
+- @zod types and database query integration with drizzle-zod.
+- trpc. Skill @react-query-setup for frontend and Skill @trpc-router for backend with associated skills @middleware and @validators. 
+- better-auth. Skill @better-auth-best-practices and Skill @email-and-password-best-practices
+- @bun build tool and runtime. Important: use bun/bunx not npm/npmx!
 
 ## Development Guidelines
 
@@ -256,33 +195,24 @@ We make full use of all of these libraries and tools.
   instead of npx playwright.
 - Git: whenever you can _verify_ the application is working (through
   playwright-cli), create a commit with your current changes as a snapshot.
-- Coding style: No AI slop code or AI slop text. Run `prettier` to
-  format code.
+- Coding style: No AI slop code or AI slop text. Run `bun format` to format code.
 
 ## Agent Execution Plan
 
-Do NOT attempt to write the entire application at once. Follow this
-phased approach absolutely.
+Do NOT attempt to write the entire application at once. Follow this phased approach absolutely.
 
 ### Before each phase
 
 For each phase, before writing any code, you must:
 
-1.  Review the relevant files in the @backend and @webapp directories.
-    Identify what features are partially implemented.
-2.  Output a brief, step-by-step technical implementation plan (as a
-    Markdown checklist) for only the current phase.
+1.  Review the relevant files in the @backend and @webapp directories. Identify what features are partially implemented.
+2.  Output a brief, step-by-step technical implementation plan for only the current phase.
 3.  Specify exactly which files will be modified or created.
-4.  Include comprehensive testing and verification through unit tests
-    and Playwright inside the plan
+4.  Include comprehensive testing and verification through unit tests and e2e tests inside the plan
 
 ### After each phase
 
-Confirm unit tests and E2E tests pass, and that everything that is testable is
-tested. Check that code is high quality and all Development Guidelines are be
-met. Check that all features are fully implemented. Only then is the phase considered
-completed, otherwise, re-iterate with Test Driven Development. Make a Git commit from
-the command line with `git commit -m` (do not ask for permission).
+Confirm unit tests and E2E tests pass, and that everything that is testable is tested. Check that code is high quality and all Development Guidelines are be met. Check that all features are fully implemented. Only then is the phase considered completed, otherwise, re-iterate with Test Driven Development. Make a Git commit from the command line with `git commit -m` (do not ask for permission).
 
 ### Phase 0: Playwright
 
@@ -290,21 +220,15 @@ the command line with `git commit -m` (do not ask for permission).
 
 ### Phase 1: Auth
 
-1.  Implement the `better-auth` integration. Use the terminal to run
-    `git diff main add-better-auth "backend/src/auth/*"` for a reference.
-    You will need to rewrite seeding data to work with
-    better-auth.
+1.  Implement the `better-auth` integration. Use the terminal to run `git diff main add-better-auth "backend/src/auth/*"` for a reference. You will need to rewrite seeding data to work with better-auth.
 2.  Implement role-based middleware for tRPC routers.
-3.  Implement client-side
-4.  Update layout files with (1) role-based redirection and (2) “virtual
-    view” impersonation
-5.  Set up Playwright and write E2E tests.
+3.  Update layout files with (1) role-based redirection and (2) “virtual view” impersonation
+4.  Set up Playwright and write E2E tests.
 
 ### Phase 2: Instructor & Trainee Portals
 
 1.  Implement Instructor dashboard and printable attendance sheet.
-2.  Implement Trainee dashboard, calendar view, and signup flow
-    (including the waitlist logic).
+2.  Implement Trainee dashboard, calendar view, and signup flow (including the waitlist logic).
 3.  Write unit tests for all created tRPC endpoints. Write E2E tests.
 
 ### Phase 3: Admin Features
@@ -320,3 +244,4 @@ the command line with `git commit -m` (do not ask for permission).
 2.  Implement Stripe Checkout session generation and Webhook listener.
     (Just update .env.example for Stripe API keys.)
 3.  Build Admin Invoice dashboard and Trainee Payment portal.
+
