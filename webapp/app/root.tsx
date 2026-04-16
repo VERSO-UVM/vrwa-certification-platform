@@ -66,10 +66,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
       links: [
         httpBatchStreamLink({
           url,
-          async headers() {
-            return {};
+          fetch(url, options) {
+            return fetch(url, {
+              ...options,
+              credentials: "include",
+            });
           },
-          credentials: "include",
         }),
       ],
     });
