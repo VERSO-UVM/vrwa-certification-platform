@@ -3,18 +3,25 @@
 // called DTOs (Data Transfer Objects))
 
 import {
-  courseEvent,
   type Course,
   type CourseEvent,
   type Profile,
   type Reservation,
+  type User,
 } from "./schema";
 
 export type ReservationDto = Reservation &
-  Pick<Profile, "firstName" | "lastName" | "isMember"> &
-  { classStartDatetime: Date | string | null } & {
+  Pick<Profile, "firstName" | "lastName" | "isMember"> & {
+    classStartDatetime: Date | string | null;
+  } & {
     course: Pick<Course, "courseName" | "creditHours" | "id">;
   };
 
-export type CourseEventDto = Omit<CourseEvent, "classStartDatetime"> & { classStartDatetime: Date | string | null } &
-  Pick<Course, "courseName" | "description" | "creditHours" | "priceCents">;
+export type CourseEventDto = Omit<CourseEvent, "classStartDatetime"> & {
+  classStartDatetime: Date | string | null;
+} & Pick<Course, "courseName" | "description" | "creditHours" | "priceCents">;
+
+export type UserDto = Pick<
+  User,
+  "id" | "email" | "name" | "role" | "createdAt"
+>;

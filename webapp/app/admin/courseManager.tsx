@@ -15,16 +15,6 @@ import {
 import { Button } from "~/components/ui/button";
 import { ButtonGroup } from "~/components/ui/button-group";
 import { DataTable } from "~/components/data-table";
-import { type CourseEvent } from "@backend/database/schema";
-import { Calendar } from "~/components/ui/calendar";
-import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "~/components/ui/popover";
-import { format } from "date-fns";
-import { ChevronDownIcon } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -32,19 +22,16 @@ import {
   DrawerHeader,
   DrawerDescription,
   DrawerTitle,
-  DrawerClose,
-  DrawerFooter,
 } from "~/components/ui/drawer";
-import { LocationTypeBadge } from "~/components/location-type-badge";
-import { Input } from "~/components/ui/input";
 import { PageHeader } from "~/components/page-header";
 import { Link } from "react-router";
+import { courseEventDefPresets } from "~/utils/field-defs/course-event";
+import { courseDefPresets } from "~/utils/field-defs/course";
+import { EditDrawer } from "~/components/entry-views/edit-drawer";
 
 function useCourseEvents() {
   const trpc = useTRPC();
-  return useQuery(
-    trpc.adminRouter.getCourseEvents.queryOptions(),
-  );
+  return useQuery(trpc.adminRouter.getCourseEvents.queryOptions());
 }
 
 function useCourses() {
@@ -60,65 +47,6 @@ export function CourseManager() {
   const courseEvents = useCourseEvents();
   const courses = useCourses();
 
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [edits, setEdits] = useState<Partial<CourseEvent>>({});
-
-  //for date picker
-  const [editDate, setEditDate] = useState<Date | undefined>();
-  const [editTime, setEditTime] = useState("12:00");
-  const [dateOpen, setDateOpen] = useState(false);
-
-  function combineDateAndTime(date: Date | undefined, time: string) {
-    if (!date) return null;
-
-    const [hours, mins] = time.split(":").map(Number);
-    const combo = new Date(date);
-    combo.setHours(hours ?? 0);
-    combo.setMinutes(mins ?? 0);
-    combo.setSeconds(0);
-    console.log(combo);
-    return combo;
-  }
-
-  function editRow(row: CourseEvent) {
-    setEditingId(row.id);
-
-    const dateTime = row.classStartDatetime
-      ? new Date(row.classStartDatetime)
-      : undefined;
-
-    setEditDate(dateTime);
-    setEditTime(dateTime ? dateTime.toISOString().substring(11, 16) : "12:00");
-    setEdits({ ...row });
-  }
-
-  function cancelEditing() {
-    setEditingId(null);
-    setEdits({});
-  }
-
-  async function saveEditing() {
-    if (!editingId) return;
-
-    const classTime = combineDateAndTime(editDate, editTime);
-
-    await client.courseManagerRouter.updateCourseEvent.mutate({
-      id: editingId,
-      seats: edits.seats ?? null,
-      locationType: edits.locationType!,
-      physicalAddress: edits.physicalAddress?.trim() || null,
-      //no place to put virtual link atm
-      virtualLink: null,
-      classStartDatetime: classTime,
-    });
-
-    await queryClient.invalidateQueries({
-      queryKey: trpc.adminRouter.getCourseEvents.queryKey(),
-    });
-
-    cancelEditing();
-  }
-
   async function deleteRow(id: string) {
     await client.courseManagerRouter.deleteCourseEvent.mutate({ id });
 
@@ -127,179 +55,50 @@ export function CourseManager() {
     });
   }
 
-  const columnsCourseEvents: ColumnDef<any>[] = [
-    {
-      accessorKey: "courseName",
-      header: "Course",
-    },
-
-    {
-      accessorKey: "physicalAddress",
-      header: "Address",
-      cell: ({ row }) =>
-        editingId === row.original.id ? (
-          <Input
-            value={edits.physicalAddress ?? ""}
-            type="text"
-            onChange={(e) =>
-              setEdits((prev) => ({
-                ...prev,
-                physicalAddress: e.target.value,
-              }))
-            }
-            className="border p-1"
-          />
-        ) : (
-          (row.original.physicalAddress ?? "-")
-        ),
-    },
-    {
-      accessorKey: "virtualLink",
-      header: "Link",
-      cell: ({ row }) =>
-        editingId === row.original.id ? (
-          <input
-            value={edits.virtualLink ?? ""}
-            onChange={(e) =>
-              setEdits((prev) => ({
-                ...prev,
-                virtualLink: e.target.value,
-              }))
-            }
-            className="border p-1"
-          />
-        ) : (
-          (row.original.virtualLink ?? "-")
-        ),
-    },
-    {
-      accessorKey: "locationType",
-      header: "Format",
-      cell: ({ row }) =>
-        editingId === row.original.id ? (
-          <select
-            value={edits.locationType}
-            onChange={(e) =>
-              setEdits((prev) => ({
-                ...prev,
-                locationType: e.target.value as
-                  | "in-person"
-                  | "virtual"
-                  | "hybrid",
-              }))
-            }
-            className="border p-1"
-          >
-            <option value="in-person">In Person</option>
-            <option value="virtual">Virtual</option>
-            <option value="hybrid">Hybrid</option>
-          </select>
-        ) : (
-          <LocationTypeBadge value={row.original.locationType} />
-        ),
-    },
-
-    {
-      accessorKey: "seats",
-      header: "Seats",
-      cell: ({ row }) =>
-        editingId === row.original.id ? (
-          <input
-            type="number"
-            value={edits.seats ?? ""}
-            onChange={(e) =>
-              setEdits((prev) => ({
-                ...prev,
-                seats: Number(e.target.value),
-              }))
-            }
-            className="border p-1 w-20"
-          />
-        ) : (
-          (row.original.seats ?? "-")
-        ),
-    },
-
-    {
-      accessorKey: "classStartDatetime",
-      header: "Date",
-      cell: ({ row }) =>
-        editingId === row.original.id ? (
-          <FieldGroup className="mx-auto max-w-xs flex-column">
-            <Field>
-              <Popover open={dateOpen} onOpenChange={setDateOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    id="date-picker"
-                    className="w-full justify-between"
-                  >
-                    {editDate ? format(editDate, "P") : "Select date"}
-
-                    <ChevronDownIcon />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-auto overflow-hidden p-0"
-                  align="start"
-                >
-                  <Calendar
-                    mode="single"
-                    selected={editDate}
-                    onSelect={(d) => {
-                      setEditDate(d);
-                      setDateOpen(false);
-                    }}
-                    captionLayout="dropdown"
-                    className="rounded-md border"
-                  />
-                </PopoverContent>
-              </Popover>
-            </Field>
-            <Field>
-              <input
-                type="Time"
-                value={editTime}
-                onChange={(e) => setEditTime(e.target.value)}
-                className="border p-2 rounded-md w-full text-sm"
-              />
-            </Field>
-          </FieldGroup>
-        ) : row.original.classStartDatetime ? (
-          new Date(row.original.classStartDatetime).toLocaleDateString()
-        ) : (
-          "-"
-        ),
-    },
-
+  const columnsCourseEvents: ColumnDef<any, any>[] = [
+    ...(courseEventDefPresets.default as unknown as ColumnDef<any, any>[]),
     {
       id: "actions",
-      cell: ({ row }) => {
-        const isEditing = editingId === row.original.id;
-
-        return isEditing ? (
-          <ButtonGroup>
-            <Button variant="secondary" onClick={saveEditing}>
-              Save
-            </Button>
-            <Button variant="secondary" onClick={cancelEditing}>
-              Cancel
-            </Button>
-          </ButtonGroup>
-        ) : (
-          <ButtonGroup>
-            <Button variant="secondary" onClick={() => editRow(row.original)}>
-              Edit
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => deleteRow(row.original.id)}
-            >
-              Delete
-            </Button>
-          </ButtonGroup>
-        );
-      },
+      cell: ({ row }) => (
+        <ButtonGroup>
+          <EditDrawer
+            item={row.original}
+            columns={courseEventDefPresets.default}
+            drawer={{
+              buttonText: "Edit",
+              title: "Edit Course Event",
+              description: "Update event details and save changes.",
+            }}
+            onSave={async (updates) => {
+              await client.courseManagerRouter.updateCourseEvent.mutate({
+                id: row.original.id,
+                classStartDatetime: updates.classStartDatetime
+                  ? new Date(updates.classStartDatetime as string | Date)
+                  : undefined,
+                seats: updates.seats as number | undefined,
+                locationType: updates.locationType as
+                  | "in-person"
+                  | "virtual"
+                  | "hybrid"
+                  | undefined,
+                physicalAddress:
+                  (updates.physicalAddress as string | undefined) ?? undefined,
+                virtualLink:
+                  (updates.virtualLink as string | undefined) ?? undefined,
+              });
+              await queryClient.invalidateQueries({
+                queryKey: trpc.adminRouter.getCourseEvents.queryKey(),
+              });
+            }}
+          />
+          <Button
+            variant="destructive"
+            onClick={() => deleteRow(row.original.id)}
+          >
+            Delete
+          </Button>
+        </ButtonGroup>
+      ),
     },
   ];
 
@@ -309,33 +108,50 @@ export function CourseManager() {
     ).length;
   }
 
-  const columnsCourses: ColumnDef<any>[] = [
-    {
-      accessorKey: "courseName",
-      header: "Course",
-      cell: ({ row, getValue }) => (
-        <Link to={`/admin/course-details/${row.original.id}`}>
-          {getValue() as string}
-        </Link>
-      ),
-    },
-    {
-      accessorKey: "description",
-      header: "Class Description",
-    },
-    {
-      accessorKey: "creditHours",
-      header: "Credit Hours",
-    },
-    {
-      accessorKey: "priceCents",
-      header: "Tuition Fee",
-      cell: ({ getValue }) => `$${(Number(getValue()) / 100).toFixed(2)}`,
-    },
+  const columnsCourses: ColumnDef<any, any>[] = [
+    ...(courseDefPresets.basic as unknown as ColumnDef<any, any>[]),
     {
       accessorKey: "id",
       header: "Upcoming Classes",
       cell: ({ row }) => getNumberOfClasses(row.original.id),
+    },
+    {
+      id: "details",
+      header: "Details",
+      cell: ({ row }) => (
+        <Link
+          className="underline"
+          to={`/admin/course-details/${row.original.id}`}
+        >
+          Open
+        </Link>
+      ),
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => (
+        <EditDrawer
+          item={row.original}
+          columns={courseDefPresets.all}
+          drawer={{
+            buttonText: "Edit",
+            title: "Edit Course",
+            description: "Update course details.",
+          }}
+          onSave={async (updates) => {
+            await client.courseManagerRouter.updateCourse.mutate({
+              id: row.original.id,
+              courseName: updates.courseName as string | undefined,
+              description: updates.description as string | null | undefined,
+              creditHours: updates.creditHours as number | undefined,
+              priceCents: updates.priceCents as number | undefined,
+            });
+            await queryClient.invalidateQueries({
+              queryKey: trpc.courseManagerRouter.getCourses.queryKey(),
+            });
+          }}
+        />
+      ),
     },
   ];
 
@@ -426,7 +242,8 @@ export function CourseManager() {
                         data,
                       );
                       await queryClient.invalidateQueries({
-                        queryKey: trpc.courseManagerRouter.getCourses.queryKey(),
+                        queryKey:
+                          trpc.courseManagerRouter.getCourses.queryKey(),
                       });
                       setCourseDrawerOpen(false);
                     }}

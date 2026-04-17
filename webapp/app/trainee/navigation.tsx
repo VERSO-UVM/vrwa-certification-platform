@@ -1,4 +1,15 @@
-import { BookOpen, Calendar, House, LogOut, Scroll, Trophy, Wallet, Eye, User, RefreshCw } from "lucide-react";
+import {
+  BookOpen,
+  Calendar,
+  House,
+  LogOut,
+  Scroll,
+  Trophy,
+  Wallet,
+  Eye,
+  User,
+  RefreshCw,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import {
   Sidebar,

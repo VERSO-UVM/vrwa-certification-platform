@@ -26,6 +26,11 @@ import {
   SelectItem,
   SelectGroup,
 } from "~/components/ui/select";
+import {
+  profileDefPresets,
+  profileFieldHelper,
+} from "~/utils/field-defs/profile";
+import { reservationDefPresets } from "~/utils/field-defs/reservation";
 
 export function CourseDetails() {
   const trpc = useTRPC();
@@ -56,28 +61,13 @@ export function CourseDetails() {
     }),
   );
 
-  const trainees = useQuery(
-    trpc.adminRouter.getTrainees.queryOptions(),
-  );
+  const trainees = useQuery(trpc.adminRouter.getTrainees.queryOptions());
 
-  const rosterTableDef: ColumnDef<ReservationDto>[] = [
-    {
-      accessorKey: "firstName",
-      header: "First Name",
-    },
-    {
-      accessorKey: "lastName",
-      header: "Last Name",
-    },
-    {
-      accessorKey: "isMember",
-      header: "Member Status",
-      cell: ({ getValue }) => (getValue() == true ? "Member" : "Non-Member"),
-    },
-    {
-      accessorKey: "paymentStatus",
-      header: "Payment Status",
-    },
+  const rosterTableDef: ColumnDef<ReservationDto, any>[] = [
+    ...(reservationDefPresets.basic as unknown as ColumnDef<
+      ReservationDto,
+      any
+    >[]),
     {
       id: "actions",
       cell: ({ row }) => {
@@ -97,17 +87,18 @@ export function CourseDetails() {
 
   //grouping reservations by courseEventId to easily access rosters
   const reservationsList = (reservations.data as any[]) ?? [];
-  const reservationsByEvent = reservationsList.reduce<
-    Record<string, any[]>
-  >((rosters, reservation) => {
-    const key = reservation.courseEventId;
-    if (!key) return rosters;
-    if (!rosters[key]) {
-      rosters[key] = [];
-    }
-    rosters[key].push(reservation);
-    return rosters;
-  }, {});
+  const reservationsByEvent = reservationsList.reduce<Record<string, any[]>>(
+    (rosters, reservation) => {
+      const key = reservation.courseEventId;
+      if (!key) return rosters;
+      if (!rosters[key]) {
+        rosters[key] = [];
+      }
+      rosters[key].push(reservation);
+      return rosters;
+    },
+    {},
+  );
 
   //getting courseEvents for tabs
   const eventIds = Object.keys(reservationsByEvent);
@@ -127,6 +118,34 @@ export function CourseDetails() {
     (trainees.data as any[])?.filter((t: any) => !rosterIds.has(t.id)) ?? [];
 
   const courseData = course.data as any;
+  const availableTraineesColumns: ColumnDef<Profile, any>[] = [
+    ...(profileDefPresets.basic as unknown as ColumnDef<Profile, any>[]),
+    profileFieldHelper.display({
+      id: "addAction",
+      header: "Action",
+      cell: ({ row }) => (
+        <Button
+          onClick={async () => {
+            if (!selectedTab) return;
+            await client.courseManagerRouter.addReservation.mutate({
+              profileId: row.original.id,
+              courseEventId: selectedTab,
+              creditHours: courseData?.creditHours ?? 0,
+              paymentStatus: "unpaid",
+            });
+            await queryClient.invalidateQueries({
+              queryKey:
+                trpc.courseManagerRouter.getReservationsByCourse.queryKey({
+                  courseId: courseId!,
+                }),
+            });
+          }}
+        >
+          Add
+        </Button>
+      ),
+    }),
+  ];
 
   return (
     <div className="flex-1">
@@ -250,11 +269,12 @@ export function CourseDetails() {
                       });
 
                       await queryClient.invalidateQueries({
-                        queryKey: trpc.courseManagerRouter.getReservationsByCourse.queryKey(
-                          {
-                            courseId: courseId!,
-                          },
-                        ) as any,
+                        queryKey:
+                          trpc.courseManagerRouter.getReservationsByCourse.queryKey(
+                            {
+                              courseId: courseId!,
+                            },
+                          ) as any,
                       });
 
                       setTraineePopupOpen(false);
@@ -264,6 +284,15 @@ export function CourseDetails() {
                   </Button>
                 </DialogContent>
               </Dialog>
+            </div>
+            <div className="mt-6">
+              <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
+                Add Trainees (Search)
+              </h3>
+              <DataTable
+                columns={availableTraineesColumns}
+                data={availableTrainees as Profile[]}
+              />
             </div>
           </CardContent>
         </Card>

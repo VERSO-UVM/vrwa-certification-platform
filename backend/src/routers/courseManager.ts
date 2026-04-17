@@ -161,7 +161,31 @@ export const courseManagerRouter = router({
       return { success: true };
     }),
 
-  //updateCourse
+  updateCourse: adminProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        courseName: z.string().optional(),
+        description: z.string().nullable().optional(),
+        creditHours: z.number().int().positive().optional(),
+        priceCents: z.number().int().positive().optional(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { id, ...update } = input;
+      const cleanUpdate = Object.fromEntries(
+        Object.entries(update).filter(([, value]) => value !== undefined),
+      );
+      if (Object.keys(cleanUpdate).length === 0) {
+        throw new Error("No fields provided to update");
+      }
+      const [updatedCourse] = await db.client
+        .update(course)
+        .set(cleanUpdate)
+        .where(eq(course.id, id))
+        .returning();
+      return updatedCourse;
+    }),
 
   //addTrainee
   addReservation: adminProcedure

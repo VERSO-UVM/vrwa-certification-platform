@@ -60,7 +60,8 @@ function getQueryClient() {
 export function Layout({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
   const [trpcClient] = useState(() => {
-    const url = (import.meta.env.VITE_BACKEND || "http://localhost:3000") + "/trpc";
+    const url =
+      (import.meta.env.VITE_BACKEND || "http://localhost:3000") + "/trpc";
     console.log("Creating trpcClient with URL:", url);
     return createTRPCClient<AppRouter>({
       links: [

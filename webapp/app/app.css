@@ -132,3 +132,23 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .attendance-page .print-root,
+  .attendance-page .print-root * {
+    visibility: visible;
+  }
+
+  .attendance-page .print-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0.75rem;
+  }
+}

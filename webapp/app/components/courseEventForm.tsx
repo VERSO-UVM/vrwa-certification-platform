@@ -33,7 +33,11 @@ function useCourses() {
   return useQuery(trpc.courseManagerRouter.getCourses.queryOptions());
 }
 
-export function NewCourseEventForm({ onCreate }: { onCreate: (data: any) => Promise<void> }) {
+export function NewCourseEventForm({
+  onCreate,
+}: {
+  onCreate: (data: any) => Promise<void>;
+}) {
   const courses = useCourses();
 
   const [values, setValues] = useState({

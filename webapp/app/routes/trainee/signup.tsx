@@ -1,10 +1,17 @@
 import { useTRPC } from "~/utils/trpc";
 import { PageHeader } from "~/components/page-header";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "~/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { format } from "date-fns";
 import { Calendar, MapPin, Users, Info } from "lucide-react";
 import { useState } from "react";
+import { useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -18,29 +25,53 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 
 export default function SignupPage() {
   const trpc = useTRPC();
-  const { data: sessions, isLoading: sessionsLoading } = useQuery(trpc.trainee.getAllAvailableSessions.queryOptions());
-  const { data: profiles, isLoading: profilesLoading } = useQuery(trpc.profile.getMine.queryOptions());
+  const { data: sessions, isLoading: sessionsLoading } = useQuery(
+    trpc.trainee.getAllAvailableSessions.queryOptions(),
+  );
+  const { data: profiles, isLoading: profilesLoading } = useQuery(
+    trpc.profile.getMyProfiles.queryOptions(),
+  );
 
-  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
-  const registerMutation = useMutation(trpc.trainee.registerForSession.mutationOptions({
-    onSuccess: (data) => {
-      toast.success(data.status === "waitlisted" ? "Added to waitlist!" : "Registered successfully!");
-    },
-    onError: (err) => {
-      toast.error(err.message);
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
+    null,
+  );
+  const registerMutation = useMutation(
+    trpc.trainee.registerForSession.mutationOptions({
+      onSuccess: (data) => {
+        toast.success(
+          data.status === "waitlisted"
+            ? "Added to waitlist!"
+            : "Registered successfully!",
+        );
+      },
+      onError: (err) => {
+        toast.error(err.message);
+      },
+    }),
+  );
+
+  useEffect(() => {
+    if (profiles && profiles.length === 1) {
+      const only = profiles[0];
+      if (only) setSelectedProfileId(only.id);
     }
-  }));
-  if (sessionsLoading || profilesLoading) return <div className="p-10 text-center">Loading courses...</div>;
+  }, [profiles]);
+
+  if (sessionsLoading || profilesLoading)
+    return <div className="p-10 text-center">Loading courses...</div>;
 
   return (
     <div className="space-y-6">
       <PageHeader>Course Sign-up</PageHeader>
-      
+
       <div className="max-w-xl bg-blue-50 border border-blue-100 p-4 rounded-lg flex items-start gap-3">
         <Info className="h-5 w-5 text-blue-600 mt-0.5" />
         <div className="text-sm text-blue-800">
           <p className="font-semibold">Important</p>
-          <p>Please select which profile you are registering for before choosing a course.</p>
+          <p>
+            Please select which profile you are registering for before choosing
+            a course.
+          </p>
         </div>
       </div>
 
@@ -60,6 +91,16 @@ export default function SignupPage() {
         </Select>
       </div>
 
+      {registerMutation.data?.status === "waitlisted" && (
+        <div className="rounded-md border border-border bg-muted p-4 text-sm">
+          <p className="font-semibold">Added to waitlist</p>
+          <p className="text-muted-foreground">
+            This class is full right now. You are on the waitlist and will be
+            contacted if a seat opens.
+          </p>
+        </div>
+      )}
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {sessions?.map((session) => (
           <Card key={session.id} className="flex flex-col">
@@ -73,32 +114,46 @@ export default function SignupPage() {
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center">
                   <Calendar className="mr-2 h-4 w-4" />
-                  {session.classStartDatetime ? format(new Date(session.classStartDatetime), "PPP p") : "TBD"}
+                  {session.classStartDatetime
+                    ? format(new Date(session.classStartDatetime), "PPP p")
+                    : "TBD"}
                 </div>
                 <div className="flex items-center">
                   <MapPin className="mr-2 h-4 w-4" />
-                  {session.locationType === "virtual" ? "Virtual" : session.physicalAddress || "TBD"}
+                  {session.locationType === "virtual"
+                    ? "Virtual"
+                    : session.physicalAddress || "TBD"}
                 </div>
                 <div className="flex items-center">
                   <Users className="mr-2 h-4 w-4" />
-                  {session.seats} Seats Available
+                  {session.seatsRemaining} Seats Remaining
                 </div>
               </div>
             </CardContent>
             <CardFooter>
-              <Button 
-                className="w-full" 
-                disabled={!selectedProfileId || registerMutation.isPending}
+              <Button
+                className="w-full"
+                disabled={
+                  !selectedProfileId ||
+                  registerMutation.isPending ||
+                  (session.classStartDatetime
+                    ? new Date(session.classStartDatetime) < new Date()
+                    : false)
+                }
                 onClick={() => {
                   if (selectedProfileId) {
                     registerMutation.mutate({
                       profileId: selectedProfileId,
-                      courseEventId: session.id
+                      courseEventId: session.id,
                     });
                   }
                 }}
               >
-                {registerMutation.isPending ? "Registering..." : "Register"}
+                {registerMutation.isPending
+                  ? "Submitting..."
+                  : session.isFull
+                    ? "Join Waitlist"
+                    : "Register"}
               </Button>
             </CardFooter>
           </Card>

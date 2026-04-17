@@ -32,19 +32,24 @@ app.all("/api/auth/*", async (request, reply) => {
   const protocol = request.protocol;
   const host = request.headers.host;
   const url = new URL(request.url, `${protocol}://${host}`);
-  
+
   const headers = new Headers();
   for (const [key, value] of Object.entries(request.headers)) {
     if (Array.isArray(value)) {
-      value.forEach(v => headers.append(key, v));
+      value.forEach((v) => headers.append(key, v));
     } else if (value !== undefined) {
       headers.set(key, value);
     }
   }
 
-  const body = (request.method === "POST" || request.method === "PATCH" || request.method === "PUT") 
-    ? (typeof request.body === 'string' ? request.body : JSON.stringify(request.body))
-    : undefined;
+  const body =
+    request.method === "POST" ||
+    request.method === "PATCH" ||
+    request.method === "PUT"
+      ? typeof request.body === "string"
+        ? request.body
+        : JSON.stringify(request.body)
+      : undefined;
 
   const req = new Request(url.toString(), {
     method: request.method,
@@ -53,12 +58,12 @@ app.all("/api/auth/*", async (request, reply) => {
   });
 
   const res = await auth.handler(req);
-  
+
   reply.status(res.status);
   res.headers.forEach((value, key) => {
     reply.header(key, value);
   });
-  
+
   return reply.send(await res.text());
 });
 
@@ -75,5 +80,7 @@ app.register(fastifyTRPCPlugin, {
   } satisfies FastifyTRPCPluginOptions<AppRouter>["trpcOptions"],
 });
 
-void app.listen({ host: "0.0.0.0", port: parseInt(process.env.PORT || "") || 3000 });
-
+void app.listen({
+  host: "0.0.0.0",
+  port: parseInt(process.env.PORT || "") || 3000,
+});

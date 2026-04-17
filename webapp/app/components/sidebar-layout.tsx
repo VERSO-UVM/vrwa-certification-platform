@@ -7,13 +7,19 @@ type SidebarLayoutProps = {
   requiredRole?: string;
 };
 
-export function SidebarLayout({ sidebar: Sidebar, requiredRole }: SidebarLayoutProps) {
+export function SidebarLayout({
+  sidebar: Sidebar,
+  requiredRole,
+}: SidebarLayoutProps) {
   const { data: session } = useSession();
-  const userRole = session?.user.role || "user";
+  const userRole =
+    (session?.user as { role?: string } | undefined)?.role ?? "user";
 
-  const isVirtualMode = requiredRole && userRole !== requiredRole && (
-    (userRole === "admin") || (userRole === "instructor" && requiredRole === "user")
-  );
+  const isVirtualMode =
+    requiredRole &&
+    userRole !== requiredRole &&
+    (userRole === "admin" ||
+      (userRole === "instructor" && requiredRole === "user"));
 
   return (
     <SidebarProvider>
@@ -22,8 +28,12 @@ export function SidebarLayout({ sidebar: Sidebar, requiredRole }: SidebarLayoutP
         {isVirtualMode && (
           <div className="bg-yellow-100 border-b border-yellow-200 px-4 py-2 text-sm text-yellow-800 flex justify-between items-center">
             <span>
-              You are an <strong>{userRole}</strong>, but this is the <strong>{requiredRole}</strong> view. Browse around, or{" "}
-              <Link to={userRole === "admin" ? "/admin" : "/instructor"} className="font-bold underline hover:no-underline">
+              You are an <strong>{userRole}</strong>, but this is the{" "}
+              <strong>{requiredRole}</strong> view. Browse around, or{" "}
+              <Link
+                to={userRole === "admin" ? "/admin" : "/instructor"}
+                className="font-bold underline hover:no-underline"
+              >
                 click here to return
               </Link>
             </span>

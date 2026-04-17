@@ -40,9 +40,7 @@ export const adminRouter = router({
       .innerJoin(course, eq(courseEvent.courseId, course.id));
   }),
 
-  getReservations: adminProcedure.query(
-    reservationDtoSelect
-  ),
+  getReservations: adminProcedure.query(reservationDtoSelect),
 
   getTraineeReservations: adminProcedure
     .input(

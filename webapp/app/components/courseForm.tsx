@@ -43,7 +43,11 @@ function textToDollars(userInput: string) {
   return Number(dollarAmt) * 100;
 }
 
-export function NewCourseForm({ onCreate }: { onCreate: (data: any) => Promise<void> }) {
+export function NewCourseForm({
+  onCreate,
+}: {
+  onCreate: (data: any) => Promise<void>;
+}) {
   const courses = useCourses();
 
   const [values, setValues] = useState({

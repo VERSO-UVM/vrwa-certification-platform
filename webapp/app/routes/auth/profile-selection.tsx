@@ -25,6 +25,9 @@ export default function ProfileSelection() {
   const switchProfile = useMutation(
     trpcProxy.profile.switchProfile.mutationOptions(),
   );
+  const activeProfileId = (
+    session?.session as { activeProfileId?: string } | undefined
+  )?.activeProfileId;
 
   useEffect(() => {
     if (!isSessionPending && !session) {
@@ -36,10 +39,12 @@ export default function ProfileSelection() {
     if (
       getMyProfiles.data &&
       getMyProfiles.data.length === 1 &&
-      !session?.session.activeProfileId
+      !activeProfileId
     ) {
       // Auto-select if only one profile
-      const profileId = getMyProfiles.data[0].id;
+      const profile = getMyProfiles.data[0];
+      if (!profile) return;
+      const profileId = profile.id;
       switchProfile.mutate(
         { profileId },
         {
@@ -83,11 +88,7 @@ export default function ProfileSelection() {
           {getMyProfiles.data?.map((profile) => (
             <Button
               key={profile.id}
-              variant={
-                session?.session.activeProfileId === profile.id
-                  ? "default"
-                  : "outline"
-              }
+              variant={activeProfileId === profile.id ? "default" : "outline"}
               className="h-20 flex items-center justify-start gap-4 px-6"
               onClick={() => handleProfileSelect(profile.id)}
               disabled={switchProfile.isPending}

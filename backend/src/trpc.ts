@@ -1,4 +1,5 @@
 import { adminRouter } from "~/routers/admin";
+import { accountRouter } from "~/routers/account";
 import { authRouter } from "~/routers/auth";
 import { certificateRouter } from "~/routers/certificate";
 import { reservationRouter } from "~/routers/reservation";
@@ -12,6 +13,7 @@ import { traineeRouter } from "./routers/trainee";
 
 export const appRouter = router({
   authRouter,
+  account: accountRouter,
   adminRouter,
   certificateRouter,
   reservation: reservationRouter,

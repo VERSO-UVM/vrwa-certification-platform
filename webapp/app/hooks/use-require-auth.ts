@@ -12,8 +12,9 @@ export function useRequireAuth(allowedRoles?: string[]) {
     }
 
     if (!isPending && session && allowedRoles) {
-      const userRole = (session.user.role || "user") as string;
-      
+      const userRole = ((session.user as { role?: string } | undefined)?.role ??
+        "user") as string;
+
       // Admin can access everything
       if (userRole === "admin") return;
 
@@ -21,7 +22,8 @@ export function useRequireAuth(allowedRoles?: string[]) {
       const isAllowed = allowedRoles.includes(userRole);
 
       // Special case: Instructor can access "user" (trainee) view
-      const isInstructorAccessingTrainee = userRole === "instructor" && allowedRoles.includes("user");
+      const isInstructorAccessingTrainee =
+        userRole === "instructor" && allowedRoles.includes("user");
 
       if (!isAllowed && !isInstructorAccessingTrainee) {
         // Redirect to their own dashboard if they are trying to access something they shouldn't

@@ -1,4 +1,13 @@
-import { BookOpenText, House, LogOut, Scroll, Trophy, Users, Eye } from "lucide-react";
+import {
+  BookOpenText,
+  House,
+  LogOut,
+  Scroll,
+  Trophy,
+  Users,
+  Eye,
+  UserCog,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import {
   Sidebar,
@@ -68,6 +77,14 @@ export function AdminSidebar() {
                 <Link to="/admin/instructors">
                   <Users className="mr-2 h-4 w-4" />
                   Instructors
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link to="/admin/users">
+                  <UserCog className="mr-2 h-4 w-4" />
+                  Users
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

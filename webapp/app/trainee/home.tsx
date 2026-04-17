@@ -1,6 +1,12 @@
 import { PageHeader } from "~/components/page-header";
 import { useTRPC } from "~/utils/trpc";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "~/components/ui/card";
 import { Calendar, Clock, MapPin, DollarSign, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "~/components/ui/button";
@@ -10,30 +16,39 @@ import { useQuery } from "@tanstack/react-query";
 
 export function TraineeHome() {
   const trpc = useTRPC();
-  const { data: sessions, isLoading } = useQuery(trpc.trainee.getMyUpcomingSessions.queryOptions());
+  const { data: sessions, isLoading } = useQuery(
+    trpc.trainee.getMyUpcomingSessions.queryOptions(),
+  );
 
   if (isLoading) return <div className="p-10">Loading your dashboard...</div>;
 
   return (
     <div className="space-y-8">
       <PageHeader>Operator Portal | Dashboard</PageHeader>
-      
+
       <div className="grid gap-6 md:grid-cols-2">
         {/* Upcoming Sessions Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xl font-bold">Upcoming Courses</CardTitle>
+            <CardTitle className="text-xl font-bold">
+              Upcoming Courses
+            </CardTitle>
             <Calendar className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {sessions?.map((session) => (
-                <div key={session.id} className="flex items-start justify-between border-b pb-4 last:border-0 last:pb-0">
+                <div
+                  key={session.id}
+                  className="flex items-start justify-between border-b pb-4 last:border-0 last:pb-0"
+                >
                   <div className="space-y-1">
                     <p className="font-semibold">{session.courseName}</p>
                     <div className="flex items-center text-sm text-muted-foreground">
                       <Clock className="mr-1 h-3 w-3" />
-                      {session.classStartDatetime ? format(new Date(session.classStartDatetime), "PPP p") : "TBD"}
+                      {session.classStartDatetime
+                        ? format(new Date(session.classStartDatetime), "PPP p")
+                        : "TBD"}
                     </div>
                     <div className="flex items-center text-sm text-muted-foreground">
                       <MapPin className="mr-1 h-3 w-3" />
@@ -60,7 +75,9 @@ export function TraineeHome() {
         {/* Unpaid Invoices Quick View */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xl font-bold">Outstanding Invoices</CardTitle>
+            <CardTitle className="text-xl font-bold">
+              Outstanding Invoices
+            </CardTitle>
             <DollarSign className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -72,9 +89,11 @@ export function TraineeHome() {
                   <p className="font-medium">Invoice #INV-001 (Placeholder)</p>
                   <p className="text-sm">Due for: Water 101 - $100.00</p>
                 </div>
-                <Button size="sm" className="ml-auto" variant="outline">Pay Now</Button>
+                <Button size="sm" className="ml-auto" variant="outline">
+                  Pay Now
+                </Button>
               </div>
-              
+
               <div className="text-center pt-4 border-t">
                 <Button asChild variant="ghost" size="sm">
                   <Link to="/trainee/invoices">View All Invoices</Link>

@@ -2,7 +2,7 @@ import { PageHeader } from "~/components/page-header";
 import { useTRPC } from "~/utils/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
-import { Calendar, MapPin, Users, Printer } from "lucide-react";
+import { Calendar, MapPin, Users, Printer, ClipboardCheck } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "react-router";
 
@@ -10,15 +10,16 @@ import { useQuery } from "@tanstack/react-query";
 
 export function InstructorHome() {
   const trpc = useTRPC();
-  const { data: courses, isPending, error } = useQuery(trpc.instructor.getMyUpcomingCourses.queryOptions());
-  console.log("InstructorHome query state:", { courses: courses?.length, isPending, error: error?.message });
+  const { data: courses, isPending } = useQuery(
+    trpc.instructor.getMyUpcomingCourses.queryOptions(),
+  );
 
   if (isPending) return <div className="p-10">Loading your courses...</div>;
 
   return (
     <div className="space-y-6">
       <PageHeader>VRWA | Instructor Dashboard</PageHeader>
-      
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {courses?.map((course) => (
           <Card key={course.id} className="flex flex-col">
@@ -29,21 +30,31 @@ export function InstructorHome() {
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center">
                   <Calendar className="mr-2 h-4 w-4" />
-                  {course.classStartDatetime ? format(new Date(course.classStartDatetime), "PPP p") : "TBD"}
+                  {course.classStartDatetime
+                    ? format(new Date(course.classStartDatetime), "PPP p")
+                    : "TBD"}
                 </div>
                 <div className="flex items-center">
                   <MapPin className="mr-2 h-4 w-4" />
-                  {course.locationType === "virtual" ? "Virtual" : course.physicalAddress || "TBD"}
+                  {course.locationType === "virtual"
+                    ? "Virtual"
+                    : course.physicalAddress || "TBD"}
                 </div>
                 <div className="flex items-center">
                   <Users className="mr-2 h-4 w-4" />
                   {course.seats} Seats
                 </div>
               </div>
-              
+
               <div className="pt-4 flex gap-2">
+                <Button size="sm" className="w-full" asChild>
+                  <Link to={`/instructor/attendance/${course.id}?view=table`}>
+                    <ClipboardCheck className="mr-2 h-4 w-4" />
+                    Manage Attendance
+                  </Link>
+                </Button>
                 <Button variant="outline" size="sm" className="w-full" asChild>
-                  <Link to={`/instructor/attendance/${course.id}`}>
+                  <Link to={`/instructor/attendance/${course.id}?view=print`}>
                     <Printer className="mr-2 h-4 w-4" />
                     Print Attendance
                   </Link>

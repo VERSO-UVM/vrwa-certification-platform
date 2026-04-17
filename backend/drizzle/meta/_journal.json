@@ -43,6 +43,13 @@
       "when": 1776204980311,
       "tag": "0005_sweet_the_liberteens",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1776437377557,
+      "tag": "0006_curved_martin_li",
+      "breakpoints": true
     }
   ]
 }

@@ -8,5 +8,7 @@ export default function Instructor() {
   if (isPending) return <div className="p-10">Loading session...</div>;
   if (!session) return null;
 
-  return <SidebarLayout sidebar={InstructorSidebar} requiredRole="instructor" />;
+  return (
+    <SidebarLayout sidebar={InstructorSidebar} requiredRole="instructor" />
+  );
 }

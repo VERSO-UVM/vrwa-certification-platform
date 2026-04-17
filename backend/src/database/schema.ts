@@ -9,16 +9,15 @@ import {
   primaryKey,
   decimal,
   index,
-} from 'drizzle-orm/pg-core';
-import { prefixedIdGenerator } from '../utils/id';
-import * as authSchema from './auth';
-export * from './auth';
-export { roles as Roles } from "~/auth/permissions"
+} from "drizzle-orm/pg-core";
+import { prefixedIdGenerator } from "../utils/id";
+import * as authSchema from "./auth";
+export * from "./auth";
 
 const { user } = authSchema;
 
-export const profile = pgTable('profile', {
-  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator('profile')),
+export const profile = pgTable("profile", {
+  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("profile")),
   // refactor: rename to userId
   accountId: varchar()
     .notNull()
@@ -34,11 +33,12 @@ export const profile = pgTable('profile', {
 });
 export type Profile = typeof profile.$inferSelect;
 
-export type Session = typeof session.$inferSelect;
+export type Session = typeof authSchema.session.$inferSelect;
 
 // export type SessionUser = { account: Account; session: Session };
 
-export type Organization = typeof organization.$inferSelect;
+export type Organization = typeof authSchema.organization.$inferSelect;
+export type User = typeof authSchema.user.$inferSelect;
 
 export const course = pgTable("course", {
   // This field may already exist as a different type in the VRWA db - it may change in the future
@@ -65,8 +65,7 @@ export const courseEvent = pgTable("courseEvent", {
   physicalAddress: text(),
   seats: integer(),
   classStartDatetime: timestamp({ withTimezone: true }),
-  instructorId: varchar()
-    .references(() => user.id),
+  instructorId: varchar().references(() => user.id),
 });
 
 export type CourseEvent = typeof courseEvent.$inferSelect;
@@ -91,7 +90,11 @@ export const reservation = pgTable(
       .notNull(),
     creditHours: decimal().notNull(),
     paymentStatus: varchar().notNull().$type<PaymentStatus>(),
-    status: varchar().notNull().$type<ReservationStatus>().default("registered"),
+    status: varchar()
+      .notNull()
+      .$type<ReservationStatus>()
+      .default("registered"),
+    attendanceMarkedAt: timestamp("attendanceMarkedAt"),
     createdAt: timestamp().defaultNow().notNull(),
   },
   (table) => [

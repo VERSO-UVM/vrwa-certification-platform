@@ -41,21 +41,33 @@ const enforceAcctIsAuthed = t.middleware(({ ctx, next }) => {
 export const protectedProcedure = t.procedure.use(enforceAcctIsAuthed);
 
 export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (!ctx.account.role || !checkRolePermission({ roles: ctx.account.role, permissions: { admin: ["admin"] } })) {
+  if (!ctx.account.role || !ctx.account.role.split(",").includes("admin")) {
     throw new TRPCError({ code: "FORBIDDEN" });
   }
   return next({ ctx });
 });
 
 export const instructorProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (!ctx.account.role || !checkRolePermission({ roles: ctx.account.role, permissions: { classes: ["update"] } })) {
+  if (
+    !ctx.account.role ||
+    !checkRolePermission({
+      roles: ctx.account.role,
+      permissions: { classes: ["update"] },
+    })
+  ) {
     throw new TRPCError({ code: "FORBIDDEN" });
   }
   return next({ ctx });
 });
 
 export const traineeProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (!ctx.account.role || !checkRolePermission({ roles: ctx.account.role, permissions: { classes: ["register"] } })) {
+  if (
+    !ctx.account.role ||
+    !checkRolePermission({
+      roles: ctx.account.role,
+      permissions: { classes: ["register"] },
+    })
+  ) {
     throw new TRPCError({ code: "FORBIDDEN" });
   }
   return next({ ctx });

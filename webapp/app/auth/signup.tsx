@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
-import { Card, CardTitle, CardContent, CardFooter, CardHeader } from "~/components/ui/card";
+import {
+  Card,
+  CardTitle,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { authClient } from "~/lib/auth-client";
@@ -36,7 +42,9 @@ export default function SignupPage() {
   return (
     <Card className="mt-10 w-full max-w-md self-center">
       <CardHeader>
-        <CardTitle className="text-center text-2xl font-bold">Sign Up</CardTitle>
+        <CardTitle className="text-center text-2xl font-bold">
+          Sign Up
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSignup} className="space-y-4">

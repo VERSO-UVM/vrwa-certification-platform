@@ -1,4 +1,4 @@
-import { BookOpen, Calendar, House, LogOut, Eye } from "lucide-react";
+import { Calendar, House, LogOut, Eye } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import {
   Sidebar,
@@ -49,15 +49,7 @@ export function InstructorSidebar() {
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link to="/instructor/course-manager">
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  Classes
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link to="/instructor/attendance">
+                <Link to="/instructor">
                   <Calendar className="mr-2 h-4 w-4" />
                   Attendance
                 </Link>
