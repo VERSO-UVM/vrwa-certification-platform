@@ -170,7 +170,7 @@ export const courseManagerRouter = router({
     }),
 
   //updateCourse
-  updateEvent: adminProcedure
+  updateCourse: adminProcedure
   .input(
     z.object({
       id: z.string(),

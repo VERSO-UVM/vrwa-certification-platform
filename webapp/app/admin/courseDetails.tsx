@@ -16,6 +16,8 @@ import { PaymentStatusBadge } from "~/components/payment-status-badge";
 import { Badge } from "~/components/ui/badge";
 import { Link } from "react-router";
 import { Users, CreditCard, Calendar, History } from "lucide-react";
+import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription} from "~/components/ui/drawer";
+import { NewCourseForm } from "~/components/courseForm";
 
 
 
@@ -116,7 +118,8 @@ export function CourseDetails() {
     const rosterIds = new Set(openRoster.map((r) => r.profileId));
     const availableTrainees = trainees.data?.filter((t) => !rosterIds.has(t.id)) ?? [];
 
-    
+    //editing a course
+    const [courseDrawerOpen, setCourseDrawerOpen] = useState<boolean | false>(false);
     
     //Data Table
     const rosterTableDef: ColumnDef<ReservationDto>[] = [
@@ -218,9 +221,40 @@ export function CourseDetails() {
                             <div>
                                 <p><b>Credit Hours: </b> {course.data?.creditHours}</p>
                             </div>
+                            <div className="flex justify-end mb-4 pr-4">
+                                <Drawer 
+                                    direction="right"
+                                    open={courseDrawerOpen}
+                                    onOpenChange={setCourseDrawerOpen}
+                                >
+                                    <DrawerContent>
+                                    <DrawerHeader>
+                                        <DrawerTitle>Update Course Details</DrawerTitle>
+                                        <DrawerDescription>Edit an existing event</DrawerDescription>
+                                    </DrawerHeader>
+                                    <div className="no-scrollbar overflow-y-auto px-4">
+                                    <NewCourseForm
+                                        key= {courseId}
+                                        course = {course.data}
+                                        onCreate= {async (data) => {
+                                            await client.courseManagerRouter.updateCourseEvent.mutate({id: courseId, ...data,});
+                                            await queryClient.invalidateQueries({
+                                            queryKey: trpc.courseManagerRouter.getCourseById.queryKey({id: courseId}),
+                                            });
+                                        setCourseDrawerOpen(false);
+                                        }}
+                                    />
+                                    </div>
+                                    </DrawerContent>
+                                </Drawer>
+                            </div>
                             <div>
-                                <Button variant="secondary" size="lg" className="w-full">
-                                    Edit Course
+                                <Button 
+                                    variant="secondary" 
+                                    size="lg" 
+                                    className="w-full" 
+                                    onClick={() => {setCourseDrawerOpen(true);}}>
+                                    Update Course
                                 </Button>
                             </div>
                             <div>

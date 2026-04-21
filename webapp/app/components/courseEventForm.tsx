@@ -32,7 +32,6 @@ export function CourseEventForm({ onCreate, event }) {
     const courses = useCourses();
 
     const [values, setValues] = useState(() => { 
-        console.log(event)
         if (!event) {
             return {
                 courseId: "",

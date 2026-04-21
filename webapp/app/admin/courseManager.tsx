@@ -38,9 +38,6 @@ export function CourseManager() {
   const courseEvents = useCourseEvents();
   const courses = useCourses();
 
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [edits, setEdits] = useState<Partial<CourseEvent>>({});
-
   async function deleteRow(id: string) {
     await client.courseManagerRouter.deleteCourseEvent.mutate({ id });
 
