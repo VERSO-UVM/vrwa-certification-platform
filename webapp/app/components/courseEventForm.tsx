@@ -74,6 +74,7 @@ export function CourseEventForm({ onCreate, event }) {
         const classStartDatetime = combineDateAndTime(values.date, values.time);
 
         onCreate({
+
             courseId: values.courseId,
             locationType: values.locationType,
             seats: values.seats,

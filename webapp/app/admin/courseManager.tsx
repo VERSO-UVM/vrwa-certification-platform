@@ -93,8 +93,13 @@ export function CourseManager() {
               }}> 
               Edit
             </Button>
-            <Button variant="destructive" onClick={() => deleteRow(row.original.id)}>
-              Delete
+            <Button variant="destructive" onClick= {() => {
+                if (confirm("Are you sure you want to delete this  event? All event information and reservations will be lost.")) {
+                    deleteRow(row.original.id);
+                } else {
+                    return;
+                }
+            }}> Delete
             </Button>
           </ButtonGroup>
         )
@@ -171,7 +176,7 @@ export function CourseManager() {
                   event = {selectedEvent}
                   onCreate= {async (data) => {
                     if (selectedEvent) {
-                      await client.courseManagerRouter.updateCourseEvent.mutate(data);
+                      await client.courseManagerRouter.updateCourseEvent.mutate({id: selectedEvent.id, ...data,});
                       await queryClient.invalidateQueries({
                         queryKey: trpc.adminRouter.getCourseEvents.queryKey(),
                       });

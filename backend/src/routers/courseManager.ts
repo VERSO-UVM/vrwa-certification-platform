@@ -15,9 +15,9 @@ export const courseManagerRouter = router({
 
   getCourseById: adminProcedure
     .input(z.object({ id: z.string() }))
-    .query(async ({ input }): Promise<Course | undefined> => {
-      const found = await db.client.select().from(course).where(eq(course.id, input.id));
-      return found[0];
+    .query(async ({ input }): Promise<Course | null> => {
+      const found = await db.client.select().from(course).where(eq(course.id, input.id)).limit(1);
+      return found[0] ?? null;
   }),
 
   getReservationsByCourse: adminProcedure
@@ -41,7 +41,15 @@ export const courseManagerRouter = router({
         .where(eq(course.id, input.courseId))
         .orderBy(courseEvent.classStartDatetime);
 
-      return reservations;
+      return reservations ?? [];
+    }),
+
+  getCourseEventsByCourse: adminProcedure
+    .input(z.object({ courseId: z.string() }))
+    .query(async ({input}) => {
+      const courseEvents = await db.client
+        .select().from(courseEvent).where(eq(courseEvent.courseId, input.courseId));
+      return courseEvents ?? [];
     }),
 
   //createCourseEvent

@@ -8,7 +8,7 @@ export type ReservationDto =
   Reservation &
   Pick<Profile, "firstName" | "lastName" | "isMember"> &
   Pick<Course, "courseName" | "creditHours" | "id"> &
-  Pick<CourseEvent, "classStartDatetime">;
+  Pick<CourseEvent, "classStartDatetime" | "seats">;
 
 export type CourseEventDto =
   & CourseEvent
