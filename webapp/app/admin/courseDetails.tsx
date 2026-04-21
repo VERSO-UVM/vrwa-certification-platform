@@ -21,18 +21,17 @@ import { Users, CreditCard, Calendar, History } from "lucide-react";
 
 export function CourseDetails() {
     const { courseId } = useParams<{courseId: string}>();
-    const enabled = !!courseId;
     const trpc = useTRPC();
     const client = useTRPCClient();
     const queryClient = useQueryClient();
     
 
     const course = useQuery(
-        trpc.courseManagerRouter.getCourseById.queryOptions({ id: courseId!}, { enabled: enabled})
+        trpc.courseManagerRouter.getCourseById.queryOptions({ id: courseId!}),
     )
     
     const reservations = useQuery(
-        trpc.courseManagerRouter.getReservationsByCourse.queryOptions({ courseId: courseId!}, {enabled: enabled}),
+        trpc.courseManagerRouter.getReservationsByCourse.queryOptions({ courseId: courseId!}),
     )
 
     const trainees = useQuery(
@@ -318,11 +317,9 @@ export function CourseDetails() {
                                                     paymentStatus: "unpaid",
                                                 });
 
-                                                await queryClient.invalidateQueries(
-                                                    trpc.courseManagerRouter.getReservationsByCourse.queryKey({
-                                                    courseId: courseId!,
-                                                    })
-                                                );
+                                                await queryClient.invalidateQueries({
+                                                    queryKey: trpc.courseManagerRouter.getReservationsByCourse.queryKey({courseId: courseId!}),
+                                                });
                                                 
                                                 setTraineePopupOpen(false);
                                             }}
