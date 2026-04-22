@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { Course, Profile } from "@backend/database/schema";
 import { useParams } from "react-router";
 import { type ColumnDef } from "@tanstack/react-table";
@@ -26,11 +26,6 @@ import {
   SelectItem,
   SelectGroup,
 } from "~/components/ui/select";
-import {
-  profileDefPresets,
-  profileFieldHelper,
-} from "~/utils/field-defs/profile";
-import { reservationDefPresets } from "~/utils/field-defs/reservation";
 
 export function CourseDetails() {
   const trpc = useTRPC();
@@ -45,29 +40,44 @@ export function CourseDetails() {
     });
 
     await queryClient.invalidateQueries({
-      queryKey: trpc.courseManagerRouter.getReservationsByCourse.queryKey({
+      queryKey: trpc.adminRouter.getReservationsByCourse.queryKey({
         courseId: courseId!,
       }),
     });
   }
 
-  const course = useQuery(
+  const course = useQuery<Course>(
     trpc.courseManagerRouter.getCourseById.queryOptions({ id: courseId! }),
   );
 
-  const reservations = useQuery(
+  const reservations = useQuery<ReservationDto[]>(
     trpc.courseManagerRouter.getReservationsByCourse.queryOptions({
       courseId: courseId!,
     }),
   );
 
-  const trainees = useQuery(trpc.adminRouter.getTrainees.queryOptions());
+  const trainees = useQuery<Profile[]>(
+    trpc.adminRouter.getTrainees.queryOptions(),
+  );
 
-  const rosterTableDef: ColumnDef<ReservationDto, any>[] = [
-    ...(reservationDefPresets.basic as unknown as ColumnDef<
-      ReservationDto,
-      any
-    >[]),
+  const rosterTableDef: ColumnDef<ReservationDto>[] = [
+    {
+      accessorKey: "firstName",
+      header: "First Name",
+    },
+    {
+      accessorKey: "lastName",
+      header: "Last Name",
+    },
+    {
+      accessorKey: "isMember",
+      header: "Member Status",
+      cell: ({ getValue }) => (getValue() == true ? "Member" : "Non-Member"),
+    },
+    {
+      accessorKey: "paymentStatus",
+      header: "Payment Status",
+    },
     {
       id: "actions",
       cell: ({ row }) => {
@@ -86,19 +96,17 @@ export function CourseDetails() {
   ];
 
   //grouping reservations by courseEventId to easily access rosters
-  const reservationsList = (reservations.data as any[]) ?? [];
-  const reservationsByEvent = reservationsList.reduce<Record<string, any[]>>(
-    (rosters, reservation) => {
-      const key = reservation.courseEventId;
-      if (!key) return rosters;
-      if (!rosters[key]) {
-        rosters[key] = [];
-      }
-      rosters[key].push(reservation);
-      return rosters;
-    },
-    {},
-  );
+  const reservationsList = reservations.data ?? [];
+  const reservationsByEvent = reservationsList.reduce<
+    Record<string, ReservationDto[]>
+  >((rosters, reservation) => {
+    const key = reservation.courseEventId;
+    if (!rosters[key]) {
+      rosters[key] = [];
+    }
+    rosters[key].push(reservation);
+    return rosters;
+  }, {});
 
   //getting courseEvents for tabs
   const eventIds = Object.keys(reservationsByEvent);
@@ -113,43 +121,13 @@ export function CourseDetails() {
   const openRoster = selectedTab
     ? (reservationsByEvent[selectedTab] ?? [])
     : [];
-  const rosterIds = new Set(openRoster.map((r: any) => r.profileId));
+  const rosterIds = new Set(openRoster.map((r) => r.profileId));
   const availableTrainees =
-    (trainees.data as any[])?.filter((t: any) => !rosterIds.has(t.id)) ?? [];
-
-  const courseData = course.data as any;
-  const availableTraineesColumns: ColumnDef<Profile, any>[] = useMemo(() => [
-    ...(profileDefPresets.basic as ColumnDef<Profile, any>[]),
-    profileFieldHelper.display({
-      id: "addAction",
-      header: "Action",
-      cell: ({ row }) => (
-        <Button
-          onClick={async () => {
-            if (!selectedTab) return;
-            await client.courseManagerRouter.addReservation.mutate({
-              profileId: row.original.id,
-              courseEventId: selectedTab,
-              creditHours: courseData?.creditHours ?? 0,
-              paymentStatus: "unpaid",
-            });
-            await queryClient.invalidateQueries({
-              queryKey:
-                trpc.courseManagerRouter.getReservationsByCourse.queryKey({
-                  courseId: courseId!,
-                }),
-            });
-          }}
-        >
-          Add
-        </Button>
-      ),
-    }),
-  ], [selectedTab, courseId, courseData]);
+    trainees.data?.filter((t) => !rosterIds.has(t.id)) ?? [];
 
   return (
     <div className="flex-1">
-      <PageHeader>{courseData?.courseName}</PageHeader>
+      <PageHeader>{course.data?.courseName}</PageHeader>
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
         <Card className="@xl:col-span-2">
           <CardHeader className="pb-3">
@@ -159,17 +137,17 @@ export function CourseDetails() {
             <div className="flex flex-col gap-4">
               <div>
                 <p>
-                  <b>Description:</b> {courseData?.description}
+                  <b>Description:</b> {course.data?.description}
                 </p>
               </div>
               <div>
                 <p>
-                  <b>Enrollment Fee:</b> ${(courseData?.priceCents ?? 0) / 100}
+                  <b>Enrollment Fee:</b> ${course.data?.priceCents / 100}
                 </p>
               </div>
               <div>
                 <p>
-                  <b>Credit Hours: </b> {courseData?.creditHours}
+                  <b>Credit Hours: </b> {course.data?.creditHours}
                 </p>
               </div>
               <div>
@@ -263,19 +241,18 @@ export function CourseDetails() {
 
                       await client.courseManagerRouter.addReservation.mutate({
                         profileId: selectedTrainee,
-                        courseEventId: selectedTab!,
-                        creditHours: courseData?.creditHours ?? 0,
+                        courseEventId: selectedTab,
+                        creditHours: course.data?.creditHours ?? 0,
                         paymentStatus: "unpaid",
                       });
 
-                      await queryClient.invalidateQueries({
-                        queryKey:
-                          trpc.courseManagerRouter.getReservationsByCourse.queryKey(
-                            {
-                              courseId: courseId!,
-                            },
-                          ) as any,
-                      });
+                      await queryClient.invalidateQueries(
+                        trpc.courseManagerRouter.getReservationsByCourse.queryKey(
+                          {
+                            courseId: courseId!,
+                          },
+                        ),
+                      );
 
                       setTraineePopupOpen(false);
                     }}
@@ -284,15 +261,6 @@ export function CourseDetails() {
                   </Button>
                 </DialogContent>
               </Dialog>
-            </div>
-            <div className="mt-6">
-              <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
-                Add Trainees (Search)
-              </h3>
-              <DataTable
-                columns={availableTraineesColumns}
-                data={availableTrainees as Profile[]}
-              />
             </div>
           </CardContent>
         </Card>

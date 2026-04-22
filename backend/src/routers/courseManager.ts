@@ -1,18 +1,21 @@
 import { asc, eq, and } from "drizzle-orm";
 import db from "~/database";
 import { courseEvent, course, reservation, profile } from "~/database/schema";
-import { adminProcedure, router } from "~/utils/trpc";
+import type { Course } from "~/database/schema";
+import { basicProcedure, router } from "~/utils/trpc";
 import { z } from "zod";
+
+const adminProcedure = basicProcedure;
 
 export const courseManagerRouter = router({
   //getCourses
-  getCourses: adminProcedure.query(() => {
+  getCourses: adminProcedure.query((): Promise<Course[]> => {
     return db.client.select().from(course).orderBy(asc(course.courseName));
   }),
 
   getCourseById: adminProcedure
     .input(z.object({ id: z.string() }))
-    .query(async ({ input }) => {
+    .query(async ({ input }): Promise<Course | undefined> => {
       const found = await db.client
         .select()
         .from(course)
@@ -161,31 +164,7 @@ export const courseManagerRouter = router({
       return { success: true };
     }),
 
-  updateCourse: adminProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        courseName: z.string().optional(),
-        description: z.string().nullable().optional(),
-        creditHours: z.number().int().positive().optional(),
-        priceCents: z.number().int().positive().optional(),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const { id, ...update } = input;
-      const cleanUpdate = Object.fromEntries(
-        Object.entries(update).filter(([, value]) => value !== undefined),
-      );
-      if (Object.keys(cleanUpdate).length === 0) {
-        throw new Error("No fields provided to update");
-      }
-      const [updatedCourse] = await db.client
-        .update(course)
-        .set(cleanUpdate)
-        .where(eq(course.id, id))
-        .returning();
-      return updatedCourse;
-    }),
+  //updateCourse
 
   //addTrainee
   addReservation: adminProcedure
