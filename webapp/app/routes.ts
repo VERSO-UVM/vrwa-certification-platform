@@ -11,7 +11,6 @@ export default [
   route("admin", "routes/admin/layout.tsx", [
     index("routes/admin/dashboard.tsx"),
     route("trainees", "routes/admin/trainees.tsx"),
-    route("instructors", "routes/admin/instructors.tsx"),
     route("users", "routes/admin/users.tsx"),
     route("*", "routes/admin/not-found.tsx"),
     route("course-manager", "routes/admin/courseManager.tsx"),

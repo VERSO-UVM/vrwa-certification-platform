@@ -31,7 +31,7 @@ const admin = ac.newRole({
 const instructor = ac.newRole({
   ...userAc.statements,
   certifications: ["assign"],
-  classes: ["update"],
+  classes: ["update", "register"],
   roster: ["view"],
 });
 

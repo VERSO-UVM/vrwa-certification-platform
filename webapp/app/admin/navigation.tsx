@@ -74,14 +74,6 @@ export function AdminSidebar() {
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link to="/admin/instructors">
-                  <Users className="mr-2 h-4 w-4" />
-                  Instructors
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
                 <Link to="/admin/users">
                   <UserCog className="mr-2 h-4 w-4" />
                   Users

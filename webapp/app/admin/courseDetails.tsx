@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { Course, Profile } from "@backend/database/schema";
 import { useParams } from "react-router";
 import { type ColumnDef } from "@tanstack/react-table";
@@ -118,8 +118,8 @@ export function CourseDetails() {
     (trainees.data as any[])?.filter((t: any) => !rosterIds.has(t.id)) ?? [];
 
   const courseData = course.data as any;
-  const availableTraineesColumns: ColumnDef<Profile, any>[] = [
-    ...(profileDefPresets.basic as unknown as ColumnDef<Profile, any>[]),
+  const availableTraineesColumns: ColumnDef<Profile, any>[] = useMemo(() => [
+    ...(profileDefPresets.basic as ColumnDef<Profile, any>[]),
     profileFieldHelper.display({
       id: "addAction",
       header: "Action",
@@ -145,7 +145,7 @@ export function CourseDetails() {
         </Button>
       ),
     }),
-  ];
+  ], [selectedTab, courseId, courseData]);
 
   return (
     <div className="flex-1">
