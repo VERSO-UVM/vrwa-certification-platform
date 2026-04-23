@@ -35,7 +35,7 @@ function textToDollars(userInput : string){
     if (dollarAmt.charAt(0)=== '$') {
         dollarAmt = dollarAmt.slice(1)
     }
-    return (Number(dollarAmt) * 100)
+    return (Math.round(Number(dollarAmt) * 100))
 }
 
 export function NewCourseForm({ onCreate, course }) {

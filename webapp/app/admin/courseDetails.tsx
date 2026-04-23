@@ -95,9 +95,11 @@ export function CourseDetails() {
     const pastEvents = [];
     const date = Date.now();
     
+    
 
     for (let i=0; i < reservationsList.length; i++) {
-        let eventTime = Number(reservationsList[i]?.classStartDatetime) 
+        let eventTime = new Date(reservationsList[i].classStartDatetime).getTime();
+        
         if (eventTime > date) {
             upcomingEvents.push(reservationsList[i]);
         } else {
@@ -208,19 +210,26 @@ export function CourseDetails() {
                 </Card>
                 <Card className="@xl:col-span-2">
                     <CardHeader className="pb-3">
-                        <CardTitle>Course Overview</CardTitle>
+                        <CardTitle className="text-xl font-semibold"> <u>Course Overview</u></CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex flex-col gap-4">
-                            <div>
-                                <p><b>Description:</b> {course.data?.description}</p>
-                            </div>
-                            <div>
-                                <p><b>Enrollment Fee:</b> ${course.data?.priceCents / 100}</p>
-                            </div>
-                            <div>
-                                <p><b>Credit Hours: </b> {course.data?.creditHours}</p>
-                            </div>
+                        <div className="space-y-6">
+                            <dl className="space-y-3">
+                                <div>
+                                    <dt className="font-medium text-muted-foreground">Description</dt>
+                                    <dd>{course.data?.description}</dd>
+                                </div>
+
+                                <div>
+                                    <dt className="font-medium text-muted-foreground">Enrollment Fee</dt>
+                                    <dd>${course.data?.priceCents / 100}</dd>
+                                </div>
+
+                                <div>
+                                    <dt className="font-medium text-muted-foreground">Credit Hours</dt>
+                                    <dd>{course.data?.creditHours}</dd>
+                                </div>
+                            </dl>
                             <div className="flex justify-end mb-4 pr-4">
                                 <Drawer 
                                     direction="right"
@@ -237,7 +246,7 @@ export function CourseDetails() {
                                         key= {courseId}
                                         course = {course.data}
                                         onCreate= {async (data) => {
-                                            await client.courseManagerRouter.updateCourseEvent.mutate({id: courseId, ...data,});
+                                            await client.courseManagerRouter.updateCourse.mutate({id: courseId, ...data,});
                                             await queryClient.invalidateQueries({
                                             queryKey: trpc.courseManagerRouter.getCourseById.queryKey({id: courseId}),
                                             });
