@@ -12,8 +12,9 @@ import {
 
 export type ReservationDto = Reservation &
   Pick<Profile, "firstName" | "lastName" | "isMember"> &
-  Pick<Course, "courseName" | "creditHours" | "id"> &
-  Pick<CourseEvent, "classStartDatetime" | "seats">;
+  Pick<CourseEvent, "classStartDatetime" | "seats"> & {
+    course: Pick<Course, "courseName" | "creditHours" | "id">;
+  };
 
 export type CourseEventDto = CourseEvent &
   Pick<Course, "courseName" | "description" | "creditHours" | "priceCents">;

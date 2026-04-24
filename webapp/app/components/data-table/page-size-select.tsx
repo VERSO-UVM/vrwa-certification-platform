@@ -7,8 +7,8 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-} from "./select";
-import { Field, FieldLabel } from "./field";
+} from "~/components/ui/select";
+import { Field, FieldLabel } from "~/components/ui/field";
 
 interface DataTablePageSizeSelectProps<
   TData,

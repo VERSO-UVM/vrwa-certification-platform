@@ -1,7 +1,7 @@
 import { flexRender, type Table } from "@tanstack/react-table";
-import { TableHead, TableHeader, TableRow } from "./table";
-import { Button } from "./button";
 import { ArrowDownZA, ArrowUpAZ, ArrowUpDown } from "lucide-react";
+import { TableHead, TableHeader, TableRow } from "~/components/ui/table";
+import { Button } from "~/components/ui/button";
 
 interface DataTableHeaderProps<TData> {
   table: Table<TData>;
@@ -9,7 +9,8 @@ interface DataTableHeaderProps<TData> {
 
 export function DataTableHeader<TData>({ table }: DataTableHeaderProps<TData>) {
   return (
-    <TableHeader>
+    // Fix header at top while scrolling!
+    <TableHeader className="sticky bg-background top-0 z-10">
       {table.getHeaderGroups().map((headerGroup) => (
         <TableRow key={headerGroup.id}>
           {headerGroup.headers.map((header) => {

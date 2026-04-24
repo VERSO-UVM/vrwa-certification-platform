@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { PageHeader } from "~/components/page-header";
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 import { useTRPC, useTRPCClient } from "~/utils/trpc";
-import { DataTable } from "~/components/ui/data-table";
+import { DataTable } from "~/components/data-table";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,

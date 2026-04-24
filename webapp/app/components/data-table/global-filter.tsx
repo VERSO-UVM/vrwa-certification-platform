@@ -1,5 +1,5 @@
 import type { Table } from "@tanstack/react-table";
-import { Input } from "./input";
+import { Input } from "~/components/ui/input";
 import React from "react";
 
 interface DataTableGlobalFilterProps<TData> {
