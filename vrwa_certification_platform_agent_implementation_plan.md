@@ -44,7 +44,6 @@ A user (an `account`) can be associated with multiple named profiles (think: Net
 1.  Course manager (prototype already implemented)
 
     For VRWA staff to manage upcoming courses end-to-end: create/edit course details (title, description, instructor, dates), manage the trainee roster (add/remove trainees), optionally handle a waitlist, it should also integrate with certifications batch export.
-
     - Must support user-friendly CRUD for both courses and classes/sessions (courseEvents)
 
 2.  Admin dashboard (partially implemented). Easy access to other pages
@@ -56,7 +55,6 @@ A user (an `account`) can be associated with multiple named profiles (think: Net
     Provide a single interface for VRWA staff to view and manage invoices.
 
     Support core workflows:
-
     - Review unpaid invoices by month
     - Record payments (credit card / check)
     - Mark invoices as paid, partially paid, waived, or refunded
@@ -67,8 +65,8 @@ A user (an `account`) can be associated with multiple named profiles (think: Net
       future, or all classes.
 
 5.  User manager
-	1.  Manage roles (Trainee, Instructor, Admin)
-    2. Search users with a DataTable and easily update their role
+    1.  Manage roles (Trainee, Instructor, Admin)
+    2.  Search users with a DataTable and easily update their role
 
 6.  Payment portal (stripe)
 
@@ -76,13 +74,12 @@ A user (an `account`) can be associated with multiple named profiles (think: Net
 
 7.  Certification pdf exporter (pdf generation prototype implemented, review @backend/src/pdf/pdf_template.tsx and @backend/src/routers/certificate.tsx)
 
-	Provide a UI in Admin Dash to generate PDFs for:
-
+    Provide a UI in Admin Dash to generate PDFs for:
     - A single trainee for a given course
     - All trainees in a class (bulk export)
-	    -  Also must be accessible from course manager to batch send out certifications from a whole class.
-	    - Manually add and remove trainees to send PDFs for
-    -  Admin can download individual certificates or send out emails to all trainees with the appropriate certificate.
+      - Also must be accessible from course manager to batch send out certifications from a whole class.
+      - Manually add and remove trainees to send PDFs for
+    - Admin can download individual certificates or send out emails to all trainees with the appropriate certificate.
     - This feature includes automated email features. Update
       .env.example with configuration variables needed to send emails.
 
@@ -98,8 +95,8 @@ A user (an `account`) can be associated with multiple named profiles (think: Net
 
 - Sidebar should show current profile and a link to [open a view to switch profiles](#profile-system).
 - User dashboard
-	- Show upcoming course sessions
-	- Once Stripe is integrated: Show unpaid invoices (quick view)
+  - Show upcoming course sessions
+  - Once Stripe is integrated: Show unpaid invoices (quick view)
 - Calendar view showing former and upcoming sessions
   - Support filters: date range, location type, course, availability (open/full).
   - Calendar UI (month/week/list toggle).
@@ -223,9 +220,9 @@ For each phase, before writing any code, you must:
 
 1.  Review the relevant files in the @backend and @webapp directories. Identify what features are partially implemented. Review relevant Skills for relevant frontend and backend features.
 2.  Output a brief, step-by-step technical implementation plan for only the current phase.
-	1. For each new page, create a UI/UX design plan for the interface. The interface should be consistent with other pages, support common workflows for the operator/instructor/admin, and be accessible.
-	2.  Specify which files will be modified or created.
-	3.  Include comprehensive testing and verification through unit tests and e2e tests inside the plan
+    1. For each new page, create a UI/UX design plan for the interface. The interface should be consistent with other pages, support common workflows for the operator/instructor/admin, and be accessible.
+    2. Specify which files will be modified or created.
+    3. Include comprehensive testing and verification through unit tests and e2e tests inside the plan
 
 - Before writing any tRPC procedure: (1) read @drizzle-orm Skill, (2) define the DTO in dtos.ts, (3) write the Zod validator, (4) wire the tRPC router
 
@@ -236,9 +233,9 @@ For each phase, before writing any code, you must:
 3. Check that code is high quality and all Development Guidelines are be met.
 4. Check that all features are fully implemented.
 5. Re-iterate on missing features and low-quality code with Test Driven Development then go back to step 2.
-7. Run `bun tsc` from each subproject and go through typescript errors one by one
-8. Only then is the phase considered completed.
-9. Make a Git commit from the command line with `git commit -m "Phase <number>: <fixes>"`.
+6. Run `bun tsc` from each subproject and go through typescript errors one by one
+7. Only then is the phase considered completed.
+8. Make a Git commit from the command line with `git commit -m "Phase <number>: <fixes>"`.
 
 ### Phase 0: Playwright
 
@@ -262,93 +259,91 @@ For each phase, before writing any code, you must:
 2.  Build Trainee dashboard, calendar view, and signup flow (including the waitlist logic).
 
 3.  Test
-  - Write tests for all API endpoints
-  - Create playwright tests for instructor dashboard, trainee dashboard, trainee calendar view, and trainee signup
+
+- Write tests for all API endpoints
+- Create playwright tests for instructor dashboard, trainee dashboard, trainee calendar view, and trainee signup
 
 ### Phase 3: Admin Features
 
 1. Complete and refine the Admin Course Manager backend routers and frontend views.
 
-  - Use ColumnDefs from @webapp/app/util/field-defs/course-event.tsx
-  - Create a matching @webapp/app/util/field-defs/course.tsx
-  - Convert all DataTables to use these definitions/presets
-  - Convert all Create and Edit features to use the same definitions with @webapp/app/components/entry-views/edit-drawer.tsx
-  - Use a DataTable for searching for new trainees to add to roster
+- Use ColumnDefs from @webapp/app/util/field-defs/course-event.tsx
+- Create a matching @webapp/app/util/field-defs/course.tsx
+- Convert all DataTables to use these definitions/presets
+- Convert all Create and Edit features to use the same definitions with @webapp/app/components/entry-views/edit-drawer.tsx
+- Use a DataTable for searching for new trainees to add to roster
 
 3. Build the User Manager APIs and UI.
 
-  - Define a UserDto object in the dtos.ts file.
-  - Define ColumnDefs in @webapp/app/utils/field-defs/user.ts following same format of other files.
-  - Define an `account` router. Add the necesary api calls for the Users admin page which return `UserDto`.
-  - Build the Users admin page that queries the API, uses ColumnDefs based off of utils, and passes it to the DataTable component.
-  - Customize the `cell` field for the Role column. It should have an "Edit" button which opens an EditDrawer. The EditDrawer only lets you set the Role and has a save button. This workflow is easy to use and minimizes input errors. See @webapp/app/admin/profile.ts for a reference for all of that.
-  - Roles options should be labeled: "Operator", "Instructor", and "Admin"
+- Define a UserDto object in the dtos.ts file.
+- Define ColumnDefs in @webapp/app/utils/field-defs/user.ts following same format of other files.
+- Define an `account` router. Add the necesary api calls for the Users admin page which return `UserDto`.
+- Build the Users admin page that queries the API, uses ColumnDefs based off of utils, and passes it to the DataTable component.
+- Customize the `cell` field for the Role column. It should have an "Edit" button which opens an EditDrawer. The EditDrawer only lets you set the Role and has a save button. This workflow is easy to use and minimizes input errors. See @webapp/app/admin/profile.ts for a reference for all of that.
+- Roles options should be labeled: "Operator", "Instructor", and "Admin"
 
 5.  Test
 
-  - Write tests for all API endpoints
-  - Create playwright tests for admin User Manager and Course Manager
-  
+- Write tests for all API endpoints
+- Create playwright tests for admin User Manager and Course Manager
+
 ### Phase 3.5: Missing features
 
 - More test seed data
-	- Add two more accounts and three profiles for each one.
-	- Add more test courses: "Wastewater Microbiology", "First Aid", and "Water Bending"
-	- Add one past and three future classes (courseEvents) for *each* course
+  - Add two more accounts and three profiles for each one.
+  - Add more test courses: "Wastewater Microbiology", "First Aid", and "Water Bending"
+  - Add one past and three future classes (courseEvents) for _each_ course
 - Instructor dashboard UI layout issue: currently the "Print Attendance" button overflows and is rendered outside of the Card. The two buttons should be a single Button Group and stay inside the card.
 - When the server responds to an API query with a FORBIDDEN message, send the user to a FORBIDDEN page instead of hanging indefinitely.
 - Trainee Course Sign-Up improvements:
-	- Add support for signing up multiple profiles at once (just a shadcn Checkbox list)
-	- The profile selection should default to just the current profile
+  - Add support for signing up multiple profiles at once (just a shadcn Checkbox list)
+  - The profile selection should default to just the current profile
 
 ## Phase 4
 
 - Build trainee Certificates page using existing certificate pdf generation backend
-	- "View Certificate" on other pages should link here to view the appropriate certificate
-	- In frontend routes.ts: add both "view" and a "download" routes
-	- View route: Display the PDF inside the page with a "Download" button-link above to link to the "download" page
-	- Update trainee sidebar!
+  - "View Certificate" on other pages should link here to view the appropriate certificate
+  - In frontend routes.ts: add both "view" and a "download" routes
+  - View route: Display the PDF inside the page with a "Download" button-link above to link to the "download" page
+  - Update trainee sidebar!
 - Build Admin certificates page
-	- use `useHashString` to actually maintain a list of trainees (separated by '+') as state with source of truth in url query string
-	- Display a DataTable of all trainees that allows adding trainees to the current list of trainees
-	- Display the current list of trainees (firstname, lastname, email) on the side
-	- Add input for email title with appropriate default
-	- Add inputs for optional email CC and BCC
-	- Add text box for message content with appropriate default
-	- Send query to backend, display success or errors
-	- Backend router API call:
-		- Use Promise.all with Array.map to bulk send emails asyncronously and collect any errors
-		- Return any errors
-	- Use a library like nodemailer for email sending, and mock it to do testing
+  - use `useHashString` to actually maintain a list of trainees (separated by '+') as state with source of truth in url query string
+  - Display a DataTable of all trainees that allows adding trainees to the current list of trainees
+  - Display the current list of trainees (firstname, lastname, email) on the side
+  - Add input for email title with appropriate default
+  - Add inputs for optional email CC and BCC
+  - Add text box for message content with appropriate default
+  - Send query to backend, display success or errors
+  - Backend router API call:
+    - Use Promise.all with Array.map to bulk send emails asyncronously and collect any errors
+    - Return any errors
+  - Use a library like nodemailer for email sending, and mock it to do testing
 
 ### Phase 5: Billing & Stripe Integration
 
-Stripe Integration Decisions:
-
 - Use Stripe Invoices API (not Checkout, not raw PaymentIntents)
+- Update .env.example with these environment variables which will be used to implement the feature:`STRIPE_PUBLIC_KEY`, `STRIPE_SECRET`, and `STRIPE_WEBHOOK_SECRET`
 - When a trainee signs up for a course, create a Stripe Invoice immediately (in draft or open state) for that course's fee. The admin can then review, adjust, and finalize it.
-- Local DB additions: stripeCustomerId on account, stripeInvoiceId on reservation
+- Local DB additions: stripeCustomerId on user (better-auth config), stripeInvoiceId on reservation
 - Stripe is the source of truth; query it directly for invoice listings (no local cache for MVP)
 - Status mappings:
-    - "paid by card" → Stripe handles via hosted invoice page
-    - "paid by check" → invoice.pay({ paid_out_of_band: true }) + memo note
-    - "waived" → invoice.pay({ paid_out_of_band: true }) with memo "Waived"
-    - "refunded" → Stripe Refunds API against the charge; add a memo to the invoice
-    - "uncollectible" → invoice.markUncollectible()
-    - "void" → invoice.voidInvoice() (for invoices created in error)
-- Webhooks: implement one endpoint listening to invoice.paid only
-    (to handle the case where a trainee pays via the hosted invoice URL
-     without admin involvement)
-- Webhook test key goes in .env.example as STRIPE_WEBHOOK_SECRET
+  - "paid by card" → Stripe handles via hosted invoice page
+  - "paid by check" → invoice.pay({ paid_out_of_band: true }) + memo note
+  - "waived" → invoice.pay({ paid_out_of_band: true }) with memo "Waived"
+  - "refunded" → Stripe Refunds API against the charge; add a memo to the invoice
+  - "uncollectible" → invoice.markUncollectible()
+  - "void" → invoice.voidInvoice() (for invoices created in error)
+- Webhooks: implement one endpoint listening to invoice.paid only (to handle the case where a trainee pays via the hosted invoice URL without admin involvement)
+  - To setup webhook test environement, run the following command: `stripe listen --forward-to localhost:3000/webhook`
+  - To load the secret, use the --print-secret flag to just get the secret: `export STRIPE_WEBHOOK_SECRET=$(stripe listen --forward-to localhost:3000/webhook --print-secret)`
 
 1. use Skill @stripe-best-practices
 2. Build the trainee Payment Portal and Invoice Viewer
-
-    - Design simple checkout page with embedded payment form
-    - Implement proper validation and error handling
-    - Add success/failure confirmation pages
+   - Design simple checkout page with embedded payment form
+   - Integrated into class registration
+   - Implement proper validation and error handling
+   - Add success/failure confirmation pages
 
 3. Build the Invoices admin page
-
-    - Review unpaid invoices by month
-    - Mark invoices as paid, waived, or refunded
+   - Review unpaid invoices by month
+   - Mark invoices as paid, waived, or refunded
