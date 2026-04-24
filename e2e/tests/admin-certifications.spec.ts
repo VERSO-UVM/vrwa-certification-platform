@@ -8,7 +8,14 @@ async function loginAsAdmin(page: Page) {
   await page.click('button[type="submit"]');
   await page.waitForURL(/.*(profile-selection|admin)/);
   if (page.url().includes("profile-selection")) {
-    await page.getByRole("button", { name: /Alexander Hamilton/i }).click();
+    const profileButton = page.getByRole("button", {
+      name: /Alexander Hamilton/i,
+    });
+    if (await profileButton.isVisible()) {
+      await expect(profileButton).toBeEnabled({ timeout: 10000 });
+      await profileButton.click();
+    }
+    await page.waitForURL(/.*(admin|$)/);
   }
 }
 
@@ -17,7 +24,9 @@ test.describe("Admin Certifications", () => {
     await loginAsAdmin(page);
     await page.goto("/admin/certifications");
 
-    await expect(page.getByText("Certifications")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Certifications" }),
+    ).toBeVisible();
     await expect(page.getByText("Course Session")).toBeVisible();
     await expect(page.getByText("Email Subject")).toBeVisible();
     await expect(page.getByRole("button", { name: "Send Certificates" })).toBeVisible();

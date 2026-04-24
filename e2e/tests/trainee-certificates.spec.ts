@@ -8,7 +8,12 @@ async function loginAsTrainee(page: Page) {
   await page.click('button[type="submit"]');
   await page.waitForURL(/.*(profile-selection|trainee)/);
   if (page.url().includes("profile-selection")) {
-    await page.getByRole("button", { name: /John Doe/i }).click();
+    const profileButton = page.getByRole("button", { name: /John Doe/i });
+    if (await profileButton.isVisible()) {
+      await expect(profileButton).toBeEnabled({ timeout: 10000 });
+      await profileButton.click();
+    }
+    await page.waitForURL(/.*(trainee|$)/);
   }
 }
 
