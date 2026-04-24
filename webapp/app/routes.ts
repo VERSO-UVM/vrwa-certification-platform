@@ -13,15 +13,15 @@ export default [
     route("trainees", "routes/admin/trainees.tsx"),
     route("*", "routes/admin/not-found.tsx"),
     route("course-manager", "routes/admin/courseManager.tsx"),
-    route("course-details/:courseId", "routes/admin/courseDetails.tsx")
+    route("course-details/:courseId", "routes/admin/courseDetails.tsx"),
   ]),
   route("trainee", "routes/trainee/layout.tsx", [
     index("routes/trainee/home.tsx"),
-    route("*", "routes/trainee/not-found.tsx")
+    route("*", "routes/trainee/not-found.tsx"),
   ]),
   route("instructor", "routes/instructor/layout.tsx", [
     index("routes/instructor/home.tsx"),
-    route("*", "routes/instructor/not-found.tsx")
+    route("*", "routes/instructor/not-found.tsx"),
   ]),
   layout("routes/auth/layout.tsx", [
     route("login", "routes/auth/login.tsx"),

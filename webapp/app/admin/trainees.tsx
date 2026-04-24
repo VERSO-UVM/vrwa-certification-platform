@@ -25,11 +25,7 @@ export function TraineeManager() {
     <div className="flex-1">
       <PageHeader>Trainees</PageHeader>
 
-      <DataTable
-        columns={profileTableDef}
-        data={trainees}
-        className="flex-1"
-      />
+      <DataTable columns={profileTableDef} data={trainees} className="flex-1" />
     </div>
   );
 }
