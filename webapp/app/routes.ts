@@ -14,6 +14,7 @@ export default [
     route("trainees", "routes/admin/trainees.tsx"),
     route("users", "routes/admin/users.tsx"),
     route("certifications", "routes/admin/certifications.tsx"),
+    route("invoices", "routes/admin/invoices.tsx"),
     route("*", "routes/admin/not-found.tsx"),
     route("course-manager", "routes/admin/courseManager.tsx"),
     route("course-details/:courseId", "routes/admin/courseDetails.tsx"),

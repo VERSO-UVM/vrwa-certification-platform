@@ -14,6 +14,8 @@ import { course, courseEvent, reservation, profile } from "~/database/schema";
 import { traineeProcedure, router } from "~/utils/trpc";
 import db from "~/database";
 import { z } from "zod";
+import { getOrCreateStripeCustomerId } from "~/utils/stripe-customer";
+import { createAndLinkRegistrationInvoice } from "~/utils/stripe-reservation";
 
 export const traineeRouter = router({
   getMyUpcomingSessions: traineeProcedure.query(async ({ ctx }) => {
@@ -219,6 +221,46 @@ export const traineeRouter = router({
         status: isFull ? "waitlisted" : "registered",
       });
 
+      if (!isFull) {
+        const [courseRow] = await db.client
+          .select()
+          .from(course)
+          .where(eq(course.id, event.courseId));
+        if (!courseRow) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Course not found for this event.",
+          });
+        }
+        try {
+          const stripeCustomerId = await getOrCreateStripeCustomerId(
+            ctx.account.id,
+          );
+          await createAndLinkRegistrationInvoice({
+            profileId: input.profileId,
+            courseEventId: input.courseEventId,
+            priceCents: courseRow.priceCents,
+            courseName: courseRow.courseName,
+            stripeCustomerId,
+          });
+        } catch (err) {
+          await db.client
+            .delete(reservation)
+            .where(
+              and(
+                eq(reservation.profileId, input.profileId),
+                eq(reservation.courseEventId, input.courseEventId),
+              ),
+            );
+          if (err instanceof TRPCError) throw err;
+          const message = err instanceof Error ? err.message : "Billing error";
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message,
+          });
+        }
+      }
+
       return { status: isFull ? "waitlisted" : "registered" };
     }),
 
@@ -288,6 +330,28 @@ export const traineeRouter = router({
         status: "registered" | "waitlisted" | "already_registered";
       }> = [];
 
+      const [courseRow] = await db.client
+        .select()
+        .from(course)
+        .where(eq(course.id, event.courseId));
+
+      if (!courseRow) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Course not found for this event.",
+        });
+      }
+
+      let cachedStripeCustomerId: string | null = null;
+      const getCustomerId = async () => {
+        if (!cachedStripeCustomerId) {
+          cachedStripeCustomerId = await getOrCreateStripeCustomerId(
+            ctx.account.id,
+          );
+        }
+        return cachedStripeCustomerId;
+      };
+
       for (const profileId of uniqueProfileIds) {
         const profileData = ownedProfileMap.get(profileId);
         if (!profileData) continue;
@@ -316,6 +380,35 @@ export const traineeRouter = router({
         existingByProfileId.add(profileId);
         if (status === "registered") {
           registeredCount++;
+        }
+
+        if (status === "registered") {
+          try {
+            const stripeCustomerId = await getCustomerId();
+            await createAndLinkRegistrationInvoice({
+              profileId,
+              courseEventId: input.courseEventId,
+              priceCents: courseRow.priceCents,
+              courseName: courseRow.courseName,
+              stripeCustomerId,
+            });
+          } catch (err) {
+            await db.client
+              .delete(reservation)
+              .where(
+                and(
+                  eq(reservation.profileId, profileId),
+                  eq(reservation.courseEventId, input.courseEventId),
+                ),
+              );
+            if (err instanceof TRPCError) throw err;
+            const message =
+              err instanceof Error ? err.message : "Billing error";
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message,
+            });
+          }
         }
 
         results.push({

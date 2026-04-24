@@ -9,7 +9,7 @@ export type AttendanceRow = {
   firstName: string;
   lastName: string;
   email: string;
-  paymentStatus: "paid" | "unpaid";
+  paymentStatus: string;
   creditHours: string;
   attendanceMarkedAt: Date | string | null;
   defaultCreditHours: number;
@@ -33,7 +33,12 @@ export function makeAttendanceDefs(options: {
     attendanceFieldHelper.accessor("email", { header: "Email" }),
     attendanceFieldHelper.accessor("paymentStatus", {
       header: "Payment",
-      cell: ({ getValue }) => (getValue() === "paid" ? "Paid" : "Unpaid"),
+      cell: ({ getValue }) => {
+        const v = getValue();
+        if (v === "paid") return "Paid";
+        if (v === "unpaid") return "Unpaid";
+        return v;
+      },
     }),
     attendanceFieldHelper.display({
       id: "creditHours",

@@ -73,6 +73,9 @@ export type CourseEvent = typeof courseEvent.$inferSelect;
 export const Status = {
   Paid: "paid",
   Unpaid: "unpaid",
+  Refunded: "refunded",
+  Void: "void",
+  Uncollectible: "uncollectible",
 } as const;
 
 export type PaymentStatus = (typeof Status)[keyof typeof Status];
@@ -95,6 +98,7 @@ export const reservation = pgTable(
       .$type<ReservationStatus>()
       .default("registered"),
     attendanceMarkedAt: timestamp("attendanceMarkedAt"),
+    stripeInvoiceId: varchar("stripe_invoice_id"),
     createdAt: timestamp().defaultNow().notNull(),
   },
   (table) => [

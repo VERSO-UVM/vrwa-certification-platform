@@ -173,7 +173,13 @@ export const courseManagerRouter = router({
         profileId: z.string(),
         courseEventId: z.string(),
         creditHours: z.number().positive(),
-        paymentStatus: z.enum(["paid", "unpaid"]),
+        paymentStatus: z.enum([
+          "paid",
+          "unpaid",
+          "refunded",
+          "void",
+          "uncollectible",
+        ]),
       }),
     )
     .mutation(async ({ input }) => {

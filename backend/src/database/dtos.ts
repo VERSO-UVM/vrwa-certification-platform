@@ -25,3 +25,29 @@ export type UserDto = Pick<
   User,
   "id" | "email" | "name" | "role" | "createdAt"
 >;
+
+/** Stripe invoice summary for list UIs (no full Stripe type on the client). */
+export type InvoiceDto = {
+  id: string;
+  status: string | null;
+  amountDue: number;
+  amountPaid: number;
+  currency: string;
+  dueDate: number | null;
+  /** Hosted payment page; null e.g. for void invoices. */
+  hostedInvoiceUrl: string | null;
+  customerName: string | null;
+  customerEmail: string | null;
+  courseName: string | null;
+  profileId: string | null;
+  courseEventId: string | null;
+  created: number;
+};
+
+export type InvoiceDetailDto = InvoiceDto & {
+  lines: Array<{
+    description: string | null;
+    amount: number;
+    currency: string;
+  }>;
+};

@@ -32,6 +32,14 @@ export const reservationDefs = {
           return <Badge variant="outline">Paid</Badge>;
         case PaymentStatus.Unpaid:
           return <Badge variant="default">Unpaid</Badge>;
+        case PaymentStatus.Refunded:
+          return <Badge variant="secondary">Refunded</Badge>;
+        case PaymentStatus.Void:
+          return <Badge variant="secondary">Void</Badge>;
+        case PaymentStatus.Uncollectible:
+          return <Badge variant="secondary">Uncollectible</Badge>;
+        default:
+          return <Badge variant="secondary">{String(getValue())}</Badge>;
       }
     },
     meta: {
@@ -39,6 +47,9 @@ export const reservationDefs = {
         options: [
           { label: "Paid", value: PaymentStatus.Paid },
           { label: "Unpaid", value: PaymentStatus.Unpaid },
+          { label: "Refunded", value: PaymentStatus.Refunded },
+          { label: "Void", value: PaymentStatus.Void },
+          { label: "Uncollectible", value: PaymentStatus.Uncollectible },
         ],
       }),
     },

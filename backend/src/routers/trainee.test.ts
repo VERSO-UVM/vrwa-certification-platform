@@ -57,6 +57,7 @@ let profileId = "";
 let pastEventId = "";
 
 beforeAll(async () => {
+  process.env.STRIPE_BYPASS_INVOICES = "1";
   caller = appRouter.createCaller(
     await getContextForEmail("example1@gmail.com"),
   );

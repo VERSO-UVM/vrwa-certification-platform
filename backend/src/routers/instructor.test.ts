@@ -1,7 +1,7 @@
 import { beforeAll, expect, test } from "bun:test";
 import { desc, eq } from "drizzle-orm";
 import db from "~/database";
-import { session, user } from "~/database/schema";
+import { courseEvent, profile, reservation, session, user } from "~/database/schema";
 import { appRouter } from "~/trpc";
 import { generatePrefixedId } from "~/utils/id";
 
@@ -55,23 +55,49 @@ let seededEventId = "";
 let seededProfileId = "";
 
 beforeAll(async () => {
-  instructorCaller = appRouter.createCaller(
-    await getContextForEmail("example2@gmail.com"),
-  );
+  const instructorCtx = await getContextForEmail("example2@gmail.com");
+  instructorCaller = appRouter.createCaller(instructorCtx);
   traineeCaller = appRouter.createCaller(
     await getContextForEmail("example1@gmail.com"),
   );
+  const [taught] = await db.client
+    .select()
+    .from(courseEvent)
+    .where(eq(courseEvent.instructorId, instructorCtx.account.id));
+  if (!taught) {
+    throw new Error("Missing seeded course event for instructor");
+  }
   const roster = await instructorCaller.instructor.getEventRoster({
-    courseEventId: "lecture_b7558486c6e97e9c",
+    courseEventId: taught.id,
   });
   if (roster.length > 0) {
     const first = roster[0];
     if (!first) throw new Error("Missing seeded roster row");
     seededEventId = first.courseEventId;
     seededProfileId = first.profileId;
+  } else {
+    seededEventId = taught.id;
+    const [res] = await db.client
+      .select({ profileId: reservation.profileId })
+      .from(reservation)
+      .where(eq(reservation.courseEventId, taught.id));
+    if (res) {
+      seededProfileId = res.profileId;
+    } else {
+      const [anyProfile] = await db.client.select().from(profile).limit(1);
+      if (!anyProfile) throw new Error("No profiles in database");
+      await db.client.insert(reservation).values({
+        profileId: anyProfile.id,
+        courseEventId: taught.id,
+        creditHours: "0",
+        paymentStatus: "unpaid",
+        status: "registered",
+      });
+      seededProfileId = anyProfile.id;
+    }
   }
   if (!seededEventId || !seededProfileId) {
-    throw new Error("Missing seeded instructor roster data");
+    throw new Error("Missing seeded instructor event or profile");
   }
 });
 

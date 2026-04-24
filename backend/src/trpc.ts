@@ -10,6 +10,7 @@ import { profileRouter } from "./routers/profile";
 import { instructorRouter } from "./routers/instructor";
 
 import { traineeRouter } from "./routers/trainee";
+import { invoiceRouter } from "./routers/invoice";
 
 export const appRouter = router({
   authRouter,
@@ -21,6 +22,7 @@ export const appRouter = router({
   courseManagerRouter,
   instructor: instructorRouter,
   trainee: traineeRouter,
+  invoice: invoiceRouter,
 });
 
 // Export type router type signature,
