@@ -72,9 +72,14 @@
       "computedHash": "873c67922d80775a9fdf596db7964b579f0408c30ec6e3d11989f6055bbec89f"
     },
     "stripe-best-practices": {
-      "source": "stripe/ai",
-      "sourceType": "github",
-      "computedHash": "ae5889d45a1e29668b672290ca8d3d833fa30ff0634be85c30918ca0385dd1c6"
+      "source": "docs.stripe.com",
+      "sourceType": "well-known",
+      "computedHash": "f0aac866fab408c8bf28f3acacbbf61539cea81b3aeb030fceb64be1ccddaf9e"
+    },
+    "stripe-projects": {
+      "source": "docs.stripe.com",
+      "sourceType": "well-known",
+      "computedHash": "74b5f9e1e24d7662000c28d6572e438ac71847d60ea0a8704b088441355e3371"
     },
     "subscriptions": {
       "source": "trpc/trpc",
@@ -95,6 +100,11 @@
       "source": "trpc/trpc",
       "sourceType": "github",
       "computedHash": "dd22c754d042bbc48826d7289463e5cfc40725899c576e25bf9766706a4b2850"
+    },
+    "upgrade-stripe": {
+      "source": "docs.stripe.com",
+      "sourceType": "well-known",
+      "computedHash": "df1c52c17aff54490e81e98979f302564988fbddaaf59e74c2d1bd4b103a7d2e"
     },
     "validators": {
       "source": "trpc/trpc",
