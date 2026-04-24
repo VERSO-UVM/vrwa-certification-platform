@@ -6,12 +6,7 @@ import {
   FormMessage,
   FormSubmit,
 } from "@radix-ui/react-form";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "~/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import { Calendar } from "~/components/ui/calendar";
 import { Button } from "~/components/ui/button";
@@ -30,20 +25,36 @@ import {
 
 function useCourses() {
   const trpc = useTRPC();
-  return useQuery<Course[]>(trpc.courseManagerRouter.getCourses.queryOptions());
+  return useQuery(trpc.courseManagerRouter.getCourses.queryOptions());
 }
 
-export function NewCourseEventForm({ onCreate }) {
+export function CourseEventForm({ onCreate, event }) {
   const courses = useCourses();
 
-  const [values, setValues] = useState({
-    courseId: "",
-    locationType: "in-person",
-    seats: 0,
-    physicalAddress: "",
-    virtualLink: "",
-    date: new Date(),
-    time: "12:00",
+  const [values, setValues] = useState(() => {
+    if (!event) {
+      return {
+        courseId: "",
+        locationType: "in-person",
+        seats: 0,
+        physicalAddress: "",
+        virtualLink: "",
+        date: new Date(),
+        time: "12:00",
+      };
+    } else {
+      const date = new Date(event.classStartDatetime);
+
+      return {
+        courseId: event.courseId,
+        locationType: event.locationType,
+        seats: event.seats,
+        physicalAddress: event.physicalAddress ?? "",
+        virtualLink: event.virtualLink ?? "",
+        date: date,
+        time: format(date, "HH:mm"),
+      };
+    }
   });
 
   function combineDateAndTime(date: Date, time: string) {
@@ -81,6 +92,7 @@ export function NewCourseEventForm({ onCreate }) {
             required
             value={values.courseId}
             onValueChange={(v) => setValues({ ...values, courseId: v })}
+            defaultValue={values.courseId}
           >
             <SelectTrigger id="courses" className="w-full max-w-48">
               <SelectValue placeholder="Select a Class" />
@@ -159,11 +171,13 @@ export function NewCourseEventForm({ onCreate }) {
         </Field>
         <Field>
           <FieldLabel htmlFor="date">
+            {" "}
             Date <span className="text-destructive">*</span>
           </FieldLabel>
           <Calendar
             id="date"
             mode="single"
+            defaultMonth={values.date}
             selected={values.date}
             onSelect={(d) => d && setValues({ ...values, date: d })}
             className="rounded-md border"
@@ -184,7 +198,7 @@ export function NewCourseEventForm({ onCreate }) {
         <Field orientation="horizontal">
           <Button type="submit" className="w-full">
             {" "}
-            Create Course Event{" "}
+            {event ? "Update Course Event" : "Create Course Event"}{" "}
           </Button>
         </Field>
       </FieldGroup>
