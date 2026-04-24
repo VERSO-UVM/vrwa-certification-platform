@@ -80,7 +80,7 @@ export function UserSidebar() {
               <SidebarMenuButton asChild>
                 <Link to="/trainee/certificates">
                   <Trophy className="mr-2 h-4 w-4" />
-                  Member Portal
+                  Certificates
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

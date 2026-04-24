@@ -90,7 +90,7 @@ export function AdminDashboard() {
               className="justify-start h-auto py-3 px-2"
               asChild
             >
-              <Link to="">
+              <Link to="/admin/certifications">
                 <Trophy className="mr-2 h-4 w-4" /> Send out certificates
               </Link>
             </Button>

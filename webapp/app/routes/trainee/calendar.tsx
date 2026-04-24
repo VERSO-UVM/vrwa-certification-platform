@@ -145,7 +145,9 @@ export default function CalendarPage() {
                       </div>
                     </div>
                     <Button asChild variant="outline" size="sm">
-                      <Link to={`/trainee/certificates?event=${session.id}`}>
+                      <Link
+                        to={`/trainee/certificates/view?profileId=${session.profileId}&eventId=${session.id}`}
+                      >
                         View Certificate
                       </Link>
                     </Button>

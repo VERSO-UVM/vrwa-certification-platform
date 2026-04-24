@@ -1,5 +1,15 @@
 import { TRPCError } from "@trpc/server";
-import { asc, eq, getTableColumns, gt, lt, and, count, sql } from "drizzle-orm";
+import {
+  asc,
+  eq,
+  getTableColumns,
+  gt,
+  lt,
+  and,
+  count,
+  sql,
+  isNotNull,
+} from "drizzle-orm";
 import { course, courseEvent, reservation, profile } from "~/database/schema";
 import { traineeProcedure, router } from "~/utils/trpc";
 import db from "~/database";
@@ -49,6 +59,7 @@ export const traineeRouter = router({
     return db.client
       .select({
         ...getTableColumns(courseEvent),
+        profileId: reservation.profileId,
         courseName: course.courseName,
         creditHours: reservation.creditHours,
         profileName: profile.firstName,
@@ -61,6 +72,30 @@ export const traineeRouter = router({
         and(
           eq(profile.accountId, ctx.account.id),
           lt(courseEvent.classStartDatetime, new Date()),
+        ),
+      )
+      .orderBy(asc(courseEvent.classStartDatetime));
+  }),
+
+  getMyCompletedCourses: traineeProcedure.query(async ({ ctx }) => {
+    return db.client
+      .select({
+        profileId: reservation.profileId,
+        courseEventId: reservation.courseEventId,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        courseName: course.courseName,
+        classStartDatetime: courseEvent.classStartDatetime,
+        creditHours: reservation.creditHours,
+      })
+      .from(reservation)
+      .innerJoin(profile, eq(reservation.profileId, profile.id))
+      .innerJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
+      .innerJoin(course, eq(courseEvent.courseId, course.id))
+      .where(
+        and(
+          eq(profile.accountId, ctx.account.id),
+          isNotNull(reservation.attendanceMarkedAt),
         ),
       )
       .orderBy(asc(courseEvent.classStartDatetime));

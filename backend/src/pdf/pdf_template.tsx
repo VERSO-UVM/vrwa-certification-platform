@@ -8,6 +8,8 @@ import {
   Image,
   Font,
 } from "@react-pdf/renderer";
+import fs from "node:fs";
+import path from "node:path";
 
 //register title font
 Font.register({
@@ -49,6 +51,12 @@ const styles = StyleSheet.create({
   },
 });
 
+const sealImagePath = path.resolve(
+  process.cwd(),
+  "src/pdf/completion_seal.png",
+);
+const hasSealImage = fs.existsSync(sealImagePath);
+
 // Create props for user specfific information
 interface CertificateDocumentProps {
   name?: string;
@@ -75,9 +83,11 @@ const CertificateDocument: React.FC<CertificateDocumentProps> = ({
           has successfully completed {course} training.
         </Text>
         <Text style={styles.text}>Date: {date}</Text>
-        <View style={styles.imageContainer}>
-          <Image style={styles.image} src="completion_seal.png" />
-        </View>
+        {hasSealImage ? (
+          <View style={styles.imageContainer}>
+            <Image style={styles.image} src={sealImagePath} />
+          </View>
+        ) : null}
       </View>
     </Page>
   </Document>
