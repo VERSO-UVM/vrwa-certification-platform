@@ -48,6 +48,38 @@
                 "city": "Burlington", "state": "VT", "postalCode": "05405", "phoneNumber": "222-222-2222",
                 "isMember": true}
             ]
+        },
+        {
+            "email": "example3@gmail.com",
+            "password" : "password3",
+            "role" : "user",
+            "profiles": [
+                {"firstName": "Maria", "lastName": "Garcia", "address": "100 Maple Street",
+                "city": "Burlington", "state": "VT", "postalCode": "05401", "phoneNumber": "802-555-0101",
+                "isMember": true},
+                {"firstName": "Luis", "lastName": "Garcia", "address": "100 Maple Street",
+                "city": "Burlington", "state": "VT", "postalCode": "05401", "phoneNumber": "802-555-0102",
+                "isMember": false},
+                {"firstName": "Sofia", "lastName": "Garcia", "address": "100 Maple Street",
+                "city": "Burlington", "state": "VT", "postalCode": "05401", "phoneNumber": "802-555-0103",
+                "isMember": true}
+            ]
+        },
+        {
+            "email": "example4@gmail.com",
+            "password" : "password4",
+            "role" : "user",
+            "profiles": [
+                {"firstName": "James", "lastName": "Smith", "address": "42 Oak Lane",
+                "city": "Montpelier", "state": "VT", "postalCode": "05602", "phoneNumber": "802-555-0201",
+                "isMember": false},
+                {"firstName": "Emily", "lastName": "Smith", "address": "42 Oak Lane",
+                "city": "Montpelier", "state": "VT", "postalCode": "05602", "phoneNumber": "802-555-0202",
+                "isMember": true},
+                {"firstName": "Robert", "lastName": "Smith", "address": "42 Oak Lane",
+                "city": "Montpelier", "state": "VT", "postalCode": "05602", "phoneNumber": "802-555-0203",
+                "isMember": false}
+            ]
         }
     ],
 
@@ -63,6 +95,24 @@
             "description": "Complex Water Systems and How to Clean Them",
             "creditHours": 2,
             "priceCents": 7500
+        },
+        {
+            "courseName": "Wastewater Microbiology",
+            "description": "Applied microbiology for wastewater treatment operations.",
+            "creditHours": 4,
+            "priceCents": 12000
+        },
+        {
+            "courseName": "First Aid",
+            "description": "Safety and first aid fundamentals for treatment operators.",
+            "creditHours": 3,
+            "priceCents": 5000
+        },
+        {
+            "courseName": "Water Bending",
+            "description": "Advanced water flow and system control concepts.",
+            "creditHours": 6,
+            "priceCents": 15000
         }
 
     ]

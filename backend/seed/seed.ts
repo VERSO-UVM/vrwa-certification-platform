@@ -119,7 +119,7 @@ async function main() {
   }
 
   //create course events
-  const courseEventIds : string[] = [];
+  const courseEvents: Array<{ id: string; isPast: boolean }> = [];
   const locations: CourseLocation[] = ['in-person', 'virtual', 'hybrid'];
   const now = new Date();
   let num = 1;
@@ -145,39 +145,40 @@ async function main() {
         instructorId: instructorUserId,
       })
       .returning();
-      courseEventIds.push(pastEvent!.id)
+    courseEvents.push({ id: pastEvent!.id, isPast: true });
 
-    //future event
-    const theFuture = new Date(now);
-    theFuture.setMonth(now.getMonth() + num);
+    // future events (3 per course)
+    for (let futureOffset = 1; futureOffset <= 3; futureOffset++) {
+      const futureLocation = locations[(num + futureOffset) % locations.length]!;
+      const theFuture = new Date(now);
+      theFuture.setMonth(now.getMonth() + num + futureOffset);
 
-    const [futureEvent] = await db.client
-      .insert(db.schema.courseEvent)
-      .values({
-        courseId,
-        locationType: locations[num % locations.length]!,
-        virtualLink: locations[num % locations.length] !== 'in-person'
-          ? 'www.zoom.com'
-          : null,
-        physicalAddress: locations[num % locations.length] !== 'virtual'
-          ? '67 Address Road'
-          : null,
-        seats: Math.trunc(profileIds.length / 2),
-        classStartDatetime: theFuture,
-        instructorId: instructorUserId,
-      })
-      .returning()  
-      courseEventIds.push(futureEvent!.id);
-      num++;  
+      const [futureEvent] = await db.client
+        .insert(db.schema.courseEvent)
+        .values({
+          courseId,
+          locationType: futureLocation,
+          virtualLink: futureLocation !== 'in-person' ? 'www.zoom.com' : null,
+          physicalAddress: futureLocation !== 'virtual' ? '67 Address Road' : null,
+          seats: Math.trunc(profileIds.length / 2),
+          classStartDatetime: theFuture,
+          instructorId: instructorUserId,
+        })
+        .returning();
+      courseEvents.push({ id: futureEvent!.id, isPast: false });
+    }
+    num++;
   }
 
-  console.log(`Created ${courseIds.length * 2} course events!`)
+  console.log(`Created ${courseEvents.length} course events!`)
 
   //create reservations + link to profiles 
   console.log(`Creating reservations...`)
   // ensure trainee has at least one upcoming session
   const traineeProfileId = profileIds[0]!;
-  const upcomingEventIds = courseEventIds.filter((_, i) => i % 2 === 1);
+  const upcomingEventIds = courseEvents
+    .filter((event) => !event.isPast)
+    .map((event) => event.id);
   
   for (const eventId of upcomingEventIds) {
     await db.client
@@ -193,8 +194,8 @@ async function main() {
   }
 
   // Create some more reservations for other profiles
-  for (let i = 0; i < courseEventIds.length; i++){
-    const courseEventId = courseEventIds[i]!;
+  for (let i = 0; i < courseEvents.length; i++){
+    const courseEventId = courseEvents[i]!.id;
     const profileId = profileIds[(i + 1) % profileIds.length]!; // shift to avoid duplicate with trainee's upcoming
 
     // Skip if already exists (drizzle will throw on primary key conflict)

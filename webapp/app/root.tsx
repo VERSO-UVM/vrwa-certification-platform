@@ -6,9 +6,18 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  MutationCache,
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { createTRPCClient, httpBatchStreamLink } from "@trpc/client";
+import {
+  TRPCClientError,
+  createTRPCClient,
+  httpBatchStreamLink,
+} from "@trpc/client";
 import { useState } from "react";
 
 import "./app.css";
@@ -30,6 +39,16 @@ export const links: Route.LinksFunction = () => [
 ];
 
 function makeQueryClient() {
+  const handleTRPCError = (error: Error) => {
+    if (
+      typeof window !== "undefined" &&
+      error instanceof TRPCClientError &&
+      error.data?.code === "FORBIDDEN"
+    ) {
+      window.location.href = "/forbidden";
+    }
+  };
+
   return new QueryClient({
     defaultOptions: {
       queries: {
@@ -38,6 +57,12 @@ function makeQueryClient() {
         staleTime: 60 * 1000,
       },
     },
+    queryCache: new QueryCache({
+      onError: handleTRPCError,
+    }),
+    mutationCache: new MutationCache({
+      onError: handleTRPCError,
+    }),
   });
 }
 

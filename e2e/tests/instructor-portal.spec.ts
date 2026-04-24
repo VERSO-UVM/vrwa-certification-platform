@@ -21,9 +21,10 @@ test.describe('Instructor Portal', () => {
     const courseCard = page.locator('div.grid > div.flex-col').first();
     await expect(courseCard).toBeVisible();
 
-    // Click "Print Attendance"
-    const printButton = courseCard.getByRole('link', { name: /Print Attendance|Manage Attendance/ }).first();
+    // Button group actions should render inside the card
+    const printButton = courseCard.getByRole('link', { name: 'Print' });
     await expect(printButton).toBeVisible();
+    await expect(courseCard.getByRole('link', { name: 'Attendance' })).toBeVisible();
     await printButton.click();
 
     // Should be on attendance page

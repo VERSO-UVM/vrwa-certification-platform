@@ -28,11 +28,10 @@ test.describe('Trainee Portal', () => {
     await page.getByRole('link', { name: 'Course Sign-up' }).click();
     await expect(page).toHaveURL(/.*signup/);
 
-    // Select profile
-    await page.click('button:has-text("Choose a profile...")');
-    const johnDoeProfile = page.getByRole('option', { name: 'John Doe' });
-    await expect(johnDoeProfile).toBeVisible();
-    await johnDoeProfile.click();
+    // Ensure at least one profile is selected
+    const selectedCountText = page.getByText(/selected$/).first();
+    await expect(selectedCountText).toBeVisible();
+    await expect(selectedCountText).toContainText("1 selected");
 
     // Register for the first course
     const sessionCard = page.locator('div.grid > div.flex-col').first();

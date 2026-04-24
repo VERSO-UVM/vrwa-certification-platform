@@ -2,6 +2,7 @@ import { PageHeader } from "~/components/page-header";
 import { useTRPC } from "~/utils/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
+import { ButtonGroup } from "~/components/ui/button-group";
 import { Calendar, MapPin, Users, Printer, ClipboardCheck } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "react-router";
@@ -46,19 +47,26 @@ export function InstructorHome() {
                 </div>
               </div>
 
-              <div className="pt-4 flex gap-2">
-                <Button size="sm" className="w-full" asChild>
-                  <Link to={`/instructor/attendance/${course.id}?view=table`}>
-                    <ClipboardCheck className="mr-2 h-4 w-4" />
-                    Manage Attendance
-                  </Link>
-                </Button>
-                <Button variant="outline" size="sm" className="w-full" asChild>
-                  <Link to={`/instructor/attendance/${course.id}?view=print`}>
-                    <Printer className="mr-2 h-4 w-4" />
-                    Print Attendance
-                  </Link>
-                </Button>
+              <div className="pt-4">
+                <ButtonGroup className="w-full">
+                  <Button size="sm" className="flex-1" asChild>
+                    <Link to={`/instructor/attendance/${course.id}?view=table`}>
+                      <ClipboardCheck className="mr-2 h-4 w-4" />
+                      Attendance
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    asChild
+                  >
+                    <Link to={`/instructor/attendance/${course.id}?view=print`}>
+                      <Printer className="mr-2 h-4 w-4" />
+                      Print
+                    </Link>
+                  </Button>
+                </ButtonGroup>
               </div>
             </CardContent>
           </Card>

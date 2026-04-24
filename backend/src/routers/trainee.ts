@@ -112,8 +112,7 @@ export const traineeRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      // 1. Verify profile belongs to account
-      const [p] = await db.client
+      const [ownedProfile] = await db.client
         .select()
         .from(profile)
         .where(
@@ -123,7 +122,7 @@ export const traineeRouter = router({
           ),
         );
 
-      if (!p)
+      if (!ownedProfile)
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Invalid profile.",
@@ -146,7 +145,6 @@ export const traineeRouter = router({
           message: "Already registered for this session.",
         });
 
-      // 3. Check event capacity
       const [event] = await db.client
         .select()
         .from(courseEvent)
@@ -164,7 +162,7 @@ export const traineeRouter = router({
         });
       }
 
-      const reservations = await db.client
+      const existingRegisteredCount = await db.client
         .select()
         .from(reservation)
         .where(
@@ -174,7 +172,8 @@ export const traineeRouter = router({
           ),
         );
 
-      const isFull = event.seats !== null && reservations.length >= event.seats;
+      const isFull =
+        event.seats !== null && existingRegisteredCount.length >= event.seats;
 
       // 4. Create reservation
       await db.client.insert(reservation).values({
@@ -186,5 +185,111 @@ export const traineeRouter = router({
       });
 
       return { status: isFull ? "waitlisted" : "registered" };
+    }),
+
+  registerMultipleForSession: traineeProcedure
+    .input(
+      z.object({
+        profileIds: z.array(z.string()).min(1),
+        courseEventId: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const uniqueProfileIds = Array.from(new Set(input.profileIds));
+      const ownedProfiles = await db.client
+        .select({
+          id: profile.id,
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+        })
+        .from(profile)
+        .where(eq(profile.accountId, ctx.account.id));
+      const ownedProfileMap = new Map(ownedProfiles.map((p) => [p.id, p]));
+
+      const hasInvalidProfile = uniqueProfileIds.some(
+        (profileId) => !ownedProfileMap.has(profileId),
+      );
+      if (hasInvalidProfile) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "One or more selected profiles are invalid.",
+        });
+      }
+
+      const [event] = await db.client
+        .select()
+        .from(courseEvent)
+        .where(eq(courseEvent.id, input.courseEventId));
+
+      if (!event) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Event not found.",
+        });
+      }
+
+      if (event.classStartDatetime && event.classStartDatetime < new Date()) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Cannot register for a past session",
+        });
+      }
+
+      const existingReservations = await db.client
+        .select()
+        .from(reservation)
+        .where(eq(reservation.courseEventId, input.courseEventId));
+
+      const existingByProfileId = new Set(
+        existingReservations.map((r) => r.profileId),
+      );
+      let registeredCount = existingReservations.filter(
+        (r) => r.status === "registered",
+      ).length;
+
+      const results: Array<{
+        profileId: string;
+        profileName: string;
+        status: "registered" | "waitlisted" | "already_registered";
+      }> = [];
+
+      for (const profileId of uniqueProfileIds) {
+        const profileData = ownedProfileMap.get(profileId);
+        if (!profileData) continue;
+
+        if (existingByProfileId.has(profileId)) {
+          results.push({
+            profileId,
+            profileName: `${profileData.firstName} ${profileData.lastName}`,
+            status: "already_registered",
+          });
+          continue;
+        }
+
+        const shouldWaitlist =
+          event.seats !== null && registeredCount >= event.seats;
+        const status = shouldWaitlist ? "waitlisted" : "registered";
+
+        await db.client.insert(reservation).values({
+          profileId,
+          courseEventId: input.courseEventId,
+          creditHours: "0",
+          paymentStatus: "unpaid",
+          status,
+        });
+
+        existingByProfileId.add(profileId);
+        if (status === "registered") {
+          registeredCount++;
+        }
+
+        results.push({
+          profileId,
+          profileName: `${profileData.firstName} ${profileData.lastName}`,
+          status,
+        });
+      }
+
+      return { results };
     }),
 });

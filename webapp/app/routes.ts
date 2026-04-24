@@ -8,6 +8,7 @@ import { redirect } from "react-router";
 
 export default [
   index("routes/home.tsx"),
+  route("forbidden", "routes/forbidden.tsx"),
   route("admin", "routes/admin/layout.tsx", [
     index("routes/admin/dashboard.tsx"),
     route("trainees", "routes/admin/trainees.tsx"),
