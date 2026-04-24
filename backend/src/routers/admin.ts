@@ -1,8 +1,6 @@
 import { asc, eq, getTableColumns } from "drizzle-orm";
-import z from "zod";
 
 import db from "~/database";
-import type { CourseEventDto, ReservationDto } from "~/database/dtos";
 import {
   account,
   course,
@@ -13,7 +11,6 @@ import {
 } from "~/database/schema";
 import type { Profile } from "~/database/schema";
 import { basicProcedure, router } from "~/utils/trpc";
-import { reservationDtoSelect } from "./reservation";
 
 // IMPORTANT: change basicProcedure to protectedProcedure
 // once auth is fully implemented (before shipping).
@@ -33,33 +30,34 @@ export const adminRouter = router({
       .where(eq(account.role, Roles.Trainee));
   }),
 
-  getCourseEvents: adminProcedure.query((): Promise<CourseEventDto[]> => {
+  getCourseEvents: adminProcedure.query(() => {
     return db.client
       .select({
         ...getTableColumns(courseEvent),
         courseName: course.courseName,
-        description: course.description,
-        creditHours: course.creditHours,
-        priceCents: course.priceCents,
+        courseDescription: course.description,
+        courseCreditHours: course.creditHours,
+        coursePrice: course.priceCents,
       })
       .from(courseEvent)
       .orderBy(asc(courseEvent.classStartDatetime))
-      .innerJoin(course, eq(courseEvent.courseId, course.id));
+      .leftJoin(course, eq(courseEvent.courseId, course.id));
   }),
 
-  getReservations: adminProcedure.query(
-    reservationDtoSelect as () => Promise<ReservationDto[]>,
-  ),
-
-  getTraineeReservations: adminProcedure
-    .input(
-      z.object({
-        profileId: z.string(),
-      }),
-    )
-    .query(({ input }): Promise<ReservationDto[]> => {
-      return reservationDtoSelect().where(
-        eq(reservation.profileId, input.profileId),
-      );
-    }),
+  getReservations: adminProcedure.query(() => {
+    return db.client
+      .select({
+        creditHours: reservation.creditHours,
+        paymentStatus: reservation.paymentStatus,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        isMember: profile.isMember,
+        classStartDateTime: courseEvent.classStartDatetime,
+        courseName: course.courseName,
+      })
+      .from(reservation)
+      .leftJoin(profile, eq(reservation.profileId, profile.id))
+      .leftJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
+      .leftJoin(course, eq(course.id, courseEvent.courseId));
+  }),
 });

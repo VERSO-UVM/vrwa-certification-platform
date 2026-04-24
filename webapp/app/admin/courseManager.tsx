@@ -12,13 +12,6 @@ import {
   CardHeader,
   CardDescription,
 } from "~/components/ui/card";
-import {
-  Card,
-  CardContent,
-  CardTitle,
-  CardHeader,
-  CardDescription,
-} from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { ButtonGroup } from "~/components/ui/button-group";
 import { DataTable } from "~/components/ui/data-table";
@@ -66,8 +59,6 @@ export function CourseManager() {
   }
 
   const columnsCourseEvents: ColumnDef<CourseEvent>[] = [
-    {
-      accessorKey: "courseName",
     {
       accessorKey: "courseName",
       header: "Course",
@@ -142,15 +133,9 @@ export function CourseManager() {
     return (courseEvents.data ?? []).filter(
       (event) => event.courseId === courseId,
     ).length;
-      (event) => event.courseId === courseId,
-    ).length;
   }
 
   const columnsCourses: ColumnDef<CourseEvent>[] = [
-    {
-      accessorKey: "courseName",
-      header: "Course",
-      cell: ({ row, getValue }) => (
     {
       accessorKey: "courseName",
       header: "Course",
@@ -159,10 +144,8 @@ export function CourseManager() {
           {getValue() as string}
         </Link>
       ),
-      ),
     },
     {
-      accessorKey: "description",
       accessorKey: "description",
       header: "Class Description",
       meta: {
@@ -177,12 +160,10 @@ export function CourseManager() {
       accessorKey: "priceCents",
       header: "Tuition Fee",
       cell: ({ getValue }) => `$${(Number(getValue()) / 100).toFixed(2)}`,
-      cell: ({ getValue }) => `$${(Number(getValue()) / 100).toFixed(2)}`,
     },
     {
       accessorKey: "id",
       header: "Upcoming Classes",
-      cell: ({ row }) => getNumberOfClasses(row.original.id),
       cell: ({ row }) => getNumberOfClasses(row.original.id),
     },
   ];
@@ -192,7 +173,6 @@ export function CourseManager() {
   const [selectedEvent, setSelectedEvent] = useState<CourseEvent | null>(null);
   return (
     <div className="flex-1">
-    <div className="flex-1">
       <PageHeader>Course Manager</PageHeader>
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
         <Card className="@xl:col-span-8">
@@ -201,15 +181,8 @@ export function CourseManager() {
             <CardDescription>
               Quickly edit or remove existing course events.
             </CardDescription>
-            <CardDescription>
-              Quickly edit or remove existing course events.
-            </CardDescription>
           </CardHeader>
           <CardContent>
-            <DataTable
-              columns={columnsCourseEvents}
-              data={courseEvents.data ?? []}
-            />
             <DataTable
               columns={columnsCourseEvents}
               data={courseEvents.data ?? []}
@@ -276,24 +249,17 @@ export function CourseManager() {
             <CardDescription>
               Click on a course to see more details!
             </CardDescription>
-            <CardDescription>
-              Click on a course to see more details!
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <DataTable columns={columnsCourses} data={courses.data ?? []} />
           </CardContent>
           <div className="flex justify-end mb-4 pr-4">
             <Drawer
-            <Drawer
               direction="right"
               open={courseDrawerOpen}
               onOpenChange={setCourseDrawerOpen}
             >
               <DrawerTrigger asChild>
-                <Button variant="secondary" size="lg">
-                  + Create New Course{" "}
-                </Button>
                 <Button variant="secondary" size="lg">
                   + Create New Course{" "}
                 </Button>

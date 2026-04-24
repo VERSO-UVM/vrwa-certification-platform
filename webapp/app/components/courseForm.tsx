@@ -7,22 +7,6 @@ import {
   FormSubmit,
 } from "@radix-ui/react-form";
 import {
-  Form,
-  FormControl,
-  FormMessage,
-  FormSubmit,
-} from "@radix-ui/react-form";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "~/components/ui/field";
-import { Input } from "~/components/ui/input";
-import { Calendar } from "~/components/ui/calendar";
-import { Button } from "~/components/ui/button";
-import { format } from "date-fns";
-import type { Course } from "@backend/database/schema";
   Field,
   FieldDescription,
   FieldGroup,
@@ -35,16 +19,6 @@ import { format } from "date-fns";
 import type { Course } from "@backend/database/schema";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectLabel,
-} from "~/components/ui/select";
-import { Textarea } from "./ui/textarea";
-
   Select,
   SelectContent,
   SelectGroup,
@@ -95,16 +69,7 @@ export function NewCourseForm({ onCreate, course }) {
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
 
-    onCreate({
-      courseName: values.courseName.trim(),
-      description: values.description.trim() || null,
-      creditHours: values.creditHours,
-      priceCents: textToDollars(values.price),
-    });
-  }
     onCreate({
       courseName: values.courseName.trim(),
       description: values.description.trim() || null,
@@ -175,4 +140,3 @@ export function NewCourseForm({ onCreate, course }) {
     </Form>
   );
 }
-
