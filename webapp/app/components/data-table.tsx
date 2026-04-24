@@ -10,17 +10,17 @@ import {
   type RowData,
 } from "@tanstack/react-table";
 
-import { DataTableBody } from "./data-table-body";
-import { DataTableGlobalFilter } from "./data-table-global-filter";
-import { DataTableHeader } from "./data-table-header";
+import { DataTableBody } from "./data-table/body";
+import { DataTableGlobalFilter } from "./data-table/global-filter";
+import { DataTableHeader } from "./data-table/header";
 import {
   DataTablePageSizeSelect,
   PAGE_SIZE_SHOW_ALL,
   type PageSizeValues,
-} from "./data-table-page-size-select";
-import { DataTablePagination } from "./data-table-pagination";
-import { Table } from "./table";
-import { DataTableInfoText } from "./data-table-info-text";
+} from "./data-table/page-size-select";
+import { DataTablePagination } from "./data-table/pagination";
+import { Table } from "~/components/ui/table";
+import { DataTableInfoText } from "./data-table/info-text";
 
 export type DataTableDecorationProps<TData> = {
   table: ReactTable<TData>;
@@ -34,9 +34,13 @@ declare module "@tanstack/table-core" {
   }
 }
 
-interface DataTableProps<TData> {
+export interface DataTableProps<TData> {
   data: TData[];
-  columns: ColumnDef<TData>[];
+  // Defining the ColumnDefs using `createColumnHelper` makes them more typesafe,
+  // but we're then forced to an `any` in TValue when passing them around...
+  // Reference: https://github.com/TanStack/table/issues/4382
+  // ColumnDef<TData, any> is the same as the type used in useReactTable props
+  columns: ColumnDef<TData, any>[];
 
   pageSizeValues?: PageSizeValues[];
   topDecorations?: React.ComponentType<DataTableDecorationProps<TData>>[];
@@ -93,7 +97,7 @@ export function DataTable<TData>({
         ))}
       </div>
 
-      <div className="overflow-hidden rounded-md">
+      <div className="rounded-md">
         <Table>
           <DataTableHeader table={table} />
           <DataTableBody table={table} />

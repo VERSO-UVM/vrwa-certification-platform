@@ -2,6 +2,7 @@ import { asc, eq, and } from "drizzle-orm";
 import db from "~/database";
 import { courseEvent, course, reservation, profile } from "~/database/schema";
 import type { Course } from "~/database/schema";
+import type { Course } from "~/database/schema";
 import { basicProcedure, router } from "~/utils/trpc";
 import { z } from "zod";
 
@@ -10,6 +11,7 @@ const adminProcedure = basicProcedure;
 export const courseManagerRouter = router({
   //getCourses
   getCourses: adminProcedure.query((): Promise<Course[]> => {
+    return db.client.select().from(course).orderBy(asc(course.courseName));
     return db.client.select().from(course).orderBy(asc(course.courseName));
   }),
 
@@ -152,7 +154,25 @@ export const courseManagerRouter = router({
           description: input.description ?? null,
         })
         .returning();
+    .input(
+      z.object({
+        courseName: z.string(),
+        description: z.string().nullable(),
+        creditHours: z.number().int().positive(),
+        priceCents: z.number().int().positive(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const [newCourse] = await db.client
+        .insert(course)
+        .values({
+          ...input,
+          description: input.description ?? null,
+        })
+        .returning();
 
+      return newCourse;
+    }),
       return newCourse;
     }),
 
@@ -224,7 +244,25 @@ export const courseManagerRouter = router({
           creditHours: input.creditHours.toString(),
         })
         .returning();
+    .input(
+      z.object({
+        profileId: z.string(),
+        courseEventId: z.string(),
+        creditHours: z.number().positive(),
+        paymentStatus: z.enum(["paid", "unpaid"]),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const [newReservation] = await db.client
+        .insert(reservation)
+        .values({
+          ...input,
+          creditHours: input.creditHours.toString(),
+        })
+        .returning();
 
+      return newReservation;
+    }),
       return newReservation;
     }),
 
@@ -244,8 +282,14 @@ export const courseManagerRouter = router({
             eq(reservation.courseEventId, input.courseEventId),
             eq(reservation.profileId, input.profileId),
           ),
+        .where(
+          and(
+            eq(reservation.courseEventId, input.courseEventId),
+            eq(reservation.profileId, input.profileId),
+          ),
         )
         .returning();
+
 
       return { success: true };
     }),
