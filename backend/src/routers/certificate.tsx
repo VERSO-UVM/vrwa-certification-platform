@@ -93,7 +93,7 @@ export const certificateRouter = router({
           and(
             eq(reservation.profileId, input.profileId),
             eq(reservation.courseEventId, input.courseEventId),
-            isNotNull(reservation.attendanceMarkedAt),
+            not(eq(reservation.creditHours, "0")),
           ),
         );
 
@@ -128,6 +128,7 @@ export const certificateRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
+      console.log("bulkSendCertificates: ", input.recipients);
       const results = await Promise.all(
         input.recipients.map(async (recipient) => {
           try {
@@ -136,10 +137,18 @@ export const certificateRouter = router({
               .select({ email: user.email })
               .from(user)
               .where(eq(user.id, certificate.profileRecord.accountId));
+            console.log("%%% RECIPIENT USER: ", recipientUser);
             if (!recipientUser?.email) {
               throw new Error("Recipient email missing.");
             }
 
+            console.log("TRYING TO SEND: \n", {
+              to: recipientUser.email,
+              subject: input.emailSubject,
+              html: input.emailBody,
+              cc: input.cc,
+              bcc: input.bcc,
+            });
             await sendEmail({
               to: recipientUser.email,
               subject: input.emailSubject,
@@ -154,9 +163,17 @@ export const certificateRouter = router({
                 },
               ],
             });
+            console.log("SENT EMAIL CONTENTS: \n", {
+              to: recipientUser.email,
+              subject: input.emailSubject,
+              html: input.emailBody,
+              cc: input.cc,
+              bcc: input.bcc,
+            });
 
             return { ok: true as const };
           } catch (error) {
+            console.log("ERROR SENDING EMAIL: \n", error);
             return {
               ok: false as const,
               profileId: recipient.profileId,

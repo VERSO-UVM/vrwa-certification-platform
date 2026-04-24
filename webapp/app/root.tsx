@@ -24,6 +24,7 @@ import "./app.css";
 import { TRPCProvider, type AppRouter } from "~/utils/trpc";
 import type { Route } from "./+types/root";
 import { TooltipProvider } from "./components/ui/tooltip";
+import { Toaster } from "sonner";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -120,6 +121,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <TooltipProvider>{children}</TooltipProvider>
             {/* customize getKey to prevent scroll reset when URLSearchParams changes*/}
             <ScrollRestoration getKey={(location) => location.pathname} />
+            <Toaster />
             <Scripts />
           </body>
         </html>

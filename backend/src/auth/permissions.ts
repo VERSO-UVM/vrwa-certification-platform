@@ -26,6 +26,9 @@ export const ac = createAccessControl({ ...defaultStatements, ...statements });
 const admin = ac.newRole({
   ...adminAc.statements,
   ...statements,
+  certifications: ["view", "assign"],
+  classes: ["register", "update"],
+  invoices: ["view"],
 });
 
 const instructor = ac.newRole({

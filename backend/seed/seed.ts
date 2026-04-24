@@ -2,7 +2,7 @@ import db from "~/database/index";
 import { eq } from "drizzle-orm";
 import fs from "fs/promises";
 import path from "path";
-import type { CourseLocation } from '../src/database/schema';
+import type { CourseLocation } from "../src/database/schema";
 import { generatePrefixedId } from "~/utils/id";
 import { auth } from "~/auth/server";
 
@@ -25,7 +25,7 @@ async function main() {
   const file = await fs.readFile(filePath, "utf-8");
   const data = JSON.parse(file);
 
-  const orgIds : string[] = [];
+  const orgIds: string[] = [];
 
   console.log("Creating organizations..");
   for (const org of data.organizations) {
@@ -33,8 +33,8 @@ async function main() {
       .insert(db.schema.organization)
       .values({
         id: generatePrefixedId("organization"),
-        name : org.orgName,
-        slug : org.orgName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+        name: org.orgName,
+        slug: org.orgName.toLowerCase().replace(/[^a-z0-9]/g, "-"),
         createdAt: new Date(),
       })
       .returning();
@@ -56,7 +56,7 @@ async function main() {
         email: acct.email,
         password: acct.password,
         name: acct.email,
-      }
+      },
     });
 
     if (!result || !result.user) {
@@ -73,7 +73,7 @@ async function main() {
       .set({ role })
       .where(eq(db.schema.user.id, newUser.id));
 
-    if (role === 'instructor') {
+    if (role === "instructor") {
       instructorUserId = newUser.id;
     }
 
@@ -92,10 +92,10 @@ async function main() {
           state: prof.state,
           postalCode: prof.postalCode,
           phoneNumber: prof.phoneNumber,
-          isMember: prof.isMember
+          isMember: prof.isMember,
         })
         .returning();
-      profileIds.push(newProfile!.id)
+      profileIds.push(newProfile!.id);
       console.log(`profile: ${prof.firstName} ${prof.lastName}`);
     }
   }
@@ -106,21 +106,21 @@ async function main() {
   //create courses
   for (const courseInfo of data.courses) {
     const [newCourse] = await db.client
-    .insert(db.schema.course)
-    .values({
-      courseName: courseInfo.courseName,
-      description: courseInfo.description,
-      creditHours: courseInfo.creditHours,
-      priceCents: courseInfo.priceCents,
-    })
-    .returning();
+      .insert(db.schema.course)
+      .values({
+        courseName: courseInfo.courseName,
+        description: courseInfo.description,
+        creditHours: courseInfo.creditHours,
+        priceCents: courseInfo.priceCents,
+      })
+      .returning();
     courseIds.push(newCourse!.id);
     console.log(`${courseInfo.courseName} created`);
   }
 
   //create course events
   const courseEvents: Array<{ id: string; isPast: boolean }> = [];
-  const locations: CourseLocation[] = ['in-person', 'virtual', 'hybrid'];
+  const locations: CourseLocation[] = ["in-person", "virtual", "hybrid"];
   const now = new Date();
   let num = 1;
 
@@ -134,12 +134,14 @@ async function main() {
       .values({
         courseId,
         locationType: locations[num % locations.length]!,
-        virtualLink: locations[num % locations.length] !== 'in-person'
-          ? 'www.zoom.com'
-          : null,
-        physicalAddress: locations[num % locations.length] !== 'virtual'
-          ? '67 Address Road'
-          : null,
+        virtualLink:
+          locations[num % locations.length] !== "in-person"
+            ? "www.zoom.com"
+            : null,
+        physicalAddress:
+          locations[num % locations.length] !== "virtual"
+            ? "67 Address Road"
+            : null,
         seats: Math.trunc(profileIds.length / 2),
         classStartDatetime: thePast,
         instructorId: instructorUserId,
@@ -149,7 +151,8 @@ async function main() {
 
     // future events (3 per course)
     for (let futureOffset = 1; futureOffset <= 3; futureOffset++) {
-      const futureLocation = locations[(num + futureOffset) % locations.length]!;
+      const futureLocation =
+        locations[(num + futureOffset) % locations.length]!;
       const theFuture = new Date(now);
       theFuture.setMonth(now.getMonth() + num + futureOffset);
 
@@ -158,8 +161,9 @@ async function main() {
         .values({
           courseId,
           locationType: futureLocation,
-          virtualLink: futureLocation !== 'in-person' ? 'www.zoom.com' : null,
-          physicalAddress: futureLocation !== 'virtual' ? '67 Address Road' : null,
+          virtualLink: futureLocation !== "in-person" ? "www.zoom.com" : null,
+          physicalAddress:
+            futureLocation !== "virtual" ? "67 Address Road" : null,
           seats: Math.trunc(profileIds.length / 2),
           classStartDatetime: theFuture,
           instructorId: instructorUserId,
@@ -170,60 +174,55 @@ async function main() {
     num++;
   }
 
-  console.log(`Created ${courseEvents.length} course events!`)
+  console.log(`Created ${courseEvents.length} course events!`);
 
-  //create reservations + link to profiles 
-  console.log(`Creating reservations...`)
+  //create reservations + link to profiles
+  console.log(`Creating reservations...`);
   // ensure trainee has at least one upcoming session
   const traineeProfileId = profileIds[0]!;
   const upcomingEventIds = courseEvents
     .filter((event) => !event.isPast)
     .map((event) => event.id);
-  
-  for (const eventId of upcomingEventIds) {
-    await db.client
-      .insert(db.schema.reservation)
-      .values({
-        profileId: traineeProfileId,
-        courseEventId: eventId,
-        creditHours: "0",
-        paymentStatus: 'unpaid',
-        status: 'registered',
-      });
-    console.log(`Created upcoming reservation for trainee on event ${eventId}`);
+
+  for (let i = 0; i < 3; i++) {
+    await db.client.insert(db.schema.reservation).values({
+      profileId: traineeProfileId,
+      courseEventId: upcomingEventIds[i]!,
+      creditHours: "0",
+      paymentStatus: "unpaid",
+      status: "registered",
+    });
+    console.log(
+      `Created upcoming reservation for trainee on event ${upcomingEventIds[i]}`,
+    );
   }
 
   // Create some more reservations for other profiles
-  for (let i = 0; i < courseEvents.length; i++){
+  for (let i = 0; i < courseEvents.length; i++) {
     const courseEventId = courseEvents[i]!.id;
-    const profileId = profileIds[(i + 1) % profileIds.length]!; // shift to avoid duplicate with trainee's upcoming
+    const profileId = profileIds[i % profileIds.length]!; // shift to avoid duplicate with trainee's upcoming
 
     // Skip if already exists (drizzle will throw on primary key conflict)
     try {
-      await db.client
-      .insert(db.schema.reservation)
-      .values({
+      await db.client.insert(db.schema.reservation).values({
         profileId,
         courseEventId,
         creditHours: i % 2 == 0 ? "2.5" : "0",
-        paymentStatus: i % 2 === 0 ? 'paid' : 'unpaid',
-        status: 'registered',
+        paymentStatus: i % 2 === 0 ? "paid" : "unpaid",
+        status: "registered",
       });
     } catch (e) {
       // ignore conflicts
     }
   }
-
 }
 
 main()
   .then(() => {
-    console.log('Seeding process complete!');
+    console.log("Seeding process complete!");
     process.exit(0);
   })
   .catch((error) => {
-    console.error('Error:', error);
+    console.error("Error:", error);
     process.exit(1);
   });
-
-

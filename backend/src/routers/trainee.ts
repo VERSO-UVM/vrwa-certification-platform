@@ -8,7 +8,7 @@ import {
   and,
   count,
   sql,
-  isNotNull,
+  not,
 } from "drizzle-orm";
 import { course, courseEvent, reservation, profile } from "~/database/schema";
 import { traineeProcedure, router } from "~/utils/trpc";
@@ -97,7 +97,7 @@ export const traineeRouter = router({
       .where(
         and(
           eq(profile.accountId, ctx.account.id),
-          isNotNull(reservation.attendanceMarkedAt),
+          not(eq(reservation.creditHours, "0")),
         ),
       )
       .orderBy(asc(courseEvent.classStartDatetime));
