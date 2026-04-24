@@ -77,6 +77,7 @@ A user (an `account`) can be associated with multiple named profiles (think: Net
 7.  Certification pdf exporter (pdf generation prototype implemented, review @backend/src/pdf/pdf_template.tsx and @backend/src/routers/certificate.tsx)
 
 	Provide a UI in Admin Dash to generate PDFs for:
+
     - A single trainee for a given course
     - All trainees in a class (bulk export)
 	    -  Also must be accessible from course manager to batch send out certifications from a whole class.
@@ -135,8 +136,8 @@ Build a kind of “virtual view” feature so that admins can see trainee and in
 
 The current database schema is fairly developed. Carefully read and understand @backend/database/schema.ts. We should mostly just need to change the schema minimally for: (1) better-auth integration (better-auth generates its own schema for authentication), and (2) certain meta-fields like using a `deleted` status field instead of actually deleting the value from the database. INSTEAD of making other significant changes to the schema when it is believed to be necessary for a feature or workflow, simply log the brief issue in a Notes.md file and write the code in a modular way such that changes and additions can be made in the future.
 
-- The `reservation` table also acts as an “attendance” once a courseEvent has passed – it connects a `profile` with a `courseEvent`. 
-- Both `course` and `reservation` have a `creditHours` field. By default, an operator who’s marked as attended earns `course.creditHours`, but an admin or an instructor may manually set the number of credit hours earned. 
+- The `reservation` table also acts as an “attendance” once a courseEvent has passed – it connects a `profile` with a `courseEvent`.
+- Both `course` and `reservation` have a `creditHours` field. By default, an operator who’s marked as attended earns `course.creditHours`, but an admin or an instructor may manually set the number of credit hours earned.
 - The `courseEvent` codename refers to a "class" or "session"
 
 ## Authentication
@@ -154,10 +155,10 @@ We make full use of all of these libraries and tools. Agents must learn the asso
 - playwright. All code written by an AI agent must also be tested using this library in addition to regular unit tests. Skill @playwright-cli.
 - drizzle ORM database definition and schema with postgres. Skill @drizzle-orm.
 - @zod types and database query integration with drizzle-zod.
-- trpc. Skill @react-query-setup for frontend and Skill @trpc-router for backend with associated skills @middleware and @validators. 
+- trpc. Skill @react-query-setup for frontend and Skill @trpc-router for backend with associated skills @middleware and @validators.
 - better-auth. Skill @better-auth-best-practices and Skill @email-and-password-best-practices
 - @bun build tool and runtime. Important: use bun/bunx not npm/npmx!
-- Stripe. Library not yet added. Install with `bun` and follow Skill @stripe-best-practices. 
+- Stripe. Library not yet added. Install with `bun` and follow Skill @stripe-best-practices.
 
 ## Development Guidelines
 
@@ -280,20 +281,50 @@ For each phase, before writing any code, you must:
   - Define ColumnDefs in @webapp/app/utils/field-defs/user.ts following same format of other files.
   - Define an `account` router. Add the necesary api calls for the Users admin page which return `UserDto`.
   - Build the Users admin page that queries the API, uses ColumnDefs based off of utils, and passes it to the DataTable component.
-  - Customize the `cell` field for the Role column. It should have an "Edit" button which opens an EditDrawer. The EditDrawer
-    only lets you set the Role and has a save button. This workflow is easy to use and minimizes input errors. See @webapp/app/admin/profile.ts
-    for a reference for all of that.
+  - Customize the `cell` field for the Role column. It should have an "Edit" button which opens an EditDrawer. The EditDrawer only lets you set the Role and has a save button. This workflow is easy to use and minimizes input errors. See @webapp/app/admin/profile.ts for a reference for all of that.
   - Roles options should be labeled: "Operator", "Instructor", and "Admin"
 
 5.  Test
 
   - Write tests for all API endpoints
   - Create playwright tests for admin User Manager and Course Manager
+  
+### Phase 3.5: Missing features
 
+- More test seed data
+	- Add two more accounts and three profiles for each one.
+	- Add more test courses: "Wastewater Microbiology", "First Aid", and "Water Bending"
+	- Add one past and three future classes (courseEvents) for *each* course
+- Instructor dashboard UI layout issue: currently the "Print Attendance" button overflows and is rendered outside of the Card. The two buttons should be a single Button Group and stay inside the card.
+- When the server responds to an API query with a FORBIDDEN message, send the user to a FORBIDDEN page instead of hanging indefinitely.
+- Trainee Course Sign-Up improvements:
+	- Add support for signing up multiple profiles at once (just a shadcn Checkbox list)
+	- The profile selection should default to just the current profile
 
-### Phase 4: Billing & Stripe Integration
+## Phase 4
+
+- Build trainee Certificates page using existing certificate pdf generation backend
+	- "View Certificate" on other pages should link here to view the appropriate certificate
+	- In frontend routes.ts: add both "view" and a "download" routes
+	- View route: Display the PDF inside the page with a "Download" button-link above to link to the "download" page
+	- Update trainee sidebar!
+- Build Admin certificates page
+	- use `useHashString` to actually maintain a list of trainees (separated by '+') as state with source of truth in url query string
+	- Display a DataTable of all trainees that allows adding trainees to the current list of trainees
+	- Display the current list of trainees (firstname, lastname, email) on the side
+	- Add input for email title with appropriate default
+	- Add inputs for optional email CC and BCC
+	- Add text box for message content with appropriate default
+	- Send query to backend, display success or errors
+	- Backend router API call:
+		- Use Promise.all with Array.map to bulk send emails asyncronously and collect any errors
+		- Return any errors
+	- Use a library like nodemailer for email sending, and mock it to do testing
+
+### Phase 5: Billing & Stripe Integration
 
 Stripe Integration Decisions:
+
 - Use Stripe Invoices API (not Checkout, not raw PaymentIntents)
 - When a trainee signs up for a course, create a Stripe Invoice immediately (in draft or open state) for that course's fee. The admin can then review, adjust, and finalize it.
 - Local DB additions: stripeCustomerId on account, stripeInvoiceId on reservation
