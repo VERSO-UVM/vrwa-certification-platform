@@ -4,7 +4,7 @@ import { pdf } from "@react-pdf/renderer";
 import { TRPCError } from "@trpc/server";
 import z from "zod";
 import { CertificateDocument } from "~/pdf/pdf_template";
-import { and, eq, isNotNull } from "drizzle-orm";
+import { and, eq, isNotNull, not } from "drizzle-orm";
 import { profile, reservation, user } from "~/database/schema";
 import { sendEmail } from "~/services/email";
 import type { Context } from "~/utils/trpc/ctx";
@@ -186,6 +186,7 @@ export const certificateRouter = router({
       }),
     )
     .query(async ({ input, ctx }) => {
+      console.log("list elegible recipients: ", input.courseEventId);
       return ctx.db.client
         .select({
           profileId: profile.id,
@@ -200,7 +201,7 @@ export const certificateRouter = router({
         .where(
           and(
             eq(reservation.courseEventId, input.courseEventId),
-            isNotNull(reservation.attendanceMarkedAt),
+            not(eq(reservation.creditHours, "0")),
           ),
         );
     }),

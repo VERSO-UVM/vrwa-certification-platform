@@ -66,7 +66,11 @@ export default function AdminCertificationsPage() {
   const courseEventsQuery = useQuery(
     trpc.adminRouter.getCourseEvents.queryOptions(undefined, {
       select: (rows) =>
-        rows.filter((row) => row.classStartDatetime && new Date() > new Date()),
+        rows.filter(
+          (row) =>
+            row.classStartDatetime &&
+            new Date(row.classStartDatetime) < new Date(),
+        ),
     }),
   );
 
@@ -174,6 +178,7 @@ export default function AdminCertificationsPage() {
       bcc: emailBcc || undefined,
     });
   };
+  console.log(courseEventsQuery.data);
 
   return (
     <div className="space-y-6">
