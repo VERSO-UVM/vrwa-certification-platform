@@ -1,14 +1,14 @@
-import { RefreshCw, User } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import { SidebarMenuItem } from "~/components/ui/sidebar";
 import { authClient } from "~/lib/auth-client";
-import { trpc } from "~/utils/trpc";
+import { useTRPC } from "~/utils/trpc";
 import { useQuery } from "@tanstack/react-query";
 
 export function SidebarProfileSwitcher() {
   const { data: session } = authClient.useSession();
-  const trpcProxy = trpc();
+  const trpcProxy = useTRPC();
   const getMyProfiles = useQuery(
     trpcProxy.profile.getMyProfiles.queryOptions(undefined, {
       enabled: !!session,
