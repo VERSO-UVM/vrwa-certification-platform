@@ -13,6 +13,11 @@ export async function updateReservationPaymentByInvoiceId(
     .where(eq(reservation.stripeInvoiceId, stripeInvoiceId));
 }
 
+export type RegistrationInvoiceResult = {
+  stripeInvoiceId: string | null;
+  hostedInvoiceUrl: string | null;
+};
+
 /**
  * Creates a finalized Stripe Invoice for a course registration and stores the id on the reservation.
  * No-op when price is zero (no invoice line item required).
@@ -23,9 +28,9 @@ export async function createAndLinkRegistrationInvoice(options: {
   priceCents: number;
   courseName: string;
   stripeCustomerId: string;
-}): Promise<string | null> {
+}): Promise<RegistrationInvoiceResult> {
   if (options.priceCents <= 0) {
-    return null;
+    return { stripeInvoiceId: null, hostedInvoiceUrl: null };
   }
 
   if (process.env.STRIPE_BYPASS_INVOICES === "1") {
@@ -39,7 +44,7 @@ export async function createAndLinkRegistrationInvoice(options: {
           eq(reservation.courseEventId, options.courseEventId),
         ),
       );
-    return fake;
+    return { stripeInvoiceId: fake, hostedInvoiceUrl: null };
   }
 
   const stripe = getStripe();
@@ -75,5 +80,10 @@ export async function createAndLinkRegistrationInvoice(options: {
       ),
     );
 
-  return finalized.id;
+  const hosted =
+    typeof finalized.hosted_invoice_url === "string"
+      ? finalized.hosted_invoice_url
+      : null;
+
+  return { stripeInvoiceId: finalized.id, hostedInvoiceUrl: hosted };
 }

@@ -11,6 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "~/components/ui/sidebar";
+import { useQueryClient } from "@tanstack/react-query";
 import { authClient } from "~/lib/auth-client";
 import {
   Select,
@@ -24,9 +25,11 @@ import { SidebarProfileSwitcher } from "~/components/sidebar-profile-switcher";
 
 export function InstructorSidebar() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const handleSignOut = async () => {
     await authClient.signOut();
+    queryClient.clear();
     navigate("/login");
   };
 

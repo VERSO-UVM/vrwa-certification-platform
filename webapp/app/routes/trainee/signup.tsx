@@ -15,16 +15,23 @@ import { useEffect, useMemo, useState } from "react";
 import { authClient } from "~/lib/auth-client";
 import { toast } from "sonner";
 
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
 
 export default function SignupPage() {
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
   const { data: sessions, isLoading: sessionsLoading } = useQuery(
     trpc.trainee.getAllAvailableSessions.queryOptions(),
   );
   const { data: profiles, isLoading: profilesLoading } = useQuery(
     trpc.profile.getMyProfiles.queryOptions(),
   );
+  const { data: registrations = [], isLoading: registrationsLoading } =
+    useQuery(trpc.trainee.getMyRegistrations.queryOptions());
+
   const { data: authSession } = authClient.useSession();
   const activeProfileId = (
     authSession?.session as { activeProfileId?: string } | undefined
@@ -33,29 +40,24 @@ export default function SignupPage() {
   const [selectedProfileIds, setSelectedProfileIds] = useState<Set<string>>(
     new Set(),
   );
+
   const registerMutation = useMutation(
     trpc.trainee.registerMultipleForSession.mutationOptions({
-      onSuccess: (data) => {
-        const waitlistCount = data.results.filter(
-          (result) => result.status === "waitlisted",
-        ).length;
-        const alreadyRegisteredCount = data.results.filter(
-          (result) => result.status === "already_registered",
-        ).length;
-        const registeredCount = data.results.filter(
-          (result) => result.status === "registered",
-        ).length;
-
-        const statusSummary = [
-          registeredCount > 0 ? `${registeredCount} registered` : null,
-          waitlistCount > 0 ? `${waitlistCount} waitlisted` : null,
-          alreadyRegisteredCount > 0
-            ? `${alreadyRegisteredCount} already registered`
-            : null,
-        ]
-          .filter(Boolean)
-          .join(", ");
-        toast.success(statusSummary || "Registration processed.");
+      onSuccess: (data, variables) => {
+        void queryClient.invalidateQueries(
+          trpc.invoice.getMyInvoices.queryFilter(),
+        );
+        void queryClient.invalidateQueries(
+          trpc.trainee.getMyRegistrations.queryFilter(),
+        );
+        const course = sessions?.find((s) => s.id === variables.courseEventId);
+        navigate("/trainee/signup/confirmation", {
+          state: {
+            courseName: course?.courseName ?? "Course",
+            courseEventId: variables.courseEventId,
+            results: data.results,
+          },
+        });
       },
       onError: (err) => {
         toast.error(err.message);
@@ -81,13 +83,25 @@ export default function SignupPage() {
   }, [profiles, activeProfileId]);
 
   const selectedProfileCount = selectedProfileIds.size;
-  const hasWaitlistedResult = useMemo(
-    () =>
-      registerMutation.data?.results.some(
-        (result) => result.status === "waitlisted",
-      ) ?? false,
-    [registerMutation.data],
-  );
+
+  const registrationSet = useMemo(() => {
+    const set = new Set<string>();
+    for (const row of registrations) {
+      set.add(`${row.profileId}:${row.courseEventId}`);
+    }
+    return set;
+  }, [registrations]);
+
+  const getAlreadyRegisteredForSession = (sessionId: string) => {
+    const names: string[] = [];
+    for (const profileId of selectedProfileIds) {
+      if (registrationSet.has(`${profileId}:${sessionId}`)) {
+        const p = profiles?.find((x) => x.id === profileId);
+        if (p) names.push(`${p.firstName} ${p.lastName}`);
+      }
+    }
+    return names;
+  };
 
   const toggleProfile = (profileId: string, isChecked: boolean) => {
     setSelectedProfileIds((previous) => {
@@ -101,7 +115,7 @@ export default function SignupPage() {
     });
   };
 
-  if (sessionsLoading || profilesLoading)
+  if (sessionsLoading || profilesLoading || registrationsLoading)
     return <div className="p-10 text-center">Loading courses...</div>;
 
   return (
@@ -147,73 +161,83 @@ export default function SignupPage() {
         </div>
       </div>
 
-      {hasWaitlistedResult && (
-        <div className="rounded-md border border-border bg-muted p-4 text-sm">
-          <p className="font-semibold">Added to waitlist</p>
-          <p className="text-muted-foreground">
-            This class is full right now. You are on the waitlist and will be
-            contacted if a seat opens.
-          </p>
-        </div>
-      )}
-
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {sessions?.map((session) => (
-          <Card key={session.id} className="flex flex-col">
-            <CardHeader>
-              <CardTitle className="text-lg">{session.courseName}</CardTitle>
-              <div className="text-sm text-muted-foreground line-clamp-2">
-                {session.description}
-              </div>
-            </CardHeader>
-            <CardContent className="flex-1 space-y-4">
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <div className="flex items-center">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  {session.classStartDatetime
-                    ? format(new Date(session.classStartDatetime), "PPP p")
-                    : "TBD"}
+        {sessions?.map((session) => {
+          const alreadyNames = getAlreadyRegisteredForSession(session.id);
+          const hasAlreadySelected = alreadyNames.length > 0;
+          const disabledReason = hasAlreadySelected
+            ? alreadyNames.length === 1
+              ? `${alreadyNames[0]} is already registered.`
+              : `${alreadyNames.join(", ")} are already registered.`
+            : null;
+
+          const isThisSubmitting =
+            registerMutation.isPending &&
+            registerMutation.variables?.courseEventId === session.id;
+
+          return (
+            <Card key={session.id} className="flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-lg">{session.courseName}</CardTitle>
+                <div className="text-sm text-muted-foreground line-clamp-2">
+                  {session.description}
                 </div>
-                <div className="flex items-center">
-                  <MapPin className="mr-2 h-4 w-4" />
-                  {session.locationType === "virtual"
-                    ? "Virtual"
-                    : session.physicalAddress || "TBD"}
+              </CardHeader>
+              <CardContent className="flex-1 space-y-4">
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <div className="flex items-center">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {session.classStartDatetime
+                      ? format(new Date(session.classStartDatetime), "PPP p")
+                      : "TBD"}
+                  </div>
+                  <div className="flex items-center">
+                    <MapPin className="mr-2 h-4 w-4" />
+                    {session.locationType === "virtual"
+                      ? "Virtual"
+                      : session.physicalAddress || "TBD"}
+                  </div>
+                  <div className="flex items-center">
+                    <Users className="mr-2 h-4 w-4" />
+                    {session.seatsRemaining} Seats Remaining
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <Users className="mr-2 h-4 w-4" />
-                  {session.seatsRemaining} Seats Remaining
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button
-                className="w-full"
-                disabled={
-                  selectedProfileCount === 0 ||
-                  registerMutation.isPending ||
-                  (session.classStartDatetime
-                    ? new Date(session.classStartDatetime) < new Date()
-                    : false)
-                }
-                onClick={() => {
-                  if (selectedProfileCount > 0) {
-                    registerMutation.mutate({
-                      profileIds: Array.from(selectedProfileIds),
-                      courseEventId: session.id,
-                    });
+              </CardContent>
+              <CardFooter className="flex flex-col gap-2 items-stretch">
+                {disabledReason ? (
+                  <p className="text-sm text-muted-foreground text-center">
+                    {disabledReason}
+                  </p>
+                ) : null}
+                <Button
+                  className="w-full"
+                  disabled={
+                    selectedProfileCount === 0 ||
+                    hasAlreadySelected ||
+                    registerMutation.isPending ||
+                    (session.classStartDatetime
+                      ? new Date(session.classStartDatetime) < new Date()
+                      : false)
                   }
-                }}
-              >
-                {registerMutation.isPending
-                  ? "Submitting..."
-                  : session.isFull
-                    ? "Join Waitlist"
-                    : "Register"}
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+                  onClick={() => {
+                    if (selectedProfileCount > 0 && !hasAlreadySelected) {
+                      registerMutation.mutate({
+                        profileIds: Array.from(selectedProfileIds),
+                        courseEventId: session.id,
+                      });
+                    }
+                  }}
+                >
+                  {isThisSubmitting
+                    ? "Submitting..."
+                    : session.isFull
+                      ? "Join Waitlist"
+                      : "Register"}
+                </Button>
+              </CardFooter>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

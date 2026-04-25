@@ -27,7 +27,8 @@ test.describe("Trainee Multi Profile Signup", () => {
     });
     await expect(registerButton).toBeVisible();
     await registerButton.click();
-    await expect(registerButton).toBeVisible();
-    await expect(page.getByText("2 selected")).toBeVisible();
+    await page.waitForURL(/\/trainee\/signup\/confirmation/, { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: "Registration" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Pay later" })).toBeVisible();
   });
 });

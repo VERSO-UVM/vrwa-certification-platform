@@ -248,6 +248,18 @@ test("registerMultipleForSession registers multiple profiles", async () => {
 
   expect(result.results.length).toBe(profileIds.length);
   expect(result.results[0]?.status).toBe("registered");
+  expect(result.results[0]).toHaveProperty("hostedInvoiceUrl");
+  expect(result.results[0]?.hostedInvoiceUrl).toBeNull();
+  expect(result.results[1]?.hostedInvoiceUrl).toBeNull();
+});
+
+test("getMyRegistrations returns future registrations for account profiles", async () => {
+  const rows = await caller.trainee.getMyRegistrations();
+  expect(Array.isArray(rows)).toBe(true);
+  for (const row of rows) {
+    expect(row).toHaveProperty("profileId");
+    expect(row).toHaveProperty("courseEventId");
+  }
 });
 
 test("registerMultipleForSession handles waitlist and already registered", async () => {

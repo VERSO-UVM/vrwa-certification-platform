@@ -10,7 +10,8 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { authClient } from "~/lib/auth-client";
+import { authClient, getSession } from "~/lib/auth-client";
+import { getPostAuthPath } from "~/lib/auth-routing";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -33,7 +34,8 @@ export default function LoginPage() {
       setError(signInError.message || "Failed to sign in");
       setLoading(false);
     } else {
-      navigate("/");
+      const sessionRes = await getSession();
+      navigate(getPostAuthPath(sessionRes?.data ?? null));
     }
   }
 

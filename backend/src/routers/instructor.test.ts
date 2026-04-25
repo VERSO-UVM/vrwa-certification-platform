@@ -1,7 +1,13 @@
 import { beforeAll, expect, test } from "bun:test";
 import { desc, eq } from "drizzle-orm";
 import db from "~/database";
-import { courseEvent, profile, reservation, session, user } from "~/database/schema";
+import {
+  courseEvent,
+  profile,
+  reservation,
+  session,
+  user,
+} from "~/database/schema";
 import { appRouter } from "~/trpc";
 import { generatePrefixedId } from "~/utils/id";
 

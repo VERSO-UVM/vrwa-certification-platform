@@ -93,7 +93,7 @@ test("createAndLinkRegistrationInvoice (bypass) sets stripe invoice id on reserv
     .where(eq(courseEvent.id, eventId));
   if (!cRow) throw new Error("event join");
   const name = cRow.courseName;
-  const id = await createAndLinkRegistrationInvoice({
+  const invoice = await createAndLinkRegistrationInvoice({
     profileId,
     courseEventId: eventId,
     priceCents: 100,
@@ -101,7 +101,8 @@ test("createAndLinkRegistrationInvoice (bypass) sets stripe invoice id on reserv
     stripeCustomerId: "cus_bypass",
   });
   const expected = `in_test_bypass_${profileId.slice(-8)}_${eventId.slice(-8)}`;
-  expect(id).toBe(expected);
+  expect(invoice.stripeInvoiceId).toBe(expected);
+  expect(invoice.hostedInvoiceUrl).toBeNull();
   const [r] = await db.client
     .select()
     .from(reservation)

@@ -22,6 +22,10 @@ export default [
   route("trainee", "routes/trainee/layout.tsx", [
     index("routes/trainee/home.tsx"),
     route("signup", "routes/trainee/signup.tsx"),
+    route(
+      "signup/confirmation",
+      "routes/trainee/registration-confirmation.tsx",
+    ),
     route("calendar", "routes/trainee/calendar.tsx"),
     route("certificates", "routes/trainee/certificates.tsx"),
     route("certificates/view", "routes/trainee/certificate-view.tsx"),

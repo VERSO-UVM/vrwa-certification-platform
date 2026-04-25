@@ -9,6 +9,7 @@ import {
   count,
   sql,
   not,
+  inArray,
 } from "drizzle-orm";
 import { course, courseEvent, reservation, profile } from "~/database/schema";
 import { traineeProcedure, router } from "~/utils/trpc";
@@ -139,6 +140,30 @@ export const traineeRouter = router({
       )
       .where(gt(courseEvent.classStartDatetime, new Date()))
       .orderBy(asc(courseEvent.classStartDatetime));
+  }),
+
+  getMyRegistrations: traineeProcedure.query(async ({ ctx }) => {
+    const profiles = await db.client
+      .select({ id: profile.id })
+      .from(profile)
+      .where(eq(profile.accountId, ctx.account.id));
+
+    const profileIds = profiles.map((p) => p.id);
+    if (profileIds.length === 0) return [];
+
+    return db.client
+      .select({
+        profileId: reservation.profileId,
+        courseEventId: reservation.courseEventId,
+      })
+      .from(reservation)
+      .innerJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
+      .where(
+        and(
+          inArray(reservation.profileId, profileIds),
+          gt(courseEvent.classStartDatetime, new Date()),
+        ),
+      );
   }),
 
   registerForSession: traineeProcedure
@@ -328,6 +353,7 @@ export const traineeRouter = router({
         profileId: string;
         profileName: string;
         status: "registered" | "waitlisted" | "already_registered";
+        hostedInvoiceUrl: string | null;
       }> = [];
 
       const [courseRow] = await db.client
@@ -361,6 +387,7 @@ export const traineeRouter = router({
             profileId,
             profileName: `${profileData.firstName} ${profileData.lastName}`,
             status: "already_registered",
+            hostedInvoiceUrl: null,
           });
           continue;
         }
@@ -382,16 +409,18 @@ export const traineeRouter = router({
           registeredCount++;
         }
 
+        let hostedInvoiceUrl: string | null = null;
         if (status === "registered") {
           try {
             const stripeCustomerId = await getCustomerId();
-            await createAndLinkRegistrationInvoice({
+            const invoice = await createAndLinkRegistrationInvoice({
               profileId,
               courseEventId: input.courseEventId,
               priceCents: courseRow.priceCents,
               courseName: courseRow.courseName,
               stripeCustomerId,
             });
+            hostedInvoiceUrl = invoice.hostedInvoiceUrl;
           } catch (err) {
             await db.client
               .delete(reservation)
@@ -415,6 +444,7 @@ export const traineeRouter = router({
           profileId,
           profileName: `${profileData.firstName} ${profileData.lastName}`,
           status,
+          hostedInvoiceUrl,
         });
       }
 
