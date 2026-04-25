@@ -1,1 +1,0 @@
-ALTER TABLE "reservation" ADD COLUMN "attendanceMarkedAt" timestamp;

@@ -5,57 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1776191175484,
-      "tag": "0000_wild_ted_forrester",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1776199182889,
-      "tag": "0001_green_adam_warlock",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1776199263947,
-      "tag": "0002_amused_vargas",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1776200449735,
-      "tag": "0003_workable_the_santerians",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1776200585249,
-      "tag": "0004_nice_machine_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1776204980311,
-      "tag": "0005_sweet_the_liberteens",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1776437377557,
-      "tag": "0006_curved_martin_li",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1777067428282,
-      "tag": "0007_sour_sumo",
+      "when": 1777078429830,
+      "tag": "0000_stormy_malice",
       "breakpoints": true
     }
   ]

@@ -1,1 +1,0 @@
-ALTER TABLE "session" ADD COLUMN "active_profile_id" text;
