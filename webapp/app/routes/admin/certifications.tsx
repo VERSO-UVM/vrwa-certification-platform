@@ -178,7 +178,6 @@ export default function AdminCertificationsPage() {
       bcc: emailBcc || undefined,
     });
   };
-  console.log(courseEventsQuery.data);
 
   return (
     <div className="space-y-6">

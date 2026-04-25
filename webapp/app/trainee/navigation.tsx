@@ -3,12 +3,8 @@ import {
   Calendar,
   House,
   LogOut,
-  Scroll,
   Trophy,
   Wallet,
-  Eye,
-  User,
-  RefreshCw,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import {
@@ -24,8 +20,6 @@ import {
 } from "~/components/ui/sidebar";
 import { useQueryClient } from "@tanstack/react-query";
 import { authClient } from "~/lib/auth-client";
-import { trpc } from "~/utils/trpc";
-import { Button } from "~/components/ui/button";
 import {
   Select,
   SelectContent,

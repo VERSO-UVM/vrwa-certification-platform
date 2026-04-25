@@ -17,7 +17,6 @@ export default function Home() {
   )?.activeProfileId;
 
   useEffect(() => {
-    console.log("Home useEffect:", { isPending, session: !!session, role });
     if (!isPending && session) {
       if (!activeProfileId) {
         navigate("/profile-selection");
