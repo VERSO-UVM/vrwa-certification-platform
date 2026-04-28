@@ -15,12 +15,13 @@ export const courseManagerRouter = router({
 
   getCourseById: adminProcedure
     .input(z.object({ id: z.string() }))
-    .query(async ({ input }): Promise<Course | undefined> => {
+    .query(async ({ input }): Promise<Course | null> => {
       const found = await db.client
         .select()
         .from(course)
-        .where(eq(course.id, input.id));
-      return found[0];
+        .where(eq(course.id, input.id))
+        .limit(1);
+      return found[0] ?? null;
     }),
 
   getReservationsByCourse: adminProcedure
@@ -44,7 +45,17 @@ export const courseManagerRouter = router({
         .where(eq(course.id, input.courseId))
         .orderBy(courseEvent.classStartDatetime);
 
-      return reservations;
+      return reservations ?? [];
+    }),
+
+  getCourseEventsByCourse: adminProcedure
+    .input(z.object({ courseId: z.string() }))
+    .query(async ({ input }) => {
+      const courseEvents = await db.client
+        .select()
+        .from(courseEvent)
+        .where(eq(courseEvent.courseId, input.courseId));
+      return courseEvents ?? [];
     }),
 
   //createCourseEvent
@@ -165,6 +176,35 @@ export const courseManagerRouter = router({
     }),
 
   //updateCourse
+  updateCourse: adminProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        courseName: z.string(),
+        description: z.string().nullable(),
+        creditHours: z.number().int().positive(),
+        priceCents: z.number().int().positive(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { id, ...update } = input;
+
+      const cleanUpdate = Object.fromEntries(
+        Object.entries(update).filter(([_, value]) => value !== undefined),
+      );
+
+      if (Object.keys(cleanUpdate).length === 0) {
+        throw new Error("No fields provided to update");
+      }
+
+      const [updatedCourse] = await db.client
+        .update(course)
+        .set(cleanUpdate)
+        .where(eq(course.id, id))
+        .returning();
+
+      return updatedCourse;
+    }),
 
   //addTrainee
   addReservation: adminProcedure

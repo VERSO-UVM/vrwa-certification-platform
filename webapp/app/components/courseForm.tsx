@@ -31,7 +31,7 @@ import { Textarea } from "./ui/textarea";
 
 function useCourses() {
   const trpc = useTRPC();
-  return useQuery<Course[]>(trpc.courseManagerRouter.getCourses.queryOptions());
+  return useQuery(trpc.courseManagerRouter.getCourses.queryOptions());
 }
 
 //for input validation of tuition fee
@@ -40,17 +40,31 @@ function textToDollars(userInput: string) {
   if (dollarAmt.charAt(0) === "$") {
     dollarAmt = dollarAmt.slice(1);
   }
-  return Number(dollarAmt) * 100;
+  return Math.round(Number(dollarAmt) * 100);
 }
 
-export function NewCourseForm({ onCreate }) {
-  const courses = useCourses();
+export function NewCourseForm({ onCreate, course }) {
+  let priceString = "";
+  if (course) {
+    priceString = (course.priceCents / 100).toFixed(2).toString();
+  }
 
-  const [values, setValues] = useState({
-    courseName: "",
-    description: "",
-    creditHours: 0,
-    price: "",
+  const [values, setValues] = useState(() => {
+    if (!course) {
+      return {
+        courseName: "",
+        description: "",
+        creditHours: 0,
+        price: "",
+      };
+    } else {
+      return {
+        courseName: course.courseName,
+        description: course.description,
+        creditHours: course.creditHours,
+        price: priceString,
+      };
+    }
   });
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
@@ -119,7 +133,7 @@ export function NewCourseForm({ onCreate }) {
         <Field orientation="horizontal">
           <Button type="submit" className="w-full">
             {" "}
-            Create Course{" "}
+            {course ? "Update Course" : "Create Course"}{" "}
           </Button>
         </Field>
       </FieldGroup>
