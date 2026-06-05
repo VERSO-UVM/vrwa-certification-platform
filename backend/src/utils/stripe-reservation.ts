@@ -68,11 +68,12 @@ export async function createAndLinkRegistrationInvoice(options: {
     description: `Registration: ${options.courseName}`,
   });
 
-  const finalized = await stripe.invoices.finalizeInvoice(draft.id);
+  // TODO: when do we want to finalize the invoice automatically?
+  // const finalized = await stripe.invoices.finalizeInvoice(draft.id);
 
   await db.client
     .update(reservation)
-    .set({ stripeInvoiceId: finalized.id })
+    .set({ stripeInvoiceId: draft.id })
     .where(
       and(
         eq(reservation.profileId, options.profileId),
@@ -81,9 +82,9 @@ export async function createAndLinkRegistrationInvoice(options: {
     );
 
   const hosted =
-    typeof finalized.hosted_invoice_url === "string"
-      ? finalized.hosted_invoice_url
+    typeof draft.hosted_invoice_url === "string"
+      ? draft.hosted_invoice_url
       : null;
 
-  return { stripeInvoiceId: finalized.id, hostedInvoiceUrl: hosted };
+  return { stripeInvoiceId: draft.id, hostedInvoiceUrl: hosted };
 }

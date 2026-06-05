@@ -35,6 +35,8 @@
     "esbuild"
   ],
   "dependencies": {
+    "mime": "^4.1.0",
+    "mime-types": "^3.0.2",
     "vaul": "^1.1.2"
   }
 }
