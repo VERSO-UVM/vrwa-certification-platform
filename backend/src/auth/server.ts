@@ -1,14 +1,14 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import db from "../database";
-import * as schema from "../database/schema";
+import db from "~/database";
+import * as schema from "~/database/schema";
 import { admin, organization } from "better-auth/plugins";
 import { ac, roles } from "./permissions";
 import { generatePrefixedId } from "~/utils/id";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db.client, {
-    provider: "pg", // or "mysql", "sqlite"
+    provider: "pg",
     schema: {
       ...schema,
     },
@@ -17,6 +17,7 @@ export const auth = betterAuth({
     database: {
       generateId: (options) => {
         switch (options.model) {
+          // The redundancy is for typescript
           case "account":
             return generatePrefixedId("account");
           case "organization":
@@ -35,6 +36,8 @@ export const auth = betterAuth({
   },
   session: {
     additionalFields: {
+      // We also need to keep track of the current active profile
+      // within the authenticated session.
       activeProfileId: {
         type: "string",
       },
@@ -47,6 +50,7 @@ export const auth = betterAuth({
     }),
     organization(),
   ],
+  // Update to not get CORS errors!
   trustedOrigins: ["http://localhost:5173"],
   emailAndPassword: {
     enabled: true,
