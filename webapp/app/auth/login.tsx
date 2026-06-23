@@ -6,7 +6,7 @@ export default function LoginPage() {
   return (
     <Card className="mt-10 w-md self-center">
       <CardTitle className="text-center">Login</CardTitle>
-      <CardContent class="flex flex-row h-full"></CardContent>
+      <CardContent className="flex flex-row h-full"></CardContent>
       <CardFooter className="flex items-start flex-col gap-4">
         <div>
           Or,&nbsp;
