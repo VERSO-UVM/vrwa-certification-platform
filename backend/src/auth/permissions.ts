@@ -51,7 +51,7 @@ export const roles = {
   instructor,
 } as const;
 
-type Role = keyof typeof roles;
+export type Role = keyof typeof roles;
 
 type PermissionsCheckInput = {
   permissions: Parameters<ReturnType<(typeof ac)["newRole"]>["authorize"]>[0];

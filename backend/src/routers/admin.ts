@@ -13,7 +13,6 @@ import {
 import type { Profile } from "~/database/schema";
 import { basicProcedure, router } from "~/utils/trpc";
 import { reservationDtoSelect } from "./reservation";
-import type { Role } from "~/auth/permissions"
 
 // IMPORTANT: change basicProcedure to protectedProcedure
 // once auth is fully implemented (before shipping).
