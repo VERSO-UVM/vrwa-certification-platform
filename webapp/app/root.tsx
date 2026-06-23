@@ -14,9 +14,10 @@ import { createTRPCClient, httpLink } from "@trpc/client";
 import { useState } from "react";
 
 import "./app.css";
-import { TRPCProvider, type AppRouter } from "~/utils/trpc";
+import { getViteBackend, TRPCProvider, type AppRouter } from "~/utils/trpc";
 import type { Route } from "./+types/root";
 import { TooltipProvider } from "./components/ui/tooltip";
+import { getTrpcUrl } from "./utils/env";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -69,8 +70,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     createTRPCClient<AppRouter>({
       links: [
         httpLink({
-          url:
-            (import.meta.env.VITE_BACKEND || "http://localhost:3000") + "/trpc",
+          url: getTrpcUrl(),
         }),
       ],
     }),
