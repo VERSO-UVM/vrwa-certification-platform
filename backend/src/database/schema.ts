@@ -38,13 +38,6 @@ export const profile = pgTable("profile", {
 });
 export type Profile = typeof profile.$inferSelect;
 
-export const organization = pgTable("organization", {
-  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("organization")),
-  orgName: text(),
-});
-
-export type Organization = typeof organization.$inferSelect;
-
 export const course = pgTable("course", {
   // This field may already exist as a different type in the VRWA db - it may change in the future
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("course")),

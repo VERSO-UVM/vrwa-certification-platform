@@ -16,14 +16,9 @@ CREATE TABLE "courseEvent" (
 	"classStartDatetime" timestamp with time zone
 );
 --> statement-breakpoint
-CREATE TABLE "organization" (
-	"id" varchar PRIMARY KEY NOT NULL,
-	"orgName" text
-);
---> statement-breakpoint
 CREATE TABLE "profile" (
 	"id" varchar PRIMARY KEY NOT NULL,
-	"accountId" varchar NOT NULL,
+	"userId" varchar NOT NULL,
 	"firstName" text NOT NULL,
 	"lastName" text NOT NULL,
 	"address" text NOT NULL,
@@ -77,6 +72,16 @@ CREATE TABLE "member" (
 	"created_at" timestamp NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "organization" (
+	"id" text PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"slug" text NOT NULL,
+	"logo" text,
+	"created_at" timestamp NOT NULL,
+	"metadata" text,
+	CONSTRAINT "organization_slug_unique" UNIQUE("slug")
+);
+--> statement-breakpoint
 CREATE TABLE "session" (
 	"id" text PRIMARY KEY NOT NULL,
 	"expires_at" timestamp NOT NULL,
@@ -117,7 +122,7 @@ CREATE TABLE "verification" (
 );
 --> statement-breakpoint
 ALTER TABLE "courseEvent" ADD CONSTRAINT "courseEvent_courseId_course_id_fk" FOREIGN KEY ("courseId") REFERENCES "public"."course"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "profile" ADD CONSTRAINT "profile_accountId_user_id_fk" FOREIGN KEY ("accountId") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "profile" ADD CONSTRAINT "profile_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "reservation" ADD CONSTRAINT "reservation_profileId_profile_id_fk" FOREIGN KEY ("profileId") REFERENCES "public"."profile"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "reservation" ADD CONSTRAINT "reservation_courseEventId_courseEvent_id_fk" FOREIGN KEY ("courseEventId") REFERENCES "public"."courseEvent"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -131,5 +136,6 @@ CREATE INDEX "invitation_organizationId_idx" ON "invitation" USING btree ("organ
 CREATE INDEX "invitation_email_idx" ON "invitation" USING btree ("email");--> statement-breakpoint
 CREATE INDEX "member_organizationId_idx" ON "member" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "member_userId_idx" ON "member" USING btree ("user_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "organization_slug_uidx" ON "organization" USING btree ("slug");--> statement-breakpoint
 CREATE INDEX "session_userId_idx" ON "session" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "verification_identifier_idx" ON "verification" USING btree ("identifier");
