@@ -17,6 +17,8 @@ import * as authSchema from "./auth";
 export * from "./auth";
 const { user, account } = authSchema;
 
+export type User = typeof user.$inferSelect;
+
 export type Account = typeof account.$inferSelect;
 // Should only use AccountInfo, not Account, in API and Client.
 // Maybe create a separate types file?

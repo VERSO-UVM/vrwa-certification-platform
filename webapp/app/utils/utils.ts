@@ -1,3 +1,6 @@
+import type { Role } from "@backend/auth/permissions";
+import type { User } from "@backend/database/schema";
+
 /**
  * This only checks object string keys
  * not numeric indices! Only because Typescript
@@ -12,4 +15,17 @@ export function shallowEqual<T extends object>(a: T, b: T) {
     if (a[key] !== b[key]) return false;
   }
   return true;
+}
+
+export function getUserHomeUrl(user: Partial<User>) {
+  switch (user.role as Role) {
+    case "user":
+      return "/trainee";
+    case "instructor":
+      return "/instructor";
+    case "admin":
+      return "/admin";
+    default:
+      return "/";
+  }
 }
