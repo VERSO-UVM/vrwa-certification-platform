@@ -14,7 +14,7 @@ import { createTRPCClient, httpLink } from "@trpc/client";
 import { useState } from "react";
 
 import "./app.css";
-import { getViteBackend, TRPCProvider, type AppRouter } from "~/utils/trpc";
+import { TRPCProvider, type AppRouter } from "~/utils/trpc";
 import type { Route } from "./+types/root";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { getTrpcUrl } from "./utils/env";
