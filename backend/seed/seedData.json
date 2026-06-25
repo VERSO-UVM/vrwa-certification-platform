@@ -32,7 +32,7 @@
         {
             "email": "founders@gmail.com",
             "password" : "america123",
-            "role" : "trainee",
+            "role" : "user",
             "orgId" : "",
             "profiles": [
                 {"firstName": "Alexander", "lastName": "Hamilton", "address": "49 Seven Squared Ave",
