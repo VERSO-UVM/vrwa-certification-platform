@@ -71,7 +71,7 @@ First, install [Docker Desktop](https://docs.docker.com/get-started/get-docker/)
 #### .env
 Next, in the [backend directory](backend), copy all lines from `.env.example` and paste them a new `.env` file (in the same directory). `.env` files generally store environment variables, and this one stores the URL for the database used by the project.
 #### Bun
-Once this is complete, go back to the [main directory](.) of the project. Then go to [bun.sh](bun.sh) to install Bun if it is not already on your computer. (Bun is primarily a runtime environment for JavaScript, but also functions as a package manager, among other things.)
+Once this is complete, go back to the [main directory](.) of the project. Then go to [bun.sh](https://bun.sh) to install Bun if it is not already on your computer. (Bun is primarily a runtime environment for JavaScript, but also functions as a package manager, among other things.)
 
 In the terminal, run the command `bun install`. This will install all necessary dependencies for the project from `package.json`.
 
@@ -82,11 +82,13 @@ Finally, run `bun dev`. In the webapp section of the terminal output, open the l
 ### Quickstart
 Once you have done the initial setup, you can simply run the following commands to get the webapp running:
 ```bash
+# to make sure all dependencies are installed:
 $ bun install
-$ bun db:dev
+
+# to set up the development database:
+$ bun db:dev # Docker Desktop must be open
+
+# to run development servers:
 $ bun dev
 ```
 
-1. Install dependencies: `bun install`
-2. Set-up development database: With [docker](https://docs.docker.com/get-started/get-docker/) running use `bun db:dev`, or see [backend/README.md](backend/README.md)
-3. Run development servers: `bun dev`
