@@ -15,16 +15,16 @@ $ bun install
 $ bun start
 
 # watch mode
-$ bun start:dev
+$ bun start:dev # BROKEN?
 # orrr...
 $ bun dev
 
 # production mode
-$ bun start:prod
+$ bun start:prod # BROKEN?
 ```
 
 ### Run tests
-
+<mark>I think all of these are broken?</mark>
 ```bash
 # unit tests
 $ bun run test
