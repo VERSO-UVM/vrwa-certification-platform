@@ -65,6 +65,28 @@ To build a new training and credential tracking system that:
 
 ## Contribution & Development Instructions
 
+### Initial setup:
+#### Docker
+First, install [Docker Desktop](https://docs.docker.com/get-started/get-docker/) on your computer. Docker allows you to run applications and their dependencies in _containers_, which share the same OS kernel but don't affect other containers. This gives you a more isolated environment, which means the software in each container will run uniformly. Docker Desktop must be running to create the container you will use to run this project.
+#### .env
+Next, in the [backend directory](backend), copy all lines from `.env.example` and paste them a new `.env` file (in the same directory). `.env` files generally store environment variables, and this one stores the URL for the database used by the project.
+#### Bun
+Once this is complete, go back to the [main directory](.) of the project. Then go to [bun.sh](bun.sh) to install Bun if it is not already on your computer. (Bun is primarily a runtime environment for JavaScript, but also functions as a package manager, among other things.)
+
+In the terminal, run the command `bun install`. This will install all necessary dependencies for the project from `package.json`.
+
+Then run `bun db:dev`. This will set up the development database for the project. For more information on everything this command does, view the README in the backend directory ([backend/README.md](backend/README.md)).
+
+Finally, run `bun dev`. In the webapp section of the terminal output, open the link to the local host. Now you can view the running webapp! To close the webapp, run the command `docker compose -f backend/compose.dev.yml down` in the terminal.
+
+### Quickstart
+Once you have done the initial setup, you can simply run the following commands to get the webapp running:
+```bash
+$ bun install
+$ bun db:dev
+$ bun dev
+```
+
 1. Install dependencies: `bun install`
 2. Set-up development database: With [docker](https://docs.docker.com/get-started/get-docker/) running use `bun db:dev`, or see [backend/README.md](backend/README.md)
 3. Run development servers: `bun dev`
