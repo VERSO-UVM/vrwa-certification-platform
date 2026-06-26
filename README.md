@@ -2,7 +2,7 @@
 
 ## Summary
 
-The Vermont Rural Water Association (VRWA) offers 3–12 training classes per month for water and wastewater treatment operators across Vermont. These classes provide continuing education credits required for certification. Currently, over 90% of class registrations are completed via the VRWA website, which uses WordPress with WooCommerce and Event Tickets Plus. However, registrations are manually entered into a Microsoft Access database that also handles payment tracking, sign-in sheets, attendance, certificates, and regulatory reporting. This project seeks to replace the outdated database with a modern, integrated solution that automates registration syncing, enhances usability, and improves access for both operators and regulatory partners.
+The Vermont Rural Water Association (VRWA) offers approximately 10-15 training classes per quarter for water and wastewater treatment operators across Vermont. These classes provide credit hours required for water certifications and wastewater licenses. <span style="background-color: #7373EB">Currently, over 90% of class registrations are completed via the VRWA website, which uses WordPress with WooCommerce and Event Tickets Plus. However, registrations are manually entered into a Microsoft Access database that also handles payment tracking, sign-in sheets, attendance, certificates, and regulatory reporting.</span> This project seeks to replace the outdated database with a modern, integrated solution that automates registration syncing, enhances usability, and improves access for both operators and regulatory partners.
 
 ## Goal
 
@@ -28,8 +28,10 @@ To build a new training and credential tracking system that:
     - Upcoming class schedule and registration status
     - Past class attendance and earned credit hours
     - Downloadable course completion certificates
-  - Admin dashboard to manually upload credit hours from non-VRWA classes
-
+  - Admin dashboard to manually upload credit hours from non-VRWA classes <span style="background-color: #7373EB"> why not add this above? </span>
+  - <span style="background-color: #7373EB"> Add something about instructor view? </span>
+  
+<span style="background-color: #7373EB"> Why do we have core features and user portal features as different sections? I think we can combine them, or make three subsections of a "Features" section for admin view, student view, and instructor view </span>
 
 ## Implementation
 
