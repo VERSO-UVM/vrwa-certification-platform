@@ -10,7 +10,7 @@ To build a new training and credential tracking system that:
 - Replaces the Microsoft Access database with a secure, web-accessible database
 - Integrates with VRWA’s existing website for automatic data entry
 - Enables operators to log in and view their training records and credit hours
-- Supports reporting and compliance with Vermont regulatory agencies
+- Supports reporting and compliance with Vermont regulatory agencies <mark>What does this mean?</mark>
 
 ## Design and Development
 
@@ -41,11 +41,13 @@ To build a new training and credential tracking system that:
 - Support data migration from existing Microsoft Access database
 - Configure export tools for monthly invoice tracking and credit hour reporting
 
+<mark>I feel like a lot of this is repeating the features section above. Maybe we add more details to the features section and keep this more general?</mark>
+
 ## Testing and Launching
 
 - Conduct internal testing with VRWA staff for registration syncing and admin workflows
 - Beta test operator portal with a small group of users to gather feedback
-- Soft launch with live data but limited access to ensure stability
+- Soft launch with live data but limit access to ensure stability
 - Official public launch to all users and operators with communication via the VRWA site
 - Monitor system for bugs and user experience issues, with a post-launch improvement phase
 
@@ -69,7 +71,7 @@ To build a new training and credential tracking system that:
 
 ### Initial setup:
 #### Docker
-First, install [Docker Desktop](https://docs.docker.com/get-started/get-docker/) on your computer. Docker allows you to run applications and their dependencies in _containers_, which share the same OS kernel but don't affect other containers. This gives you a more isolated environment, which means the software in each container will run uniformly. Docker Desktop must be running to create the container you will use to run this project.
+First, install [Docker Desktop](https://docs.docker.com/get-started/get-docker/) on your computer. Docker allows you to run applications and their dependencies in containers, which share the same OS kernel but don't affect other containers. This gives you a more isolated environment, which means the software in each container will run uniformly. Docker Desktop must be running to create the container you will use to run this project.
 #### .env
 Next, in the [backend directory](backend), copy all lines from `.env.example` and paste them a new `.env` file (in the same directory). `.env` files generally store environment variables, and this one stores the URL for the database used by the project.
 #### Bun
