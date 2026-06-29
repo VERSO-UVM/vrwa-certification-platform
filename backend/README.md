@@ -10,17 +10,20 @@ $ bun install
 
 ### Compile and run the project
 
+When running either of the following commands in a Unix-like operating system, make sure you stop them afterwards with `ctrl` + `c` instead of `ctrl` + `z`! They must be fully terminated for other processes to run properly.
 ```bash
 # run without watch
+# (runs the project backend without automatically restarting when files are modified)
 $ bun start
 
 # watch mode
+# (runs the project backend and automatically restarts when files are modified)
 $ bun dev
 ```
 
 ### Database
 
-The TrainingDB uses a vanilla PostgreSQL database. For development purposes, a docker compose environment is provided but you are free to provide your own credentials.
+The TrainingDB uses a vanilla PostgreSQL database. For development purposes, a Docker Compose environment is provided, but you are free to provide your own credentials.
 
 #### DB Quickstart
 
