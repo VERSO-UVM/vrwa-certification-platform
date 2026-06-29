@@ -58,7 +58,7 @@ Make sure to also apply migrations! If you need to reset/wipe the database: `rm 
 ### Future commands
 
 As this project progresses, we will add functionality for more terminal commands:
-<!-->
+<!--
 Do we need start:dev since we already have dev?
 What is production mode?
 What do e2e and coverage tests actually do?
