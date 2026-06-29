@@ -7,7 +7,7 @@
 Use `bun install` to install all necessary dependencies for the project backend.
 
 ### Compile and run the project
-
+<!-- Do I need these sentences? I ran into this problem but I'm not sure it's common enough to warrant this. -->
 When running either of the following commands in a Unix-like operating system, make sure you stop them afterwards with `ctrl` + `C` instead of `ctrl` + `Z`! They must be fully terminated for other processes to run properly.
 ```bash
 # run without watch
@@ -47,14 +47,15 @@ bun db:seed
 
 #### Starting a development database with Docker Compose
 
-A connection string example is provided in `.env.example`.
+A connection string example is provided in `.env.example`. In this directory, make a new file called `.env` and copy the contents of `.env.example` into it. This will store the URL for the database the project uses.
 
-To start the db container: `docker compose -f compose.dev.yml up -d`
-To stop the db container: `docker compose -f compose.dev.yml down`
+To start the database container: `docker compose -f compose.dev.yml up -d`. Make sure you have Docker Desktop running first, or this will not work! See the [main README](../README.md) for more details on this.
 
-Make sure to also apply migrations! If you need to reset/wipe the database: `rm -rf .tmp/db-data`
+To stop the database container: `docker compose -f compose.dev.yml down`.
 
-### Future commands
+Make sure to also apply migrations (see the DB Management Commands section above)! If you need to reset/wipe the database, use `rm -rf .tmp/db-data`.
+
+### Future terminal commands
 
 As this project progresses, we will add functionality for more terminal commands:
 <!--

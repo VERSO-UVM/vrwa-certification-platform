@@ -2,7 +2,7 @@
 
 ## Summary
 
-The Vermont Rural Water Association (VRWA) offers approximately 10-15 training classes per quarter for water and wastewater treatment operators across Vermont. These classes provide credit hours required for water certifications and wastewater licenses. <mark>Currently, over 90% of class registrations are completed via the VRWA website, which uses WordPress with WooCommerce and Event Tickets Plus. However, registrations are manually entered into a Microsoft Access database that also handles payment tracking, sign-in sheets, attendance, certificates, and regulatory reporting.</mark> This project seeks to replace the outdated database with a modern, integrated solution that automates registration syncing, enhances usability, and improves access for both operators and regulatory partners.
+The Vermont Rural Water Association (VRWA) offers approximately 10-15 training classes per quarter for water and wastewater treatment operators across Vermont. These classes provide credit hours required for water certifications and wastewater licenses. <!-- Not sure if this next section is accurate - need to confirm -->Currently, over 90% of class registrations are completed via the VRWA website, which uses WordPress with WooCommerce and Event Tickets Plus. However, registrations are manually entered into a Microsoft Access database that also handles payment tracking, sign-in sheets, attendance, certificates, and regulatory reporting.<!----> This project seeks to replace the outdated database with a modern, integrated solution that automates registration syncing, enhances usability, and improves access for both operators and regulatory partners.
 
 ## Goal
 
@@ -10,7 +10,7 @@ To build a new training and credential tracking system that:
 - Replaces the Microsoft Access database with a secure, web-accessible database
 - Integrates with VRWA’s existing website for automatic data entry
 - Enables operators to log in and view their training records and credit hours
-- Supports reporting and compliance with Vermont regulatory agencies <mark>What does this mean?</mark>
+- Supports reporting and compliance with Vermont regulatory agencies <!-- What does this mean? -->
 
 ## Design and Development
 
@@ -28,10 +28,12 @@ To build a new training and credential tracking system that:
     - Upcoming class schedule and registration status
     - Past class attendance and earned credit hours
     - Downloadable course completion certificates
-  - Admin dashboard to manually upload credit hours from non-VRWA classes <mark> why not add this above? </mark>
-  - <mark> Add something about instructor view? </mark>
+  - Admin dashboard to manually upload credit hours from non-VRWA classes <!-- why not add this above? -->
+  <!-- Add something about instructor view? -->
   
-<mark> Why do we have core features and user portal features as different sections? I think we can combine them, or make three subsections of a "Features" section for admin view, student view, and instructor view </mark>
+<!--
+Why do we have core features and user portal features as different sections? I think we can combine them, or make three subsections of a "Features" section for admin view, student view, and instructor view
+-->
 
 ## Implementation
 
@@ -41,7 +43,8 @@ To build a new training and credential tracking system that:
 - Support data migration from existing Microsoft Access database
 - Configure export tools for monthly invoice tracking and credit hour reporting
 
-<mark>I feel like a lot of this is repeating the features section above. Maybe we add more details to the features section and keep this more general?</mark>
+<!-- I feel like a lot of this is repeating the features section above. Maybe we add more details to the features section and keep this more general?
+-->
 
 ## Testing and Launching
 
