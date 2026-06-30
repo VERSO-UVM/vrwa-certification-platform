@@ -37,7 +37,7 @@ export function AdminDashboard() {
       <PageHeader>Admin Dashboard</PageHeader>
 
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
-        <Card className="@xl:col-span-5">
+        <Card className="@xl:col-span-5" variant="blue">
           <CardHeader>
             <CardTitle>Upcoming Classes</CardTitle>
             <CardDescription>
@@ -60,7 +60,7 @@ export function AdminDashboard() {
             />
           </CardContent>
         </Card>
-        <Card className="space-y-4 @xl:col-span-3">
+        <Card className="space-y-4 @xl:col-span-3" variant="yellow">
           <CardHeader className="pb-3">
             <CardTitle className="text-center">Quick Links</CardTitle>
           </CardHeader>
@@ -97,7 +97,7 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="col-span-full">
+        <Card className="col-span-full" variant="green">
           <CardTitle className="text-center">Search Reservations</CardTitle>
           <CardContent>
             <DataTable
