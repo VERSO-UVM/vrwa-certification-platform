@@ -27,5 +27,6 @@ export default [
   layout("routes/auth/layout.tsx", [
     route("login", "routes/auth/login.tsx"),
     route("signup", "routes/auth/signup.tsx"),
+    route("profile-select", "routes/auth/profile-select.tsx"),
   ]),
 ] satisfies RouteConfig;

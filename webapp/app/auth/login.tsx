@@ -10,8 +10,8 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { authClient, getSession } from "~/utils/auth";
-import { getUserHomeUrl } from "~/utils/utils";
+import { authClient, getSession, type Session } from "~/utils/auth";
+import { getUserRedirectUrl } from "~/utils/utils";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -25,23 +25,22 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    const { data: _, error: signInError } =
-      await authClient.signIn.email({
-        email,
-        password,
-      });
+    const { data: _, error: signInError } = await authClient.signIn.email({
+      email,
+      password,
+    });
 
     if (signInError) {
       setError(signInError.message || "Failed to sign in");
       setLoading(false);
     } else {
-      const user = (await getSession())?.data?.user;
-      if (user == null) {
+      const sessionData = (await getSession())?.data as Session | null;
+      if (sessionData?.user == null) {
         setError("Unable to sign in");
         setLoading(false);
         return;
       }
-      navigate(getUserHomeUrl(user), { replace: true });
+      navigate(getUserRedirectUrl(sessionData), { replace: true });
     }
   }
 

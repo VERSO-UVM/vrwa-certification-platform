@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import db from "~/database";
@@ -43,6 +44,28 @@ export const auth = betterAuth({
       },
     },
   },
+
+  // Fill in activeProfileId if it can be determined automatically
+  databaseHooks: {
+    session: {
+      create: {
+        before: async (session, ctx) => {
+          const profiles = await db.client
+            .select()
+            .from(schema.profile)
+            .where(eq(schema.profile.userId, session.userId));
+          const activeProfileId =
+            profiles.length == 1 ? profiles[0]?.id : session.activeProfileId;
+          return {
+            data: {
+              ...session,
+              activeProfileId,
+            },
+          };
+        },
+      },
+    },
+  },
   plugins: [
     admin({
       ac,
@@ -57,3 +80,5 @@ export const auth = betterAuth({
   },
   experimental: { joins: true },
 });
+
+export type Session = typeof auth.$Infer.Session;
