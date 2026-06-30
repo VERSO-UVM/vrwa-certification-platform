@@ -10,11 +10,21 @@
 
 html,
 body {
+  /* @apply bg-soft-blue; */
   @apply bg-white dark:bg-gray-950;
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
+}
+
+@theme {
+  --color-soft-blue: #5a8acc;
+  --color-dark-blue: #153383;
+  --color-light-green: #90B766;
+  --color-dark-green: #5B9352;
+  --color-dandelion: #ffd666;
+  --color-dark-orange: #ca7d53;
 }
 
 @theme inline {
@@ -60,6 +70,7 @@ body {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
+  /* --card: #90b766; */
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
