@@ -9,11 +9,11 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        blue: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
-        purple:
-          "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300",
-        green:
-          "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
+        blue: "bg-blue-200/50 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
+        violet:
+          "bg-violet-200/50 text-violet-800 dark:bg-violet-950 dark:text-violet-300",
+        indigo:
+          "bg-indigo-200/50 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300",
         default: "bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
         secondary:
           "bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
