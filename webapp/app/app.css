@@ -151,9 +151,9 @@ body {
 .vrwa-light {
   @apply bg-gray-50;
   --background: var(--color-gray-200);
-  --foreground: var(--color-dark-blue);
+  --foreground: var(--color-gray-800);
   --card: #5a8acc22;
-  --card-foreground: var(--color-dark-blue);
+  --card-foreground: var(--color-gray-950);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
   --primary: var(--color-dark-blue);
@@ -161,8 +161,8 @@ body {
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: var(--color-gray-400);
-  --muted-foreground: #153383bb; /* the dark blue, but at a lighter opacity */
-  --accent: oklch(0.269 0 0);
+  --muted-foreground: var(--color-gray-500);
+  --accent: var(--color-gray-400);
   --accent-foreground: oklch(16.47% 0.05501 25.619);
   --destructive: oklch(0.704 0.191 22.216);
   --border: var(--color-gray-300);
@@ -173,12 +173,12 @@ body {
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar: var(--color-gray-100);
+  --sidebar-foreground: var(--color-gray-800);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-accent: var(--color-gray-800);
+  --sidebar-accent-foreground: var(--color-gray-100);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
