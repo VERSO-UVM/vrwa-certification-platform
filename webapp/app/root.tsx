@@ -92,7 +92,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Meta />
             <Links />
           </head>
-          <body className="vrwa-light">
+          <body className="dark">
             <TooltipProvider>{children}</TooltipProvider>
             {/* customize getKey to prevent scroll reset when URLSearchParams changes*/}
             <ScrollRestoration getKey={(location) => location.pathname} />
