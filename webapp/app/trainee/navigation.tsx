@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 import {
   Sidebar,
@@ -10,8 +11,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "~/components/ui/sidebar";
+import { useSession, type Session } from "~/utils/auth";
+import { useTRPC } from "~/utils/trpc";
 
 export function UserSidebar() {
+  const trpc = useTRPC();
+  const activeProfileQuery = useQuery(trpc.profile.getActiveProfile.queryOptions());
   return (
     <Sidebar>
       <SidebarHeader />
@@ -37,6 +42,13 @@ export function UserSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <SidebarMenuButton asChild>
+          <Link to="/profile-select" className="font-medium text-center">
+            {activeProfileQuery.data?.firstName}
+            {" "}
+            {activeProfileQuery.data?.lastName}
+          </Link>
+        </SidebarMenuButton>
         <SidebarMenuButton asChild>
           <Link to="/" className="font-medium text-center">
             Exit
