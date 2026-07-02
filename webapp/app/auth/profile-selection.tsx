@@ -16,7 +16,6 @@ export function ProfileSelection() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const session = useSession();
   const profilesQuery = useQuery(trpc.profile.getUserProfiles.queryOptions());
   const profiles = profilesQuery.data ?? [];
   // Sort by last name
@@ -36,7 +35,7 @@ export function ProfileSelection() {
   return (
     <Card className="p-4 w-xl mt-10 self-center">
       <CardHeader>
-        <CardTitle className="text-center">Profile Selection</CardTitle>
+        <CardTitle className="text-center">Select Your Profile</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col space-y-4 w-lg m-auto">
         {/* TODO: Create New Profile button */}
