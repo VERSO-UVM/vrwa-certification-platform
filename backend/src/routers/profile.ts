@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 
 import db from "~/database";
 import { profile } from "~/database/schema";
-import { protectedProcedure, router } from "~/utils/trpc";
+import { adminProcedure, protectedProcedure, router } from "~/utils/trpc";
 
 import { createUpdateSchema } from "drizzle-zod";
 import z from "zod";
@@ -12,7 +12,7 @@ const updateSchema = createUpdateSchema(profile, {
 });
 
 export const profileRouter = router({
-  update: protectedProcedure.input(updateSchema).mutation(({ input }) => {
+  update: adminProcedure.input(updateSchema).mutation(({ input }) => {
     const { id, ...changes } = input;
     return db.client
       .update(profile)
