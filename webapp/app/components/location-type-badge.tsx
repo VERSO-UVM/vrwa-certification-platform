@@ -8,6 +8,6 @@ export function LocationTypeBadge({ value }: { value: CourseLocation }) {
     case "hybrid":
       return <Badge variant="indigo">Hybrid</Badge>;
     case "in-person":
-      return <Badge variant="indigo">In Person</Badge>;
+      return <Badge variant="blue">In Person</Badge>;
   }
 }

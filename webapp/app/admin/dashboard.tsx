@@ -15,6 +15,7 @@ import { Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Book, Trophy, Users } from "lucide-react";
 import { LocationTypeBadge } from "~/components/location-type-badge";
+import { PaymentStatusBadge } from "~/components/payment-status-badge";
 import { PageHeader } from "~/components/page-header";
 import {
   courseEventDefPresets,
