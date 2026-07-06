@@ -58,11 +58,6 @@ Make sure to also apply migrations (see the DB Management Commands section above
 ### Future terminal commands
 
 As this project progresses, we will add functionality for more terminal commands:
-<!--
-Do we need start:dev since we already have dev?
-What is production mode?
-What do e2e and coverage tests actually do?
--->
 ```bash
 # Running the project:
 $ bun start:dev # this will be another way to run the backend in watch mode
