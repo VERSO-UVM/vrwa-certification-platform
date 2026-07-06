@@ -2,7 +2,7 @@
 
 ## Background
 
-The Vermont Rural Water Association (VRWA) offers approximately 10-15 training classes per quarter for water and wastewater treatment operators across Vermont. These classes provide credit hours required for water certifications and wastewater licenses. <!-- Not sure if this next section is accurate - need to confirm -->Currently, over 90% of class registrations are completed via the VRWA website, which uses WordPress with WooCommerce and Event Tickets Plus. However, registrations are manually entered into a Microsoft Access database that also handles payment tracking, sign-in sheets, attendance, certificates, and regulatory reporting.<!----> This project seeks to replace the outdated database with a modern, integrated solution that automates registration syncing, enhances usability, and improves access for both operators and regulatory partners.
+The Vermont Rural Water Association (VRWA) offers approximately 10-15 training classes per quarter for water and wastewater treatment operators across Vermont. These classes provide credit hours required for water certifications and wastewater licenses. <!-- Need to check with VRWA to confirm this is still accurate -->Currently, over 90% of class registrations are completed via the VRWA website, which uses WordPress with WooCommerce and Event Tickets Plus. However, registrations are manually entered into a Microsoft Access database that also handles payment tracking, sign-in sheets, attendance, certificates, and regulatory reporting.<!----> This project seeks to replace the outdated database with a modern, integrated solution that automates registration syncing, enhances usability, and improves access for both operators and regulatory partners.
 
 ## Goal
 
@@ -10,7 +10,7 @@ To build a new training and credential tracking system that:
 - Replaces the Microsoft Access database with one that is secure and web-accessible
 - Integrates with VRWA’s existing website for automatic data entry
 - Enables trainees to log in and view their training records and credit hours
-- Supports reporting and compliance with Vermont regulatory agencies <!-- What does this mean? -->
+- Supports reporting and complies with Vermont regulatory agencies <!-- Need to check with K about what this entails -->
 
 ## Design and Development
 
@@ -38,7 +38,7 @@ To build a new training and credential tracking system that:
 - Work with VRWA staff to conduct internal testing for administration workflows and registration syncing
 - Beta test trainee portal with a small group of users to gather feedback
 - Soft launch with live data but limit access to ensure stability
-- Official public launch to all users via displays on the VRWA site
+- Official public launch to all users with an announcement on the VRWA site
 - Monitor system for bugs and user experience issues, with a post-launch improvement phase
 
 ## Resources
@@ -50,7 +50,7 @@ To build a new training and credential tracking system that:
 
 ### Potential Funding
 
-<!-- Not sure how accurate the funding section is; I can ask Kendall during the next ORCA meeting if there are updates to this. -E -->
+<!-- Need to check with K to see if this is still accurate -->
 
 - Internal VRWA budget
 - State training and compliance funds
