@@ -7,7 +7,6 @@
 Use `bun install` to install all necessary dependencies for the project backend.
 
 ### Compile and run the project
-<!-- Do I need these sentences? I ran into this problem but I'm not sure it's common enough to warrant this. -->
 When running either of the following commands in a Unix-like operating system, make sure you stop them afterwards with `ctrl` + `C` instead of `ctrl` + `Z`! They must be fully terminated for other processes to run properly.
 ```bash
 # run without watch
