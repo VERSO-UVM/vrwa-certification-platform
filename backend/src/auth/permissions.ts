@@ -6,9 +6,7 @@
  * https://www.better-auth.com/docs/plugins/admin#access-control
  */
 
-import {
-  createAccessControl,
-} from "better-auth/plugins/access";
+import { createAccessControl } from "better-auth/plugins/access";
 import {
   defaultStatements,
   adminAc,

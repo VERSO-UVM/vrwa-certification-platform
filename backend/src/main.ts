@@ -48,7 +48,7 @@ app.route({
     try {
       // Construct request URL
       const url = new URL(request.url, `http://${request.headers.host}`);
-      
+
       // Convert Fastify headers to standard Headers object
       const headers = fromNodeHeaders(request.headers);
 
@@ -68,12 +68,12 @@ app.route({
       return reply.send(response.body ? await response.text() : null);
     } catch (error) {
       app.log.error("Authentication Error: " + error);
-      return reply.status(500).send({ 
+      return reply.status(500).send({
         error: "Internal authentication error",
-        code: "AUTH_FAILURE"
+        code: "AUTH_FAILURE",
       });
     }
-  }
+  },
 });
 
 void app.listen({ port: parseInt(process.env.PORT || "") || 3000 });

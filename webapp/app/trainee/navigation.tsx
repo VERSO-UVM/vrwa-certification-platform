@@ -16,7 +16,9 @@ import { useTRPC } from "~/utils/trpc";
 
 export function UserSidebar() {
   const trpc = useTRPC();
-  const activeProfileQuery = useQuery(trpc.profile.getActiveProfile.queryOptions());
+  const activeProfileQuery = useQuery(
+    trpc.profile.getActiveProfile.queryOptions(),
+  );
   return (
     <Sidebar>
       <SidebarHeader />
@@ -44,8 +46,7 @@ export function UserSidebar() {
       <SidebarFooter>
         <SidebarMenuButton asChild>
           <Link to="/profile-select" className="font-medium text-center">
-            {activeProfileQuery.data?.firstName}
-            {" "}
+            {activeProfileQuery.data?.firstName}{" "}
             {activeProfileQuery.data?.lastName}
           </Link>
         </SidebarMenuButton>
