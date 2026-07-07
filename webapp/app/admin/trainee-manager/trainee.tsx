@@ -14,7 +14,7 @@ import { profileDefPresets } from "~/utils/field-defs/profile";
 export function Trainee({ trainee }: { trainee: Profile }) {
   return (
     <div id={trainee.id}>
-      <br></br><h2 className="text-xl font-medium text-left p-4 vrwa-light:vrwa-light:text-gray-800 dark:dark:text-[#90b766] rounded-xl">
+      <br></br><h2 className="text-xl font-medium text-left p-4 vrwa-light:text-gray-800 dark:text-gray-200 rounded-xl">
         {trainee.firstName} {trainee.lastName}
       </h2>
 

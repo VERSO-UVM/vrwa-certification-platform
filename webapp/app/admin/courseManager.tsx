@@ -243,7 +243,7 @@ export function CourseManager() {
             </Drawer>
           </div>
         </Card>
-        <Card className="@xl:col-span-8" variant="blue">
+        <Card className="@xl:col-span-8" variant="yellow">
           <CardHeader>
             <CardTitle>Courses Overview</CardTitle>
             <CardDescription>
