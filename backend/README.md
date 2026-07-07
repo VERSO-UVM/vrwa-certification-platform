@@ -18,6 +18,16 @@ $ bun start
 $ bun dev
 ```
 
+#### Authentication Database Schema
+
+Better-Auth uses it's own configuration to generate the database schema. This is derived automatically from the plugins.
+
+```sh
+bunx @better-auth/cli generate --config src/auth/server.ts --output src/database/auth.ts
+```
+
+This generates the auth schema to it's own file, so that it doesn't mix with the other database tables.
+
 ### Database
 
 The TrainingDB uses a Vanilla PostgreSQL database. For development purposes, a Docker Compose environment is provided, but you are free to provide your own credentials.
