@@ -19,6 +19,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@trpc/client": "^11.10.0",
     "@trpc/tanstack-react-query": "^11.10.0",
+    "better-auth": "catalog:",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-zod": "^0.8.3",
