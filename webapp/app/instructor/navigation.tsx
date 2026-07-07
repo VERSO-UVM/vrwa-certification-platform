@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { LogOutButton } from "~/auth/logout-button";
 import {
   Sidebar,
   SidebarContent,
@@ -35,9 +36,7 @@ export function InstructorSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenuButton asChild>
-          <Link to="/" className="font-medium">
-            Exit
-          </Link>
+          <LogOutButton />
         </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>

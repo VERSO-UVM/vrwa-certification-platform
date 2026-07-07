@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
+import { LogOutButton } from "~/auth/logout-button";
 import {
   Sidebar,
   SidebarContent,
@@ -51,9 +52,7 @@ export function UserSidebar() {
           </Link>
         </SidebarMenuButton>
         <SidebarMenuButton asChild>
-          <Link to="/" className="font-medium text-center">
-            Exit
-          </Link>
+          <LogOutButton />
         </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>

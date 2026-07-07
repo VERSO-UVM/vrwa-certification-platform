@@ -1,19 +1,23 @@
 /* Dev login buttons in home page */
 
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "~/components/ui/button";
 import { signIn } from "~/utils/auth";
 import { isDev } from "~/utils/utils";
 
-async function devLogin(where: "admin" | "instructor" | "trainee") {
-  const { error } = await signIn.email({
-    email: "example1@gmail.com",
-    password: "password1",
-    callbackURL: `/${where}`,
-  });
-  if (error) throw error;
-}
-
 export function DevHacks() {
+  const queryClient = useQueryClient();
+  const devLogin = async function (where: "admin" | "instructor" | "trainee") {
+    // Invalidate all queries
+    queryClient.invalidateQueries();
+    const { error } = await signIn.email({
+      email: "example1@gmail.com",
+      password: "password1",
+      callbackURL: `/${where}`,
+    });
+    if (error) throw error;
+  };
+
   if (!isDev()) return <></>;
   return (
     <>
