@@ -1,17 +1,19 @@
+/**
+ * Access permissions using better-auth access
+ * control plugin.
+ *
+ * See docs on how to write permissions
+ * https://www.better-auth.com/docs/plugins/admin#access-control
+ */
+
 import {
   createAccessControl,
-  type AuthorizeResponse,
 } from "better-auth/plugins/access";
 import {
   defaultStatements,
   adminAc,
   userAc,
 } from "better-auth/plugins/admin/access";
-
-/**
- * See docs on how to write permissions
- * https://www.better-auth.com/docs/plugins/admin#access-control
- */
 
 const statements = {
   certifications: ["view", "update", "assign"], // System configuration; key value table in postgres

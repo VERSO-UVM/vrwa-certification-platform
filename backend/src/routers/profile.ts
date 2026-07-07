@@ -12,6 +12,10 @@ const updateSchema = createUpdateSchema(profile, {
 });
 
 export const profileRouter = router({
+  /**
+   * Update the profile information associated with a user.
+   * This is an admin procedure.
+   */
   update: adminProcedure.input(updateSchema).mutation(({ input }) => {
     const { id, ...changes } = input;
     return db.client
@@ -23,7 +27,10 @@ export const profileRouter = router({
       .returning();
   }),
 
-  getUserProfiles: protectedProcedure.query(async ({ ctx }) => {
+  /**
+   * Get all profiles associated with the logged-in user.
+   */
+  getProfiles: protectedProcedure.query(async ({ ctx }) => {
     const profiles = await db.client
       .select()
       .from(profile)
@@ -31,6 +38,9 @@ export const profileRouter = router({
     return profiles;
   }),
 
+  /**
+   * Get the entry for the currently active profile.
+   */
   getActiveProfile: protectedProcedure.query(async ({ ctx }) => {
     const profiles = await db.client
       .select()

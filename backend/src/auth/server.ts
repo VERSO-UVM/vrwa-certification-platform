@@ -1,3 +1,9 @@
+/**
+ * Better-auth configuration.
+ * See README for how to generate the database table
+ * schema from this configuration.
+ */
+
 import { eq } from "drizzle-orm";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";

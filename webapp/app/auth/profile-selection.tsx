@@ -16,7 +16,7 @@ export function ProfileSelection() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const profilesQuery = useQuery(trpc.profile.getUserProfiles.queryOptions());
+  const profilesQuery = useQuery(trpc.profile.getProfiles.queryOptions());
   const profiles = profilesQuery.data ?? [];
   // Sort by last name
   profiles.sort((a, b) => a.lastName.localeCompare(b.lastName));
