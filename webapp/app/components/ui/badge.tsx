@@ -16,8 +16,8 @@ const badgeVariants = cva(
         indigo:
           "bg-indigo-200/50 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300",
         // Variants for paid/unpaid indicators
-        green: "bg-green-700/10 text-green-700",
-        orange: "bg-amber-600/10 text-amber-600",
+        green: "vrwa-light:bg-green-700/10 vrwa-light:text-green-700 dark:bg-green-900/40 dark:text-green-500/90",
+        orange: "bg-amber-600/15 text-amber-600 dark:bg-amber-900/40 dark:text-amber-500/90",
         // Others
         test:
           "bg-red-500 text-purple-800",
