@@ -14,9 +14,9 @@ import { profileDefPresets } from "~/utils/field-defs/profile";
 export function Trainee({ trainee }: { trainee: Profile }) {
   return (
     <div id={trainee.id}>
-      <br></br><h2 className="text-xl font-medium text-center p-4 vrwa-light:bg-[#90B76622] vrwa-light:text-[#2f5e28] dark:bg-[#2f5e2844] dark:text-[#90b766] rounded-xl">
+      <br></br><h2 className="text-xl font-medium text-left p-4 vrwa-light:vrwa-light:text-gray-800 dark:dark:text-[#90b766] rounded-xl">
         {trainee.firstName} {trainee.lastName}
-      </h2><br></br>
+      </h2>
 
       <div className="flex flex-wrap place-content-between space-x-5">
         <Card className="flex-1 border-none shadow-none max-w-[100%]" variant="green">
@@ -30,9 +30,12 @@ export function Trainee({ trainee }: { trainee: Profile }) {
             <TraineeReservations profileId={trainee.id} />
           </CardContent>
         </Card>
-        <Card className="w-[250px] border-none shadow-none" variant="green">
+        <Card className="w-[250px] border-none shadow-none" variant="yellow">
           <CardHeader>
             <CardTitle>Profile Details</CardTitle>
+            <CardDescription>
+              {trainee.firstName + " " + trainee.lastName}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <TraineeEditButton label="Edit" trainee={trainee} />
