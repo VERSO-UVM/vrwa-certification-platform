@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
@@ -19,6 +20,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   async function handleLogin(e: React.SubmitEvent) {
     e.preventDefault();
@@ -40,6 +42,10 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
+
+      // Invalidate ALL queries after logging in
+      await queryClient.invalidateQueries();
+
       navigate(getUserRedirectUrl(sessionData), { replace: true });
     }
   }
