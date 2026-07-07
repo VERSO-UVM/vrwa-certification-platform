@@ -67,7 +67,7 @@ export function AdminDashboard() {
           </CardHeader>
           <CardContent className="grid gap-2">
             <Button
-              variant="ghost"
+              variant="ghost_lighter"
               className="justify-start h-auto py-3 px-2"
               asChild
             >
@@ -77,7 +77,7 @@ export function AdminDashboard() {
             </Button>
 
             <Button
-              variant="ghost"
+              variant="ghost_lighter"
               className="justify-start h-auto py-3 px-2"
               asChild
             >
@@ -87,7 +87,7 @@ export function AdminDashboard() {
             </Button>
 
             <Button
-              variant="ghost"
+              variant="ghost_lighter"
               className="justify-start h-auto py-3 px-2"
               asChild
             >

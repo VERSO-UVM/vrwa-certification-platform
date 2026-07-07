@@ -19,8 +19,6 @@ const badgeVariants = cva(
         green: "vrwa-light:bg-green-700/10 vrwa-light:text-green-700 dark:bg-green-900/40 dark:text-green-500/90",
         orange: "bg-amber-600/15 text-amber-600 dark:bg-amber-900/40 dark:text-amber-500/90",
         // Others
-        test:
-          "bg-red-500 text-purple-800",
         default: "bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
         secondary:
           "bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
