@@ -8,7 +8,7 @@ const cardVariants = cva(
   {
     variants: {
       variant: {
-        blue: "vrwa-light:bg-[#5a8acc22] vrwa-light:text-[#153383] dark:bg-[#15338344] dark:text-[#5a8acc]",
+        blue: "vrwa-light:bg-[#5a8acc22] vrwa-light:text-[#153383] dark:bg-[#15338344] dark:text-[#84a8d9]",
         green: "vrwa-light:bg-[#90B76622] vrwa-light:text-[#2f5e28] dark:bg-[#2f5e2844] dark:text-[#90b766]",
         yellow: "vrwa-light:bg-[#ffd66633] vrwa-light:text-[#917529] dark:bg-[#91752944] dark:text-[#ffd666]",
         default: "bg-white text-black"

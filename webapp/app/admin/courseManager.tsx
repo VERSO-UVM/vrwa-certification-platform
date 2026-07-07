@@ -175,7 +175,7 @@ export function CourseManager() {
     <div className="flex-1">
       <PageHeader>Course Manager</PageHeader>
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
-        <Card className="@xl:col-span-8">
+        <Card className="@xl:col-span-8" variant="blue">
           <CardHeader>
             <CardTitle>Classes Overview</CardTitle>
             <CardDescription>
@@ -243,7 +243,7 @@ export function CourseManager() {
             </Drawer>
           </div>
         </Card>
-        <Card className="@xl:col-span-8">
+        <Card className="@xl:col-span-8" variant="blue">
           <CardHeader>
             <CardTitle>Courses Overview</CardTitle>
             <CardDescription>
