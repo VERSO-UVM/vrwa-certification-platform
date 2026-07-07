@@ -113,8 +113,8 @@ body {
 
 .dark {
   @apply bg-gray-950;
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
+  --background: var(--color-gray-800);
+  --foreground: var(--color-gray-200);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
