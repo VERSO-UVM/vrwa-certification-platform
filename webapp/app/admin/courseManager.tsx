@@ -111,7 +111,7 @@ export function CourseManager() {
               onClick={() => {
                 if (
                   confirm(
-                    "Are you sure you want to delete this  event? All event information and reservations will be lost.",
+                    "Are you sure you want to delete this event? All event information and reservations will be lost.",
                   )
                 ) {
                   deleteRow(row.original.id);
