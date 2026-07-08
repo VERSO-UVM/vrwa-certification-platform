@@ -66,8 +66,8 @@ export const profileDefs = {
     meta: {
       editor: selectOptionsEditor({
         options: [
-          { label: "yes", value: true },
-          { label: "no", value: false },
+          { label: "Yes", value: true },
+          { label: "No", value: false },
         ],
       }),
     },
