@@ -4,34 +4,20 @@ import {
   text,
   integer,
   timestamp,
-  uniqueIndex,
   boolean,
   primaryKey,
   decimal,
 } from "drizzle-orm/pg-core";
 import { prefixedIdGenerator } from "~/utils/id";
 
-export const Roles = {
-  Trainee: "trainee",
-  BillingManager: "billing-manager",
-  Instructor: "instructor",
-  Administrator: "vrwa-administrator",
-} as const;
+// Auth schema must only be modified through the better-auth configuration
+// in ~/auth/server.ts. Then the drizzle schema must be re-generated
+// through the instructions in the README.
+import * as authSchema from "./auth";
+export * from "./auth";
+const { user, account } = authSchema;
 
-export type AccountRole = (typeof Roles)[keyof typeof Roles];
-
-export const account = pgTable(
-  "account",
-  {
-    id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("account")),
-    hasRegistered: boolean().notNull().default(false),
-    email: text().notNull().unique(),
-    passwordHash: text(),
-    role: varchar().notNull().$type<AccountRole>(),
-    orgId: varchar().references(() => organization.id),
-  },
-  (table) => [uniqueIndex("email_idx").on(table.email)],
-);
+export type User = typeof user.$inferSelect;
 
 export type Account = typeof account.$inferSelect;
 // Should only use AccountInfo, not Account, in API and Client.
@@ -40,9 +26,9 @@ export type AccountInfo = Omit<Account, "passwordHash">;
 
 export const profile = pgTable("profile", {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("profile")),
-  accountId: varchar()
+  userId: varchar()
     .notNull()
-    .references(() => account.id),
+    .references(() => user.id),
   firstName: text().notNull(),
   lastName: text().notNull(),
   address: text().notNull(),
@@ -53,26 +39,6 @@ export const profile = pgTable("profile", {
   isMember: boolean().notNull(),
 });
 export type Profile = typeof profile.$inferSelect;
-
-export const session = pgTable("session", {
-  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("session")),
-  accountId: varchar()
-    .references(() => account.id)
-    .notNull(),
-  expiresAt: timestamp({ withTimezone: true }).notNull(),
-  createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
-});
-
-export type Session = typeof session.$inferSelect;
-
-export type SessionUser = { account: Account; session: Session };
-
-export const organization = pgTable("organization", {
-  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("organization")),
-  orgName: text(),
-});
-
-export type Organization = typeof organization.$inferSelect;
 
 export const course = pgTable("course", {
   // This field may already exist as a different type in the VRWA db - it may change in the future

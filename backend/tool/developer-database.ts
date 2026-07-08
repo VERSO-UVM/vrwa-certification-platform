@@ -18,6 +18,7 @@ if (existsSync(".tmp/db-data")) {
 
 await verbose`docker compose -f compose.dev.yml up -d --wait`;
 await verbose`bun db:gen`;
+await verbose`sleep 1`;
 await verbose`bun db:migrate`;
 await verbose`bun db:seed`;
 

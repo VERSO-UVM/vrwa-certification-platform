@@ -10,13 +10,14 @@ import { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
-import { createTRPCClient, httpLink } from "@trpc/client";
+import { createTRPCClient, httpBatchStreamLink, httpLink } from "@trpc/client";
 import { useState } from "react";
 
 import "./app.css";
 import { TRPCProvider, type AppRouter } from "~/utils/trpc";
 import type { Route } from "./+types/root";
 import { TooltipProvider } from "./components/ui/tooltip";
+import { getTrpcUrl } from "./utils/env";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -68,9 +69,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [trpcClient] = useState(() =>
     createTRPCClient<AppRouter>({
       links: [
-        httpLink({
-          url:
-            (import.meta.env.VITE_BACKEND || "http://localhost:3000") + "/trpc",
+        httpBatchStreamLink({
+          url: getTrpcUrl(),
+          fetch(url, options) {
+            return fetch(url, {
+              ...options,
+              credentials: "include",
+            });
+          },
         }),
       ],
     }),
