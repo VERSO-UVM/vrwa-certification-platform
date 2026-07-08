@@ -21,7 +21,7 @@ const seedLogins = {
   },
 };
 
-export function DevHacks() {
+export function DevLogins() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -36,16 +36,16 @@ export function DevHacks() {
 
   if (!isDev()) return <></>;
   return (
-    <>
+    <div className="flex flex-col">
       <Button variant="link" onClick={() => devLogin("admin")}>
-        DEV LOGIN - admin dashboard
+        DEV login - Admin
       </Button>
       <Button variant="link" onClick={() => devLogin("trainee")}>
-        DEV - trainee home
+        DEV login - Trainee
       </Button>
       <Button variant="link" onClick={() => devLogin("instructor")}>
-        DEV - instructor dashboard
+        DEV login - Instructor
       </Button>
-    </>
+    </div>
   );
 }
