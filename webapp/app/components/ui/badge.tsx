@@ -29,7 +29,7 @@ const badgeVariants = cva(
         ghost: "[a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         link: "text-primary underline-offset-4 [a&]:hover:underline",
         not_member:
-          "vrwa-light:bg-gray-700/5 dark:bg-gray-100/70 dark:text-[#091430]",
+          "vrwa-light:bg-gray-700/5 dark:bg-gray-100/70 dark:text-gray-900",
         member:
           "vrwa-light:border-gray-700/5 dark:text-gray-100/80 dark:border-gray-100/30",
       },
