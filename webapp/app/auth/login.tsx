@@ -11,8 +11,8 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { authClient, getSession, type Session } from "~/utils/auth";
-import { getUserRedirectUrl } from "~/utils/utils";
+import { authClient } from "~/utils/auth";
+import { getSessionData, getUserRedirectUrl } from "~/utils/utils";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -36,7 +36,7 @@ export default function LoginPage() {
       setError(signInError.message || "Failed to sign in");
       setLoading(false);
     } else {
-      const sessionData = (await getSession())?.data as Session | null;
+      const sessionData = await getSessionData();
       if (sessionData?.user == null) {
         setError("Unable to sign in");
         setLoading(false);

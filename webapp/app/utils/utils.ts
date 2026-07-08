@@ -1,6 +1,6 @@
 import type { Role } from "@backend/auth/permissions";
 import type { User } from "@backend/database/schema";
-import type { Session } from "./auth";
+import { getSession, useSession, type Session } from "./auth";
 
 /**
  * This only checks object string keys
@@ -39,6 +39,23 @@ export function getUserRedirectUrl(session: Session | null) {
     default:
       return "/";
   }
+}
+
+/**
+ * Access the session data as the correct type, or null if there
+ * is no active session.
+ */
+export async function useSessionData() {
+  // Not casting to Session type results in not inferring
+  // our custom session fields.
+  return useSession()?.data as Session | null;
+}
+
+/**
+ * Direct get equivalent for useSessionData.
+ */
+export async function getSessionData() {
+  return (await getSession())?.data as Session | null;
 }
 
 export function isDev() {
