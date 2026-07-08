@@ -22,10 +22,12 @@ export function ProfileSelection() {
   profiles.sort((a, b) => a.lastName.localeCompare(b.lastName));
 
   const onProfileSelect = async (profileId: string) => {
+    // Update active profile for the current session
     await authClient.updateSession({
       activeProfileId: profileId,
     });
     const { data: sessionData } = await getSession();
+    // TODO: Does this invalidate all needed queries?
     await queryClient.invalidateQueries({
       queryKey: trpc.profile.getActiveProfile.queryKey(),
     });

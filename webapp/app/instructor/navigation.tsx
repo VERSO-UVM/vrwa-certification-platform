@@ -1,5 +1,6 @@
 import { Link } from "react-router";
-import { LogOutButton } from "~/auth/logout-button";
+import { ActiveProfileIndicator } from "~/components/active-profile-indicator";
+import { LogOutButton } from "~/components/logout-button";
 import {
   Sidebar,
   SidebarContent,
@@ -35,6 +36,9 @@ export function InstructorSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <SidebarMenuButton asChild>
+          <ActiveProfileIndicator />
+        </SidebarMenuButton>
         <SidebarMenuButton asChild>
           <LogOutButton />
         </SidebarMenuButton>

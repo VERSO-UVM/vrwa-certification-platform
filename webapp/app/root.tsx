@@ -72,6 +72,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         httpBatchStreamLink({
           url: getTrpcUrl(),
           fetch(url, options) {
+            // Use regular JS fetch() and make sure to pass
+            // all headers and credentials
             return fetch(url, {
               ...options,
               credentials: "include",
