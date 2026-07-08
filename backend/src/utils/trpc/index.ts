@@ -36,5 +36,29 @@ const enforceAcctIsAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
-export const protectedProcedure = t.procedure.use(enforceAcctIsAuthed);
 export const basicProcedure = t.procedure;
+export const protectedProcedure = t.procedure.use(enforceAcctIsAuthed);
+export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (ctx.account.role !== "admin") {
+    throw new TRPCError({ code: "FORBIDDEN" });
+  }
+  return next({ ctx });
+});
+
+export const instructorProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (ctx.account.role !== "admin" && ctx.account.role !== "instructor") {
+    throw new TRPCError({ code: "FORBIDDEN" });
+  }
+  return next({ ctx });
+});
+
+export const traineeProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (
+    ctx.account.role !== "trainee" &&
+    ctx.account.role !== "admin" &&
+    ctx.account.role !== "instructor"
+  ) {
+    throw new TRPCError({ code: "FORBIDDEN" });
+  }
+  return next({ ctx });
+});

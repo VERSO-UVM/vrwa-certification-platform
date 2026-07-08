@@ -12,6 +12,8 @@ const ID_PREFIXES = {
   courseEvent: "lecture",
   session: "sid",
   organization: "org",
+  verification: "verif",
+  user: "user",
 } as const;
 
 type IdPrefixNames = keyof typeof ID_PREFIXES;

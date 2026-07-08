@@ -3,10 +3,11 @@ import fs from "fs/promises";
 import path from "path";
 import * as argon2 from 'argon2';
 import type { CourseLocation } from '../src/database/schema';
-
+import { generatePrefixedId } from "~/utils/id";
+import { auth } from "~/auth/server";
+import { eq } from "drizzle-orm";
 
 async function main() {
-
   console.log("Seeding database..");
 
   //load in data
@@ -14,7 +15,16 @@ async function main() {
   const file = await fs.readFile(filePath, "utf-8");
   const data = JSON.parse(file);
 
-  //delete existing data?
+  //delete existing data
+  console.log("Clearing existing data..");
+  await db.client.delete(db.schema.reservation);
+  await db.client.delete(db.schema.courseEvent);
+  await db.client.delete(db.schema.course);
+  await db.client.delete(db.schema.profile);
+  await db.client.delete(db.schema.account);
+  await db.client.delete(db.schema.session);
+  await db.client.delete(db.schema.user);
+  await db.client.delete(db.schema.organization);
 
   //get organization(s)
   const orgIds : string[] = [];
@@ -24,14 +34,15 @@ async function main() {
     const [newOrg] = await db.client
       .insert(db.schema.organization)
       .values({
-        orgName : org.orgName
+        id: generatePrefixedId("organization"),
+        name: org.orgName,
+        slug: org.orgName.toLowerCase().replace(/[^a-z0-9]/g, "-"),
+        createdAt: new Date(),
       })
     .returning();
-    orgIds.push(newOrg.id);
-    console.log(`Created ${newOrg.orgName}`);
+    orgIds.push(newOrg!.id);
+    console.log(`Created ${newOrg!.name}`);
   }
-  
-  
 
   //create accounts + profiles
   console.log("Creating accounts...");
@@ -40,18 +51,26 @@ async function main() {
 
   for (const acct of data.accounts) {
     ++acctNum;
-    const password = await hashPassword(acct.password);
 
-    const [newAccount] = await db.client
-      .insert(db.schema.account)
-      .values({
-        hasRegistered: true,
+    const result = await auth.api.signUpEmail({
+      body: {
         email: acct.email,
-        passwordHash: password,
-        role: acct.role,
-        orgId : acctNum == 3 ? orgIds[0] : null,
-      })
-      .returning();
+        password: acct.password,
+        name: acct.email,
+      },
+    });
+    if (!result || !result.user) {
+      console.error(`Failed to create account for ${acct.email}:`, result);
+      continue;
+    }
+    const newUser = result.user;
+
+    // update user role
+    const role = acct.role;
+    await db.client
+      .update(db.schema.user)
+      .set({ role })
+      .where(eq(db.schema.user.id, newUser.id));
 
       console.log(`Created account under email ${acct.email}`);
       console.log(`password: ${acct.password}`);
@@ -60,7 +79,8 @@ async function main() {
         const [newProfile] = await db.client
           .insert(db.schema.profile)
           .values({
-            accountId: newAccount.id,
+            id: prof.id ?? generatePrefixedId("profile"),
+            userId: newUser.id,
             firstName: prof.firstName,
             lastName: prof.lastName,
             address: prof.address,
@@ -71,7 +91,7 @@ async function main() {
             isMember: prof.isMember
           })
           .returning();
-          profileIds.push(newProfile.id)
+          profileIds.push(newProfile!.id)
           console.log(`profile: ${prof.firstName} ${prof.lastName}`);
       }
   }
@@ -91,7 +111,7 @@ async function main() {
       priceCents: courseInfo.priceCents,
     })
     .returning();
-    courseIds.push(newCourse.id);
+    courseIds.push(newCourse!.id);
     console.log(`${courseInfo.courseName} created`);
   }
 
@@ -111,7 +131,7 @@ async function main() {
       .insert(db.schema.courseEvent)
       .values({
         courseId,
-        locationType: locations[num % locations.length],
+        locationType: locations[num % locations.length]!,
         virtualLink: locations[num % locations.length] !== 'in-person'
           ? 'www.zoom.com'
           : null,
@@ -122,7 +142,7 @@ async function main() {
         classStartDatetime: thePast,
       })
       .returning();
-      courseEventIds.push(pastEvent.id)
+      courseEventIds.push(pastEvent!.id)
 
     //future event
     const theFuture = new Date(now);
@@ -132,7 +152,7 @@ async function main() {
       .insert(db.schema.courseEvent)
       .values({
         courseId,
-        locationType: locations[num % locations.length],
+        locationType: locations[num % locations.length]!,
         virtualLink: locations[num % locations.length] !== 'in-person'
           ? 'www.zoom.com'
           : null,
@@ -143,7 +163,7 @@ async function main() {
         classStartDatetime: theFuture,
       })
       .returning()  
-      courseEventIds.push(futureEvent.id);
+      courseEventIds.push(futureEvent!.id);
       num++;  
   }
 
@@ -152,8 +172,8 @@ async function main() {
   //create reservations + link to profiles 
   console.log(`Creating reservations...`)
   for (let i = 0; i < courseEventIds.length; i++){
-    const courseEventId = courseEventIds[i];
-    const profileId = profileIds[i % profileIds.length];
+    const courseEventId = courseEventIds[i]!;
+    const profileId = profileIds[i % profileIds.length]!;
 
     await db.client
     .insert(db.schema.reservation)
@@ -167,11 +187,6 @@ async function main() {
 
 }
 
-async function hashPassword(password: string) {
-  return argon2.hash(password);
-}
-
-
 main()
   .then(() => {
     console.log('Seeding process complete!');
@@ -181,5 +196,3 @@ main()
     console.error('Error:', error);
     process.exit(1);
   });
-
-

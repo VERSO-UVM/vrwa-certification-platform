@@ -4,22 +4,15 @@ import z from "zod";
 import db from "~/database";
 import type { CourseEventDto, ReservationDto } from "~/database/dtos";
 import {
-  account,
+  user,
   course,
   courseEvent,
   profile,
   reservation,
-  Roles,
 } from "~/database/schema";
 import type { Profile } from "~/database/schema";
-import { basicProcedure, router } from "~/utils/trpc";
+import { adminProcedure, router } from "~/utils/trpc";
 import { reservationDtoSelect } from "./reservation";
-
-// IMPORTANT: change basicProcedure to protectedProcedure
-// once auth is fully implemented (before shipping).
-const adminProcedure = basicProcedure;
-
-const { passwordHash: _, ...accountInfo } = getTableColumns(account);
 
 export const adminRouter = router({
   getTrainees: adminProcedure.query((): Promise<Profile[]> => {
@@ -29,8 +22,8 @@ export const adminRouter = router({
       })
       .from(profile)
       .orderBy(asc(profile.lastName))
-      .leftJoin(account, eq(profile.accountId, account.id))
-      .where(eq(account.role, Roles.Trainee));
+      .leftJoin(user, eq(profile.userId, user.id))
+      .where(eq(user.role, "user"));
   }),
 
   getCourseEvents: adminProcedure.query((): Promise<CourseEventDto[]> => {
