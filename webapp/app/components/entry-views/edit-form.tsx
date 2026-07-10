@@ -65,7 +65,6 @@ export function EditForm<T extends object>({
                       },
                       onBlur: (_value) => {},
                       onChange: (value) => (
-                        console.log("ONCH", cell.column.id, value),
                         setUpdates({
                           ...updates,
                           [cell.column.id]: value,

@@ -46,7 +46,7 @@ export const profileDefs = {
     meta: {
       editor: selectOptionsEditor({
         options: [
-          { label: "VT", value: "VT " },
+          { label: "VT", value: "VT", selected: true },
           { label: "Non-VT", value: "Non-VT " },
         ],
       }),
@@ -90,4 +90,18 @@ export const profileDefPresets = {
 
   // Object.values() is required to produce values in insertion order for String keys
   all: Object.values(profileDefs),
+};
+
+// Initial state when creating new profile
+export const emptyProfile: Profile = {
+  isMember: false,
+  postalCode: "",
+  address: "",
+  city: "",
+  phoneNumber: "",
+  lastName: "",
+  firstName: "",
+  id: "",
+  userId: "",
+  state: "VT",
 };
