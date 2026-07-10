@@ -41,6 +41,12 @@ export const profileDefs = {
       editor: textInputEditor(),
     },
   }),
+  state: profileFieldHelper.accessor("state", {
+    header: "State",
+    meta: {
+      editor: textInputEditor(),
+    },
+  }),
   postalCode: profileFieldHelper.accessor("postalCode", {
     header: "Postal Code",
     meta: {

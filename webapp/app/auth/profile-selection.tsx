@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router";
+import { Undo, Undo2 } from "lucide-react";
+import { Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -34,22 +35,32 @@ export function ProfileSelection() {
     navigate(getUserRedirectUrl(sessionData as Session | null));
   };
 
+  const handleCreateProfile = async () => {
+    navigate("/profile-create");
+  };
+
   return (
     <Card className="p-4 w-xl mt-10 self-center">
       <CardHeader>
         <CardTitle className="text-center">Select Your Profile</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col space-y-4 w-lg m-auto">
-        {/* TODO: Create New Profile button */}
         {profiles.map((profile) => (
           <Button
             key={profile.id}
-            variant="default"
+            variant="outline"
             onClick={() => onProfileSelect(profile.id)}
           >
             {profile.firstName} {profile.lastName}
           </Button>
         ))}
+        <Button variant="secondary" onClick={() => handleCreateProfile()}>
+          Add New Profile
+        </Button>
+        <Link to="/" className="justify-center gap-2 flex">
+          <Undo className="inline" />
+          Exit
+        </Link>
       </CardContent>
     </Card>
   );
