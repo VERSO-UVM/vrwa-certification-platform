@@ -44,7 +44,12 @@ export const profileDefs = {
   state: profileFieldHelper.accessor("state", {
     header: "State",
     meta: {
-      editor: textInputEditor(),
+      editor: selectOptionsEditor({
+        options: [
+          { label: "VT", value: "VT " },
+          { label: "Non-VT", value: "Non-VT " },
+        ],
+      }),
     },
   }),
   postalCode: profileFieldHelper.accessor("postalCode", {

@@ -56,7 +56,9 @@ export function EditForm<T extends object>({
                 <dd>
                   {cell.column.columnDef.meta.editor({
                     ctx: cell.getContext(),
-                    forId: htmlId,
+                    overrides: {
+                      id: htmlId,
+                    },
                     onBlur: (_value) => {},
                     onChange: (value) =>
                       setUpdates({

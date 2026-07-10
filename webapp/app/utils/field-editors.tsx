@@ -18,13 +18,22 @@ import {
   NativeSelectOption,
 } from "~/components/ui/native-select";
 
+/**
+ * I didn't see a built-in interface for props for generic form fields that exist
+ * in <input>, <select>, etc. This can be updated with any of those.
+ */
+export interface FormFieldProps {
+  id: string; /* To match <label> `for` attribute */
+  required: boolean;
+}
+
 export type FieldEditor<TData, TValue> = (item: {
   /**
    * `ctx` is the same as the object pass to table `cell` ColumnDef funciton.
    */
   ctx: CellContext<TData, TValue>;
 
-  forId: string;
+  overrides: Partial<FormFieldProps>;
 
   onChange: (value: TValue) => void;
 
@@ -41,15 +50,14 @@ export type FieldEditor<TData, TValue> = (item: {
  * Can override `props` for, e.g. type="number".
  */
 export function textInputEditor<T>(
-  props?: React.ComponentProps<"input">,
+  props?: React.ComponentProps<typeof Input>,
 ): FieldEditor<T, string> {
-  return ({ forId, onChange, onBlur, ctx: { getValue } }) => {
+  return ({ overrides, onChange, onBlur, ctx: { getValue } }) => {
     const [value, setValue] = useState(getValue());
     // if the value's been taken out from under us
     useEffect(() => setValue(getValue()), [getValue()]);
     return (
       <Input
-        id={forId}
         value={value}
         type="text"
         onChange={(event) => {
@@ -57,7 +65,10 @@ export function textInputEditor<T>(
           onChange(event.target.value);
         }}
         onBlur={() => onBlur(value)}
+        // Default to required, can be overriden
+        required
         {...props}
+        {...overrides}
       />
     );
   };
@@ -65,14 +76,16 @@ export function textInputEditor<T>(
 
 export function selectOptionsEditor<T, U extends { toString: () => string }>({
   options,
+  props,
 }: {
   options: { label: string; value: U }[];
+  props?: React.ComponentProps<typeof NativeSelect>;
 }): FieldEditor<T, U> {
   // Native <select> requires string values, but we want this function to be generic
   const stringToValue = Object.fromEntries(
     options.map(({ value }) => [value.toString(), value]),
   );
-  return ({ forId, onChange, onBlur, ctx: { getValue } }) => {
+  return ({ overrides, onChange, onBlur, ctx: { getValue } }) => {
     const [value, _setValue] = useState(getValue());
     // if the value's been taken out from under us
     useEffect(() => _setValue(getValue()), [getValue()]);
@@ -82,12 +95,13 @@ export function selectOptionsEditor<T, U extends { toString: () => string }>({
     };
     return (
       <NativeSelect
-        id={forId}
         onBlur={() => onBlur(value)}
-        value={value.toString()}
+        value={value?.toString()}
         onChange={(event) =>
           setValue(stringToValue[event.target.value] ?? value)
         }
+        {...props}
+        {...overrides}
       >
         {options.map(({ label, value }) => (
           <NativeSelectOption value={value.toString()} key={value.toString()}>

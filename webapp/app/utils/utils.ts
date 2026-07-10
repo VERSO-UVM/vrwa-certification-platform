@@ -44,6 +44,7 @@ export function getUserRedirectUrl(session: Session | null) {
 /**
  * Access the session data as the correct type, or null if there
  * is no active session.
+ * This just exists to avoid needing to cast all over the place.
  */
 export async function useSessionData() {
   // Not casting to Session type results in not inferring
@@ -52,7 +53,8 @@ export async function useSessionData() {
 }
 
 /**
- * Direct get equivalent for useSessionData.
+ * Direct get equivalent for useSessionData. Again, to avoid
+ * casting to the correct type every time.
  */
 export async function getSessionData() {
   return (await getSession())?.data as Session | null;
