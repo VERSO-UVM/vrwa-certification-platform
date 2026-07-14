@@ -1,7 +1,7 @@
 import { Card, CardContent, CardTitle } from "~/components/ui/card";
 import type { Route } from "./+types/home";
 import { Link } from "react-router";
-import { DevHacks } from "~/auth/dev-hacks";
+import { DevLogins } from "~/auth/dev-logins";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "VRWA Training Database" }];
@@ -13,7 +13,7 @@ export default function Home() {
       <Card className="min-w-md">
         <CardTitle className="text-center">VRWA Training Database</CardTitle>
         <CardContent>
-          <DevHacks />
+          <DevLogins />
           <Link to="/login" className="block underline p-2">
             Login
           </Link>
