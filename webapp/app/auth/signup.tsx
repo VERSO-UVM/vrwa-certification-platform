@@ -29,7 +29,7 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
-    // Our names our tied to profiles not users, but
+    // Our names are tied to profiles not users, but
     // Better-Auth requires a name for legacy reasons
     const name = email.split("@")[0];
     if (name == null) {
