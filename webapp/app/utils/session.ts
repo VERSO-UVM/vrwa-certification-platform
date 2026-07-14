@@ -48,3 +48,50 @@ export function getUserRedirectUrl(session: Session | null) {
       return "/";
   }
 }
+
+/**
+ * Check if a user has the required permission level to access an area.
+ */
+export function hasRolePermissions(is: string, needs: Role) {
+  switch (is) {
+    case "admin":
+      return true;
+    case "instructor":
+      return needs == "user" || needs == "instructor";
+    case "user":
+      return needs == "user";
+  }
+}
+
+/**
+ * A helper to create loaders for pages that require certain privelages.
+ *
+ * We only serve pages when the user is logged in with an appropriate role.
+ * "Loaders" is how react-router lets us do this:
+ * https://reactrouter.com/start/framework/data-loading
+ *
+ * A loader must be exported from a layout (or specific route) file
+ * under the name `loader`.
+ */
+export function protectedLoader(needs: Role) {
+  return async ({ request }: LoaderFunctionArgs) => {
+    // This is run on the server end of the webapp. We need to pass
+    // through the appropriate headers from the request from the client.
+    const session = await getSessionData({
+      fetchOptions: {
+        headers: request.headers,
+      },
+    });
+
+    if (!session) {
+      throw redirect("/login");
+    }
+
+    // They're logged in, but are they allowed here?
+    if (!hasRolePermissions(session.user.role!, needs)) {
+      throw redirect(getUserRedirectUrl(session));
+    }
+
+    return session;
+  };
+}
