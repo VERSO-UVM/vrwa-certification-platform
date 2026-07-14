@@ -64,7 +64,7 @@ export function hasRolePermissions(is: string, needs: Role) {
 }
 
 /**
- * A helper to create loaders for pages that require certain privelages.
+ * A helper to create loaders for pages that require certain privileges.
  *
  * We only serve pages when the user is logged in with an appropriate role.
  * "Loaders" is how react-router lets us do this:

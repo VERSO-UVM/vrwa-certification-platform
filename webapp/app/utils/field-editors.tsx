@@ -104,7 +104,11 @@ export function selectOptionsEditor<T, U extends { toString: () => string }>({
         {...overrides}
       >
         {options.map(({ label, value, ...rest }) => (
-          <NativeSelectOption value={value.toString()} key={value.toString()} {...rest}>
+          <NativeSelectOption
+            value={value.toString()}
+            key={value.toString()}
+            {...rest}
+          >
             {label}
           </NativeSelectOption>
         ))}
