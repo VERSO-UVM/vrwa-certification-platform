@@ -1,14 +1,19 @@
 import { and, eq } from "drizzle-orm";
 
 import db from "~/database";
-import { profile } from "~/database/schema";
+import { profile, type Profile } from "~/database/schema";
 import { adminProcedure, protectedProcedure, router } from "~/utils/trpc";
 
-import { createUpdateSchema } from "drizzle-zod";
+import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import z from "zod";
 
 const updateSchema = createUpdateSchema(profile, {
   id: z.string(),
+});
+
+const insertSchema = createInsertSchema(profile).omit({
+  userId: true,
+  id: true,
 });
 
 export const profileRouter = router({
@@ -25,6 +30,17 @@ export const profileRouter = router({
       })
       .where(and(eq(profile.id, id)))
       .returning();
+  }),
+
+  /**
+   * Create a new profile associated with a user.
+   */
+  create: protectedProcedure.input(insertSchema).mutation(({ ctx, input }) => {
+    const { ...fields } = input;
+    return db.client.insert(profile).values({
+      userId: ctx.account.id,
+      ...fields,
+    });
   }),
 
   /**

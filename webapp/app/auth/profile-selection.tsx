@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router";
+import { Undo, Undo2 } from "lucide-react";
+import { Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -22,14 +23,20 @@ export function ProfileSelection() {
   profiles.sort((a, b) => a.lastName.localeCompare(b.lastName));
 
   const onProfileSelect = async (profileId: string) => {
+    // Update active profile for the current session
     await authClient.updateSession({
       activeProfileId: profileId,
     });
     const { data: sessionData } = await getSession();
+    // TODO: Does this invalidate all needed queries?
     await queryClient.invalidateQueries({
       queryKey: trpc.profile.getActiveProfile.queryKey(),
     });
     navigate(getUserRedirectUrl(sessionData as Session | null));
+  };
+
+  const handleCreateProfile = async () => {
+    navigate("/profile-create");
   };
 
   return (
@@ -38,16 +45,22 @@ export function ProfileSelection() {
         <CardTitle className="text-center">Select Your Profile</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col space-y-4 w-lg m-auto">
-        {/* TODO: Create New Profile button */}
         {profiles.map((profile) => (
           <Button
             key={profile.id}
-            variant="default"
+            variant="outline"
             onClick={() => onProfileSelect(profile.id)}
           >
             {profile.firstName} {profile.lastName}
           </Button>
         ))}
+        <Button variant="secondary" onClick={() => handleCreateProfile()}>
+          Add New Profile
+        </Button>
+        <Link to="/" className="justify-center gap-2 flex">
+          <Undo className="inline" />
+          Exit
+        </Link>
       </CardContent>
     </Card>
   );
