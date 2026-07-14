@@ -4,7 +4,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import { signIn } from "~/utils/auth";
-import { getSessionData, getUserRedirectUrl, isDev } from "~/utils/utils";
+import { getSessionData, getUserRedirectUrl } from "~/utils/session";
+import { isDev } from "~/utils/utils";
 
 const seedLogins = {
   admin: {
