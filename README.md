@@ -84,3 +84,52 @@ $ bun db:dev # Docker Desktop must be open
 # to run development servers:
 $ bun dev
 ```
+
+## Architecture
+
+This project is structured as a monorepo with a `backend` API and a `webapp`.
+Please see [`backend/README.md`](backend/README.md) for details on the backend.
+
+### Core Tools and libraries
+
+- `tRPC`: For defining and calling API procedures in the backend and webapp.
+- `tanstack-query`: All queries are cached with tanstack query. Used with the tRPC integration.
+- `drizzle ORM`: Database ORM layer on top of posgres.
+- `zod`: Type validation and DB query integration with `drizzle-zod`.
+- `better-auth`: Authentication library.
+- `shadcn/ui`: All core UI components added to [`webapp/app/components/ui`](webapp/app/components/ui).
+- `react-router`: The webapp router for webpages.
+- `tanstack-table`: Used both data tables and custom usage to generate CRUD forms (See files in [`webapp/app/util/field-defs/`](webapp/app/util/field-defs/) and [`webapp/app/components/entry-views/`](webapp/app/components/entry-views)).
+- `bun`: Build tool and runtime. Always run bun/bunx not npm/npmx.
+
+### Organization
+
+```
+├── backend                             
+│   ├── drizzle               // Generated database schema and migration files
+│   ├── seed                  // Our custom seed data generation
+│   ├── src                   // All the backend code
+│   │   ├── auth              // Better-auth configuration
+│   │   ├── database          // Main drizzle schema (and generated auth schema)
+│   │   ├── pdf               // PDF generation
+│   │   ├── routers           // API routers 
+│   │   └── utils             
+│   │       └── trpc          // TRPC configuration
+│   ├── test                  // API tests
+│   └── tool                  // Development and migration tools
+└── webapp
+    ├── app                   // All the frontend and web server code
+    │   ├── admin             // All ADMIN pages
+    │   ├── auth              // Login and signup pages
+    │   ├── components        // Components common in different places
+    │   │   ├── data-table    // Our fancy shmancy data table component
+    │   │   ├── entry-views   // CRUD forms/views used with utils/field-defs.ts
+    │   │   └── ui            // shadcn/ui components
+    │   ├── hooks             // React custom useXXX hooks
+    │   ├── instructor        // All INSTRUCTOR pages
+    │   ├── layouts           // React-Router layouts
+    │   ├── routes            // React-Router page loading and metadata
+    │   ├── trainee           // All TRAINEE pages
+    │   └── utils             // Helpers and utilities
+    │       └── field-defs    // Defs for generating CRUD for database types
+```
