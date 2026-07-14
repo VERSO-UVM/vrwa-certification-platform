@@ -88,19 +88,19 @@ $ bun dev
 ## Architecture
 
 This project is structured as a monorepo with a `backend` API and a `webapp`.
-Please see `backend/README.md` for details on the backend.
+Please see [`backend/README.md`](backend/README.md) for details on the backend.
 
 ### Core Tools and libraries
 
-- `tRPC` For defining and calling API procedures in the backend and webapp.
-- `tanstack-query` All queries are cached with tanstack query. Used with the tRPC integration.
-- `drizzle ORM` Database ORM layer on top of posgres
-- `zod` Type validation and DB query integration with `drizzle-zod`
-- `better-auth` Authentication library
-- `shadcn/ui` All core UI components added to `webapp/app/components/ui`
-- `react-router` The webapp router for webpages
-- `tanstack-table` Used both data tables and custom usage to generate CRUD forms (See files in `webapp/app/util/field-defs/` and `webapp/app/components/entry-views/`)
-- `bun` build tool and runtime. Always run bun/bunx not npm/npmx.
+- `tRPC`: For defining and calling API procedures in the backend and webapp.
+- `tanstack-query`: All queries are cached with tanstack query. Used with the tRPC integration.
+- `drizzle ORM`: Database ORM layer on top of posgres.
+- `zod`: Type validation and DB query integration with `drizzle-zod`.
+- `better-auth`: Authentication library.
+- `shadcn/ui`: All core UI components added to [`webapp/app/components/ui`](webapp/app/components/ui).
+- `react-router`: The webapp router for webpages.
+- `tanstack-table`: Used both data tables and custom usage to generate CRUD forms (See files in [`webapp/app/util/field-defs/`](webapp/app/util/field-defs/) and [`webapp/app/components/entry-views/`](webapp/app/components/entry-views)).
+- `bun`: Build tool and runtime. Always run bun/bunx not npm/npmx.
 
 ### Organization
 
