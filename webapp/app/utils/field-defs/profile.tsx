@@ -47,7 +47,7 @@ export const profileDefs = {
       editor: selectOptionsEditor({
         options: [
           { label: "VT", value: "VT", selected: true },
-          { label: "Non-VT", value: "Non-VT " },
+          { label: "Non-VT", value: "Non-VT" },
         ],
       }),
     },
