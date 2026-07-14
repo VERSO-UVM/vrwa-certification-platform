@@ -1,3 +1,6 @@
+import clsx, { type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
 /**
  * This only checks object string keys
  * not numeric indices! Only because Typescript
@@ -16,4 +19,11 @@ export function shallowEqual<T extends object>(a: T, b: T) {
 
 export function isDev() {
   return process.env.NODE_ENV === "development";
+}
+
+/**
+ * Short for "className", for combining together class lists. Used heavily by shadcn/ui components.
+ */
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
 }
