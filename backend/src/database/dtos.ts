@@ -8,6 +8,7 @@ import {
   type CourseEvent,
   type Profile,
   type Reservation,
+  type User,
 } from "./schema";
 
 export type ReservationDto = Reservation &
@@ -18,3 +19,5 @@ export type ReservationDto = Reservation &
 
 export type CourseEventDto = CourseEvent &
   Pick<Course, "courseName" | "description" | "creditHours" | "priceCents">;
+
+export type UserDto = Pick<User, "email" | "role">;

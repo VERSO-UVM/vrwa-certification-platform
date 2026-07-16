@@ -1,4 +1,4 @@
-import { BookOpenText, House, Scroll, Trophy, Users } from "lucide-react";
+import { BookOpenText, House, Scroll, Trophy, UserCog, Users } from "lucide-react";
 import { Link } from "react-router";
 import { LogOutButton } from "~/components/logout-button";
 import {
@@ -48,8 +48,8 @@ export function AdminSidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <Link to="/admin/instructors">
-                  <Users />
-                  Instructors
+                  <UserCog />
+                  Users
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
