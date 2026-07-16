@@ -78,7 +78,7 @@ export function EditForm<T extends object>({
           </Field>
         </FieldGroup>
         <Button
-          disabled={shallowEqual({ ...row.original, ...updates }, row.original)}
+          disabled={shallowEqual({ ...row.original, ...updates }, row.original)} className="max-w-99/100 w-full flex flex-col items-center justify-center"
           // onClick={() => onSave(updates)}
         >
           Save changes
