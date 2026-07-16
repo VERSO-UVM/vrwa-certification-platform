@@ -1,18 +1,23 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { selectOptionsEditor, textInputEditor } from "../field-editors";
 import type { UserDto } from "@backend/database/dtos";
+import { RoleBadge } from "~/components/role-badge";
+import type { Role } from "@backend/auth/permissions";
 
 export const userFieldHelper = createColumnHelper<UserDto>();
 
 export const userDefs = {
   email: userFieldHelper.accessor("email", {
-    header: "email",
+    header: "Account",
     meta: {
       editor: textInputEditor(),
     },
   }),
   role: userFieldHelper.accessor("role", {
-    header: "role",
+    header: "Role",
+    cell: ({ getValue }) => (
+      <RoleBadge value={getValue() as Role} />
+    ),
     meta: {
       editor: selectOptionsEditor({
         options: [
