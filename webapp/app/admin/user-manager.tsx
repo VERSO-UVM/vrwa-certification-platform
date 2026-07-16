@@ -9,16 +9,24 @@ import {
 import { useTRPC } from "~/utils/trpc";
 import { EditUserButton } from "./user-manager/edit-user-button";
 import { useSessionData } from "~/utils/session";
+import { Button } from "~/components/ui/button";
+import { SquarePen } from "lucide-react";
 
 const userColumns = [
   userDefs.email,
   userDefs.role,
   userFieldHelper.display({
     header: "Actions",
-    cell: ({ row, cell }) => {
+    cell: ({ row }) => {
       const session = useSessionData();
       if (row.original.email == session?.user.email) {
-        return <p className="font-light">(This is you)</p>;
+        // Don't let them demote themselves. They would not
+        // be able to change themselves back to admin after.
+        return (
+          <Button variant="secondary" disabled className="">
+            <SquarePen /> You're admin
+          </Button>
+        );
       }
       return <EditUserButton user={row.original} />;
     },
