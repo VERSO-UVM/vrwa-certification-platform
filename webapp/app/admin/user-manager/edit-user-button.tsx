@@ -3,10 +3,25 @@ import type { Profile } from "@backend/database/schema";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { EditDrawer } from "~/components/entry-views/edit-drawer";
 import { profileDefPresets } from "~/utils/field-defs/profile";
-import { userDefPresets, userDefs } from "~/utils/field-defs/user";
+import {
+  userDefPresets,
+  userDefs,
+  userFieldHelper,
+} from "~/utils/field-defs/user";
 import { useTRPC } from "~/utils/trpc";
 
-const fieldDefs = [userDefs.role];
+const fields = [
+  // Display Email so they know whose role they are updating
+  userFieldHelper.accessor("email", {
+    header: "Email",
+    meta: {
+      editor: ({ ctx: { renderValue } }) => {
+        return renderValue();
+      },
+    },
+  }),
+  userDefs.role,
+];
 
 export function EditUserButton({ user }: { user: UserDto }) {
   const trpc = useTRPC();
@@ -28,7 +43,7 @@ export function EditUserButton({ user }: { user: UserDto }) {
         description: "Save changes to go through with the update.",
       }}
       item={user}
-      columns={fieldDefs}
+      columns={fields}
       onSave={async (changes) => {
         await updateQuery.mutateAsync({
           ...changes,
