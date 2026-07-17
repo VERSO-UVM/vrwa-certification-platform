@@ -82,6 +82,7 @@ export function EditForm<T extends object>({
         >
           Save changes
         </Button>
+        <br></br>
       </FieldSet>
     </form>
   );

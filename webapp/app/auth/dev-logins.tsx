@@ -38,13 +38,13 @@ export function DevLogins() {
   if (!isDev()) return <></>;
   return (
     <div className="flex flex-col">
-      <Button variant="link" onClick={() => devLogin("admin")}>
+      <Button variant="link" className="text-sm lg:text-base" onClick={() => devLogin("admin")}>
         DEV login - Admin
       </Button>
-      <Button variant="link" onClick={() => devLogin("trainee")}>
+      <Button variant="link" className="text-sm lg:text-base" onClick={() => devLogin("trainee")}>
         DEV login - Trainee
       </Button>
-      <Button variant="link" onClick={() => devLogin("instructor")}>
+      <Button variant="link" className="text-sm lg:text-base" onClick={() => devLogin("instructor")}>
         DEV login - Instructor
       </Button>
     </div>

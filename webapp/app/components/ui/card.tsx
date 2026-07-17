@@ -11,6 +11,7 @@ const cardVariants = cva(
         blue: "vrwa-light:bg-[#5a8acc22] vrwa-light:text-[#153383] dark:bg-[#15338344] dark:text-[#84a8d9]",
         green: "vrwa-light:bg-[#90B76622] vrwa-light:text-[#2f5e28] dark:bg-[#2f5e2844] dark:text-[#90b766]",
         yellow: "vrwa-light:bg-[#ffd66633] vrwa-light:text-[#765e1e] dark:bg-[#91752944] dark:text-[#e4be57]",
+        outline: "bg-white text-gray-800 rounded-lg px-6 py-8 ring shadow-xl ring-gray-900/5 dark:text-gray-400 dark:bg-gray-800",
         default: "bg-white text-black"
       },
     },
