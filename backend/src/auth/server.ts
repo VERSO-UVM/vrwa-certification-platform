@@ -12,6 +12,7 @@ import * as schema from "~/database/schema";
 import { admin, organization } from "better-auth/plugins";
 import { ac, roles } from "./permissions";
 import { generatePrefixedId } from "~/utils/id";
+import { TRUSTED_ORIGINS } from "~/constants";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db.client, {
@@ -79,8 +80,7 @@ export const auth = betterAuth({
     }),
     organization(),
   ],
-  // Update to not get CORS errors!
-  trustedOrigins: ["http://localhost:5173"],
+  trustedOrigins: TRUSTED_ORIGINS,
   emailAndPassword: {
     enabled: true,
   },
