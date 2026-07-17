@@ -284,6 +284,18 @@
       "description": "Learn to master one of the four elements.",
       "creditHours": 8,
       "priceCents": 50000
+    },
+    {
+      "courseName": "Multimeters and Control Panels",
+      "description": "Description for Multimeters and Control Panels.",
+      "creditHours": 4,
+      "priceCents": 2000
+    },
+    {
+      "courseName": "Wastewater Microbiology",
+      "description": "Learn the role of bacteria, protozoa and metazoa in the treatment process along with the conditions that allow them to do their best work of removing nutrients from wastewater. Topics will include microbiota identification, development of a wastewater microbiology monitoring program, how to foster system conditions that favor the growth of phosphorus-accumulating microorganisms (PAOs), and how to troubleshoot existing treatment system problems.",
+      "creditHours": 5,
+      "priceCents": 1200
     }
   ]
 }
