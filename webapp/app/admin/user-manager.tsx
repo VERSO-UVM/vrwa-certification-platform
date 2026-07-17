@@ -15,6 +15,7 @@ import { SquarePen } from "lucide-react";
 const userColumns = [
   userDefs.email,
   userDefs.role,
+  userDefs.profiles,
   userFieldHelper.display({
     header: "Actions",
     cell: ({ row }) => {

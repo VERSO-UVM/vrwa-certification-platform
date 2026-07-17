@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
-import { createSelectSchema, createUpdateSchema } from "drizzle-zod";
+import { createUpdateSchema } from "drizzle-zod";
 import z from "zod";
 import db from "~/database";
-import { user } from "~/database/auth";
+import { user } from "~/database/schema";
 import type { UserDto } from "~/database/dtos";
 import { adminProcedure, router } from "~/utils/trpc";
 
@@ -16,14 +16,16 @@ const updateSchema = createUpdateSchema(user, {
 
 export const userRouter = router({
   getUsers: adminProcedure.query((): Promise<UserDto[]> => {
-    return db.client
-      .select({
-        email: user.email,
-        role: user.role,
-        id: user.id,
-      })
-      .from(user)
-      .orderBy(user.createdAt);
+    return db.client.query.user.findMany({
+      columns: {
+        id: true,
+        role: true,
+        email: true,
+      },
+      with: {
+        profiles: true,
+      },
+    });
   }),
 
   update: adminProcedure.input(updateSchema).mutation(({ input }) => {
@@ -35,5 +37,5 @@ export const userRouter = router({
       })
       .where(eq(user.id, id))
       .returning();
-  })
+  }),
 });

@@ -1,4 +1,11 @@
-import { BookOpenText, House, Scroll, Trophy, UserCog, Users } from "lucide-react";
+import {
+  BookOpenText,
+  House,
+  Scroll,
+  Trophy,
+  UserCog,
+  Users,
+} from "lucide-react";
 import { Link } from "react-router";
 import { LogOutButton } from "~/components/logout-button";
 import {

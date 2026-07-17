@@ -20,4 +20,6 @@ export type ReservationDto = Reservation &
 export type CourseEventDto = CourseEvent &
   Pick<Course, "courseName" | "description" | "creditHours" | "priceCents">;
 
-export type UserDto = Pick<User, "id" | "email" | "role">;
+export type UserDto = Pick<User, "id" | "email" | "role"> & {
+  profiles: Profile[];
+};

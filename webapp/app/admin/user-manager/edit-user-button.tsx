@@ -1,13 +1,7 @@
 import type { UserDto } from "@backend/database/dtos";
-import type { Profile } from "@backend/database/schema";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { EditDrawer } from "~/components/entry-views/edit-drawer";
-import { profileDefPresets } from "~/utils/field-defs/profile";
-import {
-  userDefPresets,
-  userDefs,
-  userFieldHelper,
-} from "~/utils/field-defs/user";
+import { userDefs, userFieldHelper } from "~/utils/field-defs/user";
 import { useTRPC } from "~/utils/trpc";
 
 const fields = [
@@ -15,11 +9,10 @@ const fields = [
   userFieldHelper.accessor("email", {
     header: "Email",
     meta: {
-      editor: ({ ctx: { renderValue } }) => {
-        return renderValue();
-      },
+      editor: ({ ctx: { renderValue } }) => renderValue(),
     },
   }),
+  userDefs.profiles,
   userDefs.role,
 ];
 
