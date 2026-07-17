@@ -48,6 +48,100 @@
                 "city": "Burlington", "state": "VT", "postalCode": "05405", "phoneNumber": "222-222-2222",
                 "isMember": true}
             ]
+        },
+        {
+            "email": "example3@gmail.com",
+            "password" : "password3",
+            "role" : "user",
+            "profiles": [
+                {"firstName": "Trainee3", "lastName": "03", "address": "123 Address <F8>",
+                "city": "Shelburne", "state": "VT", "postalCode": "05402", "phoneNumber": "802-111-1111",
+                "isMember": true }
+            ]
+        },
+        {
+            "email": "example4@gmail.com",
+            "password" : "password4",
+            "role" : "user",
+            "profiles": [
+                {"firstName": "Trainee4", "lastName": "04", "address": "Address 04",
+                "city": "Shelburne", "state": "VT", "postalCode": "05402", "phoneNumber": "444-444-4444",
+                "isMember": true }
+            ]
+        },
+        {
+            "email": "example5@gmail.com",
+            "password" : "password5",
+            "role" : "user",
+            "profiles": [
+                {"firstName": "Trainee5", "lastName": "05", "address": "Address 05",
+                "city": "Shelburne", "state": "VT", "postalCode": "05402", "phoneNumber": "555-555-5555",
+                "isMember": true }
+            ]
+        },
+        {
+            "email": "example6@gmail.com",
+            "password" : "password6",
+            "role" : "user",
+            "profiles": [
+                {"firstName": "Trainee6", "lastName": "06", "address": "Address 06",
+                "city": "Shelburne", "state": "VT", "postalCode": "05402", "phoneNumber": "666-666-6666",
+                "isMember": true }
+            ]
+        },
+        {
+            "email": "fruit@company.com",
+            "password" : "fruitfruit",
+            "role" : "user",
+            "profiles": [
+                {"firstName": "Golden", "lastName": "Delicious", "address": "102 Apple St",
+                "city": "Rutland", "state": "VT", "postalCode": "05701", "phoneNumber": "123-456-7890",
+                "isMember": false },
+                {"firstName": "Passion", "lastName": "Fruit", "address": "222 Seed Avenue",
+                "city": "Williston", "state": "VT", "postalCode": "05495", "phoneNumber": "123-456-7890", "isMember": true },
+                {"firstName": "Water", "lastName": "Melon", "address": "111 Red St",
+                "city": "Charlotte", "state": "VT", "postalCode": "05445", "phoneNumber": "123-456-7890", "isMember": false }
+            ]
+        },
+        {
+            "email": "elliephant@dabom.com",
+            "password" : "12345678",
+            "role" : "user",
+            "profiles": [
+                {"firstName": "Gellie", "lastName": "Ookin", "address": "314 Pi Avenue",
+                "city": "Burlington", "state": "VT", "postalCode": "05405", "phoneNumber": "802-679-6676",
+                "isMember": false }
+            ]
+        },
+        {
+            "email": "rzzz@gaf.com",
+            "password" : "password",
+            "role" : "user",
+            "profiles": [
+                {"firstName": "Rustoleum", "lastName": "Zya", "address": "123 Devil Stick Rd",
+                "city": "Shelburne", "state": "VT", "postalCode": "05402", "phoneNumber": "802-111-2222",
+                "isMember": false }
+            ]
+        },
+        {
+            "email": "vov@yaG.com",
+            "password" : "opheliYAS",
+            "role" : "user",
+            "profiles": [
+                {"firstName": "Voiolet", "lastName": "Voracious", "address": "666 Earl St",
+                "city": "Burlington", "state": "VT", "postalCode": "05402", "phoneNumber": "802-111-2222",
+                "isMember": false }
+            ]
+        },
+        {
+            "email": "notjames@gmail.com",
+            "password" : "JamesR00ls",
+            "role" : "user",
+            "profiles": [
+                {"firstName": "Djames", "lastName": "Stavenport", "address": "408 Pearl St",
+                "city": "Burlington", "state": "VT", "postalCode": "05405", "phoneNumber": "802-679-6676",
+                "isMember": true }
+            ]
         }
     ],
 
@@ -63,7 +157,12 @@
             "description": "Complex Water Systems and How to Clean Them",
             "creditHours": 2,
             "priceCents": 7500
+        },
+        {
+            "courseName": "Water Bending",
+            "description": "Learn to master one of the four elements.",
+            "creditHours": 8,
+            "priceCents": 50000
         }
-
     ]
 }
