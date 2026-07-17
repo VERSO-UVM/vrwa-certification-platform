@@ -34,9 +34,5 @@
     "@swc/core",
     "@tailwindcss/oxide",
     "esbuild"
-  ],
-  "dependencies": {
-    "@daypicker/react": "^10.0.1",
-    "vaul": "^1.1.2"
-  }
+  ]
 }
