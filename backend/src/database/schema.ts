@@ -14,6 +14,7 @@ import { prefixedIdGenerator } from "~/utils/id";
 // in ~/auth/server.ts. Then the drizzle schema must be re-generated
 // through the instructions in the README.
 import * as authSchema from "./auth";
+import { relations } from "drizzle-orm";
 export * from "./auth";
 const { user, account } = authSchema;
 
@@ -39,6 +40,18 @@ export const profile = pgTable("profile", {
   isMember: boolean().notNull(),
 });
 export type Profile = typeof profile.$inferSelect;
+
+// We have to define the relation both ways for drizzle to understand it.
+// TODO: this whole syntax changes when we update Drizzle to new v1.0
+export const profileUserRelation = relations(profile, ({ one, many }) => ({
+  user: one(user, {
+    fields: [profile.userId],
+    references: [user.id],
+  }),
+}));
+export const userProfilesRelation = relations(user, ({ many }) => ({
+  profiles: many(profile),
+}));
 
 export const course = pgTable("course", {
   // This field may already exist as a different type in the VRWA db - it may change in the future

@@ -1,3 +1,4 @@
+import type { Profile } from "@backend/database/schema";
 import clsx, { type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -26,4 +27,8 @@ export function isDev() {
  */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export function profileFullName(profile: Profile) {
+  return profile.firstName + " " + profile.lastName;
 }

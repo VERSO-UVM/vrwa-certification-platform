@@ -10,7 +10,7 @@ import type { Role } from "@backend/auth/permissions";
  * is no active session.
  * This just exists to avoid needing to cast all over the place.
  */
-export async function useSessionData() {
+export function useSessionData() {
   // Not casting to Session type results in not inferring
   // our custom session fields.
   return authClient.useSession()?.data as Session | null;
