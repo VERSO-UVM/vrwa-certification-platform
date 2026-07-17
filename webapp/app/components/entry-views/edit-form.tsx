@@ -64,12 +64,11 @@ export function EditForm<T extends object>({
                         id: htmlId,
                       },
                       onBlur: (_value) => {},
-                      onChange: (value) => (
+                      onChange: (value) =>
                         setUpdates({
                           ...updates,
                           [cell.column.id]: value,
-                        })
-                      ),
+                        }),
                     })}
                   </dd>
                 </div>

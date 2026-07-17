@@ -1,6 +1,6 @@
-import type { Role } from "@backend/auth/permissions";
-import type { User } from "@backend/database/schema";
-import { getSession, useSession, type Session } from "./auth";
+import type { Profile } from "@backend/database/schema";
+import clsx, { type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 /**
  * This only checks object string keys
@@ -18,48 +18,17 @@ export function shallowEqual<T extends object>(a: T, b: T) {
   return true;
 }
 
-/**
- * Redirection to apply after authentication.
- */
-export function getUserRedirectUrl(session: Session | null) {
-  if (session == null) {
-    return "/login";
-  }
-  const { activeProfileId } = session.session;
-  if (activeProfileId == "" || activeProfileId == null) {
-    return "/profile-select";
-  }
-  switch (session.user.role as Role) {
-    case "user":
-      return "/trainee";
-    case "instructor":
-      return "/instructor";
-    case "admin":
-      return "/admin";
-    default:
-      return "/";
-  }
-}
-
-/**
- * Access the session data as the correct type, or null if there
- * is no active session.
- * This just exists to avoid needing to cast all over the place.
- */
-export async function useSessionData() {
-  // Not casting to Session type results in not inferring
-  // our custom session fields.
-  return useSession()?.data as Session | null;
-}
-
-/**
- * Direct get equivalent for useSessionData. Again, to avoid
- * casting to the correct type every time.
- */
-export async function getSessionData() {
-  return (await getSession())?.data as Session | null;
-}
-
 export function isDev() {
   return process.env.NODE_ENV === "development";
+}
+
+/**
+ * Short for "className", for combining together class lists. Used heavily by shadcn/ui components.
+ */
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+export function profileFullName(profile: Profile) {
+  return profile.firstName + " " + profile.lastName;
 }

@@ -12,7 +12,7 @@ import {
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { authClient } from "~/utils/auth";
-import { getSessionData, getUserRedirectUrl } from "~/utils/utils";
+import { getSessionData, getUserRedirectUrl } from "~/utils/session";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");

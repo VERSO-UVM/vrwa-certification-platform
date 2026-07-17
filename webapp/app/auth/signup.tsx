@@ -13,7 +13,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { authClient } from "~/utils/auth";
 import { useTRPC } from "~/utils/trpc";
-import { getSessionData, getUserRedirectUrl } from "~/utils/utils";
+import { getSessionData, getUserRedirectUrl } from "~/utils/session";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -101,7 +101,7 @@ export default function SignupPage() {
       <CardFooter className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
           Have an account?{" "}
-          <Link to="/signup" className="text-blue-700 underline">
+          <Link to="/login" className="text-blue-700 underline">
             Log in
           </Link>
         </div>

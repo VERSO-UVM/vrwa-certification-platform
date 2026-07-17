@@ -11,7 +11,7 @@ import {
 } from "~/components/ui/card";
 import { authClient, getSession, useSession, type Session } from "~/utils/auth";
 import { useTRPC } from "~/utils/trpc";
-import { getUserRedirectUrl } from "~/utils/utils";
+import { getUserRedirectUrl } from "~/utils/session";
 
 export function ProfileSelection() {
   const trpc = useTRPC();

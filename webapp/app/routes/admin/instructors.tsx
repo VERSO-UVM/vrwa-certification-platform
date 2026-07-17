@@ -1,4 +1,4 @@
-import { InstructorManager } from "~/admin/instructor-manager";
+import { UserManager } from "~/admin/user-manager";
 import type { Route } from "../+types/home";
 
 export function meta({}: Route.MetaArgs) {
@@ -6,5 +6,5 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function () {
-  return <InstructorManager />;
+  return <UserManager />;
 }
