@@ -27,7 +27,7 @@ const buttonVariants = cva(
         cancel_button:
           "vrwa-light:bg-gray-500/20 vrwa-light:hover:bg-gray-500/45 vrwa-light:text-gray-600 hover:vrwa-light:text-gray-700 dark:bg-gray-600/40 dark:hover:bg-gray-600/75 dark:text-gray-300",
         cancel_icon:
-          "vrwa-light:hover:bg-gray-500/20 vrwa-light:text-gray-600 hover:vrwa-light:text-gray-700 dark:bg-gray-600/40 dark:hover:bg-gray-600/75 dark:text-gray-300",
+          "vrwa-light:hover:bg-gray-500/20 vrwa-light:text-gray-600 dark:hover:bg-gray-600/40 dark:text-gray-300",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
