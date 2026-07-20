@@ -33,7 +33,17 @@ export function DataTablePageSizeSelect<TData>({
   };
   const currentSize = table.getState().pagination.pageSize;
   const pageSizeOptions = table.options.meta?.pageSizeOptions;
+  // Page size selector can be disabled this way
   if (!pageSizeOptions) {
+    // Still use a div not a <></> so there is an element there
+    return <div></div>;
+  }
+  // Also, if there are less than 5 / the smallest available
+  // option, don't bother showing the page size select at all
+  const smallestValue = Math.min(
+    ...pageSizeOptions.map((option) => option.value),
+  );
+  if (table.getCoreRowModel().rows.length <= smallestValue) {
     return <div></div>;
   }
 
