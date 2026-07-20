@@ -10,13 +10,13 @@ import { auth } from "~/auth/server";
 import { createContext } from "~/utils/trpc/ctx";
 import type { AppRouter } from "~/trpc";
 import { appRouter } from "~/trpc";
+import { TRUSTED_ORIGINS } from "./constants";
 const app = Fastify({
   logger: true,
 });
 
-// Keep up to date to not get CORB errors
 app.register(cors, {
-  origin: ["http://localhost:5173"],
+  origin: TRUSTED_ORIGINS,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 });
@@ -76,4 +76,6 @@ app.route({
   },
 });
 
-void app.listen({ port: parseInt(process.env.PORT || "") || 3000 });
+const port = parseInt(process.env.PORT || "") || 3000;
+const host = process.env.HOST || '0.0.0.0';
+void app.listen({ host, port });
