@@ -8,6 +8,7 @@ import { FieldSet, FieldGroup, Field } from "~/components/ui/field";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { shallowEqual } from "~/utils/utils";
+import {DrawerClose} from "~/components/ui/drawer"
 
 /**
  * Generate an edit form using column defs!
@@ -77,12 +78,19 @@ export function EditForm<T extends object>({
           </Field>
         </FieldGroup>
         <Button
-          disabled={shallowEqual({ ...row.original, ...updates }, row.original)} className="max-w-99/100 w-full flex flex-col items-center justify-center"
+          disabled={shallowEqual({ ...row.original, ...updates }, row.original)} className="w-full flex flex-col items-center justify-center"
           // onClick={() => onSave(updates)}
         >
           Save changes
         </Button>
-        <br></br>
+        <DrawerClose>
+        <Button
+          variant="cancel_button"
+          className="-mt-4 w-full flex flex-col items-center justify-center"
+        >
+          Cancel
+        </Button>
+        </DrawerClose>
       </FieldSet>
     </form>
   );

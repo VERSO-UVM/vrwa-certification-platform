@@ -9,6 +9,7 @@ import {
   DrawerClose,
 } from "./ui/drawer";
 import type { PropsWithChildren } from "react";
+import { X } from "lucide-react";
 
 /**
  * I just got sick of the number of <DrawerXxxx> components cluttering
@@ -35,12 +36,14 @@ export function StandardDrawer({
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>{title}</DrawerTitle>
+          <DrawerClose asChild>
+            <Button variant="cancel_icon" className="absolute top-2 right-2">
+              <X className="size-5" />
+            </Button>
+          </DrawerClose>
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
         <div className="overflow-y-auto px-4">{children}</div>
-        <DrawerClose asChild>
-          <Button variant="secondary" className="rounded-none absolute bottom-0 left-0 right-0 h-10 md:h-12">Cancel</Button>
-        </DrawerClose>
       </DrawerContent>
     </Drawer>
   );

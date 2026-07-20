@@ -24,6 +24,10 @@ const buttonVariants = cva(
         ghost_lighter:
           "vrwa-light:hover:bg-gray-400/40 dark:hover:bg-gray-600/40",
         link: "text-primary underline-offset-4 hover:underline vrwa-light:text-gray-700 vrwa-light:hover:text-gray-950 dark:text-gray-400 dark:hover:text-gray-200",
+        cancel_button:
+          "vrwa-light:bg-gray-500/20 vrwa-light:hover:bg-gray-500/45 vrwa-light:text-gray-600 hover:vrwa-light:text-gray-700 dark:bg-gray-600/40 dark:hover:bg-gray-600/75 dark:text-gray-300",
+        cancel_icon:
+          "vrwa-light:hover:bg-gray-500/20 vrwa-light:text-gray-600 hover:vrwa-light:text-gray-700 dark:bg-gray-600/40 dark:hover:bg-gray-600/75 dark:text-gray-300",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
