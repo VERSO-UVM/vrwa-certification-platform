@@ -20,8 +20,13 @@ export const PAGE_SIZE_SHOW_ALL = {
   label: "All",
   // It might not be a good idea to render more than 10_000 anyways
   value: 10_000,
+  showAlways: true,
 } as PageSizeValues;
-export type PageSizeValues = { label: string; value: number };
+export type PageSizeValues = {
+  label: string;
+  value: number;
+  showAlways?: boolean;
+};
 
 export function DataTablePageSizeSelect<TData>({
   table,
@@ -33,17 +38,14 @@ export function DataTablePageSizeSelect<TData>({
   };
   const currentSize = table.getState().pagination.pageSize;
   const pageSizeOptions = table.options.meta?.pageSizeOptions;
-  // Page size selector can be disabled this way
-  if (!pageSizeOptions) {
-    // Still use a div not a <></> so there is an element there
-    return <div></div>;
-  }
-  // Also, if there are less than 5 / the smallest available
-  // option, don't bother showing the page size select at all
-  const smallestValue = Math.min(
-    ...pageSizeOptions.map((option) => option.value),
+  // Hide options that don't make sense to display
+  const totalRows = table.getCoreRowModel().rows.length;
+  const availableOptions = (pageSizeOptions ?? []).filter(
+    (option) => option.showAlways || option.value < totalRows,
   );
-  if (table.getCoreRowModel().rows.length <= smallestValue) {
+  // And hide the selector entirely if we're not left with multiple options
+  // to choose from
+  if (availableOptions.length <= 1) {
     return <div></div>;
   }
 
@@ -62,7 +64,7 @@ export function DataTablePageSizeSelect<TData>({
           </SelectTrigger>
           <SelectContent align="start">
             <SelectGroup>
-              {pageSizeOptions?.map(({ label, value }) => (
+              {availableOptions.map(({ label, value }) => (
                 <SelectItem key={value} value={value.toString()}>
                   {label}
                 </SelectItem>
