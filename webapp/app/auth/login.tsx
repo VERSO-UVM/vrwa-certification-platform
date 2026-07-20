@@ -51,50 +51,52 @@ export default function LoginPage() {
   }
 
   return (
-    <Card className="mt-10 w-full max-w-md self-center">
-      <CardHeader>
-        <CardTitle className="text-center text-2xl font-bold">Login</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="account@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+    <main className="flex items-center justify-center h-screen vrwa-light:bg-gray-50 dark:bg-gray-950">
+      <Card className="mt-10 w-full max-w-md self-center">
+        <CardHeader>
+          <CardTitle className="text-center dark:text-gray-200 text-2xl font-bold">Login</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="account@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+            <Button type="submit" className="w-full dark:hover:bg-gray-300" disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            Need an account?{" "}
+            <Link to="/signup" className="text-blue-700 dark:text-blue-300 underline">
+              Sign up
+            </Link>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
-          </Button>
-        </form>
-      </CardContent>
-      <CardFooter className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Need an account?{" "}
-          <Link to="/signup" className="text-blue-700 underline">
-            Sign up
+          <Link to="/" className="text-sm underline">
+            Home
           </Link>
-        </div>
-        <Link to="/" className="text-sm underline">
-          Home
-        </Link>
-      </CardFooter>
-    </Card>
+        </CardFooter>
+      </Card>
+    </main>
   );
 }
