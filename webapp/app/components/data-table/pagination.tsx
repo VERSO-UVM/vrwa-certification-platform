@@ -75,13 +75,16 @@ export function DataTablePagination<TData>({
     <Pagination className="justify-left w-fit mx-0" {...props}>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious onClick={() => table.previousPage()} />
+          <PaginationPrevious
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          />
         </PaginationItem>
-        {items.map((item, i) =>
+        {items.map((item, _) =>
           typeof item == "number" ? (
             <PaginationButton
               isActive={item == pageIndex}
-              onClick={(ev) => table.setPageIndex(item)}
+              onClick={() => table.setPageIndex(item)}
               key={item.toString()}
             >
               {item + 1}
@@ -91,7 +94,10 @@ export function DataTablePagination<TData>({
           ),
         )}
         <PaginationItem>
-          <PaginationNext onClick={() => table.nextPage()} />
+          <PaginationNext
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          />
         </PaginationItem>
       </PaginationContent>
     </Pagination>
