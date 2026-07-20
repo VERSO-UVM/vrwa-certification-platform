@@ -66,7 +66,7 @@ export function DataTablePagination<TData>({
 }: DataTablePaginationProps<TData>) {
   const { pageIndex } = table.getState().pagination;
   const pageCount = table.getPageCount();
-  if (pageCount == 1) {
+  if (pageCount <= 1) {
     return <div></div>;
   }
   const items = pagination(pageIndex, pageCount);
