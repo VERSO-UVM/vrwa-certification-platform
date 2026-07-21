@@ -23,8 +23,8 @@ export const MAX_PAGE_SIZE = 10_000;
  */
 export function smartPageSizeOptions<TData>(
   table: Table<TData>,
-  pageSizeOptions: PageSizeValues[],
-): PageSizeValues[] {
+  pageSizeOptions: PageSizeOption[],
+): PageSizeOption[] {
   const totalRows = table.getCoreRowModel().rows.length;
   return [
     ...pageSizeOptions.filter((option) => option.value < totalRows),
@@ -38,7 +38,7 @@ export function smartPageSizeOptions<TData>(
   ];
 }
 
-export type PageSizeValues = {
+export type PageSizeOption = {
   label: string;
   value: number;
 };

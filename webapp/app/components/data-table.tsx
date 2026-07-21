@@ -16,7 +16,7 @@ import { DataTableHeader } from "./data-table/header";
 import {
   DataTablePageSizeSelect,
   smartPageSizeOptions,
-  type PageSizeValues,
+  type PageSizeOption,
 } from "./data-table/page-size-select";
 import { DataTablePagination } from "./data-table/pagination";
 import { Table } from "~/components/ui/table";
@@ -29,7 +29,7 @@ export type DataTableDecorationProps<TData> = {
 /* We can define values to go in the `meta` field of table options */
 declare module "@tanstack/table-core" {
   interface TableMeta<TData extends RowData> {
-    pageSizeOptions: (table: ReactTable<TData>) => PageSizeValues[];
+    pageSizeOptions: (table: ReactTable<TData>) => PageSizeOption[];
     _?: undefined & TData; /* ignore unused warning */
   }
 }
@@ -42,7 +42,7 @@ export interface DataTableProps<TData> {
   // ColumnDef<TData, any> is the same as the type used in useReactTable props
   columns: ColumnDef<TData, any>[];
 
-  pageSizeValues?: (table: ReactTable<TData>) => PageSizeValues[];
+  pageSizeOptions?: (table: ReactTable<TData>) => PageSizeOption[];
   topDecorations?: React.ComponentType<DataTableDecorationProps<TData>>[];
   bottomDecorations?: React.ComponentType<DataTableDecorationProps<TData>>[];
 
@@ -52,7 +52,7 @@ export interface DataTableProps<TData> {
 export function DataTable<TData>({
   data,
   columns,
-  pageSizeValues = (table) => smartPageSizeOptions(table, [
+  pageSizeOptions = (table) => smartPageSizeOptions(table, [
     { label: "5", value: 5 },
     { label: "10", value: 10 },
     { label: "25", value: 25 },
@@ -82,7 +82,7 @@ export function DataTable<TData>({
       ...tableOptions?.initialState,
     },
     meta: {
-      pageSizeOptions: pageSizeValues,
+      pageSizeOptions,
       ...tableOptions?.meta,
     },
     ...tableOptions,
