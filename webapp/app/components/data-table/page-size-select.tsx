@@ -16,16 +16,31 @@ interface DataTablePageSizeSelectProps<
   table: Table<TData>;
 }
 
-export const PAGE_SIZE_SHOW_ALL = {
-  label: "All",
-  // It might not be a good idea to render more than 10_000 anyways
-  value: 10_000,
-  showAlways: true,
-} as PageSizeValues;
+export const MAX_PAGE_SIZE = 10_000;
+
+/**
+ * Include a show all option and hide other unnecessary options.
+ */
+export function smartPageSizeOptions<TData>(
+  table: Table<TData>,
+  pageSizeOptions: PageSizeValues[],
+): PageSizeValues[] {
+  const totalRows = table.getCoreRowModel().rows.length;
+  return [
+    ...pageSizeOptions.filter((option) => option.value < totalRows),
+    {
+      label: `All (${totalRows})`,
+      // It's better to set this to a fixed value, so state doesn't become
+      // invalid when we add or remove a row
+      // value: totalRows,
+      value: MAX_PAGE_SIZE,
+    },
+  ];
+}
+
 export type PageSizeValues = {
   label: string;
   value: number;
-  showAlways?: boolean;
 };
 
 export function DataTablePageSizeSelect<TData>({
@@ -37,15 +52,8 @@ export function DataTablePageSizeSelect<TData>({
     table.setPageSize(Number(value));
   };
   const currentSize = table.getState().pagination.pageSize;
-  const pageSizeOptions = table.options.meta?.pageSizeOptions;
-  // Hide options that don't make sense to display
-  const totalRows = table.getCoreRowModel().rows.length;
-  const availableOptions = (pageSizeOptions ?? []).filter(
-    (option) => option.showAlways || option.value < totalRows,
-  );
-  // And hide the selector entirely if we're not left with multiple options
-  // to choose from
-  if (availableOptions.length <= 1) {
+  const pageSizeOptions = table.options.meta?.pageSizeOptions(table);
+  if (!pageSizeOptions || pageSizeOptions.length <= 1) {
     return <div></div>;
   }
 
@@ -64,7 +72,7 @@ export function DataTablePageSizeSelect<TData>({
           </SelectTrigger>
           <SelectContent align="start">
             <SelectGroup>
-              {availableOptions.map(({ label, value }) => (
+              {pageSizeOptions.map(({ label, value }) => (
                 <SelectItem key={value} value={value.toString()}>
                   {label}
                 </SelectItem>
