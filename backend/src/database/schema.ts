@@ -43,7 +43,7 @@ export type Profile = typeof profile.$inferSelect;
 
 // We have to define the relation both ways for drizzle to understand it.
 // TODO: this whole syntax changes when we update Drizzle to new v1.0
-export const profileUserRelation = relations(profile, ({ one, many }) => ({
+export const profileUserRelation = relations(profile, ({ one }) => ({
   user: one(user, {
     fields: [profile.userId],
     references: [user.id],
@@ -78,7 +78,9 @@ export const courseEvent = pgTable("courseEvent", {
   physicalAddress: text(),
   seats: integer(),
   classStartDatetime: timestamp({ withTimezone: true }),
-  instructorId: varchar().references(() => profile.id).notNull(),
+  instructorId: varchar()
+    .references(() => profile.id)
+    .notNull(),
 });
 
 export type CourseEvent = typeof courseEvent.$inferSelect;

@@ -3,15 +3,14 @@
 // called DTOs (Data Transfer Objects))
 
 import {
-  courseEventView,
   user,
   profile,
-  reservationView,
 } from "./schema";
 import {
   createSelectSchema,
 } from "drizzle-zod";
 import z from "zod";
+import { courseEventView, reservationView } from "./views";
 
 // Here we are using the drizzle zod integration to create schemas straight
 // from the database views, but they can also be altered with .pick(),

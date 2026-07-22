@@ -2,10 +2,9 @@ import { asc, eq, getTableColumns } from "drizzle-orm";
 import z from "zod";
 
 import db from "~/database";
-import type { CourseEventDto, ReservationDto } from "~/database/dtos";
+import { type CourseEventDto, type ReservationDto } from "~/database/dtos";
 import {
   user,
-  course,
   courseEvent,
   profile,
   reservation,
@@ -13,6 +12,7 @@ import {
 import type { Profile } from "~/database/schema";
 import { adminProcedure, router } from "~/utils/trpc";
 import { reservationDtoSelect } from "./reservation";
+import { courseEventView } from "~/database/views";
 
 export const adminRouter = router({
   getTrainees: adminProcedure.query((): Promise<Profile[]> => {
@@ -28,16 +28,9 @@ export const adminRouter = router({
 
   getCourseEvents: adminProcedure.query((): Promise<CourseEventDto[]> => {
     return db.client
-      .select({
-        ...getTableColumns(courseEvent),
-        courseName: course.courseName,
-        description: course.description,
-        creditHours: course.creditHours,
-        priceCents: course.priceCents,
-      })
-      .from(courseEvent)
-      .orderBy(asc(courseEvent.classStartDatetime))
-      .innerJoin(course, eq(courseEvent.courseId, course.id));
+      .select()
+      .from(courseEventView)
+      .orderBy(asc(courseEvent.classStartDatetime));
   }),
 
   getReservations: adminProcedure.query(
