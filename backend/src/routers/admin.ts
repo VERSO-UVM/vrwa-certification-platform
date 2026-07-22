@@ -12,7 +12,6 @@ import {
 } from "~/database/schema";
 import type { Profile } from "~/database/schema";
 import { adminProcedure, router } from "~/utils/trpc";
-import { reservationDtoSelect } from "./reservation";
 
 export const adminRouter = router({
   getTrainees: adminProcedure.query((): Promise<Profile[]> => {
@@ -40,8 +39,10 @@ export const adminRouter = router({
       .innerJoin(course, eq(courseEvent.courseId, course.id));
   }),
 
-  getReservations: adminProcedure.query(
-    reservationDtoSelect as () => Promise<ReservationDto[]>,
+  getReservations: adminProcedure.query(({ ctx }) =>
+    ctx.repos.reservations
+      .reservationQuery()
+      .orderBy(courseEvent.classStartDatetime, profile.firstName),
   ),
 
   getTraineeReservations: adminProcedure
@@ -50,9 +51,9 @@ export const adminRouter = router({
         profileId: z.string(),
       }),
     )
-    .query(({ input }): Promise<ReservationDto[]> => {
-      return reservationDtoSelect().where(
-        eq(reservation.profileId, input.profileId),
-      );
+    .query(({ ctx, input }): Promise<ReservationDto[]> => {
+      return ctx.repos.reservations
+        .reservationQuery()
+        .where(eq(reservation.profileId, input.profileId));
     }),
 });

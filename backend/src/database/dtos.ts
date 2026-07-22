@@ -3,24 +3,27 @@
 // called DTOs (Data Transfer Objects))
 
 import {
-  courseEventView,
   user,
   profile,
-  reservationView,
+  type Reservation,
+  type Profile,
+  type CourseEvent,
+  type Course,
+  type User,
 } from "./schema";
 import {
   createSelectSchema,
 } from "drizzle-zod";
 import z from "zod";
 
-// Here we are using the drizzle zod integration to create schemas straight
-// from the database views, but they can also be altered with .pick(),
-// .omit(), and .extend()
-export const ReservationDtoSchema = createSelectSchema(reservationView);
-export type ReservationDto = z.infer<typeof ReservationDtoSchema>;
+export type ReservationDto = Reservation &
+  Pick<Profile, "firstName" | "lastName" | "isMember"> &
+  Pick<CourseEvent, "classStartDatetime" | "seats"> & {
+    course: Pick<Course, "courseName" | "creditHours" | "id">;
+  };
 
-export const CourseEventDtoSchema = createSelectSchema(courseEventView);
-export type CourseEventDto = z.infer<typeof CourseEventDtoSchema>;
+export type CourseEventDto = CourseEvent &
+  Pick<Course, "courseName" | "description" | "creditHours" | "priceCents">;
 
 export const ProfileDtoSchema = createSelectSchema(profile);
 export type ProfileDto = z.infer<typeof ProfileDtoSchema>;
