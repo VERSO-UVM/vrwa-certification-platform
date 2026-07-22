@@ -27,11 +27,11 @@ await verbose`bun db:gen`.catch((err) => {
 await verbose`sleep 1`;
 
 await verbose`bun db:migrate`.catch((err) => {
-  error(err, "ERROR applying SQL migrations\Diagnose bun db:migrate");
+  error(err, "ERROR applying SQL migrations\nDiagnose bun db:migrate");
 });
 
 await verbose`bun db:seed`.text().catch((err) => {
-  error(err, "ERROR loading seed data into DB\Diagnose bun db:seed");
+  error(err, "ERROR loading seed data into DB\nDiagnose bun db:seed");
 });
 
 function verbose(command: TemplateStringsArray) {
