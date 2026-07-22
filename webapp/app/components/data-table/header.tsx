@@ -10,7 +10,6 @@ interface DataTableHeaderProps<TData> {
 export function DataTableHeader<TData>({ table }: DataTableHeaderProps<TData>) {
   return (
     // Fix header at top while scrolling!
-    // TODO: Fix header color so it's the same base color as the rest of the card
     <TableHeader className="sticky top-0 z-10 vrwa-light:bg-gray-700/5 dark: bg-gray-100/15">
       {table.getHeaderGroups().map((headerGroup) => (
         <TableRow key={headerGroup.id}>

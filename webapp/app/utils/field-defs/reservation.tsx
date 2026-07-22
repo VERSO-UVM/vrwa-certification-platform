@@ -29,15 +29,6 @@ export const reservationDefs = {
     header: "Payment Status",
     cell: ({ getValue }) => (
       <PaymentStatusBadge value={getValue()} />
-      // <PaymentStatusBadge value={getValue()} />
-      /*
-      switch (getValue()) {
-        case PaymentStatus.Paid:
-          return <Badge variant="outline">Paid</Badge>;
-        case PaymentStatus.Unpaid:
-          return <Badge variant="default">Unpaid</Badge>;
-      }
-      */
     ),
     meta: {
       editor: selectOptionsEditor({
