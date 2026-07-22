@@ -7,8 +7,8 @@ export function RoleBadge({ value }: { value: Role }) {
     case "instructor":
       return <Badge variant="other_blue">Instructor</Badge>;
     case "user":
-      return <Badge variant="yellow">Trainee</Badge>;
+      return <Badge variant="other_green">Trainee</Badge>;
     case "admin":
-      return <Badge variant="other_green">Admin</Badge>;
+      return <Badge variant="yellow">Admin</Badge>;
   }
 }
