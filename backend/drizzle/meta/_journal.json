@@ -15,13 +15,6 @@
       "when": 1784647416289,
       "tag": "0001_steady_kronos",
       "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1784731274013,
-      "tag": "0002_friendly_gertrude_yorkes",
-      "breakpoints": true
-    },
+    }
   ]
 }
