@@ -78,7 +78,7 @@ export function EditForm<T extends object>({
           </Field>
         </FieldGroup>
         <Button
-          disabled={shallowEqual({ ...row.original, ...updates }, row.original)} className="w-full flex flex-col items-center justify-center"
+          disabled={shallowEqual({ ...row.original, ...updates }, row.original)} className="flex flex-col items-center justify-center fixed bottom-15 left-4 right-4"
           // onClick={() => onSave(updates)}
         >
           Save changes
@@ -86,7 +86,7 @@ export function EditForm<T extends object>({
         <DrawerClose>
         <Button
           variant="cancel_button"
-          className="-mt-4 w-full flex flex-col items-center justify-center"
+          className="flex flex-col items-center justify-center fixed bottom-4 left-4 right-4"
         >
           Cancel
         </Button>
