@@ -27,9 +27,7 @@ export const reservationDefs = {
   }),
   paymentStatus: reservationFieldHelper.accessor("paymentStatus", {
     header: "Payment Status",
-    cell: ({ getValue }) => (
-      <PaymentStatusBadge value={getValue()} />
-    ),
+    cell: ({ getValue }) => <PaymentStatusBadge value={getValue()} />,
     meta: {
       editor: selectOptionsEditor({
         options: [
