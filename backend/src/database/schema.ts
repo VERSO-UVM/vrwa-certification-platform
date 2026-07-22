@@ -43,7 +43,7 @@ export type Profile = typeof profile.$inferSelect;
 
 // We have to define the relation both ways for drizzle to understand it.
 // TODO: this whole syntax changes when we update Drizzle to new v1.0
-export const profileUserRelation = relations(profile, ({ one, many }) => ({
+export const profileUserRelation = relations(profile, ({ one }) => ({
   user: one(user, {
     fields: [profile.userId],
     references: [user.id],

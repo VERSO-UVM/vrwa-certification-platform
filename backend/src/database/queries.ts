@@ -13,7 +13,7 @@ import {
   user,
   type Profile,
 } from "~/database/schema";
-import type { CourseEventDto, ReservationDto } from "./dtos";
+import type { CourseEventDto, ReservationDto, UserDto } from "./dtos";
 import db from ".";
 
 export function reservationQuery() {
@@ -66,4 +66,17 @@ export function profilesQuery() {
     .orderBy(asc(profile.lastName))
     .leftJoin(user, eq(profile.userId, user.id))
     .$dynamic() satisfies Promise<Profile[]>;
+}
+
+export function usersWithProfilesQuery() {
+  return db.client.query.user.findMany({
+    columns: {
+      id: true,
+      role: true,
+      email: true,
+    },
+    with: {
+      profiles: true,
+    },
+  }) satisfies Promise<UserDto[]>;
 }
