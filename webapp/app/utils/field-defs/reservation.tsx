@@ -28,7 +28,7 @@ export const reservationDefs = {
   paymentStatus: reservationFieldHelper.accessor("paymentStatus", {
     header: "Payment Status",
     cell: ({ getValue }) => (
-      <PaymentStatusBadge value={getValue()}/>
+      <PaymentStatusBadge value={getValue()} />
       // <PaymentStatusBadge value={getValue()} />
       /*
       switch (getValue()) {

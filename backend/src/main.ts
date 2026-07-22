@@ -77,5 +77,5 @@ app.route({
 });
 
 const port = parseInt(process.env.PORT || "") || 3000;
-const host = process.env.HOST || '0.0.0.0';
+const host = process.env.HOST || "0.0.0.0";
 void app.listen({ host, port });

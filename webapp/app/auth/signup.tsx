@@ -94,7 +94,11 @@ export default function SignupPage() {
               />
             </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}
-            <Button type="submit" className="w-full dark:hover:bg-gray-300" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full dark:hover:bg-gray-300"
+              disabled={loading}
+            >
               {loading ? "Signing up..." : "Sign up"}
             </Button>
           </form>
@@ -102,7 +106,10 @@ export default function SignupPage() {
         <CardFooter className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
             Have an account?{" "}
-            <Link to="/login" className="text-blue-700 dark:text-blue-300 underline">
+            <Link
+              to="/login"
+              className="text-blue-700 dark:text-blue-300 underline"
+            >
               Log in
             </Link>
           </div>

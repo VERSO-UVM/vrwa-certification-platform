@@ -22,7 +22,7 @@ const columnDefs = (() => {
     profileFieldHelper.display({
       header: "Actions",
       cell: ({ row }) => {
-        return <TraineeEditButton trainee={row.original} label="Edit"/>;
+        return <TraineeEditButton trainee={row.original} label="Edit" />;
       },
     }),
   ];

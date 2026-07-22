@@ -16,12 +16,17 @@ const badgeVariants = cva(
         indigo:
           "bg-indigo-200/50 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300",
         // Variants for paid/unpaid indicators
-        green: "vrwa-light:bg-green-700/10 vrwa-light:text-green-700 dark:bg-green-900/40 dark:text-green-500/90",
-        orange: "bg-amber-600/15 text-amber-600 dark:bg-amber-900/40 dark:text-amber-500/90",
+        green:
+          "vrwa-light:bg-green-700/10 vrwa-light:text-green-700 dark:bg-green-900/40 dark:text-green-500/90",
+        orange:
+          "bg-amber-600/15 text-amber-600 dark:bg-amber-900/40 dark:text-amber-500/90",
         // Variants for role badges
-        yellow: "vrwa-light:bg-[#ffd66644] vrwa-light:text-[#765e1e] dark:bg-[#91752955] dark:text-[#e4be57]",
-        other_green: "vrwa-light:bg-[#90B76633] vrwa-light:text-[#2f5e28] dark:bg-[#2f5e2855] dark:text-[#90b766]",
-        other_blue: "vrwa-light:bg-[#5a8acc22] vrwa-light:text-[#153383] dark:bg-[#15338355] dark:text-[#84a8d9]",
+        yellow:
+          "vrwa-light:bg-[#ffd66644] vrwa-light:text-[#765e1e] dark:bg-[#91752955] dark:text-[#e4be57]",
+        other_green:
+          "vrwa-light:bg-[#90B76633] vrwa-light:text-[#2f5e28] dark:bg-[#2f5e2855] dark:text-[#90b766]",
+        other_blue:
+          "vrwa-light:bg-[#5a8acc22] vrwa-light:text-[#153383] dark:bg-[#15338355] dark:text-[#84a8d9]",
         // Others
         default: "bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
         secondary:
@@ -34,8 +39,7 @@ const badgeVariants = cva(
         link: "text-primary underline-offset-4 [a&]:hover:underline",
         not_member:
           "vrwa-light:bg-gray-700/10 vrwa-light:border-gray-700/20 dark:bg-gray-100/13 dark:border-gray-100/30",
-        member:
-          "vrwa-light:border-gray-700/20 dark:border-gray-100/30",
+        member: "vrwa-light:border-gray-700/20 dark:border-gray-100/30",
       },
     },
     defaultVariants: {

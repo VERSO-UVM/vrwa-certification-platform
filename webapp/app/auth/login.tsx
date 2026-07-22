@@ -54,7 +54,9 @@ export default function LoginPage() {
     <main className="flex items-center justify-center h-screen vrwa-light:bg-gray-50 dark:bg-gray-950">
       <Card className="mt-10 w-full max-w-md self-center">
         <CardHeader>
-          <CardTitle className="text-center dark:text-gray-200 text-2xl font-bold">Login</CardTitle>
+          <CardTitle className="text-center dark:text-gray-200 text-2xl font-bold">
+            Login
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -80,7 +82,11 @@ export default function LoginPage() {
               />
             </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}
-            <Button type="submit" className="w-full dark:hover:bg-gray-300" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full dark:hover:bg-gray-300"
+              disabled={loading}
+            >
               {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
@@ -88,7 +94,10 @@ export default function LoginPage() {
         <CardFooter className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
             Need an account?{" "}
-            <Link to="/signup" className="text-blue-700 dark:text-blue-300 underline">
+            <Link
+              to="/signup"
+              className="text-blue-700 dark:text-blue-300 underline"
+            >
               Sign up
             </Link>
           </div>

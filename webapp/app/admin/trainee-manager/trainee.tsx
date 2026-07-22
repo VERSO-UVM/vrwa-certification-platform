@@ -14,12 +14,16 @@ import { profileDefPresets } from "~/utils/field-defs/profile";
 export function Trainee({ trainee }: { trainee: Profile }) {
   return (
     <div id={trainee.id}>
-      <br></br><h2 className="text-xl font-medium text-left p-4 vrwa-light:text-gray-800 dark:text-gray-200 rounded-xl">
+      <br></br>
+      <h2 className="text-xl font-medium text-left p-4 vrwa-light:text-gray-800 dark:text-gray-200 rounded-xl">
         {trainee.firstName} {trainee.lastName}
       </h2>
 
       <div className="flex flex-wrap place-content-between space-x-5">
-        <Card className="flex-1 border-none shadow-none max-w-[100%]" variant="green">
+        <Card
+          className="flex-1 border-none shadow-none max-w-[100%]"
+          variant="green"
+        >
           <CardHeader>
             <CardTitle>Classes</CardTitle>
             <CardDescription>

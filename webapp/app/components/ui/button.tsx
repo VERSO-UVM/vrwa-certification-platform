@@ -12,13 +12,12 @@ const buttonVariants = cva(
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive:
           "vrwa-light:bg-red-400/30 vrwa-light:hover:bg-red-400/50 vrwa-light:text-gray-600 hover:vrwa-light:text-gray-700 dark:bg-red-500/25 dark:hover:bg-red-500/40 dark:text-gray-300 dark:hover:text-gray-200",
-          // "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+        // "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
         secondary:
           "vrwa-light:bg-gray-500/20 vrwa-light:hover:bg-gray-500/45 vrwa-light:text-gray-600 hover:vrwa-light:text-gray-700 dark:bg-gray-600/40 dark:hover:bg-gray-600/75 dark:text-gray-300",
-        edit:
-          "vrwa-light:bg-gray-500/15 vrwa-light:text-gray-900/60 vrwa-light:hover:bg-gray-500/30 vrwa-light:hover:text-gray-900/70 dark:bg-gray-400/15 dark:text-gray-100/70 dark:hover:bg-gray-400/30 dark:hover:text-gray-100/80",
+        edit: "vrwa-light:bg-gray-500/15 vrwa-light:text-gray-900/60 vrwa-light:hover:bg-gray-500/30 vrwa-light:hover:text-gray-900/70 dark:bg-gray-400/15 dark:text-gray-100/70 dark:hover:bg-gray-400/30 dark:hover:text-gray-100/80",
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         ghost_lighter:
