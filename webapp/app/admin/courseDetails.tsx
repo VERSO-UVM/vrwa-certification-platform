@@ -168,9 +168,9 @@ export function CourseDetails() {
       header: "Member Status",
       cell: ({ getValue }) =>
         getValue() == true ? (
-          <Badge variant="purple"> Member</Badge>
+          <Badge variant="member"> Member</Badge>
         ) : (
-          <Badge variant="blue"> Non-Member</Badge>
+          <Badge variant="not_member"> Non-Member</Badge>
         ),
     },
     {
