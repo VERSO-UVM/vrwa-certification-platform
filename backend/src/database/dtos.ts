@@ -9,7 +9,6 @@ import {
   type Profile,
   type CourseEvent,
   type Course,
-  type User,
 } from "./schema";
 import {
   createSelectSchema,
