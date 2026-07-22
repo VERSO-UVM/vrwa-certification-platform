@@ -14,7 +14,6 @@ import { DataTable } from "~/components/data-table";
 import { Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Book, Trophy, Users } from "lucide-react";
-import { LocationTypeBadge } from "~/components/location-type-badge";
 import { PageHeader } from "~/components/page-header";
 import {
   courseEventDefPresets,
@@ -37,7 +36,7 @@ export function AdminDashboard() {
       <PageHeader>Admin Dashboard</PageHeader>
 
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
-        <Card className="@xl:col-span-5">
+        <Card className="@xl:col-span-5" variant="blue">
           <CardHeader>
             <CardTitle>Upcoming Classes</CardTitle>
             <CardDescription>
@@ -60,13 +59,13 @@ export function AdminDashboard() {
             />
           </CardContent>
         </Card>
-        <Card className="space-y-4 @xl:col-span-3">
+        <Card className="space-y-4 @xl:col-span-3" variant="yellow">
           <CardHeader className="pb-3">
             <CardTitle className="text-center">Quick Links</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-2">
             <Button
-              variant="ghost"
+              variant="ghost_lighter"
               className="justify-start h-auto py-3 px-2"
               asChild
             >
@@ -76,7 +75,7 @@ export function AdminDashboard() {
             </Button>
 
             <Button
-              variant="ghost"
+              variant="ghost_lighter"
               className="justify-start h-auto py-3 px-2"
               asChild
             >
@@ -86,7 +85,7 @@ export function AdminDashboard() {
             </Button>
 
             <Button
-              variant="ghost"
+              variant="ghost_lighter"
               className="justify-start h-auto py-3 px-2"
               asChild
             >
@@ -97,7 +96,7 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="col-span-full">
+        <Card className="col-span-full" variant="green">
           <CardTitle className="text-center">Search Reservations</CardTitle>
           <CardContent>
             <DataTable

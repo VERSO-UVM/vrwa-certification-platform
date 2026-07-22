@@ -45,8 +45,8 @@ export function TraineeManager() {
     <div className="flex-1">
       <PageHeader>Trainees</PageHeader>
 
-      <div className="flex flex-col space-y-1 ">
-        <div className="flex-1 rounded p-3">
+      <div className="flex flex-col space-y-1">
+        <div className="flex-1 rounded p-3 rounded-xl vrwa-light:bg-[#5a8acc22] vrwa-light:text-[#153383] dark:bg-[#15338344] dark:text-[#84a8d9]">
           <DataTable
             columns={columnDefs}
             data={trainees}

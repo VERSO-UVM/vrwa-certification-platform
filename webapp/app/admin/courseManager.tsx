@@ -111,7 +111,7 @@ export function CourseManager() {
               onClick={() => {
                 if (
                   confirm(
-                    "Are you sure you want to delete this  event? All event information and reservations will be lost.",
+                    "Are you sure you want to delete this event? All event information and reservations will be lost.",
                   )
                 ) {
                   deleteRow(row.original.id);
@@ -175,7 +175,7 @@ export function CourseManager() {
     <div className="flex-1">
       <PageHeader>Course Manager</PageHeader>
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
-        <Card className="@xl:col-span-8">
+        <Card className="@xl:col-span-8" variant="blue">
           <CardHeader>
             <CardTitle>Classes Overview</CardTitle>
             <CardDescription>
@@ -243,7 +243,7 @@ export function CourseManager() {
             </Drawer>
           </div>
         </Card>
-        <Card className="@xl:col-span-8">
+        <Card className="@xl:col-span-8" variant="yellow">
           <CardHeader>
             <CardTitle>Courses Overview</CardTitle>
             <CardDescription>

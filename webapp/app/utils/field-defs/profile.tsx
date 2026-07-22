@@ -69,16 +69,16 @@ export const profileDefs = {
     cell: ({ getValue }) => {
       switch (getValue()) {
         case true:
-          return <Badge variant="outline">Yes</Badge>;
+          return <Badge variant="member">Yes</Badge>;
         case false:
-          return <Badge variant="default">No</Badge>;
+          return <Badge variant="not_member">No</Badge>;
       }
     },
     meta: {
       editor: selectOptionsEditor({
         options: [
-          { label: "yes", value: true },
-          { label: "no", value: false },
+          { label: "Yes", value: true },
+          { label: "No", value: false },
         ],
       }),
     },

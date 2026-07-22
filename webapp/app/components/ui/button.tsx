@@ -11,14 +11,21 @@ const buttonVariants = cva(
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+          "vrwa-light:bg-red-400/30 vrwa-light:hover:bg-red-400/50 vrwa-light:text-gray-600 hover:vrwa-light:text-gray-700 dark:bg-red-500/25 dark:hover:bg-red-500/40 dark:text-gray-300 dark:hover:text-gray-200",
         outline:
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "vrwa-light:bg-gray-500/20 vrwa-light:hover:bg-gray-500/45 vrwa-light:text-gray-600 hover:vrwa-light:text-gray-700 dark:bg-gray-600/40 dark:hover:bg-gray-600/75 dark:text-gray-300",
+        edit: "vrwa-light:bg-gray-500/15 vrwa-light:text-gray-900/60 vrwa-light:hover:bg-gray-500/30 vrwa-light:hover:text-gray-900/70 dark:bg-gray-400/15 dark:text-gray-100/70 dark:hover:bg-gray-400/30 dark:hover:text-gray-100/80",
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
+        ghost_lighter:
+          "vrwa-light:hover:bg-gray-400/40 dark:hover:bg-gray-600/40",
+        link: "text-primary underline-offset-4 hover:underline vrwa-light:text-gray-700 vrwa-light:hover:text-gray-950 dark:text-gray-400 dark:hover:text-gray-200",
+        cancel_button:
+          "vrwa-light:bg-gray-500/20 vrwa-light:hover:bg-gray-500/45 vrwa-light:text-gray-600 hover:vrwa-light:text-gray-700 dark:bg-gray-600/40 dark:hover:bg-gray-600/75 dark:text-gray-300",
+        cancel_icon:
+          "vrwa-light:hover:bg-gray-500/20 vrwa-light:text-gray-600 dark:hover:bg-gray-600/40 dark:text-gray-300",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

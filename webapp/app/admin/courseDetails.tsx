@@ -168,9 +168,9 @@ export function CourseDetails() {
       header: "Member Status",
       cell: ({ getValue }) =>
         getValue() == true ? (
-          <Badge variant="purple"> Member</Badge>
+          <Badge variant="member"> Member</Badge>
         ) : (
-          <Badge variant="blue"> Non-Member</Badge>
+          <Badge variant="not_member"> Non-Member</Badge>
         ),
     },
     {
@@ -215,7 +215,7 @@ export function CourseDetails() {
     <div className="flex-1">
       <PageHeader>{course.data?.courseName}</PageHeader>
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
-        <Card className="@xl: col-span-2">
+        <Card className="@xl: col-span-2" variant="green">
           <CardContent className="p-6 flex items-center gap-4">
             <Users className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
@@ -224,7 +224,7 @@ export function CourseDetails() {
             </div>
           </CardContent>
         </Card>
-        <Card className="@xl: col-span-2">
+        <Card className="@xl: col-span-2" variant="green">
           <CardContent className="p-6 flex items-center gap-4">
             <CreditCard className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
@@ -235,7 +235,7 @@ export function CourseDetails() {
             </div>
           </CardContent>
         </Card>
-        <Card className="@xl: col-span-2">
+        <Card className="@xl: col-span-2" variant="green">
           <CardContent className="p-6 flex items-center gap-4">
             <Calendar className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
@@ -244,7 +244,7 @@ export function CourseDetails() {
             </div>
           </CardContent>
         </Card>
-        <Card className="@xl: col-span-2">
+        <Card className="@xl: col-span-2" variant="green">
           <CardContent className="p-6 flex items-center gap-4">
             <History className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
@@ -253,7 +253,7 @@ export function CourseDetails() {
             </div>
           </CardContent>
         </Card>
-        <Card className="@xl:col-span-2">
+        <Card className="@xl:col-span-2" variant="green">
           <CardHeader className="pb-3">
             <CardTitle className="text-xl font-semibold">
               {" "}
@@ -361,7 +361,7 @@ export function CourseDetails() {
             </div>
           </CardContent>
         </Card>
-        <Card className="@xl:col-span-6">
+        <Card className="@xl:col-span-6" variant="green">
           <CardHeader className="pb-3">
             <CardTitle>
               Class Roster{" "}
@@ -393,7 +393,7 @@ export function CourseDetails() {
               </TabsList>
               {courseEvents.data?.map((event) => (
                 <TabsContent key={event.id} value={event.id}>
-                  <Card>
+                  <Card variant="green">
                     <CardContent>
                       <DataTable
                         columns={rosterTableDef}

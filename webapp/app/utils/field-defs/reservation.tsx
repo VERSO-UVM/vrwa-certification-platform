@@ -3,6 +3,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { selectOptionsEditor, textInputEditor } from "../field-editors";
 import { Status as PaymentStatus } from "@backend/database/schema";
 import { Badge } from "~/components/ui/badge";
+import { PaymentStatusBadge } from "~/components/payment-status-badge";
 
 export const reservationFieldHelper = createColumnHelper<ReservationDto>();
 
@@ -26,14 +27,7 @@ export const reservationDefs = {
   }),
   paymentStatus: reservationFieldHelper.accessor("paymentStatus", {
     header: "Payment Status",
-    cell: ({ getValue }) => {
-      switch (getValue()) {
-        case PaymentStatus.Paid:
-          return <Badge variant="outline">Paid</Badge>;
-        case PaymentStatus.Unpaid:
-          return <Badge variant="default">Unpaid</Badge>;
-      }
-    },
+    cell: ({ getValue }) => <PaymentStatusBadge value={getValue()} />,
     meta: {
       editor: selectOptionsEditor({
         options: [
