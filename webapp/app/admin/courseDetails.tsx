@@ -347,7 +347,7 @@ export function CourseDetails() {
                       });
                       await queryClient.invalidateQueries({
                         queryKey:
-                          trpc.courseManagerRouter.getCourses.queryKey(),
+                          trpc.courses.admin.list.queryKey(),
                       });
                       setCourseDeleted(true);
                     } else {

@@ -39,7 +39,7 @@ function useCourseEvents() {
 
 function useCourses() {
   const trpc = useTRPC();
-  return useQuery(trpc.courseManagerRouter.getCourses.queryOptions());
+  return useQuery(trpc.courses.admin.list.queryOptions());
 }
 
 export function CourseManager() {
@@ -277,7 +277,7 @@ export function CourseManager() {
                       );
                       await queryClient.invalidateQueries({
                         queryKey:
-                          trpc.courseManagerRouter.getCourses.queryKey(),
+                          trpc.course.admin.list.queryKey(),
                       });
                       setCourseDrawerOpen(false);
                     }}
