@@ -10,9 +10,7 @@ import {
   type CourseEvent,
   type Course,
 } from "./schema";
-import {
-  createSelectSchema,
-} from "drizzle-zod";
+import { createSelectSchema } from "drizzle-zod";
 import z from "zod";
 
 export type ReservationDto = Reservation &

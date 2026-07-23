@@ -78,7 +78,9 @@ export const courseEvent = pgTable("courseEvent", {
   physicalAddress: text(),
   seats: integer(),
   classStartDatetime: timestamp({ withTimezone: true }),
-  instructorId: varchar().references(() => profile.id).notNull(),
+  instructorId: varchar()
+    .references(() => profile.id)
+    .notNull(),
 });
 
 export type CourseEvent = typeof courseEvent.$inferSelect;

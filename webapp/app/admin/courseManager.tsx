@@ -221,16 +221,15 @@ export function CourseManager() {
                     event={selectedEvent}
                     onCreate={async (data) => {
                       if (selectedEvent) {
-                        await client.courseEvents.admin.update.mutate(
-                          { id: selectedEvent.id, ...data },
-                        );
+                        await client.courseEvents.admin.update.mutate({
+                          id: selectedEvent.id,
+                          ...data,
+                        });
                         await queryClient.invalidateQueries({
                           queryKey: trpc.courseEvents.admin.list.queryKey(),
                         });
                       } else {
-                        await client.courses.admin.mutate(
-                          data,
-                        );
+                        await client.courses.admin.mutate(data);
                         await queryClient.invalidateQueries({
                           queryKey: trpc.courseEvents.admin.list.queryKey(),
                         });
@@ -272,12 +271,9 @@ export function CourseManager() {
                 <div className="no-scrollbar overflow-y-auto px-4">
                   <NewCourseForm
                     onCreate={async (data) => {
-                      await client.courses.admin.create.mutate(
-                        data,
-                      );
+                      await client.courses.admin.create.mutate(data);
                       await queryClient.invalidateQueries({
-                        queryKey:
-                          trpc.course.admin.list.queryKey(),
+                        queryKey: trpc.course.admin.list.queryKey(),
                       });
                       setCourseDrawerOpen(false);
                     }}
