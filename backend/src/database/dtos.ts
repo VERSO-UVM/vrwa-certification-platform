@@ -14,7 +14,7 @@ import { createSelectSchema } from "drizzle-zod";
 import z from "zod";
 
 export type ReservationDto = Reservation &
-  Pick<Profile, "firstName" | "lastName" | "isMember"> &
+  Omit<Profile, "id"> &
   Pick<CourseEvent, "classStartDatetime" | "seats"> & {
     course: Pick<Course, "courseName" | "creditHours" | "id">;
   };

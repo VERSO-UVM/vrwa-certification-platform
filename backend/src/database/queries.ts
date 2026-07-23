@@ -16,16 +16,14 @@ import {
 import type { CourseEventDto, ReservationDto, UserDto } from "./dtos";
 import db from ".";
 
+const { id: _, ...profileFields } = getTableColumns(profile);
+const reservationFields = getTableColumns(reservation);
+
 export function reservationQuery() {
   return db.client
     .select({
-      profileId: reservation.profileId,
-      courseEventId: reservation.courseEventId,
-      creditHours: reservation.creditHours,
-      paymentStatus: reservation.paymentStatus,
-      firstName: profile.firstName,
-      lastName: profile.lastName,
-      isMember: profile.isMember,
+      ...reservationFields,
+      ...profileFields,
       classStartDatetime: courseEvent.classStartDatetime,
       seats: courseEvent.seats,
       course: {
