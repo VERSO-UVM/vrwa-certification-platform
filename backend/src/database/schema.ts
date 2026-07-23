@@ -8,14 +8,14 @@ import {
   primaryKey,
   decimal,
 } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { prefixedIdGenerator } from "~/utils/id";
 
 // Auth schema must only be modified through the better-auth configuration
 // in ~/auth/server.ts. Then the drizzle schema must be re-generated
 // through the instructions in the README.
-import * as authSchema from "./auth";
-import { relations } from "drizzle-orm";
-export * from "./auth";
+import * as authSchema from "../../drizzle/auth-schema";
+export * from "../../drizzle/auth-schema";
 const { user, account } = authSchema;
 
 export type User = typeof user.$inferSelect;
