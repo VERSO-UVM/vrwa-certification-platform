@@ -32,31 +32,6 @@ export const courseManagerRouter = router({
       return reservations ?? [];
     }),
 
-  //createCourseEvent
-  createCourseEvent: adminProcedure
-    .input(
-      z.object({
-        courseId: z.string(),
-        locationType: z.enum(["in-person", "virtual", "hybrid"]),
-        classStartDatetime: z.coerce.date(),
-        seats: z.number().int().positive(),
-        virtualLink: z.url().optional().nullable(),
-        physicalAddress: z.string().nullable().optional(),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const [newEvent] = await db.client
-        .insert(courseEvent)
-        .values({
-          ...input,
-          virtualLink: input.virtualLink ?? null,
-          physicalAddress: input.physicalAddress ?? null,
-        })
-        .returning();
-
-      return newEvent;
-    }),
-
   //updateCourseEvent
   updateCourseEvent: adminProcedure
     .input(
