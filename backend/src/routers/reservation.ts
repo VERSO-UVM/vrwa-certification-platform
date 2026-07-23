@@ -12,6 +12,8 @@ import { adminProcedure, router } from "~/utils/trpc";
 
 import { createUpdateSchema } from "drizzle-zod";
 import z from "zod";
+import { reservationQuery } from "~/database/queries";
+import type { ReservationDto } from "~/database/dtos";
 
 const updateSchema = createUpdateSchema(reservation, {
   courseEventId: z.string(),
@@ -36,29 +38,32 @@ export const reservationRouter = router({
         .returning();
     }),
 
+    list: adminProcedure.query(() =>
+      reservationQuery().orderBy(
+        courseEvent.classStartDatetime,
+        profile.firstName,
+      ),
+    ),
+
+    listTrainee: adminProcedure
+      .input(
+        z.object({
+          profileId: z.string(),
+        }),
+      )
+      .query(({ input }): Promise<ReservationDto[]> => {
+        return reservationQuery()
+          .orderBy()
+          .where(eq(reservation.profileId, input.profileId));
+      }),
+
     listCourse: adminProcedure
       .input(z.object({ courseId: z.string() }))
-      .query(async ({ input }) => {
-        const reservations = await db.client
-          .select({
-            profileId: reservation.profileId,
-            firstName: profile.firstName,
-            lastName: profile.lastName,
-            isMember: profile.isMember,
-            creditHours: reservation.creditHours,
-            paymentStatus: reservation.paymentStatus,
-            classStartDatetime: courseEvent.classStartDatetime,
-            courseEventId: courseEvent.id,
-          })
-          .from(reservation)
-          .leftJoin(profile, eq(reservation.profileId, profile.id))
-          .leftJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
-          .leftJoin(course, eq(courseEvent.courseId, course.id))
+      .query(({ input }) =>
+        reservationQuery()
           .where(eq(course.id, input.courseId))
-          .orderBy(courseEvent.classStartDatetime);
-
-        return reservations ?? [];
-      }),
+          .orderBy(courseEvent.classStartDatetime),
+      ),
 
     create: adminProcedure
       .input(

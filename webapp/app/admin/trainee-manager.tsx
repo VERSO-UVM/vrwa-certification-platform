@@ -30,7 +30,7 @@ const columnDefs = (() => {
 
 export function TraineeManager() {
   const trpc = useTRPC();
-  const traineesQuery = useQuery(trpc.adminRouter.getTrainees.queryOptions());
+  const traineesQuery = useQuery(trpc.profile.admin.listTrainees.queryOptions());
   const trainees = traineesQuery.data ?? [];
 
   const [selectedId, setSelectedId] = useHashString(null);

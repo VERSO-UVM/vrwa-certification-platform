@@ -28,7 +28,7 @@ export function AdminDashboard() {
     trpc.courseEvents.admin.list.queryOptions(),
   );
   const reservations = useQuery(
-    trpc.adminRouter.getReservations.queryOptions(),
+    trpc.reservations.admin.list.queryOptions(),
   );
   const navigate = useNavigate();
 

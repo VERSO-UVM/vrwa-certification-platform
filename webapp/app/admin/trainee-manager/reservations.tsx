@@ -28,7 +28,7 @@ const columnDefs = [
 export function TraineeReservations({ profileId }: { profileId: string }) {
   const trpc = useTRPC();
   const query = useQuery(
-    trpc.adminRouter.getTraineeReservations.queryOptions({
+    trpc.reservations.admin.listTrainee.queryOptions({
       profileId: profileId,
     }),
   );

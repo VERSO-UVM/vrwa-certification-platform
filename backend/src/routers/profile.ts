@@ -1,11 +1,12 @@
 import { and, eq } from "drizzle-orm";
 
 import db from "~/database";
-import { profile, type Profile } from "~/database/schema";
+import { profile, user, type Profile } from "~/database/schema";
 import { adminProcedure, protectedProcedure, router } from "~/utils/trpc";
 
 import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import z from "zod";
+import { profilesQuery } from "~/database/queries";
 
 const updateSchema = createUpdateSchema(profile, {
   id: z.string(),
@@ -17,19 +18,25 @@ const insertSchema = createInsertSchema(profile).omit({
 });
 
 export const profileRouter = router({
-  /**
-   * Update the profile information associated with a user.
-   * This is an admin procedure.
-   */
-  update: adminProcedure.input(updateSchema).mutation(({ input }) => {
-    const { id, ...changes } = input;
-    return db.client
-      .update(profile)
-      .set({
-        ...changes,
-      })
-      .where(and(eq(profile.id, id)))
-      .returning();
+  admin: router({
+    /**
+     * Update the profile information associated with a user.
+     * This is an admin procedure.
+     */
+    update: adminProcedure.input(updateSchema).mutation(({ input }) => {
+      const { id, ...changes } = input;
+      return db.client
+        .update(profile)
+        .set({
+          ...changes,
+        })
+        .where(and(eq(profile.id, id)))
+        .returning();
+    }),
+
+    listTrainees: adminProcedure.query((): Promise<Profile[]> => {
+      return profilesQuery().where(eq(user.role, "user"));
+    }),
   }),
 
   /**
