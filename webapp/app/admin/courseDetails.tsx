@@ -302,7 +302,7 @@ export function CourseDetails() {
                         key={courseId}
                         course={course.data}
                         onCreate={async (data) => {
-                          await client.courseManagerRouter.updateCourse.mutate({
+                          await client.courses.admin.update.mutate({
                             id: courseId,
                             ...data,
                           });

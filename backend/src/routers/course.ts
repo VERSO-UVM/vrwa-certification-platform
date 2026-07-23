@@ -1,8 +1,8 @@
-import { asc, eq, and } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import db from "~/database";
-import { courseEvent, course, reservation, profile } from "~/database/schema";
+import { course } from "~/database/schema";
 import type { Course } from "~/database/schema";
-import { adminProcedure, basicProcedure, router } from "~/utils/trpc";
+import { adminProcedure, router } from "~/utils/trpc";
 import { z } from "zod";
 
 export const courseRouter = router({
@@ -59,6 +59,36 @@ export const courseRouter = router({
           throw new Error("No matching Course Event found!");
         }
         return { success: true };
+      }),
+
+    update: adminProcedure
+      .input(
+        z.object({
+          id: z.string(),
+          courseName: z.string(),
+          description: z.string().nullable(),
+          creditHours: z.number().int().positive(),
+          priceCents: z.number().int().positive(),
+        }),
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...update } = input;
+
+        const cleanUpdate = Object.fromEntries(
+          Object.entries(update).filter(([_, value]) => value !== undefined),
+        );
+
+        if (Object.keys(cleanUpdate).length === 0) {
+          throw new Error("No fields provided to update");
+        }
+
+        const [updatedCourse] = await db.client
+          .update(course)
+          .set(cleanUpdate)
+          .where(eq(course.id, id))
+          .returning();
+
+        return updatedCourse;
       }),
   }),
 });

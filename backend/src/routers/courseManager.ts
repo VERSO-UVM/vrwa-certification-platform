@@ -8,37 +8,6 @@ import { z } from "zod";
 const adminProcedure = basicProcedure;
 
 export const courseManagerRouter = router({
-  //updateCourse
-  updateCourse: adminProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        courseName: z.string(),
-        description: z.string().nullable(),
-        creditHours: z.number().int().positive(),
-        priceCents: z.number().int().positive(),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const { id, ...update } = input;
-
-      const cleanUpdate = Object.fromEntries(
-        Object.entries(update).filter(([_, value]) => value !== undefined),
-      );
-
-      if (Object.keys(cleanUpdate).length === 0) {
-        throw new Error("No fields provided to update");
-      }
-
-      const [updatedCourse] = await db.client
-        .update(course)
-        .set(cleanUpdate)
-        .where(eq(course.id, id))
-        .returning();
-
-      return updatedCourse;
-    }),
-
   //addTrainee
   addReservation: adminProcedure
     .input(
