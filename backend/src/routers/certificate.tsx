@@ -1,4 +1,3 @@
-import React from "react";
 import { basicProcedure, router } from "~/utils/trpc";
 import { pdf } from "@react-pdf/renderer";
 import z from "zod";
