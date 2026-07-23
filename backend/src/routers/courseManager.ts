@@ -8,27 +8,6 @@ import { z } from "zod";
 const adminProcedure = basicProcedure;
 
 export const courseManagerRouter = router({
-  //createCourse
-  createCourse: adminProcedure
-    .input(
-      z.object({
-        courseName: z.string(),
-        description: z.string().nullable(),
-        creditHours: z.number().int().positive(),
-        priceCents: z.number().int().positive(),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const [newCourse] = await db.client
-        .insert(course)
-        .values({
-          ...input,
-          description: input.description ?? null,
-        })
-        .returning();
-
-      return newCourse;
-    }),
 
   //deleteCourse
   deleteCourse: adminProcedure

@@ -272,7 +272,7 @@ export function CourseManager() {
                 <div className="no-scrollbar overflow-y-auto px-4">
                   <NewCourseForm
                     onCreate={async (data) => {
-                      await client.courseManagerRouter.createCourse.mutate(
+                      await client.courses.admin.create.mutate(
                         data,
                       );
                       await queryClient.invalidateQueries({
