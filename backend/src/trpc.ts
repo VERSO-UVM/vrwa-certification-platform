@@ -10,7 +10,7 @@ export const appRouter = router({
   certificates: certificateRouter,
   reservations: reservationRouter,
   profiles: profileRouter,
-  user: userRouter,
+  users: userRouter,
   courses: courseRouter,
   courseEvents: courseEventRouter,
 });
