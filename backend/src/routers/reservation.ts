@@ -59,5 +59,47 @@ export const reservationRouter = router({
 
         return reservations ?? [];
       }),
+
+    create: adminProcedure
+      .input(
+        z.object({
+          profileId: z.string(),
+          courseEventId: z.string(),
+          creditHours: z.number().positive(),
+          paymentStatus: z.enum(["paid", "unpaid"]),
+        }),
+      )
+      .mutation(async ({ input }) => {
+        const [newReservation] = await db.client
+          .insert(reservation)
+          .values({
+            ...input,
+            creditHours: input.creditHours.toString(),
+          })
+          .returning();
+
+        return newReservation;
+      }),
+
+    delete: adminProcedure
+      .input(
+        z.object({
+          profileId: z.string(),
+          courseEventId: z.string(),
+        }),
+      )
+      .mutation(async ({ input }) => {
+        const deletedRows = await db.client
+          .delete(reservation)
+          .where(
+            and(
+              eq(reservation.courseEventId, input.courseEventId),
+              eq(reservation.profileId, input.profileId),
+            ),
+          )
+          .returning();
+
+        return { success: true };
+      }),
   }),
 });

@@ -14,7 +14,6 @@ export const appRouter = router({
   reservations: reservationRouter,
   profile: profileRouter,
   user: userRouter,
-  courseManagerRouter,
   courses: courseRouter,
   courseEvents: courseEventRouter,
 });

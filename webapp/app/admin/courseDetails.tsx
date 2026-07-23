@@ -47,7 +47,7 @@ export function CourseDetails() {
   const queryClient = useQueryClient();
 
   const course = useQuery(
-    trpc.courseManagerRouter.getCourseById.queryOptions({ id: courseId! }),
+    trpc.courses.admin.get.queryOptions({ id: courseId! }),
   );
 
   const reservations = useQuery(
@@ -81,7 +81,7 @@ export function CourseDetails() {
   const eventIds = courseEvents.data?.map((e) => e.id) ?? [];
 
   async function deleteRow(profileId: string, courseEventId: string) {
-    await client.courseManagerRouter.deleteReservation.mutate({
+    await client.reservations.admin.delete.mutate({
       profileId,
       courseEventId,
     });
@@ -307,10 +307,9 @@ export function CourseDetails() {
                             ...data,
                           });
                           await queryClient.invalidateQueries({
-                            queryKey:
-                              trpc.courseManagerRouter.getCourseById.queryKey({
-                                id: courseId,
-                              }),
+                            queryKey: trpc.courses.admin.get.queryKey({
+                              id: courseId,
+                            }),
                           });
                           setCourseDrawerOpen(false);
                         }}
@@ -346,8 +345,7 @@ export function CourseDetails() {
                         id: courseId!,
                       });
                       await queryClient.invalidateQueries({
-                        queryKey:
-                          trpc.courses.admin.list.queryKey(),
+                        queryKey: trpc.courses.admin.list.queryKey(),
                       });
                       setCourseDeleted(true);
                     } else {
@@ -445,7 +443,7 @@ export function CourseDetails() {
                     onClick={async () => {
                       if (!selectedTrainee) return;
 
-                      await client.courseManagerRouter.addReservation.mutate({
+                      await client.reservations.admin.create.mutate({
                         profileId: selectedTrainee,
                         courseEventId: activeEventId ?? "",
                         creditHours: course.data?.creditHours ?? 0,
@@ -453,10 +451,9 @@ export function CourseDetails() {
                       });
 
                       await queryClient.invalidateQueries({
-                        queryKey:
-                          trpc.reservations.admin.listCourse.queryKey(
-                            { courseId: courseId! },
-                          ),
+                        queryKey: trpc.reservations.admin.listCourse.queryKey({
+                          courseId: courseId!,
+                        }),
                       });
 
                       setTraineePopupOpen(false);
