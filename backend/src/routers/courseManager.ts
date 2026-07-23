@@ -8,26 +8,6 @@ import { z } from "zod";
 const adminProcedure = basicProcedure;
 
 export const courseManagerRouter = router({
-
-  //deleteCourse
-  deleteCourse: adminProcedure
-    .input(
-      z.object({
-        id: z.string(),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const deletedRows = await db.client
-        .delete(course)
-        .where(eq(course.id, input.id))
-        .returning();
-
-      if (deletedRows.length === 0) {
-        throw new Error("No matching Course Event found!");
-      }
-      return { success: true };
-    }),
-
   //updateCourse
   updateCourse: adminProcedure
     .input(

@@ -342,7 +342,7 @@ export function CourseDetails() {
                         "Are you sure you want to delete this course? All course information and reservations will be lost.",
                       )
                     ) {
-                      await client.courseManagerRouter.deleteCourse.mutate({
+                      await client.courses.admin.delete.mutate({
                         id: courseId!,
                       });
                       await queryClient.invalidateQueries({
