@@ -59,7 +59,7 @@ export function CourseDetails() {
   const trainees = useQuery(trpc.adminRouter.getTrainees.queryOptions());
 
   const courseEvents = useQuery(
-    trpc.courseManagerRouter.getCourseEventsByCourse.queryOptions({
+    trpc.courseEvents.admin.listByCourse.queryOptions({
       courseId: courseId!,
     }),
   );

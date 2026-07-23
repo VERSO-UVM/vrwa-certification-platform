@@ -30,7 +30,7 @@ export function CreateProfile() {
     trpc.profile.create.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({
-          queryKey: trpc.profile.getProfiles.queryKey(),
+          queryKey: trpc.profile.list.queryKey(),
         });
       },
     }),

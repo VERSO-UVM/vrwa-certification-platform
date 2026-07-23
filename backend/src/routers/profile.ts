@@ -46,7 +46,7 @@ export const profileRouter = router({
   /**
    * Get all profiles associated with the logged-in user.
    */
-  getProfiles: protectedProcedure.query(async ({ ctx }) => {
+  list: protectedProcedure.query(async ({ ctx }) => {
     const profiles = await db.client
       .select()
       .from(profile)
