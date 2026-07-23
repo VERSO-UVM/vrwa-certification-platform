@@ -34,7 +34,7 @@ import { Link } from "react-router";
 
 function useCourseEvents() {
   const trpc = useTRPC();
-  return useQuery(trpc.adminRouter.getCourseEvents.queryOptions());
+  return useQuery(trpc.courseEvents.admin.list.queryOptions());
 }
 
 function useCourses() {
@@ -54,7 +54,7 @@ export function CourseManager() {
     await client.courseManagerRouter.deleteCourseEvent.mutate({ id });
 
     await queryClient.invalidateQueries({
-      queryKey: trpc.adminRouter.getCourseEvents.queryKey(),
+      queryKey: trpc.courseEvents.admin.list.queryKey(),
     });
   }
 
@@ -225,14 +225,14 @@ export function CourseManager() {
                           { id: selectedEvent.id, ...data },
                         );
                         await queryClient.invalidateQueries({
-                          queryKey: trpc.adminRouter.getCourseEvents.queryKey(),
+                          queryKey: trpc.courseEvents.admin.list.queryKey(),
                         });
                       } else {
                         await client.courseManagerRouter.createCourseEvent.mutate(
                           data,
                         );
                         await queryClient.invalidateQueries({
-                          queryKey: trpc.adminRouter.getCourseEvents.queryKey(),
+                          queryKey: trpc.courseEvents.admin.list.queryKey(),
                         });
                       }
                       setCourseEventDrawerOpen(false);

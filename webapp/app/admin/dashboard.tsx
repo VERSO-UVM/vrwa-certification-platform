@@ -25,7 +25,7 @@ import { reservationDefPresets } from "~/utils/field-defs/reservation";
 export function AdminDashboard() {
   const trpc = useTRPC();
   const courseEvents = useQuery(
-    trpc.adminRouter.getCourseEvents.queryOptions(),
+    trpc.courseEvents.admin.list.queryOptions(),
   );
   const reservations = useQuery(
     trpc.adminRouter.getReservations.queryOptions(),

@@ -16,10 +16,6 @@ export const adminRouter = router({
     return profilesQuery().where(eq(user.role, "user"));
   }),
 
-  getCourseEvents: adminProcedure.query((): Promise<CourseEventDto[]> => {
-    return courseEventQuery().orderBy(asc(courseEvent.classStartDatetime));
-  }),
-
   getReservations: adminProcedure.query(() =>
     reservationQuery().orderBy(
       courseEvent.classStartDatetime,

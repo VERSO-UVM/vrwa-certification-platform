@@ -6,6 +6,7 @@ import { courseManagerRouter } from "./routers/courseManager";
 import { profileRouter } from "./routers/profile";
 import { userRouter } from "./routers/user";
 import { courseRouter } from "./routers/course";
+import { courseEventRouter } from "./routers/courseEvent";
 
 export const appRouter = router({
   adminRouter,
@@ -15,6 +16,7 @@ export const appRouter = router({
   user: userRouter,
   courseManagerRouter,
   courses: courseRouter,
+  courseEvents: courseEventRouter,
 });
 
 // Export type router type signature,
