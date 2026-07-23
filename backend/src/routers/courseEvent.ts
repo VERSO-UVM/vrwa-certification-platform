@@ -18,7 +18,7 @@ export const courseEventRouter = router({
       return courseEventQuery().orderBy(asc(courseEvent.classStartDatetime));
     }),
 
-    listByCourse: adminProcedure
+    listCourse: adminProcedure
       .input(z.object({ courseId: z.string() }))
       .query(async ({ input }) => {
         const courseEvents = await db.client
@@ -50,6 +50,37 @@ export const courseEventRouter = router({
           .returning();
 
         return newEvent;
+      }),
+
+    update: adminProcedure
+      .input(
+        z.object({
+          id: z.string(),
+          classStartDatetime: z.coerce.date().optional().nullable(),
+          seats: z.number().int().positive().nullable().optional(),
+          locationType: z.enum(["in-person", "virtual", "hybrid"]).optional(),
+          physicalAddress: z.string().nullable().optional(),
+          virtualLink: z.url().optional().nullable(),
+        }),
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...update } = input;
+
+        const cleanUpdate = Object.fromEntries(
+          Object.entries(update).filter(([_, value]) => value !== undefined),
+        );
+
+        if (Object.keys(cleanUpdate).length === 0) {
+          throw new Error("No fields provided to update");
+        }
+
+        const [updatedEvent] = await db.client
+          .update(courseEvent)
+          .set(cleanUpdate)
+          .where(eq(courseEvent.id, id))
+          .returning();
+
+        return updatedEvent;
       }),
   }),
 

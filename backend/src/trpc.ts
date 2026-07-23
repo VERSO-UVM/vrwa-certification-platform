@@ -11,7 +11,7 @@ import { courseEventRouter } from "./routers/courseEvent";
 export const appRouter = router({
   adminRouter,
   certificateRouter,
-  reservation: reservationRouter,
+  reservations: reservationRouter,
   profile: profileRouter,
   user: userRouter,
   courseManagerRouter,

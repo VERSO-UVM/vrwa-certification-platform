@@ -221,14 +221,14 @@ export function CourseManager() {
                     event={selectedEvent}
                     onCreate={async (data) => {
                       if (selectedEvent) {
-                        await client.courseManagerRouter.updateCourseEvent.mutate(
+                        await client.courseEvents.admin.update.mutate(
                           { id: selectedEvent.id, ...data },
                         );
                         await queryClient.invalidateQueries({
                           queryKey: trpc.courseEvents.admin.list.queryKey(),
                         });
                       } else {
-                        await client.courseEvents.admin.create.mutate(
+                        await client.courses.admin.mutate(
                           data,
                         );
                         await queryClient.invalidateQueries({

@@ -51,7 +51,7 @@ export function CourseDetails() {
   );
 
   const reservations = useQuery(
-    trpc.courseManagerRouter.getReservationsByCourse.queryOptions({
+    trpc.reservations.admin.listCourse.queryOptions({
       courseId: courseId!,
     }),
   );
@@ -59,7 +59,7 @@ export function CourseDetails() {
   const trainees = useQuery(trpc.adminRouter.getTrainees.queryOptions());
 
   const courseEvents = useQuery(
-    trpc.courseEvents.admin.listByCourse.queryOptions({
+    trpc.courseEvents.admin.listCourse.queryOptions({
       courseId: courseId!,
     }),
   );
@@ -86,7 +86,7 @@ export function CourseDetails() {
       courseEventId,
     });
     await queryClient.invalidateQueries({
-      queryKey: trpc.courseManagerRouter.getReservationsByCourse.queryKey({
+      queryKey: trpc.reservations.admin.listCourse.queryKey({
         courseId: courseId!,
       }),
     });
@@ -454,7 +454,7 @@ export function CourseDetails() {
 
                       await queryClient.invalidateQueries({
                         queryKey:
-                          trpc.courseManagerRouter.getReservationsByCourse.queryKey(
+                          trpc.reservations.admin.listCourse.queryKey(
                             { courseId: courseId! },
                           ),
                       });
