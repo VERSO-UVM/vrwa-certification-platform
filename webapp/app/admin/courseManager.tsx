@@ -51,7 +51,7 @@ export function CourseManager() {
   const courses = useCourses();
 
   async function deleteRow(id: string) {
-    await client.courseManagerRouter.deleteCourseEvent.mutate({ id });
+    await client.courseEvents.admin.delete.mutate({ id });
 
     await queryClient.invalidateQueries({
       queryKey: trpc.courseEvents.admin.list.queryKey(),
