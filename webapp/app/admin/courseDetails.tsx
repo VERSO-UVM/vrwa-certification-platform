@@ -56,7 +56,7 @@ export function CourseDetails() {
     }),
   );
 
-  const trainees = useQuery(trpc.profile.admin.listTrainees.queryOptions());
+  const trainees = useQuery(trpc.profiles.admin.listTrainees.queryOptions());
 
   const courseEvents = useQuery(
     trpc.courseEvents.admin.listCourse.queryOptions({

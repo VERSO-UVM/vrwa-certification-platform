@@ -17,7 +17,7 @@ export function ProfileSelection() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const profilesQuery = useQuery(trpc.profile.list.queryOptions());
+  const profilesQuery = useQuery(trpc.profiles.list.queryOptions());
   const profiles = profilesQuery.data ?? [];
   // Sort by last name
   profiles.sort((a, b) => a.lastName.localeCompare(b.lastName));
@@ -30,7 +30,7 @@ export function ProfileSelection() {
     const { data: sessionData } = await getSession();
     // TODO: Does this invalidate all needed queries?
     await queryClient.invalidateQueries({
-      queryKey: trpc.profile.getActiveProfile.queryKey(),
+      queryKey: trpc.profiles.getActiveProfile.queryKey(),
     });
     navigate(getUserRedirectUrl(sessionData as Session | null));
   };
