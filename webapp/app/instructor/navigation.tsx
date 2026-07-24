@@ -23,14 +23,16 @@ export function InstructorSidebar() {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link to="/instructor">Home</Link>
+                <Link to="/instructor">My Classes</Link>
               </SidebarMenuButton>
-              <SidebarMenuButton asChild>
+              {/*
+                <SidebarMenuButton asChild>
                 <Link to="/instructor/course-manager">Classes</Link>
-              </SidebarMenuButton>
-              <SidebarMenuButton asChild>
+                </SidebarMenuButton>
+                <SidebarMenuButton asChild>
                 <Link to="/instructor/attendance">Attendance</Link>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              */}
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
