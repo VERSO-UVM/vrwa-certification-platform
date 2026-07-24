@@ -1,4 +1,3 @@
-import React from "react";
 import { basicProcedure, router } from "~/utils/trpc";
 import { pdf } from "@react-pdf/renderer";
 import z from "zod";
@@ -6,7 +5,7 @@ import { CertificateDocument } from "~/pdf/pdf_template";
 import { eq } from "drizzle-orm";
 
 export const certificateRouter = router({
-  generateCertificate: basicProcedure // Replace with protectedProcedure once auth works
+  get: basicProcedure // Replace with protectedProcedure once auth works
     .input(
       z.object({
         profileId: z.string(),

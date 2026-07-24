@@ -12,7 +12,7 @@ export function EditTraineeReservation({
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const reservationUpdater = useMutation(
-    trpc.reservation.update.mutationOptions(),
+    trpc.reservations.admin.update.mutationOptions(),
   );
 
   const updateData = async (updates: Partial<ReservationDto>) => {
@@ -23,7 +23,7 @@ export function EditTraineeReservation({
       paymentStatus: updates.paymentStatus,
     });
     await queryClient.invalidateQueries({
-      queryKey: trpc.adminRouter.getTraineeReservations.queryKey(),
+      queryKey: trpc.reservations.admin.listTrainee.queryKey(),
     });
   };
 

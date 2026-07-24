@@ -5,7 +5,7 @@ import { Link } from "react-router";
 export function ActiveProfileIndicator() {
   const trpc = useTRPC();
   const activeProfileQuery = useQuery(
-    trpc.profile.getActiveProfile.queryOptions(),
+    trpc.profiles.getActiveProfile.queryOptions(),
   );
   return (
     <div className="flex flex-col ml-4 text-xs">

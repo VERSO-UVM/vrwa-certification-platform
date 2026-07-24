@@ -8,8 +8,8 @@ import Fastify from "fastify";
 import { fromNodeHeaders } from "better-auth/node";
 import { auth } from "~/auth/server";
 import { createContext } from "~/utils/trpc/ctx";
-import type { AppRouter } from "~/trpc";
-import { appRouter } from "~/trpc";
+import type { AppRouter } from "~/routers";
+import { appRouter } from "~/routers";
 import { TRUSTED_ORIGINS } from "./constants";
 const app = Fastify({
   logger: true,

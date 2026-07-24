@@ -34,12 +34,12 @@ import { Link } from "react-router";
 
 function useCourseEvents() {
   const trpc = useTRPC();
-  return useQuery(trpc.adminRouter.getCourseEvents.queryOptions());
+  return useQuery(trpc.courseEvents.admin.list.queryOptions());
 }
 
 function useCourses() {
   const trpc = useTRPC();
-  return useQuery(trpc.courseManagerRouter.getCourses.queryOptions());
+  return useQuery(trpc.courses.admin.list.queryOptions());
 }
 
 export function CourseManager() {
@@ -51,10 +51,10 @@ export function CourseManager() {
   const courses = useCourses();
 
   async function deleteRow(id: string) {
-    await client.courseManagerRouter.deleteCourseEvent.mutate({ id });
+    await client.courseEvents.admin.delete.mutate({ id });
 
     await queryClient.invalidateQueries({
-      queryKey: trpc.adminRouter.getCourseEvents.queryKey(),
+      queryKey: trpc.courseEvents.admin.list.queryKey(),
     });
   }
 
@@ -221,18 +221,17 @@ export function CourseManager() {
                     event={selectedEvent}
                     onCreate={async (data) => {
                       if (selectedEvent) {
-                        await client.courseManagerRouter.updateCourseEvent.mutate(
-                          { id: selectedEvent.id, ...data },
-                        );
+                        await client.courseEvents.admin.update.mutate({
+                          id: selectedEvent.id,
+                          ...data,
+                        });
                         await queryClient.invalidateQueries({
-                          queryKey: trpc.adminRouter.getCourseEvents.queryKey(),
+                          queryKey: trpc.courseEvents.admin.list.queryKey(),
                         });
                       } else {
-                        await client.courseManagerRouter.createCourseEvent.mutate(
-                          data,
-                        );
+                        await client.courses.admin.mutate(data);
                         await queryClient.invalidateQueries({
-                          queryKey: trpc.adminRouter.getCourseEvents.queryKey(),
+                          queryKey: trpc.courseEvents.admin.list.queryKey(),
                         });
                       }
                       setCourseEventDrawerOpen(false);
@@ -272,12 +271,9 @@ export function CourseManager() {
                 <div className="no-scrollbar overflow-y-auto px-4">
                   <NewCourseForm
                     onCreate={async (data) => {
-                      await client.courseManagerRouter.createCourse.mutate(
-                        data,
-                      );
+                      await client.courses.admin.create.mutate(data);
                       await queryClient.invalidateQueries({
-                        queryKey:
-                          trpc.courseManagerRouter.getCourses.queryKey(),
+                        queryKey: trpc.course.admin.list.queryKey(),
                       });
                       setCourseDrawerOpen(false);
                     }}
