@@ -19,8 +19,12 @@ export type ReservationDto = Reservation &
     course: Pick<Course, "courseName" | "creditHours" | "id">;
   };
 
-export type CourseEventDto = CourseEvent &
-  Pick<Course, "courseName" | "description" | "creditHours" | "priceCents">;
+export type CourseEventDto = Omit<CourseEvent, "classStartDatetime"> &
+  Pick<Course, "courseName" | "description" | "creditHours" | "priceCents"> & {
+    // TODO: use superjson library so this can be serialized/deserialized as a Date
+    // and avoid typescript linting errors
+    classStartDatetime: string|null;
+  };
 
 export const ProfileDtoSchema = createSelectSchema(profile);
 export type ProfileDto = z.infer<typeof ProfileDtoSchema>;

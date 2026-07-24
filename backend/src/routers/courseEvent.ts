@@ -103,9 +103,9 @@ export const courseEventRouter = router({
   }),
 
   instructor: router({
-    listUpcoming: instructorProcedure.query(({ ctx: { account } }) => {
+    listUpcoming: instructorProcedure.query(({ ctx: { session } }) => {
       return courseEventQuery()
-        .where(eq(courseEvent.instructorId, account.id))
+        .where(eq(courseEvent.instructorId, session.activeProfileId))
         .orderBy(asc(courseEvent.classStartDatetime)) satisfies Promise<
         CourseEventDto[]
       >;

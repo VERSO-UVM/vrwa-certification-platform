@@ -107,49 +107,49 @@ export const reservationRouter = router({
 
         return { success: true };
       }),
+  }),
 
-    instructor: router({
-      updateCreditHours: instructorProcedure
-        .input(
-          z.object({
-            courseEventId: z.string(),
-            profileId: z.string(),
-            creditHours: z.number().min(0).max(24),
-          }),
-        )
-        .mutation(async ({ input, ctx }) => {
-          const [event] = await db.client
-            .select({ instructorId: courseEvent.instructorId })
-            .from(courseEvent)
-            .where(eq(courseEvent.id, input.courseEventId));
-          if (!event || event.instructorId !== ctx.account.id) {
-            throw new TRPCError({
-              code: "FORBIDDEN",
-              message: "Unauthorized event access.",
-            });
-          }
-
-          const updated = await db.client
-            .update(reservation)
-            .set({
-              creditHours: input.creditHours.toString(),
-            })
-            .where(
-              and(
-                eq(reservation.courseEventId, input.courseEventId),
-                eq(reservation.profileId, input.profileId),
-              ),
-            )
-            .returning();
-
-          if (updated.length === 0) {
-            throw new TRPCError({
-              code: "BAD_REQUEST",
-              message: "Reservation not found.",
-            });
-          }
-          return updated[0];
+  instructor: router({
+    updateCreditHours: instructorProcedure
+      .input(
+        z.object({
+          courseEventId: z.string(),
+          profileId: z.string(),
+          creditHours: z.number().min(0).max(24),
         }),
-    }),
+      )
+      .mutation(async ({ input, ctx }) => {
+        const [event] = await db.client
+          .select({ instructorId: courseEvent.instructorId })
+          .from(courseEvent)
+          .where(eq(courseEvent.id, input.courseEventId));
+        if (!event || event.instructorId !== ctx.account.id) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Unauthorized event access.",
+          });
+        }
+
+        const updated = await db.client
+          .update(reservation)
+          .set({
+            creditHours: input.creditHours.toString(),
+          })
+          .where(
+            and(
+              eq(reservation.courseEventId, input.courseEventId),
+              eq(reservation.profileId, input.profileId),
+            ),
+          )
+          .returning();
+
+        if (updated.length === 0) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Reservation not found.",
+          });
+        }
+        return updated[0];
+      }),
   }),
 });
