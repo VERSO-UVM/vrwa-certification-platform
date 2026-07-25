@@ -19,7 +19,7 @@ export default function InstructorHome() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {courseEvents?.map((session) => (
-          <ClassInfoCard session={session} />
+          <ClassInfoCard key={session.id} session={session} />
         ))}
         {courseEvents?.length === 0 &&
           (isPending ? (

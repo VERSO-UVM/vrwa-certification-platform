@@ -12,7 +12,7 @@ import { adminProcedure, instructorProcedure, router } from "~/utils/trpc";
 
 import { createUpdateSchema } from "drizzle-zod";
 import z from "zod";
-import { reservationQuery } from "~/database/queries";
+import { courseEventQuery, reservationQuery } from "~/database/queries";
 import type { ReservationDto } from "~/database/dtos";
 import { TRPCError } from "@trpc/server";
 
@@ -110,6 +110,18 @@ export const reservationRouter = router({
   }),
 
   instructor: router({
+    listCourseEvent: instructorProcedure
+      .input(
+        z.object({
+          courseEventId: z.string(),
+        }),
+      )
+      .query(({ input, ctx }) => {
+        return reservationQuery().where(
+          eq(reservation.courseEventId, input.courseEventId),
+        );
+      }),
+
     updateCreditHours: instructorProcedure
       .input(
         z.object({
@@ -123,7 +135,7 @@ export const reservationRouter = router({
           .select({ instructorId: courseEvent.instructorId })
           .from(courseEvent)
           .where(eq(courseEvent.id, input.courseEventId));
-        if (!event || event.instructorId !== ctx.account.id) {
+        if (!event || event.instructorId !== ctx.session.activeProfileId) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "Unauthorized event access.",

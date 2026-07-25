@@ -2,6 +2,7 @@
 // to be imported (`import type` only) in both the server and the client. (These are
 // called DTOs (Data Transfer Objects))
 
+import type { User } from "better-auth";
 import {
   user,
   profile,
@@ -15,6 +16,7 @@ import z from "zod";
 
 export type ReservationDto = Reservation &
   Omit<Profile, "id"> &
+  Pick<User, "email"> &
   Pick<CourseEvent, "classStartDatetime" | "seats"> & {
     course: Pick<Course, "courseName" | "creditHours" | "id">;
   };
