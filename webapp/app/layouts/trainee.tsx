@@ -1,6 +1,6 @@
-import { UserSidebar } from "~/trainee/navigation";
+import { TraineeSidebar } from "./navigation/trainee-sidebar";
 import { SidebarLayout } from "~/components/sidebar-layout";
 
-export default function User() {
-  return <SidebarLayout sidebar={UserSidebar} />;
+export default function TraineeLayout() {
+  return <SidebarLayout sidebar={TraineeSidebar} />;
 }

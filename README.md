@@ -102,7 +102,7 @@ Please see [`backend/README.md`](backend/README.md) for details on the backend.
 - `tanstack-table`: Used both data tables and custom usage to generate CRUD forms (See files in [`webapp/app/util/field-defs/`](webapp/app/util/field-defs/) and [`webapp/app/components/entry-views/`](webapp/app/components/entry-views)).
 - `bun`: Build tool and runtime. Always run bun/bunx not npm/npmx.
 
-### Organization
+### Project structure
 
 ```
 ├── backend                             
@@ -119,17 +119,18 @@ Please see [`backend/README.md`](backend/README.md) for details on the backend.
 │   └── tool                  // Development and migration tools
 └── webapp
     ├── app                   // All the frontend and web server code
-    │   ├── admin             // All ADMIN pages
     │   ├── auth              // Login and signup pages
-    │   ├── components        // Components common in different places
+    │   ├── components        // Components common across views
     │   │   ├── data-table    // Our fancy shmancy data table component
     │   │   ├── entry-views   // CRUD forms/views used with utils/field-defs.ts
-    │   │   └── ui            // shadcn/ui components
+    │   │   └── ui            // shadcn/ui components (customized)
     │   ├── hooks             // React custom useXXX hooks
-    │   ├── instructor        // All INSTRUCTOR pages
     │   ├── layouts           // React-Router layouts
-    │   ├── routes            // React-Router page loading and metadata
-    │   ├── trainee           // All TRAINEE pages
+    │   ├── pages             // Pages and page-specific components
+    │   │   ├── admin         // Pages under ADMIN view
+    │   │   ├── auth          // Login, logout, profile selection pages
+    │   │   ├── instructor    // Pages under INSTRUCTOR view
+    │   │   └── trainee       // Pages under TRAINEE view
     │   └── utils             // Helpers and utilities
     │       └── field-defs    // Defs for generating CRUD for database types
 ```
