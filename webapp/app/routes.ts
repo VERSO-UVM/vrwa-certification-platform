@@ -4,12 +4,11 @@ import {
   route,
   layout,
 } from "@react-router/dev/routes";
-import { redirect } from "react-router";
 
 export default [
   index("routes/home.tsx"),
   route("admin", "layouts/admin.tsx", [
-    index("routes/admin/dashboard.tsx"),
+    index("admin/dashboard.tsx"),
     route("trainees", "routes/admin/trainees.tsx"),
     route("instructors", "routes/admin/instructors.tsx"),
     route("*", "routes/admin/not-found.tsx"),

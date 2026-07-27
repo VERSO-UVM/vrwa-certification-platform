@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { type ColumnDef } from "@tanstack/react-table";
 import { useTRPC } from "~/utils/trpc";
 import {
   Card,
@@ -8,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import type { CourseLocation } from "@backend/database/schema";
 import type { CourseEventDto, ReservationDto } from "@backend/database/dtos";
 import { DataTable } from "~/components/data-table";
 import { Link, useNavigate } from "react-router";
@@ -17,11 +15,14 @@ import { Book, Trophy, Users } from "lucide-react";
 import { PageHeader } from "~/components/page-header";
 import {
   courseEventDefPresets,
-  courseEventDefs,
 } from "~/utils/field-defs/course-event";
 import { reservationDefPresets } from "~/utils/field-defs/reservation";
 
-export function AdminDashboard() {
+export function meta() {
+  return [{ title: "Admin Dashboard - VRWA Training Database" }];
+}
+
+export default function AdminDashboard() {
   const trpc = useTRPC();
   const courseEvents = useQuery(trpc.courseEvents.admin.list.queryOptions());
   const reservations = useQuery(trpc.reservations.admin.list.queryOptions());
