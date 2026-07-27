@@ -5,6 +5,15 @@ import type { Course } from "~/database/schema";
 import { adminProcedure, router } from "~/utils/trpc";
 import { z } from "zod";
 
+const courseUpdateSchema = z.object({
+  courseName: z.string(),
+  description: z.string().nullable(),
+  creditHours: z.number().int().positive(),
+  priceCents: z.number().int().positive(),
+});
+
+export type CourseUpdateInput = z.infer<typeof courseUpdateSchema>
+
 export const courseRouter = router({
   admin: router({
     list: adminProcedure.query((): Promise<Course[]> => {
@@ -23,14 +32,7 @@ export const courseRouter = router({
       }),
 
     create: adminProcedure
-      .input(
-        z.object({
-          courseName: z.string(),
-          description: z.string().nullable(),
-          creditHours: z.number().int().positive(),
-          priceCents: z.number().int().positive(),
-        }),
-      )
+      .input(courseUpdateSchema)
       .mutation(async ({ input }) => {
         const [newCourse] = await db.client
           .insert(course)

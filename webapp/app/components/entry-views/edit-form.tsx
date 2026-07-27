@@ -8,6 +8,7 @@ import { FieldSet, FieldGroup, Field } from "~/components/ui/field";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { shallowEqual } from "~/utils/utils";
+import { DrawerClose } from "~/components/ui/drawer";
 
 /**
  * Generate an edit form using column defs!
@@ -78,6 +79,7 @@ export function EditForm<T extends object>({
         </FieldGroup>
         <Button
           disabled={shallowEqual({ ...row.original, ...updates }, row.original)}
+          className="flex flex-col items-center justify-center fixed bottom-15 left-4 right-4"
           // onClick={() => onSave(updates)}
         >
           Save changes

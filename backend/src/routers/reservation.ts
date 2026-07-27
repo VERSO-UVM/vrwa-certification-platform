@@ -116,7 +116,7 @@ export const reservationRouter = router({
           courseEventId: z.string(),
         }),
       )
-      .query(({ input, ctx }) => {
+      .query(({ input }) => {
         return reservationQuery().where(
           eq(reservation.courseEventId, input.courseEventId),
         );
