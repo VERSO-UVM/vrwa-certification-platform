@@ -84,14 +84,6 @@ export function EditForm<T extends object>({
         >
           Save changes
         </Button>
-        <DrawerClose>
-          <Button
-            variant="cancel_button"
-            className="flex flex-col items-center justify-center fixed bottom-4 left-4 right-4"
-          >
-            Cancel
-          </Button>
-        </DrawerClose>
       </FieldSet>
     </form>
   );
