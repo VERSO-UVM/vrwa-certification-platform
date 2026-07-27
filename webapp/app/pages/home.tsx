@@ -1,9 +1,8 @@
 import { Card, CardContent, CardTitle } from "~/components/ui/card";
-import type { Route } from "./+types/home";
 import { Link } from "react-router";
 import { DevLogins } from "~/components/dev-logins";
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [{ title: "VRWA Training Database" }];
 }
 
