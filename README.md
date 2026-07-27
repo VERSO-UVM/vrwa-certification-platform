@@ -126,7 +126,7 @@ Please see [`backend/README.md`](backend/README.md) for details on the backend.
     │   │   └── ui            // shadcn/ui components (customized)
     │   ├── hooks             // React custom useXXX hooks
     │   ├── layouts           // React-Router layouts
-    │   ├── pages             // React-Router page loading and metadata
+    │   ├── pages             // Pages and page-specific components
     │   │   ├── admin         // Pages under ADMIN view
     │   │   ├── auth          // Login, logout, profile selection pages
     │   │   ├── instructor    // Pages under INSTRUCTOR view
