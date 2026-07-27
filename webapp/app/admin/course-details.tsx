@@ -1,6 +1,6 @@
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import type { Course, PaymentStatus, Profile } from "@backend/database/schema";
+import type { PaymentStatus, Profile } from "@backend/database/schema";
 import { useParams } from "react-router";
 import { type ColumnDef } from "@tanstack/react-table";
 import type { ReservationDto } from "@backend/database/dtos";
@@ -32,7 +32,6 @@ import { Link } from "react-router";
 import { Users, CreditCard, Calendar, History } from "lucide-react";
 import {
   Drawer,
-  DrawerTrigger,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
@@ -40,7 +39,11 @@ import {
 } from "~/components/ui/drawer";
 import { NewCourseForm } from "~/components/courseForm";
 
-export function CourseDetails() {
+export function meta() {
+  return [{ title: "Course Details - VRWA Training Database" }];
+}
+
+export default function CourseDetails() {
   const { courseId } = useParams<{ courseId: string }>();
   const trpc = useTRPC();
   const client = useTRPCClient();
