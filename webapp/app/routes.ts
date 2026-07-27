@@ -20,7 +20,7 @@ export default [
     route("*", "routes/trainee/not-found.tsx"),
   ]),
   route("instructor", "layouts/instructor.tsx", [
-    index("routes/instructor/home.tsx"),
+    index("instructor/home.tsx"),
     route("*", "routes/instructor/not-found.tsx"),
   ]),
   layout("layouts/auth.tsx", [
