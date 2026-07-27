@@ -14,10 +14,10 @@ export function TraineeEditButton({
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const updateQuery = useMutation(
-    trpc.profile.update.mutationOptions({
+    trpc.profiles.admin.update.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: trpc.adminRouter.getTrainees.queryKey(),
+          queryKey: trpc.profiles.admin.listTrainees.queryKey(),
         });
       },
     }),

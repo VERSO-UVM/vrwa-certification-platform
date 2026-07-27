@@ -1,18 +1,18 @@
-import { adminRouter } from "~/routers/admin";
 import { certificateRouter } from "~/routers/certificate";
+import { courseEventRouter } from "./routers/courseEvent";
+import { courseRouter } from "./routers/course";
+import { profileRouter } from "./routers/profile";
 import { reservationRouter } from "~/routers/reservation";
 import { router } from "~/utils/trpc";
-import { courseManagerRouter } from "./routers/courseManager";
-import { profileRouter } from "./routers/profile";
 import { userRouter } from "./routers/user";
 
 export const appRouter = router({
-  adminRouter,
-  certificateRouter,
-  reservation: reservationRouter,
-  profile: profileRouter,
-  user: userRouter,
-  courseManagerRouter,
+  certificates: certificateRouter,
+  courseEvents: courseEventRouter,
+  courses: courseRouter,
+  profiles: profileRouter,
+  reservations: reservationRouter,
+  users: userRouter,
 });
 
 // Export type router type signature,

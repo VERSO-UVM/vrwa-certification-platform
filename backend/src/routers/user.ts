@@ -5,6 +5,7 @@ import db from "~/database";
 import { user } from "~/database/schema";
 import type { UserDto } from "~/database/dtos";
 import { adminProcedure, router } from "~/utils/trpc";
+import { usersWithProfilesQuery } from "~/database/queries";
 
 const updateSchema = createUpdateSchema(user, {
   id: z.string(),
@@ -15,17 +16,8 @@ const updateSchema = createUpdateSchema(user, {
 // https://better-auth.com/docs/plugins/admin
 
 export const userRouter = router({
-  getUsers: adminProcedure.query((): Promise<UserDto[]> => {
-    return db.client.query.user.findMany({
-      columns: {
-        id: true,
-        role: true,
-        email: true,
-      },
-      with: {
-        profiles: true,
-      },
-    });
+  getUsers: adminProcedure.query(() => {
+    return usersWithProfilesQuery();
   }),
 
   update: adminProcedure.input(updateSchema).mutation(({ input }) => {

@@ -25,7 +25,7 @@ import {
 
 function useCourses() {
   const trpc = useTRPC();
-  return useQuery(trpc.courseManagerRouter.getCourses.queryOptions());
+  return useQuery(trpc.courses.admin.list.queryOptions());
 }
 
 export function CourseEventForm({ onCreate, event }) {

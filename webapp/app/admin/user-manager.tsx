@@ -36,7 +36,7 @@ const userColumns = [
 
 export function UserManager() {
   const trpc = useTRPC();
-  const usersQuery = useQuery(trpc.user.getUsers.queryOptions());
+  const usersQuery = useQuery(trpc.users.getUsers.queryOptions());
   const users = usersQuery.data ?? [];
   return (
     <>

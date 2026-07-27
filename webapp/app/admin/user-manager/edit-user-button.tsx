@@ -20,10 +20,10 @@ export function EditUserButton({ user }: { user: UserDto }) {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const updateQuery = useMutation(
-    trpc.user.update.mutationOptions({
+    trpc.users.update.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: trpc.user.getUsers.queryKey(),
+          queryKey: trpc.users.getUsers.queryKey(),
         });
       },
     }),

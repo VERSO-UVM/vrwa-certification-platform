@@ -1,0 +1,2 @@
+ALTER TABLE "courseEvent" ADD COLUMN "instructorId" varchar NOT NULL;--> statement-breakpoint
+ALTER TABLE "courseEvent" ADD CONSTRAINT "courseEvent_instructorId_profile_id_fk" FOREIGN KEY ("instructorId") REFERENCES "public"."profile"("id") ON DELETE no action ON UPDATE no action;

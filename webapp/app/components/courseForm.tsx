@@ -31,7 +31,7 @@ import { Textarea } from "./ui/textarea";
 
 function useCourses() {
   const trpc = useTRPC();
-  return useQuery(trpc.courseManagerRouter.getCourses.queryOptions());
+  return useQuery(trpc.courses.admin.list.queryOptions());
 }
 
 //for input validation of tuition fee

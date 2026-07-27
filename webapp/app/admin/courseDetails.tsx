@@ -47,19 +47,19 @@ export function CourseDetails() {
   const queryClient = useQueryClient();
 
   const course = useQuery(
-    trpc.courseManagerRouter.getCourseById.queryOptions({ id: courseId! }),
+    trpc.courses.admin.get.queryOptions({ id: courseId! }),
   );
 
   const reservations = useQuery(
-    trpc.courseManagerRouter.getReservationsByCourse.queryOptions({
+    trpc.reservations.admin.listCourse.queryOptions({
       courseId: courseId!,
     }),
   );
 
-  const trainees = useQuery(trpc.adminRouter.getTrainees.queryOptions());
+  const trainees = useQuery(trpc.profiles.admin.listTrainees.queryOptions());
 
   const courseEvents = useQuery(
-    trpc.courseManagerRouter.getCourseEventsByCourse.queryOptions({
+    trpc.courseEvents.admin.listCourse.queryOptions({
       courseId: courseId!,
     }),
   );
@@ -81,12 +81,12 @@ export function CourseDetails() {
   const eventIds = courseEvents.data?.map((e) => e.id) ?? [];
 
   async function deleteRow(profileId: string, courseEventId: string) {
-    await client.courseManagerRouter.deleteReservation.mutate({
+    await client.reservations.admin.delete.mutate({
       profileId,
       courseEventId,
     });
     await queryClient.invalidateQueries({
-      queryKey: trpc.courseManagerRouter.getReservationsByCourse.queryKey({
+      queryKey: trpc.reservations.admin.listCourse.queryKey({
         courseId: courseId!,
       }),
     });
@@ -302,15 +302,14 @@ export function CourseDetails() {
                         key={courseId}
                         course={course.data}
                         onCreate={async (data) => {
-                          await client.courseManagerRouter.updateCourse.mutate({
+                          await client.courses.admin.update.mutate({
                             id: courseId,
                             ...data,
                           });
                           await queryClient.invalidateQueries({
-                            queryKey:
-                              trpc.courseManagerRouter.getCourseById.queryKey({
-                                id: courseId,
-                              }),
+                            queryKey: trpc.courses.admin.get.queryKey({
+                              id: courseId,
+                            }),
                           });
                           setCourseDrawerOpen(false);
                         }}
@@ -342,12 +341,11 @@ export function CourseDetails() {
                         "Are you sure you want to delete this course? All course information and reservations will be lost.",
                       )
                     ) {
-                      await client.courseManagerRouter.deleteCourse.mutate({
+                      await client.courses.admin.delete.mutate({
                         id: courseId!,
                       });
                       await queryClient.invalidateQueries({
-                        queryKey:
-                          trpc.courseManagerRouter.getCourses.queryKey(),
+                        queryKey: trpc.courses.admin.list.queryKey(),
                       });
                       setCourseDeleted(true);
                     } else {
@@ -445,7 +443,7 @@ export function CourseDetails() {
                     onClick={async () => {
                       if (!selectedTrainee) return;
 
-                      await client.courseManagerRouter.addReservation.mutate({
+                      await client.reservations.admin.create.mutate({
                         profileId: selectedTrainee,
                         courseEventId: activeEventId ?? "",
                         creditHours: course.data?.creditHours ?? 0,
@@ -453,10 +451,9 @@ export function CourseDetails() {
                       });
 
                       await queryClient.invalidateQueries({
-                        queryKey:
-                          trpc.courseManagerRouter.getReservationsByCourse.queryKey(
-                            { courseId: courseId! },
-                          ),
+                        queryKey: trpc.reservations.admin.listCourse.queryKey({
+                          courseId: courseId!,
+                        }),
                       });
 
                       setTraineePopupOpen(false);

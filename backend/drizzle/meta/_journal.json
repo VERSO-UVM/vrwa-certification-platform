@@ -8,6 +8,13 @@
       "when": 1782246742384,
       "tag": "0000_cynical_namora",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784647416289,
+      "tag": "0001_steady_kronos",
+      "breakpoints": true
     }
   ]
 }
