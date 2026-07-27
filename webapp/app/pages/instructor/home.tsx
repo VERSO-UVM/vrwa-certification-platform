@@ -1,6 +1,7 @@
 import { PageHeader } from "~/components/page-header";
+import type { Route } from "./+types/home"
 
-export function meta() {
+export function meta({} : Route.MetaArgs) {
   return [{ title: "Instructor Dashboard" }];
 }
 

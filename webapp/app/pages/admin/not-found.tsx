@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { PageHeader } from "~/components/page-header";
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [{ title: "Not found" }];
 }
 

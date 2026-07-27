@@ -13,9 +13,7 @@ import { Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Book, Trophy, Users } from "lucide-react";
 import { PageHeader } from "~/components/page-header";
-import {
-  courseEventDefPresets,
-} from "~/utils/field-defs/course-event";
+import { courseEventDefPresets } from "~/utils/field-defs/course-event";
 import { reservationDefPresets } from "~/utils/field-defs/reservation";
 
 export function meta() {
