@@ -10,7 +10,7 @@ interface DataTableHeaderProps<TData> {
 export function DataTableHeader<TData>({ table }: DataTableHeaderProps<TData>) {
   return (
     // Fix header at top while scrolling!
-    <TableHeader className="sticky bg-background top-0 z-10">
+    <TableHeader className="sticky top-0 z-10 vrwa-light:bg-gray-700/5 dark: bg-gray-100/15">
       {table.getHeaderGroups().map((headerGroup) => (
         <TableRow key={headerGroup.id}>
           {headerGroup.headers.map((header) => {
@@ -44,7 +44,7 @@ export function DataTableHeader<TData>({ table }: DataTableHeaderProps<TData>) {
 function SortIcon({ sorted }: { sorted: "asc" | "desc" | false }) {
   switch (sorted) {
     case false:
-      return <ArrowUpDown className="h-4 w-4 text-gray-400" />;
+      return <ArrowUpDown className="h-4 w-4 text-gray-500" />;
 
     case "desc":
       return <ArrowDownZA className="h-4 w-4" />;

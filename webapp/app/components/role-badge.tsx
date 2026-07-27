@@ -5,10 +5,10 @@ import { Badge } from "~/components/ui/badge";
 export function RoleBadge({ value }: { value: Role }) {
   switch (value) {
     case "instructor":
-      return <Badge variant="blue">Instructor</Badge>;
+      return <Badge variant="other_blue">Instructor</Badge>;
     case "user":
-      return <Badge variant="green">Trainee</Badge>;
+      return <Badge variant="other_green">Trainee</Badge>;
     case "admin":
-      return <Badge variant="purple">Admin</Badge>;
+      return <Badge variant="yellow">Admin</Badge>;
   }
 }

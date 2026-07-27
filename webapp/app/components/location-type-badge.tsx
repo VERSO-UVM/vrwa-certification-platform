@@ -4,10 +4,10 @@ import { Badge } from "~/components/ui/badge";
 export function LocationTypeBadge({ value }: { value: CourseLocation }) {
   switch (value) {
     case "virtual":
-      return <Badge variant="blue">Virtual</Badge>;
+      return <Badge variant="violet">Virtual</Badge>;
     case "hybrid":
-      return <Badge variant="purple">Hybrid</Badge>;
+      return <Badge variant="indigo">Hybrid</Badge>;
     case "in-person":
-      return <Badge variant="green">In Person</Badge>;
+      return <Badge variant="blue">In Person</Badge>;
   }
 }

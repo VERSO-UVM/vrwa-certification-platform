@@ -34,7 +34,7 @@ export function EditDrawer<T extends object>({
     <StandardDrawer
       {...drawer}
       openButton={
-        <Button variant="secondary">
+        <Button variant="edit">
           <SquarePen />
           {buttonText}
         </Button>

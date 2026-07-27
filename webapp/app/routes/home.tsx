@@ -9,17 +9,27 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Home() {
   return (
-    <main className="flex items-center justify-center pt-8">
-      <Card className="min-w-md">
-        <CardTitle className="text-center">VRWA Training Database</CardTitle>
+    <main className="flex items-center justify-center h-screen vrwa-light:bg-gray-50 dark:bg-gray-950">
+      <Card className="min-w-md flex items-center justify-center text-lg lg:text-xl size-1/2 xl:size-1/3">
+        <CardTitle className="text-center vrwa-light:text-gray-950 dark:text-gray-100">
+          Welcome to the VRWA Training Database!
+        </CardTitle>
         <CardContent>
           <DevLogins />
-          <Link to="/login" className="block underline p-2">
-            Login
-          </Link>
-          <Link to="/signup" className="block underline p-2">
-            Sign-up
-          </Link>
+          <div className="flex justify-center">
+            <Link
+              to="/login"
+              className="block p-2 hover:underline vrwa-light:hover:text-gray-950 dark:hover:text-gray-200"
+            >
+              Log In
+            </Link>
+            <Link
+              to="/signup"
+              className="block p-2 hover:underline vrwa-light:hover:text-gray-950 dark:hover:text-gray-200"
+            >
+              Sign Up
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </main>
