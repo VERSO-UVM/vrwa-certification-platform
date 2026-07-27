@@ -17,7 +17,7 @@ export function meta() {
   return [{ title: "Profile Select" }];
 }
 
-export function ProfileSelection() {
+export default function ProfileSelection() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
