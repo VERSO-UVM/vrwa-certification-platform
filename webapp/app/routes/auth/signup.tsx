@@ -1,7 +1,6 @@
-import type { Route } from "../+types/home";
-import SignupPage from "~/auth/signup";
+import SignupPage from "~/pages/auth/signup";
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [{ title: "Sign-up" }];
 }
 

@@ -1,7 +1,6 @@
-import { CreateProfile } from "~/auth/create-profile";
-import type { Route } from "../+types/home";
+import { CreateProfile } from "~/pages/auth/create-profile";
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [{ title: "Create a Profile" }];
 }
 

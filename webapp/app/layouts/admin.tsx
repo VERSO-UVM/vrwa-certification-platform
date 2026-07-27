@@ -1,4 +1,4 @@
-import { AdminSidebar } from "~/admin/navigation";
+import { AdminSidebar } from "~/pages/admin/navigation";
 import { SidebarLayout } from "~/components/sidebar-layout";
 import { protectedLoader } from "~/utils/session";
 

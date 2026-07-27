@@ -15,8 +15,7 @@ import {
 import { Button } from "~/components/ui/button";
 import { ButtonGroup } from "~/components/ui/button-group";
 import { DataTable } from "~/components/data-table";
-import type { CourseLocation } from "@backend/database/schema";
-import { type CourseEvent } from "../../../backend/src/database/schema";
+import type { CourseLocation, CourseEvent } from "@backend/database/schema";
 import {
   Drawer,
   DrawerContent,

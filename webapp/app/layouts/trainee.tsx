@@ -1,4 +1,4 @@
-import { UserSidebar } from "~/trainee/navigation";
+import { UserSidebar } from "~/pages/trainee/navigation";
 import { SidebarLayout } from "~/components/sidebar-layout";
 
 export default function User() {

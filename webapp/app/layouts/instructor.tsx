@@ -1,4 +1,4 @@
-import { InstructorSidebar } from "~/instructor/navigation";
+import { InstructorSidebar } from "~/pages/instructor/navigation";
 import { SidebarLayout } from "~/components/sidebar-layout";
 import { protectedLoader } from "~/utils/session";
 

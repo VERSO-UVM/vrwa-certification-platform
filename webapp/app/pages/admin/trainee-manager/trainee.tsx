@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { TraineeReservations } from "~/admin/trainee-manager/reservations";
+import { TraineeReservations } from "./reservations";
 import type { Profile } from "@backend/database/schema";
 import { TraineeEditButton } from "./edit-profile";
 import { DetailsDisplay } from "~/components/entry-views/details-display";

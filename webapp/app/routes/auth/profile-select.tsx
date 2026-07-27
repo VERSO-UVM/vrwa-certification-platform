@@ -1,7 +1,6 @@
-import { ProfileSelection } from "~/auth/profile-selection";
-import type { Route } from "../+types/home";
+import { ProfileSelection } from "~/pages/auth/profile-selection";
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [{ title: "Profile Select" }];
 }
 
