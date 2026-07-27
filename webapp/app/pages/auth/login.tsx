@@ -14,6 +14,10 @@ import { Label } from "~/components/ui/label";
 import { authClient } from "~/utils/auth";
 import { getSessionData, getUserRedirectUrl } from "~/utils/session";
 
+export function meta() {
+  return [{ title: "Login" }];
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

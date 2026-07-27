@@ -22,7 +22,11 @@ const columnDefs = [
   profileDefs.phoneNumber,
 ];
 
-export function CreateProfile() {
+export function meta() {
+  return [{ title: "Create a Profile" }];
+}
+
+export default function CreateProfile() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const trpc = useTRPC();

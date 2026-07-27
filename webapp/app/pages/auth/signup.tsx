@@ -15,6 +15,10 @@ import { authClient } from "~/utils/auth";
 import { useTRPC } from "~/utils/trpc";
 import { getSessionData, getUserRedirectUrl } from "~/utils/session";
 
+export function meta() {
+  return [{ title: "Sign-up" }];
+}
+
 export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

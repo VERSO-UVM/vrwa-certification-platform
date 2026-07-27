@@ -24,9 +24,9 @@ export default [
     route("*", "routes/instructor/not-found.tsx"),
   ]),
   layout("layouts/auth.tsx", [
-    route("login", "routes/auth/login.tsx"),
-    route("signup", "routes/auth/signup.tsx"),
-    route("profile-select", "routes/auth/profile-select.tsx"),
-    route("profile-create", "routes/auth/profile-create.tsx"),
+    route("login", "pages/auth/login.tsx"),
+    route("signup", "pages/auth/signup.tsx"),
+    route("profile-select", "pages/auth/profile-selection.tsx"),
+    route("profile-create", "pages/auth/create-profile.tsx"),
   ]),
 ] satisfies RouteConfig;
