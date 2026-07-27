@@ -2,8 +2,8 @@ import { useState } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useTRPCClient, useTRPC } from "~/utils/trpc";
-import { CourseEventForm } from "~/components/courseEventForm";
-import { NewCourseForm } from "~/components/courseForm";
+import { CourseEventForm } from "./course-manager/course-event-form";
+import { NewCourseForm } from "./course-manager/course-form";
 
 import {
   Card,

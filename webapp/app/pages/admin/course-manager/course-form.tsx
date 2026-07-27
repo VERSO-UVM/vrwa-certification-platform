@@ -27,7 +27,7 @@ import {
   SelectValue,
   SelectLabel,
 } from "~/components/ui/select";
-import { Textarea } from "./ui/textarea";
+import { Textarea } from "../../../components/ui/textarea";
 
 function useCourses() {
   const trpc = useTRPC();

@@ -37,7 +37,7 @@ import {
   DrawerTitle,
   DrawerDescription,
 } from "~/components/ui/drawer";
-import { NewCourseForm } from "~/components/courseForm";
+import { NewCourseForm } from "~/pages/admin/course-manager/course-form";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
