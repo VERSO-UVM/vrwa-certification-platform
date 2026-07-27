@@ -85,7 +85,10 @@ export function DataTablePagination<TData>({
             <PaginationButton
               isActive={item == pageIndex}
               onClick={() => table.setPageIndex(item)}
-              key={item.toString()}
+              key={
+                /* Prevent a visual flicker when switch pages */
+                item.toString() + (item == pageIndex ? "0" : "1")
+              }
             >
               {item + 1}
             </PaginationButton>
