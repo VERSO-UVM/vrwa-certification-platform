@@ -148,9 +148,9 @@ export default function CourseManager() {
     {
       accessorKey: "description",
       header: "Class Description",
-      meta: {
-        className: "text-muted-foreground",
-      },
+      cell: ({ getValue }) => (
+        <div className="text-muted-foreground">{String(getValue())}</div>
+      ),
     },
     {
       accessorKey: "creditHours",
@@ -273,7 +273,7 @@ export default function CourseManager() {
                     onCreate={async (data) => {
                       await client.courses.admin.create.mutate(data);
                       await queryClient.invalidateQueries({
-                        queryKey: trpc.course.admin.list.queryKey(),
+                        queryKey: trpc.courses.admin.list.queryKey(),
                       });
                       setCourseDrawerOpen(false);
                     }}

@@ -1,38 +1,17 @@
 import { useState } from "react";
-import { useTRPC } from "~/utils/trpc";
 import {
   Form,
-  FormControl,
-  FormMessage,
-  FormSubmit,
 } from "@radix-ui/react-form";
 import {
   Field,
-  FieldDescription,
   FieldGroup,
   FieldLabel,
 } from "~/components/ui/field";
-import { Input } from "~/components/ui/input";
-import { Calendar } from "~/components/ui/calendar";
 import { Button } from "~/components/ui/button";
-import { format } from "date-fns";
-import type { Course } from "@backend/database/schema";
-import { useQuery } from "@tanstack/react-query";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectLabel,
-} from "~/components/ui/select";
 import { Textarea } from "../../../components/ui/textarea";
-
-function useCourses() {
-  const trpc = useTRPC();
-  return useQuery(trpc.courses.admin.list.queryOptions());
-}
+import type { Course } from "@backend/database/schema";
+import type { CourseUpdateInput } from "@backend/routers/course";
+import { Input } from "~/components/ui/input";
 
 //for input validation of tuition fee
 function textToDollars(userInput: string) {
@@ -43,7 +22,12 @@ function textToDollars(userInput: string) {
   return Math.round(Number(dollarAmt) * 100);
 }
 
-export function NewCourseForm({ onCreate, course }) {
+export interface NewCourseFormProps {
+  onCreate: (data: CourseUpdateInput) => void,
+  course?: Course|null,
+}
+
+export function NewCourseForm({ onCreate, course } : NewCourseFormProps) {
   let priceString = "";
   if (course) {
     priceString = (course.priceCents / 100).toFixed(2).toString();
@@ -72,7 +56,7 @@ export function NewCourseForm({ onCreate, course }) {
 
     onCreate({
       courseName: values.courseName.trim(),
-      description: values.description.trim() || null,
+      description: values.description?.trim() ?? null,
       creditHours: values.creditHours,
       priceCents: textToDollars(values.price),
     });
@@ -100,7 +84,7 @@ export function NewCourseForm({ onCreate, course }) {
           <Textarea
             id="desription"
             className="resize-none"
-            value={values.description}
+            value={values.description ?? ""}
             onChange={(e) =>
               setValues({ ...values, description: e.target.value })
             }
