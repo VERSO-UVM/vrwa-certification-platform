@@ -34,7 +34,11 @@ const userColumns = [
   }),
 ];
 
-export function UserManager() {
+export function meta() {
+  return [{ title: "Admin - Instructor Manager" }];
+}
+
+export default function UserManager() {
   const trpc = useTRPC();
   const usersQuery = useQuery(trpc.users.getUsers.queryOptions());
   const users = usersQuery.data ?? [];
