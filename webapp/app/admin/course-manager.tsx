@@ -24,13 +24,14 @@ import {
   DrawerHeader,
   DrawerDescription,
   DrawerTitle,
-  DrawerClose,
-  DrawerFooter,
 } from "~/components/ui/drawer";
 import { LocationTypeBadge } from "~/components/location-type-badge";
-import { Input } from "~/components/ui/input";
 import { PageHeader } from "~/components/page-header";
 import { Link } from "react-router";
+
+export function meta() {
+  return [{ title: "Course Manager - VRWA Training Database" }];
+}
 
 function useCourseEvents() {
   const trpc = useTRPC();
@@ -42,7 +43,7 @@ function useCourses() {
   return useQuery(trpc.courses.admin.list.queryOptions());
 }
 
-export function CourseManager() {
+export default function CourseManager() {
   const trpc = useTRPC();
   const client = useTRPCClient();
   const queryClient = useQueryClient();
