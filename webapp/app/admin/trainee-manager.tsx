@@ -28,7 +28,11 @@ const columnDefs = (() => {
   ];
 })();
 
-export function TraineeManager() {
+export function meta() {
+  return [{ title: "Admin - Trainee Manager" }];
+}
+
+export default function TraineeManager() {
   const trpc = useTRPC();
   const traineesQuery = useQuery(
     trpc.profiles.admin.listTrainees.queryOptions(),

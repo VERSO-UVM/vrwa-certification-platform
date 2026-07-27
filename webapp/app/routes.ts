@@ -9,7 +9,7 @@ export default [
   index("routes/home.tsx"),
   route("admin", "layouts/admin.tsx", [
     index("admin/dashboard.tsx"),
-    route("trainees", "routes/admin/trainees.tsx"),
+    route("trainees", "admin/trainee-manager.tsx"),
     route("instructors", "routes/admin/instructors.tsx"),
     route("*", "routes/admin/not-found.tsx"),
     route("course-manager", "routes/admin/courseManager.tsx"),
