@@ -106,11 +106,11 @@ Please see [`backend/README.md`](backend/README.md) for details on the backend.
 
 ```
 ├── backend                             
-│   ├── drizzle               // Generated database schema and migration files
+│   ├── drizzle               // Generated schemas and migration files
 │   ├── seed                  // Our custom seed data generation
 │   ├── src                   // All the backend code
 │   │   ├── auth              // Better-auth configuration
-│   │   ├── database          // Main drizzle schema (and generated auth schema)
+│   │   ├── database          // Main drizzle schema
 │   │   ├── pdf               // PDF generation
 │   │   ├── routers           // API routers 
 │   │   └── utils             
