@@ -17,12 +17,23 @@ export type EditFormProps<T> = {
   item: T;
   columns: ColumnDef<T, any>[]; // any: see comment in data-table.tsx
   onSave: (updated: Partial<T>) => void;
+  submitButton?: Partial<{
+    title: string;
+    disabledFn: (original: T, updates: Partial<T>) => boolean;
+    props: React.ComponentProps<typeof Button>;
+  }>;
 };
+
 export function EditForm<T extends object>({
   item,
   columns,
   onSave,
+  submitButton = {},
 }: EditFormProps<T>) {
+  submitButton.title ??= "Save changes";
+  submitButton.disabledFn ??= (original, updates) =>
+    shallowEqual({ ...original, ...updates }, original);
+
   const data = useMemo(() => [item], [item]);
   const [updates, setUpdates] = useState<Partial<T>>({});
   // If data is swiped out from under us
@@ -78,11 +89,10 @@ export function EditForm<T extends object>({
           </Field>
         </FieldGroup>
         <Button
-          disabled={shallowEqual({ ...row.original, ...updates }, row.original)}
-          className="flex flex-col items-center justify-center fixed bottom-15 left-4 right-4"
-          // onClick={() => onSave(updates)}
+          disabled={submitButton.disabledFn(row.original, updates)}
+          {...submitButton.props}
         >
-          Save changes
+          {submitButton.title}
         </Button>
       </FieldSet>
     </form>
