@@ -12,7 +12,6 @@ import {
 import { DataTable } from "~/components/data-table";
 import { Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
-import { ActiveProfileIndicator } from "~/components/active-profile-indicator";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "VRWA Certifications" }];
