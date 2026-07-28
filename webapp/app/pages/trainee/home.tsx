@@ -12,6 +12,8 @@ import {
 import { DataTable } from "~/components/data-table";
 import { Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
+import { courseEventDefPresets } from "~/utils/field-defs/course-event";
+import type { CourseEventDto, ReservationDto } from "@backend/database/dtos";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "VRWA Certifications" }];
@@ -24,6 +26,8 @@ export default function TraineeHome() {
     trpc.profiles.getActiveProfile.queryOptions(),
   );
   const profileName = activeProfileQuery.data?.firstName + " " + activeProfileQuery.data?.lastName;
+
+  const courseEvents = useQuery(trpc.courseEvents.admin.list.queryOptions());
 
   return (
     <div className="flex-1">
@@ -39,6 +43,11 @@ export default function TraineeHome() {
           </CardHeader>
           <CardContent>
             [Add a DataTable for the classes a specific user is signed up for here.]
+            <DataTable 
+              columns={courseEventDefPresets.default}
+              data={(courseEvents.data as CourseEventDto[]) ?? []}
+              table={{enableRowSelection: false,}}
+            />
           </CardContent>
         </Card>
         <Card className="space-y-4 @xl:col-span-4" variant="green">
