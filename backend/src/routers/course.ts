@@ -12,7 +12,7 @@ const courseUpdateSchema = z.object({
   priceCents: z.number().int().positive(),
 });
 
-export type CourseUpdateInput = z.infer<typeof courseUpdateSchema>
+export type CourseUpdateInput = z.infer<typeof courseUpdateSchema>;
 
 export const courseRouter = router({
   admin: router({
