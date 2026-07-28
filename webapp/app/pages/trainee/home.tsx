@@ -1,4 +1,6 @@
 import { PageHeader } from "~/components/page-header";
+import { useTRPC } from "~/utils/trpc";
+import { useQuery } from "@tanstack/react-query";
 import type { Route } from "../+types/home";
 import {
   Card,
@@ -10,16 +12,24 @@ import {
 import { DataTable } from "~/components/data-table";
 import { Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
+import { ActiveProfileIndicator } from "~/components/active-profile-indicator";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "VRWA Certifications" }];
 }
 
 export default function TraineeHome() {
+  // Code to get the active profile - taken from part of the ActiveProfileIndicator in active-profile-indicator.tsx
+  const trpc = useTRPC();
+  const activeProfileQuery = useQuery(
+    trpc.profiles.getActiveProfile.queryOptions(),
+  );
+  const profileName = activeProfileQuery.data?.firstName + " " + activeProfileQuery.data?.lastName;
+
   return (
     <div className="flex-1">
-      {/* TODO: Add profile name here - look at sidebar code for a ActiveProfileIndicator function - can make helper function for it? */}
-      <PageHeader>Hello, NAME!</PageHeader>
+      <PageHeader>Hello, {profileName}!
+      </PageHeader>
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
         <Card className="@xl:col-span-4" variant="blue">
           <CardHeader>
