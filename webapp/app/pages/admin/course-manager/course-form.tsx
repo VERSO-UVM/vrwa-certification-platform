@@ -1,12 +1,6 @@
 import { useState } from "react";
-import {
-  Form,
-} from "@radix-ui/react-form";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-} from "~/components/ui/field";
+import { Form } from "@radix-ui/react-form";
+import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Button } from "~/components/ui/button";
 import type { Course } from "@backend/database/schema";
 import type { CourseUpdateInput } from "@backend/routers/course";
@@ -23,11 +17,11 @@ function textToDollars(userInput: string) {
 }
 
 export interface NewCourseFormProps {
-  onCreate: (data: CourseUpdateInput) => void,
-  course?: Course|null,
+  onCreate: (data: CourseUpdateInput) => void;
+  course?: Course | null;
 }
 
-export function NewCourseForm({ onCreate, course } : NewCourseFormProps) {
+export function NewCourseForm({ onCreate, course }: NewCourseFormProps) {
   let priceString = "";
   if (course) {
     priceString = (course.priceCents / 100).toFixed(2).toString();

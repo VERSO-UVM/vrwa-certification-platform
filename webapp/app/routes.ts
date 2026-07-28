@@ -13,7 +13,10 @@ export default [
     route("instructors", "pages/admin/user-manager.tsx"),
     route("*", "pages/admin/not-found.tsx"),
     route("course-manager", "pages/admin/course-manager.tsx"),
-    route("course-details/:courseId", "pages/admin/course-manager/course-details.tsx"),
+    route(
+      "course-details/:courseId",
+      "pages/admin/course-manager/course-details.tsx",
+    ),
   ]),
   route("trainee", "layouts/trainee.tsx", [
     index("pages/trainee/home.tsx"),
