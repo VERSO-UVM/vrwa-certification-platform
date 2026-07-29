@@ -40,7 +40,7 @@ export default function TraineeHome() {
       <PageHeader>Hello, {profileName}!
       </PageHeader>
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
-        <Card className="@xl:col-span-4" variant="blue">
+        <Card className="@xl:col-span-4" variant="green">
           <CardHeader>
             <CardTitle>Upcoming Classes</CardTitle>
             <CardDescription>
@@ -55,7 +55,7 @@ export default function TraineeHome() {
             />
           </CardContent>
         </Card>
-        <Card className="space-y-4 @xl:col-span-4" variant="green">
+        <Card className="space-y-4 @xl:col-span-4" variant="blue">
           <CardHeader>
             <CardTitle>
               Outstanding Invoices
