@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { format } from "date-fns";
 import { makeAttendanceDefs } from "./attendance-field-defs";
 import { useClassDetailsQuery } from "./use-class-details-query";
 import { useRosterQuery } from "./use-roster-query";
@@ -15,6 +14,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { MAX_PAGE_SIZE } from "~/components/data-table/page-size-select";
+import { ClassTitle } from "./class-title";
 
 export function AttendanceEditView({
   courseEventId,
@@ -57,16 +57,7 @@ export function AttendanceEditView({
   return (
     <>
       <PageHeader>
-        {details != null ? (
-          <>
-            {details.courseName} -{" "}
-            {details.classStartDatetime
-              ? format(new Date(details.classStartDatetime), "PPP p")
-              : "Date TBD"}
-          </>
-        ) : (
-          <>Loading course details...</>
-        )}
+        <ClassTitle courseEventId={courseEventId} />
       </PageHeader>
       <Card>
         <CardHeader>
