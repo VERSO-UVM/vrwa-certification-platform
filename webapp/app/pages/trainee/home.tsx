@@ -26,19 +26,24 @@ export default function TraineeHome() {
   const activeProfileQuery = useQuery(
     trpc.profiles.getActiveProfile.queryOptions(),
   );
-  const profileName = activeProfileQuery.data?.firstName + " " + activeProfileQuery.data?.lastName;
+  const profileName =
+    activeProfileQuery.data?.firstName +
+    " " +
+    activeProfileQuery.data?.lastName;
 
   const profileId = activeProfileQuery.data?.id;
 
   // We are telling queryOptions that the profileId input will not be null, which is fine to do in this case because of the enabled line right below.
-  const reservations = useQuery(trpc.reservations.trainee.listTrainee.queryOptions({ profileId: profileId! },
-    { enabled: !!profileId }
-  ));
+  const reservations = useQuery(
+    trpc.reservations.trainee.listTrainee.queryOptions(
+      { profileId: profileId! },
+      { enabled: Boolean(profileId) },
+    ),
+  );
 
   return (
     <div className="flex-1">
-      <PageHeader>Hello, {profileName}!
-      </PageHeader>
+      <PageHeader>Hello, {profileName}!</PageHeader>
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
         <Card className="@xl:col-span-4" variant="green">
           <CardHeader>
@@ -48,21 +53,20 @@ export default function TraineeHome() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <DataTable 
+            <DataTable
               columns={reservationDefPresets.all}
               data={(reservations.data as ReservationDto[]) ?? []}
-              table={{enableRowSelection: false,}}
+              table={{ enableRowSelection: false }}
             />
           </CardContent>
         </Card>
         <Card className="space-y-4 @xl:col-span-4" variant="blue">
           <CardHeader>
-            <CardTitle>
-              Outstanding Invoices
-            </CardTitle>
+            <CardTitle>Outstanding Invoices</CardTitle>
           </CardHeader>
           <CardContent>
-            [Add a DataTable for the unpaid invoices for a specific user here - need to wait until after we set up the payment system]
+            [Add a DataTable for the unpaid invoices for a specific user here -
+            need to wait until after we set up the payment system]
           </CardContent>
         </Card>
       </div>
