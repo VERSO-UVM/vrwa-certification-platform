@@ -174,3 +174,14 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Make attendance page printable */
+@media print {
+ body:has(.print-root) {
+   visibility: hidden;
+ }
+
+ .attendance-page .print-root {
+   visibility: visible;
+ }
+}
