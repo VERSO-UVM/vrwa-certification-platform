@@ -13,6 +13,7 @@ import { DataTable } from "~/components/data-table";
 import { Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import { courseEventDefPresets } from "~/utils/field-defs/course-event";
+import { reservationDefPresets } from "~/utils/field-defs/reservation";
 import type { CourseEventDto, ReservationDto } from "@backend/database/dtos";
 
 export function meta({}: Route.MetaArgs) {
@@ -27,7 +28,12 @@ export default function TraineeHome() {
   );
   const profileName = activeProfileQuery.data?.firstName + " " + activeProfileQuery.data?.lastName;
 
-  const courseEvents = useQuery(trpc.courseEvents.admin.list.queryOptions());
+  const profileId = activeProfileQuery.data?.id;
+
+  // We are telling queryOptions that the profileId input will not be null, which is fine to do in this case because of the enabled line right below.
+  const reservations = useQuery(trpc.reservations.trainee.listTrainee.queryOptions({ profileId: profileId! },
+    { enabled: !!profileId }
+  ));
 
   return (
     <div className="flex-1">
@@ -42,10 +48,9 @@ export default function TraineeHome() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            [Add a DataTable for the classes a specific user is signed up for here.]
             <DataTable 
-              columns={courseEventDefPresets.default}
-              data={(courseEvents.data as CourseEventDto[]) ?? []}
+              columns={reservationDefPresets.all}
+              data={(reservations.data as ReservationDto[]) ?? []}
               table={{enableRowSelection: false,}}
             />
           </CardContent>
@@ -57,7 +62,7 @@ export default function TraineeHome() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            [Add a DataTable for the unpaid invoices for a specific user here - might need to wait until after we set up the payment system?]
+            [Add a DataTable for the unpaid invoices for a specific user here - need to wait until after we set up the payment system]
           </CardContent>
         </Card>
       </div>
