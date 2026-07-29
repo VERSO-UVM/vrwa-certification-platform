@@ -1,19 +1,11 @@
 import { Link } from "react-router";
 import type { Route } from "./+types/attendance";
 import { useSearchParamEntry } from "~/hooks/use-search-param-entry";
-import { useMemo } from "react";
 import { Button } from "~/components/ui/button";
-import { ArrowLeft, Printer } from "lucide-react";
-import { DataTable } from "~/components/data-table";
-import { PageHeader } from "~/components/page-header";
-import type { ReservationDto } from "@backend/database/dtos";
-import { makeAttendanceDefs } from "./attendance/attendance-table-defs";
-import { useRosterQuery } from "./attendance/use-roster-query";
-import { useClassDetailsQuery } from "./attendance/use-class-details-query";
-import { useCreditHoursUpdate } from "./attendance/use-update-credit-hours-mutation";
 import { AttendancePrintView } from "./attendance/attendance-print-view";
 import { AttendanceEditView } from "./attendance/attendance-edit-view";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { ArrowLeft } from "lucide-react";
 
 export default function AttendancePage({
   params: { courseEventId },

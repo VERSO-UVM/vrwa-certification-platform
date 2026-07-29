@@ -14,7 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { AttendancePrintView } from "./attendance-print-view";
 
 export function AttendanceEditView({
   courseEventId,
