@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { MAX_PAGE_SIZE } from "~/components/data-table/page-size-select";
 
 export function AttendanceEditView({
   courseEventId,
@@ -42,7 +43,7 @@ export function AttendanceEditView({
             });
           }
         },
-        onCreditHoursBlur: (row, value) => {
+        onSetCreditHours: (row, value) => {
           creditHoursUpdate.mutate({
             courseEventId: row.courseEventId,
             profileId: row.profileId,
@@ -80,6 +81,11 @@ export function AttendanceEditView({
             data={roster as ReservationDto[]}
             table={{
               enableRowSelection: false,
+              initialState: {
+                pagination: {
+                  pageSize: MAX_PAGE_SIZE,
+                },
+              },
             }}
           />
         </CardContent>
