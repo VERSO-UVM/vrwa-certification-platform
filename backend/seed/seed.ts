@@ -180,15 +180,19 @@ async function main() {
 
   //create reservations + link to profiles
   console.log(`Creating reservations...`);
+  const NUM_RESERVATIONS_PER_CLASS = 10;
   for (let i = 0; i < courseEventIds.length; i++) {
-    const courseEventId = courseEventIds[i]!;
-    const profileId = profileIds[i % profileIds.length]!;
-    await db.client.insert(db.schema.reservation).values({
-      profileId,
-      courseEventId,
-      creditHours: i % 2 == 0 ? "2.5" : "0",
-      paymentStatus: i % 2 === 0 ? "paid" : "unpaid",
-    });
+    for (let j = 0; j < NUM_RESERVATIONS_PER_CLASS; j++) {
+      const courseEventId = courseEventIds[i]!;
+      const n = i * NUM_RESERVATIONS_PER_CLASS + j;
+      const profileId = profileIds[n % profileIds.length]!;
+      await db.client.insert(db.schema.reservation).values({
+        profileId,
+        courseEventId,
+        creditHours: n % 2 == 0 ? "2.5" : "0",
+        paymentStatus: n % 2 === 0 ? "paid" : "unpaid",
+      });
+    }
   }
 }
 
