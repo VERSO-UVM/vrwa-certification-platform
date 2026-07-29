@@ -3,9 +3,22 @@ import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 import { ClassLinks } from "./class-links";
 import { ClassStats } from "./class-stats";
 
-export function ClassInfoCard({ session }: { session: CourseEventDto }) {
+const classInfoCardVariants = ["blue", "green", "yellow"] as const;
+
+export function ClassInfoCard({
+  session,
+  index,
+}: {
+  session: CourseEventDto;
+  index: number;
+}) {
+  const variant = index % classInfoCardVariants.length;
   return (
-    <Card key={session.id} className="flex flex-col">
+    <Card
+      key={session.id}
+      className="flex flex-col"
+      variant={classInfoCardVariants[variant]}
+    >
       <CardHeader>
         <CardTitle className="text-lg">{session.courseName}</CardTitle>
       </CardHeader>

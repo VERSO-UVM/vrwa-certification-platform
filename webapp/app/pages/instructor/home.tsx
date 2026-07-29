@@ -18,8 +18,8 @@ export default function InstructorHome() {
       <PageHeader>VRWA | Instructor Dashboard</PageHeader>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {courseEvents?.map((session) => (
-          <ClassInfoCard key={session.id} session={session} />
+        {courseEvents?.map((session, i) => (
+          <ClassInfoCard key={session.id} session={session} index={i} />
         ))}
         {courseEvents?.length === 0 &&
           (isPending ? (
