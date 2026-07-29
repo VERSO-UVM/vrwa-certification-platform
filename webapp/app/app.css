@@ -181,7 +181,7 @@ body {
    visibility: hidden;
  }
 
- .attendance-page .print-root {
+ .print-root {
    visibility: visible;
  }
 }
