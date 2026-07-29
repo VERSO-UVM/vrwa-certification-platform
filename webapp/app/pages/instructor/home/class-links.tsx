@@ -9,7 +9,7 @@ export function ClassLinks({ session }: { session: CourseEventDto }) {
     <div className="pt-4">
       <ButtonGroup className="w-full">
         <Button size="sm" className="flex-1" asChild>
-          <Link to={`/instructor/attendance/${session.id}?view=table`}>
+          <Link to={`/instructor/attendance/${session.id}?view=edit`}>
             <ClipboardCheck className="mr-2 h-4 w-4" />
             Attendance
           </Link>
