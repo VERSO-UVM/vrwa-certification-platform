@@ -3,6 +3,8 @@ import { Button } from "~/components/ui/button";
 import { useClassDetailsQuery } from "./use-class-details-query";
 import { useRosterQuery } from "./use-roster-query";
 import { PageHeader } from "~/components/page-header";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { Printer } from "lucide-react";
 
 export function AttendancePrintView({
   courseEventId,
@@ -17,13 +19,13 @@ export function AttendancePrintView({
       <PageHeader>
         {details != null ? (
           <>
-            <div className="flex gap-4 place-content-between">
+            <div className="">
               {details.courseName} -{" "}
               {details.classStartDatetime
                 ? format(new Date(details.classStartDatetime), "PPP p")
                 : "Date TBD"}
-              <Button className="flex-1" type="button" variant="secondary" onClick={() => print()}>
-                Print
+              <Button className="mx-4 min-w-30" type="button" variant="secondary" onClick={() => print()}>
+                <Printer /> Print
               </Button>
             </div>
           </>
@@ -31,7 +33,9 @@ export function AttendancePrintView({
           <>Loading course details...</>
         )}
       </PageHeader>
-      <div className="print:visible print-root print:absolute print:left-0 print:top-0 print:right-0 print:m-0 print:p-3 border-black bg-white text-black p-8">
+      <Card>
+      <CardContent>
+      <div className="print:visible print-root print:absolute print:left-0 print:top-0 print:right-0 print:m-0 print:p-3 border-black print:bg-white print:text-black p-8">
         <header className="mb-6 text-center">
           <h1 className="text-2xl font-bold uppercase underline">
             Class Attendance Sheet
@@ -90,6 +94,8 @@ export function AttendancePrintView({
           </tbody>
         </table>
       </div>
+      </CardContent>
+      </Card>
     </>
   );
 }

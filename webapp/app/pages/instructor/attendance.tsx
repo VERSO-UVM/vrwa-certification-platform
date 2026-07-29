@@ -43,7 +43,7 @@ export default function AttendancePage({
             variant={viewMode == "print" ? "default" : "outline"}
             onClick={() => setViewMode("print")}
           >
-            <Printer className="mr-2 h-4 w-4" /> Print Attendance Sheet
+            <Printer className="mr-2 h-4 w-4" /> Printable View
           </Button>
         </div>
       </div>

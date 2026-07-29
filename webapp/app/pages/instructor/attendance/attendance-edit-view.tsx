@@ -7,6 +7,14 @@ import { useCreditHoursUpdate } from "./use-update-credit-hours-mutation";
 import { DataTable } from "~/components/data-table";
 import type { ReservationDto } from "@backend/database/dtos";
 import { PageHeader } from "~/components/page-header";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { AttendancePrintView } from "./attendance-print-view";
 
 export function AttendanceEditView({
   courseEventId,
@@ -60,7 +68,23 @@ export function AttendanceEditView({
           <>Loading course details...</>
         )}
       </PageHeader>
-      <DataTable columns={columns} data={roster as ReservationDto[]} />;
+      <Card>
+        <CardHeader>
+          <CardTitle>Manage Attendance</CardTitle>
+          <CardDescription>
+            Update attendance and credit hours for trainees.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <DataTable
+            columns={columns}
+            data={roster as ReservationDto[]}
+            table={{
+              enableRowSelection: false,
+            }}
+          />
+        </CardContent>
+      </Card>
     </>
   );
 }
