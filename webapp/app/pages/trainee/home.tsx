@@ -54,7 +54,7 @@ export default function TraineeHome() {
           </CardHeader>
           <CardContent>
             <DataTable
-              columns={reservationDefPresets.all}
+              columns={reservationDefPresets.basic}
               data={(reservations.data as ReservationDto[]) ?? []}
               table={{ enableRowSelection: false }}
             />
