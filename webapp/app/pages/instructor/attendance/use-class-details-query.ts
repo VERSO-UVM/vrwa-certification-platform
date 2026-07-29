@@ -7,7 +7,6 @@ export function useClassDetailsQuery(courseEventId: string) {
   return useQuery(
     trpc.courseEvents.instructor.get.queryOptions(
       { courseEventId: courseEventId },
-      { enabled: !!courseEventId },
     ),
   );
 }

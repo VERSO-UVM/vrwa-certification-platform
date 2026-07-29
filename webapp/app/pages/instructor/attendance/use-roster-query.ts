@@ -8,7 +8,6 @@ export function useRosterQuery(courseEventId: string) {
   return useQuery(
     trpc.reservations.instructor.listCourseEvent.queryOptions(
       { courseEventId },
-      { enabled: !!courseEventId },
     ),
   );
 }
