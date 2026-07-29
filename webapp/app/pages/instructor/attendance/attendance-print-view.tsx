@@ -3,7 +3,7 @@ import { Button } from "~/components/ui/button";
 import { useClassDetailsQuery } from "./use-class-details-query";
 import { useRosterQuery } from "./use-roster-query";
 import { PageHeader } from "~/components/page-header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { Card, CardContent } from "~/components/ui/card";
 import { Printer } from "lucide-react";
 
 export function AttendancePrintView({
@@ -12,7 +12,7 @@ export function AttendancePrintView({
   courseEventId: string;
 }) {
   const { data: details } = useClassDetailsQuery(courseEventId);
-  const { data: roster } = useRosterQuery(courseEventId);
+  const { data: roster = [] } = useRosterQuery(courseEventId);
 
   return (
     <>

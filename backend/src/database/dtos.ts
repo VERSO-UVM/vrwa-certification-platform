@@ -17,8 +17,10 @@ import z from "zod";
 export type ReservationDto = Reservation &
   Omit<Profile, "id"> &
   Pick<User, "email"> &
-  Pick<CourseEvent, "classStartDatetime" | "seats"> & {
+  Pick<CourseEvent, "seats"> & {
     course: Pick<Course, "courseName" | "creditHours" | "id">;
+    // TODO: use superjson (see below)
+    classStartDatetime: string|null;
   };
 
 export type CourseEventDto = Omit<CourseEvent, "classStartDatetime"> &

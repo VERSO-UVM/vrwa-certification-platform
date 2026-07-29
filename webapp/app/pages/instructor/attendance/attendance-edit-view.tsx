@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { format } from "date-fns";
-import { makeAttendanceDefs } from "./attendance-table-defs";
+import { makeAttendanceDefs } from "./attendance-field-defs";
 import { useClassDetailsQuery } from "./use-class-details-query";
 import { useRosterQuery } from "./use-roster-query";
 import { useCreditHoursUpdate } from "./use-update-credit-hours-mutation";
@@ -21,7 +21,7 @@ export function AttendanceEditView({
   courseEventId: string;
 }) {
   const { data: details } = useClassDetailsQuery(courseEventId);
-  const { data: roster } = useRosterQuery(courseEventId);
+  const { data: roster = [] } = useRosterQuery(courseEventId);
   const creditHoursUpdate = useCreditHoursUpdate(courseEventId);
 
   const columns = useMemo(
