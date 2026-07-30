@@ -1,3 +1,6 @@
+/**
+ * Instructor home/dashboard page with view of upcoming classes.
+ */
 import { PageHeader } from "~/components/page-header";
 import { useTRPC } from "~/utils/trpc";
 import { useQuery } from "@tanstack/react-query";
@@ -15,7 +18,7 @@ export default function InstructorHome() {
 
   return (
     <div className="space-y-6">
-      <PageHeader>VRWA | Instructor Dashboard</PageHeader>
+      <PageHeader>Upcoming Classes</PageHeader>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {courseEvents?.map((session, i) => (

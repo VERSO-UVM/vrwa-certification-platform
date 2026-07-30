@@ -1,3 +1,6 @@
+/**
+ * Class details for ClassInfoCard.
+ */
 import type { CourseEventDto } from "@backend/database/dtos";
 import { Calendar, MapPin, Users } from "lucide-react";
 import { format } from "date-fns";

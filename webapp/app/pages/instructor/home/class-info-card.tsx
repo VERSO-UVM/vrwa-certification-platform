@@ -1,3 +1,6 @@
+/**
+ * Card with quick links and class info for instructors.
+ */
 import type { CourseEventDto } from "@backend/database/dtos";
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 import { ClassLinks } from "./class-links";

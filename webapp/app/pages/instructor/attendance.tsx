@@ -1,3 +1,6 @@
+/**
+ * Instructor class attendance page.
+ */
 import { Link } from "react-router";
 import type { Route } from "./+types/attendance";
 import { useSearchParamEntry } from "~/hooks/use-search-param-entry";
@@ -22,7 +25,7 @@ export default function AttendancePage({
         </Button>
         <TabsList variant="line">
           <TabsTrigger value="edit">Manage Attendance</TabsTrigger>
-          <TabsTrigger value="print">Printable View</TabsTrigger>
+          <TabsTrigger value="print">Sign-in Sheet</TabsTrigger>
         </TabsList>
       </div>
       <TabsContent value="edit">

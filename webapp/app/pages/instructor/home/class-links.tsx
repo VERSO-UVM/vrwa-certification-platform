@@ -1,3 +1,6 @@
+/**
+ * Links for instructors for an upcoming class.
+ */
 import type { CourseEventDto } from "@backend/database/dtos";
 import { ClipboardCheck, Printer } from "lucide-react";
 import { Link } from "react-router";

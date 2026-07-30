@@ -110,7 +110,7 @@ export const courseEventRouter = router({
           courseEventId: z.string(),
         }),
       )
-      .query(async ({ input, ctx }) => {
+      .query(async ({ input }) => {
         const events = await courseEventQuery().where(
           eq(courseEvent.id, input.courseEventId),
         );

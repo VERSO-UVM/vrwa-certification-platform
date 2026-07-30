@@ -1,3 +1,6 @@
+/**
+ * Configurable printable table for the attendance sign-in sheet.
+ */
 import { Button } from "~/components/ui/button";
 import { useClassDetailsQuery } from "./use-class-details-query";
 import { useRosterQuery } from "./use-roster-query";
@@ -95,15 +98,13 @@ export function AttendancePrintView({
         <CardContent>
           <div className="print:visible print-root print:absolute print:left-0 print:top-0 print:right-0 print:m-0 print:p-3 border-black print:bg-white print:text-black p-8">
             <header className="mb-6 text-center">
-              <h1 className="text-2xl font-bold uppercase underline">
-                Class Attendance Sheet
-              </h1>
               {details != null && details.classStartDatetime != null && (
-                <p className="mt-2 text-sm">
+                <h1 className="text-2xl font-bold">
                   {details?.courseName} -{" "}
                   {new Date(details.classStartDatetime).toLocaleDateString()}
-                </p>
+                </h1>
               )}
+              <p className="mt-2 text-sm">VRWA Training - Attendance Sheet</p>
             </header>
             <table className="w-full border-collapse border border-black text-xs">
               <thead>
@@ -141,9 +142,7 @@ export function AttendancePrintView({
                         entry.city,
                         entry.state,
                         entry.postalCode,
-                      ]
-                        .filter(Boolean)
-                        .join(", ")}
+                      ].join(", ")}
                     </td>
                     <td className="border border-black p-2">
                       {entry.phoneNumber ?? "-"}
