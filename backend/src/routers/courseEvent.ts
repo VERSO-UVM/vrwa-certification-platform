@@ -11,6 +11,7 @@ import {
 import { z } from "zod";
 import type { CourseEventDto } from "~/database/dtos";
 import { courseEventQuery } from "~/database/queries";
+import { TRPCError } from "@trpc/server";
 
 export const courseEventRouter = router({
   admin: router({
@@ -103,9 +104,29 @@ export const courseEventRouter = router({
   }),
 
   instructor: router({
-    listUpcoming: instructorProcedure.query(({ ctx: { account } }) => {
+    get: instructorProcedure
+      .input(
+        z.object({
+          courseEventId: z.string(),
+        }),
+      )
+      .query(async ({ input }) => {
+        const events = await courseEventQuery().where(
+          eq(courseEvent.id, input.courseEventId),
+        );
+        const event = events?.[0];
+        if (event == null) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Course event not found.",
+          });
+        }
+        return event;
+      }),
+
+    listUpcoming: instructorProcedure.query(({ ctx: { session } }) => {
       return courseEventQuery()
-        .where(eq(courseEvent.instructorId, account.id))
+        .where(eq(courseEvent.instructorId, session.activeProfileId))
         .orderBy(asc(courseEvent.classStartDatetime)) satisfies Promise<
         CourseEventDto[]
       >;
