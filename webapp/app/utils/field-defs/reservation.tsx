@@ -2,7 +2,6 @@ import type { ReservationDto } from "@backend/database/dtos";
 import { createColumnHelper } from "@tanstack/react-table";
 import { selectOptionsEditor, textInputEditor } from "../field-editors";
 import { Status as PaymentStatus } from "@backend/database/schema";
-import { Badge } from "~/components/ui/badge";
 import { PaymentStatusBadge } from "~/components/payment-status-badge";
 
 export const reservationFieldHelper = createColumnHelper<ReservationDto>();
@@ -15,6 +14,12 @@ export const reservationDefs = {
   lastName: reservationFieldHelper.accessor("lastName", {
     header: "Last Name",
     cell: ({ renderValue }) => <span className="italic">{renderValue()}</span>,
+  }),
+  email: reservationFieldHelper.accessor("email", {
+    header: "Email",
+    cell: ({ renderValue }) => (
+      <span className="tracking-tight">{renderValue()}</span>
+    ),
   }),
   creditHours: reservationFieldHelper.accessor("creditHours", {
     header: "Credit Hours",

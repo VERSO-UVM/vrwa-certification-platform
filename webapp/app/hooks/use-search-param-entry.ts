@@ -1,5 +1,5 @@
 import { useSearchParams } from "react-router";
-type Value = string | null;
+type Value = string;
 
 /**
  * useState but value is pulled and updated from the search params!
@@ -10,7 +10,7 @@ export function useSearchParamEntry(
 ): [value: Value, setValue: (val: Value) => void] {
   const [searchParams, setSearchParams] = useSearchParams();
   const value = searchParams.get(key) ?? init;
-  const setValue = (newValue: Value) => {
+  const setValue = (newValue: Value | null) => {
     setSearchParams((current) => {
       if (newValue == null) {
         current.delete(key);

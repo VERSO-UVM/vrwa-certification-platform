@@ -26,6 +26,7 @@ export function reservationQuery() {
       ...profileFields,
       classStartDatetime: courseEvent.classStartDatetime,
       seats: courseEvent.seats,
+      email: user.email,
       course: {
         id: course.id,
         courseName: course.courseName,
@@ -34,6 +35,7 @@ export function reservationQuery() {
     })
     .from(reservation)
     .innerJoin(profile, eq(reservation.profileId, profile.id))
+    .innerJoin(user, eq(profile.userId, user.id))
     .innerJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
     .innerJoin(course, eq(course.id, courseEvent.courseId))
     .orderBy(courseEvent.classStartDatetime, profile.lastName)
