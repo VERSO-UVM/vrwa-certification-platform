@@ -1,0 +1,27 @@
+Layout:
+
+- Default  
+  - Homepage  
+  - Login  
+  - Logout  
+- User  
+  - Dashboard  
+  - Calendar view  
+  - Course sign up page with waitlist  
+  - Payment portal (stripe)  
+  - Invoice viewer (stripe)  
+- Admin  
+  - Dashboard  
+    - Overview of all other pages  
+  - Courses  
+    - Schedule courses and course sessions  
+    - Set trainees and instructors  
+    - Bulk send out certificates per course sessions  
+  - Trainees  
+    - Manage users and profiles for trainees  
+  - Invoices  
+    - View and send out invoices (stripe)  
+- Instructor  
+  - Dashboard  
+  - Course session manager for taught courses  
+  - Attendance for taught courses

@@ -8,6 +8,7 @@ import { FieldSet, FieldGroup, Field } from "~/components/ui/field";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { shallowEqual } from "~/utils/utils";
+import { DrawerClose } from "~/components/ui/drawer";
 
 /**
  * Generate an edit form using column defs!
@@ -16,16 +17,31 @@ export type EditFormProps<T> = {
   item: T;
   columns: ColumnDef<T, any>[]; // any: see comment in data-table.tsx
   onSave: (updated: Partial<T>) => void;
+  submitButton?: Partial<{
+    title: string;
+    disabledFn: (original: T, updates: Partial<T>) => boolean;
+    props: React.ComponentProps<typeof Button>;
+  }>;
 };
+
 export function EditForm<T extends object>({
   item,
   columns,
   onSave,
+  submitButton = {},
 }: EditFormProps<T>) {
+  submitButton.title ??= "Save changes";
+  submitButton.disabledFn ??= (original, updates) =>
+    shallowEqual({ ...original, ...updates }, original);
+
   const data = useMemo(() => [item], [item]);
   const [updates, setUpdates] = useState<Partial<T>>({});
   // If data is swiped out from under us
   useEffect(() => setUpdates({}), [data]);
+  const onSubmit = (e: React.SubmitEvent) => {
+    e.preventDefault();
+    onSave(updates);
+  };
 
   const table = useReactTable<T>({
     columns,
@@ -35,47 +51,50 @@ export function EditForm<T extends object>({
   const row = table.getRow("0");
   const headers = table.getFlatHeaders();
 
-  // TODO: this should really be wrapped in an actual <form> shouldn't it...
   return (
-    <FieldSet className="pb-2">
-      <FieldGroup>
-        <Field>
-          {row.getVisibleCells().map((cell) => {
-            const header = headers.find((x) => x.column.id == cell.column.id);
-            if (header == null) return null;
-            if (cell.column.columnDef.meta?.editor == null) return null;
-            const htmlId = cell.column.id + "_input";
-            return (
-              <div key={cell.id}>
-                <dt className="text-sm font-semibold">
-                  {flexRender(
-                    cell.column.columnDef.header,
-                    header.getContext(),
-                  )}
-                </dt>
-                <dd>
-                  {cell.column.columnDef.meta.editor({
-                    ctx: cell.getContext(),
-                    forId: htmlId,
-                    onBlur: (_value) => {},
-                    onChange: (value) =>
-                      setUpdates({
-                        ...updates,
-                        [cell.column.id]: value,
-                      }),
-                  })}
-                </dd>
-              </div>
-            );
-          })}
-        </Field>
-      </FieldGroup>
-      <Button
-        disabled={shallowEqual({ ...row.original, ...updates }, row.original)}
-        onClick={() => onSave(updates)}
-      >
-        Save changes
-      </Button>
-    </FieldSet>
+    <form onSubmit={onSubmit}>
+      <FieldSet className="pb-2">
+        <FieldGroup>
+          <Field>
+            {row.getVisibleCells().map((cell) => {
+              const header = headers.find((x) => x.column.id == cell.column.id);
+              if (header == null) return null;
+              if (cell.column.columnDef.meta?.editor == null) return null;
+              const htmlId = cell.column.id + "_input";
+              return (
+                <div key={cell.id}>
+                  <dt className="text-sm font-semibold">
+                    {flexRender(
+                      cell.column.columnDef.header,
+                      header.getContext(),
+                    )}
+                  </dt>
+                  <dd>
+                    {cell.column.columnDef.meta.editor({
+                      ctx: cell.getContext(),
+                      overrides: {
+                        id: htmlId,
+                      },
+                      onBlur: (_value) => {},
+                      onChange: (value) =>
+                        setUpdates({
+                          ...updates,
+                          [cell.column.id]: value,
+                        }),
+                    })}
+                  </dd>
+                </div>
+              );
+            })}
+          </Field>
+        </FieldGroup>
+        <Button
+          disabled={submitButton.disabledFn(row.original, updates)}
+          {...submitButton.props}
+        >
+          {submitButton.title}
+        </Button>
+      </FieldSet>
+    </form>
   );
 }

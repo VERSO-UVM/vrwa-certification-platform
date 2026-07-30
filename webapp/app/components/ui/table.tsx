@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { cn } from "~/lib/utils";
+import { cn } from "~/utils/utils";
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
@@ -55,7 +55,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors",
+        "vrwa-light:hover:bg-muted/20 vrwa-light:data-[state=selected]:bg-muted/30 dark:hover:bg-muted/20 dark:data-[state=selected]:bg-muted/30 border-b transition-colors",
         className,
       )}
       {...props}

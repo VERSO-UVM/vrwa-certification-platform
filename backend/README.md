@@ -16,6 +16,17 @@ $ bun start
 # watch mode
 # (runs the project backend and automatically restarts when files are modified)
 $ bun dev
+<<<<<<< HEAD
+=======
+```
+
+#### Authentication Database Schema
+
+Better-Auth uses its own configuration to generate the database schema. This is derived automatically from the plugins. This generates the auth schema to its own file, so that it doesn't mix with the other database tables. It must be run whenever the Better-Auth configuration is changed, but does not need to be run otherwise.
+
+```sh
+bunx @better-auth/cli generate --config src/auth/server.ts --output drizzle/auth-schema.ts
+>>>>>>> 572375b73fabd523dff7428f77197f04709a68b8
 ```
 
 ### Database

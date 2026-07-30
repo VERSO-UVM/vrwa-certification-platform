@@ -4,6 +4,8 @@ import { EditForm } from "./edit-form";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { SquarePen } from "lucide-react";
+import { DrawerClose } from "../ui/drawer";
+import { shallowEqual } from "~/utils/utils";
 
 export interface EditDrawerProps<T> {
   item: T;
@@ -34,7 +36,7 @@ export function EditDrawer<T extends object>({
     <StandardDrawer
       {...drawer}
       openButton={
-        <Button variant="secondary">
+        <Button variant="edit">
           <SquarePen />
           {buttonText}
         </Button>
@@ -48,7 +50,23 @@ export function EditDrawer<T extends object>({
         onSave={(updates: Partial<T>) =>
           onSave(updates).then(() => setOpen(false))
         }
+        submitButton={{
+          title: "Save changes",
+          props: {
+            /* Fix button to bottom of drawer */
+            className:
+              "flex flex-col items-center justify-center fixed bottom-15 left-4 right-4",
+          },
+        }}
       />
+      <DrawerClose>
+        <Button
+          variant="cancel_button"
+          className="flex flex-col items-center justify-center fixed bottom-4 left-4 right-4"
+        >
+          Cancel
+        </Button>
+      </DrawerClose>
     </StandardDrawer>
   );
 }

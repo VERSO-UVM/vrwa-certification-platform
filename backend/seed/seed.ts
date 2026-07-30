@@ -1,12 +1,12 @@
 import db from "~/database/index";
 import fs from "fs/promises";
 import path from "path";
-import * as argon2 from 'argon2';
-import type { CourseLocation } from '../src/database/schema';
-
+import type { CourseLocation } from "../src/database/schema";
+import { generatePrefixedId } from "~/utils/id";
+import { auth } from "~/auth/server";
+import { eq } from "drizzle-orm";
 
 async function main() {
-
   console.log("Seeding database..");
 
   //load in data
@@ -14,68 +14,91 @@ async function main() {
   const file = await fs.readFile(filePath, "utf-8");
   const data = JSON.parse(file);
 
-  //delete existing data?
+  //delete existing data
+  console.log("Clearing existing data..");
+  await db.client.delete(db.schema.reservation);
+  await db.client.delete(db.schema.courseEvent);
+  await db.client.delete(db.schema.course);
+  await db.client.delete(db.schema.profile);
+  await db.client.delete(db.schema.account);
+  await db.client.delete(db.schema.session);
+  await db.client.delete(db.schema.user);
+  await db.client.delete(db.schema.organization);
 
   //get organization(s)
-  const orgIds : string[] = [];
+  const orgIds: string[] = [];
 
   console.log("Creating organizations..");
   for (const org of data.organizations) {
     const [newOrg] = await db.client
       .insert(db.schema.organization)
       .values({
-        orgName : org.orgName
+        id: generatePrefixedId("organization"),
+        name: org.orgName,
+        slug: org.orgName.toLowerCase().replace(/[^a-z0-9]/g, "-"),
+        createdAt: new Date(),
       })
-    .returning();
-    orgIds.push(newOrg.id);
-    console.log(`Created ${newOrg.orgName}`);
+      .returning();
+    orgIds.push(newOrg!.id);
+    console.log(`Created ${newOrg!.name}`);
   }
-  
-  
 
   //create accounts + profiles
   console.log("Creating accounts...");
   const profileIds: string[] = [];
+  const instructorIds: string[] = [];
   let acctNum = 0;
 
   for (const acct of data.accounts) {
     ++acctNum;
-    const password = await hashPassword(acct.password);
 
-    const [newAccount] = await db.client
-      .insert(db.schema.account)
-      .values({
-        hasRegistered: true,
+    const result = await auth.api.signUpEmail({
+      body: {
         email: acct.email,
-        passwordHash: password,
-        role: acct.role,
-        orgId : acctNum == 3 ? orgIds[0] : null,
-      })
-      .returning();
+        password: acct.password,
+        name: acct.email,
+      },
+    });
+    if (!result || !result.user) {
+      console.error(`Failed to create account for ${acct.email}:`, result);
+      continue;
+    }
+    const newUser = result.user;
 
-      console.log(`Created account under email ${acct.email}`);
-      console.log(`password: ${acct.password}`);
+    // update user role
+    const role = acct.role;
+    await db.client
+      .update(db.schema.user)
+      .set({ role })
+      .where(eq(db.schema.user.id, newUser.id));
 
-      for (const prof of acct.profiles) {
-        const [newProfile] = await db.client
-          .insert(db.schema.profile)
-          .values({
-            accountId: newAccount.id,
-            firstName: prof.firstName,
-            lastName: prof.lastName,
-            address: prof.address,
-            city: prof.city,
-            state: prof.state,
-            postalCode: prof.postalCode,
-            phoneNumber: prof.phoneNumber,
-            isMember: prof.isMember
-          })
-          .returning();
-          profileIds.push(newProfile.id)
-          console.log(`profile: ${prof.firstName} ${prof.lastName}`);
+    console.log(`Created account under email ${acct.email}`);
+    console.log(`password: ${acct.password}`);
+
+    for (const prof of acct.profiles) {
+      const [newProfile] = await db.client
+        .insert(db.schema.profile)
+        .values({
+          id: prof.id ?? generatePrefixedId("profile"),
+          userId: newUser.id,
+          firstName: prof.firstName,
+          lastName: prof.lastName,
+          address: prof.address,
+          city: prof.city,
+          state: prof.state,
+          postalCode: prof.postalCode,
+          phoneNumber: prof.phoneNumber,
+          isMember: prof.isMember,
+        })
+        .returning();
+      if (role == "user") {
+        profileIds.push(newProfile!.id);
+      } else if (role == "instructor") {
+        instructorIds.push(newProfile!.id);
       }
+      console.log(`profile: ${prof.firstName} ${prof.lastName}`);
+    }
   }
-
 
   //keep track of courses
   const courseIds: string[] = [];
@@ -83,46 +106,49 @@ async function main() {
   //create courses
   for (const courseInfo of data.courses) {
     const [newCourse] = await db.client
-    .insert(db.schema.course)
-    .values({
-      courseName: courseInfo.courseName,
-      description: courseInfo.description,
-      creditHours: courseInfo.creditHours,
-      priceCents: courseInfo.priceCents,
-    })
-    .returning();
-    courseIds.push(newCourse.id);
+      .insert(db.schema.course)
+      .values({
+        courseName: courseInfo.courseName,
+        description: courseInfo.description,
+        creditHours: courseInfo.creditHours,
+        priceCents: courseInfo.priceCents,
+      })
+      .returning();
+    courseIds.push(newCourse!.id);
     console.log(`${courseInfo.courseName} created`);
   }
 
   //create course events
-  const courseEventIds : string[] = [];
-  const locations: CourseLocation[] = ['in-person', 'virtual', 'hybrid'];
+  const courseEventIds: string[] = [];
+  const locations: CourseLocation[] = ["in-person", "virtual", "hybrid"];
   const now = new Date();
   let num = 1;
-
 
   for (const courseId of courseIds) {
     //past event
     const thePast = new Date(now);
     thePast.setMonth(now.getMonth() - num);
+    const instructorId = instructorIds[num % instructorIds.length]!;
 
     const [pastEvent] = await db.client
       .insert(db.schema.courseEvent)
       .values({
         courseId,
-        locationType: locations[num % locations.length],
-        virtualLink: locations[num % locations.length] !== 'in-person'
-          ? 'www.zoom.com'
-          : null,
-        physicalAddress: locations[num % locations.length] !== 'virtual'
-          ? '67 Address Road'
-          : null,
+        instructorId,
+        locationType: locations[num % locations.length]!,
+        virtualLink:
+          locations[num % locations.length] !== "in-person"
+            ? "www.zoom.com"
+            : null,
+        physicalAddress:
+          locations[num % locations.length] !== "virtual"
+            ? "67 Address Road"
+            : null,
         seats: Math.trunc(profileIds.length / 2),
         classStartDatetime: thePast,
       })
       .returning();
-      courseEventIds.push(pastEvent.id)
+    courseEventIds.push(pastEvent!.id);
 
     //future event
     const theFuture = new Date(now);
@@ -132,54 +158,50 @@ async function main() {
       .insert(db.schema.courseEvent)
       .values({
         courseId,
-        locationType: locations[num % locations.length],
-        virtualLink: locations[num % locations.length] !== 'in-person'
-          ? 'www.zoom.com'
-          : null,
-        physicalAddress: locations[num % locations.length] !== 'virtual'
-          ? '67 Address Road'
-          : null,
+        instructorId,
+        locationType: locations[num % locations.length]!,
+        virtualLink:
+          locations[num % locations.length] !== "in-person"
+            ? "www.zoom.com"
+            : null,
+        physicalAddress:
+          locations[num % locations.length] !== "virtual"
+            ? "67 Address Road"
+            : null,
         seats: Math.trunc(profileIds.length / 2),
         classStartDatetime: theFuture,
       })
-      .returning()  
-      courseEventIds.push(futureEvent.id);
-      num++;  
+      .returning();
+    courseEventIds.push(futureEvent!.id);
+    num++;
   }
 
-  console.log(`Created ${courseIds.length * 2} course events!`)
-  
-  //create reservations + link to profiles 
-  console.log(`Creating reservations...`)
-  for (let i = 0; i < courseEventIds.length; i++){
-    const courseEventId = courseEventIds[i];
-    const profileId = profileIds[i % profileIds.length];
+  console.log(`Created ${courseIds.length * 2} course events!`);
 
-    await db.client
-    .insert(db.schema.reservation)
-    .values({
-      profileId,
-      courseEventId,
-      creditHours: i % 2 == 0 ? "2.5" : "0",
-      paymentStatus: i % 2 === 0 ? 'paid' : 'unpaid',
-    });
+  //create reservations + link to profiles
+  console.log(`Creating reservations...`);
+  const NUM_RESERVATIONS_PER_CLASS = 10;
+  for (let i = 0; i < courseEventIds.length; i++) {
+    for (let j = 0; j < NUM_RESERVATIONS_PER_CLASS; j++) {
+      const courseEventId = courseEventIds[i]!;
+      const n = i * NUM_RESERVATIONS_PER_CLASS + j;
+      const profileId = profileIds[n % profileIds.length]!;
+      await db.client.insert(db.schema.reservation).values({
+        profileId,
+        courseEventId,
+        creditHours: n % 2 == 0 ? "2.5" : "0",
+        paymentStatus: n % 2 === 0 ? "paid" : "unpaid",
+      });
+    }
   }
-
 }
-
-async function hashPassword(password: string) {
-  return argon2.hash(password);
-}
-
 
 main()
   .then(() => {
-    console.log('Seeding process complete!');
+    console.log("Seeding process complete!");
     process.exit(0);
   })
   .catch((error) => {
-    console.error('Error:', error);
+    console.error("Error:", error);
     process.exit(1);
   });
-
-

@@ -41,6 +41,17 @@ export const profileDefs = {
       editor: textInputEditor(),
     },
   }),
+  state: profileFieldHelper.accessor("state", {
+    header: "State",
+    meta: {
+      editor: selectOptionsEditor({
+        options: [
+          { label: "VT", value: "VT", selected: true },
+          { label: "Non-VT", value: "Non-VT" },
+        ],
+      }),
+    },
+  }),
   postalCode: profileFieldHelper.accessor("postalCode", {
     header: "Postal Code",
     meta: {
@@ -58,16 +69,16 @@ export const profileDefs = {
     cell: ({ getValue }) => {
       switch (getValue()) {
         case true:
-          return <Badge variant="outline">Yes</Badge>;
+          return <Badge variant="member">Yes</Badge>;
         case false:
-          return <Badge variant="default">No</Badge>;
+          return <Badge variant="not_member">No</Badge>;
       }
     },
     meta: {
       editor: selectOptionsEditor({
         options: [
-          { label: "yes", value: true },
-          { label: "no", value: false },
+          { label: "Yes", value: true },
+          { label: "No", value: false },
         ],
       }),
     },
@@ -79,4 +90,18 @@ export const profileDefPresets = {
 
   // Object.values() is required to produce values in insertion order for String keys
   all: Object.values(profileDefs),
+};
+
+// Initial state when creating new profile
+export const emptyProfile: Profile = {
+  isMember: false,
+  postalCode: "",
+  address: "",
+  city: "",
+  phoneNumber: "",
+  lastName: "",
+  firstName: "",
+  id: "",
+  userId: "",
+  state: "VT",
 };

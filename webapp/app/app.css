@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant vrwa-light (&:is(.vrwa-light *));
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
@@ -10,10 +11,15 @@
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  /* Background colors for specific color schemes are in the .dark and .vrwa-light sections below. */
+  @apply bg-white;
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
+  }
+
+  @media (prefers-color-scheme: vrwa-light) {
+    color-scheme: vrwa-light;
   }
 }
 
@@ -91,8 +97,9 @@ body {
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
+  @apply bg-gray-950;
+  --background: var(--color-gray-800);
+  --foreground: var(--color-gray-200);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
@@ -101,9 +108,9 @@ body {
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
+  --muted: var(--color-gray-600);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --accent: var(--color-gray-700);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
@@ -120,6 +127,41 @@ body {
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+.vrwa-light {
+  @apply bg-gray-50;
+  --background: var(--color-gray-200);
+  --foreground: var(--color-gray-800);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--color-gray-950);
+--popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: var(--color-gray-800);
+  --primary-foreground: var(--color-gray-200);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: var(--color-gray-400);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: var(--color-gray-300);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: var(--color-gray-300);
+  --input: #1e293933;
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: var(--color-gray-100);
+  --sidebar-foreground: var(--color-gray-800);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: var(--color-gray-500);
+  --sidebar-accent-foreground: var(--color-gray-100);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
