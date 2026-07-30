@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 import { ClassLinks } from "./class-links";
 import { ClassStats } from "./class-stats";
 
-const classInfoCardVariants = ["blue", "green", "yellow"] as const;
+const classInfoCardVariants = ["blue", "green", "yellow", "orange"] as const;
 
 export function ClassInfoCard({
   session,

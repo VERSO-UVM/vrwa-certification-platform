@@ -49,7 +49,7 @@ export default function CreateProfile() {
   };
 
   return (
-    <Card className="p-4 w-xl mt-10 self-center">
+    <Card className="p-4 w-xl self-center">
       <CardHeader>
         <CardTitle className="text-center">Create a Profile</CardTitle>
         <CardContent className="flex flex-col space-y-4 w-lg m-auto">

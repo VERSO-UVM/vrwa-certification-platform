@@ -44,7 +44,7 @@ export default function ProfileSelection() {
   };
 
   return (
-    <Card className="p-4 w-xl mt-10 self-center">
+    <Card className="p-4 w-xl self-center">
       <CardHeader>
         <CardTitle className="text-center">Select Your Profile</CardTitle>
       </CardHeader>
