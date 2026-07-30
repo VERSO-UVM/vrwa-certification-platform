@@ -5,7 +5,7 @@ export function ClassTitle({ courseEventId }: { courseEventId: string }) {
   const { data: details } = useClassDetailsQuery(courseEventId);
 
   if (details == null) {
-    return <>Loading course details...</>;
+    return <>Loading class...</>;
   }
 
   return (
