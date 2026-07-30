@@ -2,7 +2,7 @@
 
 ## Background
 
-The Vermont Rural Water Association (VRWA) offers approximately 10-15 training classes per quarter for water and wastewater treatment operators across Vermont. These classes provide credit hours required for water certifications and wastewater licenses. <!-- Need to check with VRWA to confirm this is still accurate -->Currently, over 90% of class registrations are completed via the VRWA website, which uses WordPress with WooCommerce and Event Tickets Plus. However, registrations are manually entered into a Microsoft Access database that also handles payment tracking, sign-in sheets, attendance, certificates, and regulatory reporting.<!----> This project seeks to replace the outdated database with a modern, integrated solution that automates registration syncing, enhances usability, and improves access for both operators and regulatory partners.
+The Vermont Rural Water Association (VRWA) offers approximately 3-12 training classes per month for water and wastewater treatment plant operators across Vermont. These classes provide credit hours required for water certifications and wastewater licenses. Currently, over 90% of class registrations are completed via the VRWA website, which uses WordPress with WooCommerce integrated with The Events Calendar and Event Tickets Plus. However, registrations are manually entered into a Microsoft Access database that also handles payment tracking, sign-in sheets, attendance, certificates, and regulatory reporting. This project seeks to replace the outdated database with a modern, streamlined solution that automates registration syncing, enhances usability, and improves access for both operators and regulatory partners.
 
 ## Goal
 
@@ -10,7 +10,7 @@ To build a new training and credential tracking system that:
 - Replaces the Microsoft Access database with one that is secure and web-accessible
 - Integrates with VRWA’s existing website for automatic data entry
 - Enables trainees to log in and view their training records and credit hours
-- Supports reporting and complies with Vermont regulatory agencies <!-- Need to check with K about what this entails -->
+- Supports reporting and complies with Vermont regulatory agencies
 
 ## Design and Development
 
@@ -24,7 +24,7 @@ To build a new training and credential tracking system that:
 - Automatic syncing of website registrations into a secure backend database
 - Support for data migration from the existing Microsoft Access database
 - Payment tracking for credit card and check-based registrations
-- Monthly reports of unpaid invoices
+- Monthly reports of outstanding payments for mailing invoices
 - Waitlist functionality for full classes
 
 ## Implementation
@@ -84,8 +84,6 @@ $ bun db:dev # Docker Desktop must be open
 # to run development servers:
 $ bun dev
 ```
-<<<<<<< HEAD
-=======
 
 ## Architecture
 
@@ -136,4 +134,3 @@ Please see [`backend/README.md`](backend/README.md) for details on the backend.
     │   └── utils             // Helpers and utilities
     │       └── field-defs    // Defs for generating CRUD for database types
 ```
->>>>>>> 572375b73fabd523dff7428f77197f04709a68b8
