@@ -2,9 +2,26 @@ import { Button } from "~/components/ui/button";
 import { useClassDetailsQuery } from "./use-class-details-query";
 import { useRosterQuery } from "./use-roster-query";
 import { PageHeader } from "~/components/page-header";
-import { Card, CardContent } from "~/components/ui/card";
-import { Printer } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { Car, Printer } from "lucide-react";
 import { ClassTitle } from "./class-title";
+import { useState } from "react";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { Switch } from "~/components/ui/switch";
+
+const defaultColumns = [
+  { header: "Sign in", enabled: true, id: 1 },
+  { header: "Break 1", enabled: true, id: 2 },
+  { header: "Break 2", enabled: true, id: 3 },
+  { header: "", enabled: false, id: 4 },
+];
 
 export function AttendancePrintView({
   courseEventId,
@@ -13,6 +30,18 @@ export function AttendancePrintView({
 }) {
   const { data: details } = useClassDetailsQuery(courseEventId);
   const { data: roster = [] } = useRosterQuery(courseEventId);
+
+  const [columns, setColumns] = useState(defaultColumns);
+
+  const updateColumn = ({
+    header,
+    enabled,
+    id,
+  }: (typeof defaultColumns)[0]) => {
+    setColumns((columns) =>
+      columns.map((c) => (c.id == id ? { id, header, enabled } : c)),
+    );
+  };
 
   return (
     <>
@@ -27,6 +56,46 @@ export function AttendancePrintView({
           <Printer /> Print
         </Button>
       </PageHeader>
+      <Card>
+        <CardHeader>
+          <CardTitle>Additional Fields</CardTitle>
+          <CardDescription>
+            Add more columns to the sign in sheet.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {columns.map(({ header, enabled, id }) => {
+            return (
+              <div key={id} className="p-2">
+                <Label>
+                  <Switch
+                    checked={enabled}
+                    onCheckedChange={(checked) =>
+                      updateColumn({ id, header, enabled: checked })
+                    }
+                  />
+                  <Input
+                    value={header}
+                    onChange={(e) =>
+                      setColumns((columns) =>
+                        columns.map((c) =>
+                          c.id == id
+                            ? {
+                                id: id,
+                                header: e.target.value,
+                                enabled: Boolean(e.target.value),
+                              }
+                            : c,
+                        ),
+                      )
+                    }
+                  />
+                </Label>
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
       <Card>
         <CardContent>
           <div className="print:visible print-root print:absolute print:left-0 print:top-0 print:right-0 print:m-0 print:p-3 border-black print:bg-white print:text-black p-8">
@@ -51,15 +120,14 @@ export function AttendancePrintView({
                   <th className="border border-black p-2 text-left">Address</th>
                   <th className="border border-black p-2 text-left">Phone</th>
                   <th className="border border-black p-2 text-left">Email</th>
-                  <th className="border border-black p-2 text-center w-20">
-                    Sign In
-                  </th>
-                  <th className="border border-black p-2 text-center w-20">
-                    Break 1
-                  </th>
-                  <th className="border border-black p-2 text-center w-20">
-                    Break 2
-                  </th>
+                  {columns.map(({ id, header }) => {
+                    if (!header) return <></>;
+                    return (
+                      <th className="border border-black p-1 text-center w-20">
+                        {header}
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
@@ -85,9 +153,10 @@ export function AttendancePrintView({
                       {entry.phoneNumber ?? "-"}
                     </td>
                     <td className="border border-black p-2">{entry.email}</td>
-                    <td className="border border-black p-2 h-12"></td>
-                    <td className="border border-black p-2 h-12"></td>
-                    <td className="border border-black p-2 h-12"></td>
+                    {columns.map(({ id, header }) => {
+                      if (!header) return <></>;
+                      return <td className="border border-black p-2 h-12"></td>;
+                    })}
                   </tr>
                 ))}
               </tbody>
