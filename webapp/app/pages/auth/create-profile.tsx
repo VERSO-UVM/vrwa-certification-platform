@@ -49,22 +49,20 @@ export default function CreateProfile() {
   };
 
   return (
-    <main className="flex items-center justify-center h-screen vrwa-light:bg-gray-50 dark:bg-gray-950">
-      <Card className="p-4 w-xl mt-10 self-center">
-        <CardHeader>
-          <CardTitle className="text-center">Create a Profile</CardTitle>
-          <CardContent className="flex flex-col space-y-4 w-lg m-auto">
-            <EditForm
-              item={emptyProfile}
-              columns={columnDefs}
-              onSave={handleOnSave}
-            />
-            <Link to="/profile-select">
-              <Undo2 className="inline" /> Back
-            </Link>
-          </CardContent>
-        </CardHeader>
-      </Card>
-    </main>
+    <Card className="p-4 w-xl self-center">
+      <CardHeader>
+        <CardTitle className="text-center">Create a Profile</CardTitle>
+        <CardContent className="flex flex-col space-y-4 w-lg m-auto">
+          <EditForm
+            item={emptyProfile}
+            columns={columnDefs}
+            onSave={handleOnSave}
+          />
+          <Link to="/profile-select">
+            <Undo2 className="inline" /> Back
+          </Link>
+        </CardContent>
+      </CardHeader>
+    </Card>
   );
 }

@@ -44,30 +44,28 @@ export default function ProfileSelection() {
   };
 
   return (
-    <main className="flex items-center justify-center h-screen vrwa-light:bg-gray-50 dark:bg-gray-950">
-      <Card className="p-4 w-xl mt-10 self-center">
-        <CardHeader>
-          <CardTitle className="text-center">Select Your Profile</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col space-y-4 w-lg m-auto">
-          {profiles.map((profile) => (
-            <Button
-              key={profile.id}
-              variant="outline"
-              onClick={() => onProfileSelect(profile.id)}
-            >
-              {profile.firstName} {profile.lastName}
-            </Button>
-          ))}
-          <Button variant="secondary" onClick={() => handleCreateProfile()}>
-            Add New Profile
+    <Card className="p-4 w-xl self-center">
+      <CardHeader>
+        <CardTitle className="text-center">Select Your Profile</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col space-y-4 w-lg m-auto">
+        {profiles.map((profile) => (
+          <Button
+            key={profile.id}
+            variant="outline"
+            onClick={() => onProfileSelect(profile.id)}
+          >
+            {profile.firstName} {profile.lastName}
           </Button>
-          <Link to="/" className="justify-center gap-2 flex">
-            <Undo className="inline" />
-            Exit
-          </Link>
-        </CardContent>
-      </Card>
-    </main>
+        ))}
+        <Button variant="secondary" onClick={() => handleCreateProfile()}>
+          Add New Profile
+        </Button>
+        <Link to="/" className="justify-center gap-2 flex">
+          <Undo className="inline" />
+          Exit
+        </Link>
+      </CardContent>
+    </Card>
   );
 }
