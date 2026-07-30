@@ -24,7 +24,10 @@ export default [
   ]),
   route("instructor", "layouts/instructor.tsx", [
     index("pages/instructor/home/home.tsx"),
-    route("attendance/:courseEventId", "pages/instructor/attendance/attendance.tsx"),
+    route(
+      "attendance/:courseEventId",
+      "pages/instructor/attendance/attendance.tsx",
+    ),
     route("*", "pages/instructor/not-found.tsx"),
   ]),
   layout("layouts/auth.tsx", [
