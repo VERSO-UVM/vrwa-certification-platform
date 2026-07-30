@@ -61,17 +61,3 @@ To start the database container: `docker compose -f compose.dev.yml up -d`. Make
 To stop the database container: `docker compose -f compose.dev.yml down`.
 
 Make sure to also apply migrations (see the DB Management Commands section above)! If you need to reset/wipe the database, use `rm -rf .tmp/db-data`.
-
-### Future terminal commands
-
-As this project progresses, we will add functionality for more terminal commands:
-```bash
-# Running the project:
-$ bun start:dev # this will be another way to run the backend in watch mode
-$ bun start:prod # this will run the project in production mode
-
-# Testing the project:
-$ bun run test # this will run all unit tests
-$ bun run test:e2e # this will run all e2e tests
-$ bun run test:cov # this will test coverage
-```
