@@ -20,14 +20,14 @@ export type ReservationDto = Reservation &
   Pick<CourseEvent, "seats"> & {
     course: Pick<Course, "courseName" | "creditHours" | "id">;
     // TODO: use superjson (see below)
-    classStartDatetime: string|null;
+    classStartDatetime: string | null;
   };
 
 export type CourseEventDto = Omit<CourseEvent, "classStartDatetime"> &
   Pick<Course, "courseName" | "description" | "creditHours" | "priceCents"> & {
     // TODO: use superjson library so this can be serialized/deserialized as a Date
     // and avoid typescript linting errors
-    classStartDatetime: string|null;
+    classStartDatetime: string | null;
   };
 
 export const ProfileDtoSchema = createSelectSchema(profile);

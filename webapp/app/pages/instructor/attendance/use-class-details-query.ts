@@ -5,8 +5,8 @@ export function useClassDetailsQuery(courseEventId: string) {
   const trpc = useTRPC();
 
   return useQuery(
-    trpc.courseEvents.instructor.get.queryOptions(
-      { courseEventId: courseEventId },
-    ),
+    trpc.courseEvents.instructor.get.queryOptions({
+      courseEventId: courseEventId,
+    }),
   );
 }
