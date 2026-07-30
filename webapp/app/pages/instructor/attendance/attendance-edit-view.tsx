@@ -59,7 +59,7 @@ export function AttendanceEditView({
       <PageHeader>
         <ClassTitle courseEventId={courseEventId} />
       </PageHeader>
-      <Card>
+      <Card variant="green" className="border-0">
         <CardHeader>
           <CardTitle>Manage Attendance</CardTitle>
           <CardDescription>
