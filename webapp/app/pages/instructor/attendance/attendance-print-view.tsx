@@ -16,7 +16,13 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
 
-const defaultColumns = [
+interface Column {
+  header: string;
+  enabled: boolean;
+  id: number;
+}
+
+const defaultColumns: Column[] = [
   { header: "Sign in", enabled: true, id: 1 },
   { header: "Break 1", enabled: true, id: 2 },
   { header: "Break 2", enabled: true, id: 3 },
@@ -30,14 +36,9 @@ export function AttendancePrintView({
 }) {
   const { data: details } = useClassDetailsQuery(courseEventId);
   const { data: roster = [] } = useRosterQuery(courseEventId);
+  const [columns, setColumns] = useState<Column[]>(defaultColumns);
 
-  const [columns, setColumns] = useState(defaultColumns);
-
-  const updateColumn = ({
-    header,
-    enabled,
-    id,
-  }: (typeof defaultColumns)[0]) => {
+  const updateColumn = ({ header, enabled, id }: Column) => {
     setColumns((columns) =>
       columns.map((c) => (c.id == id ? { id, header, enabled } : c)),
     );
@@ -56,11 +57,11 @@ export function AttendancePrintView({
           <Printer /> Print
         </Button>
       </PageHeader>
-      <Card>
+      <Card variant="green" className="mb-4 border-0">
         <CardHeader>
-          <CardTitle>Additional Fields</CardTitle>
+          <CardTitle>Additional Columns</CardTitle>
           <CardDescription>
-            Add more columns to the sign in sheet.
+            Configure more columns for the sign-in sheet.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -77,17 +78,11 @@ export function AttendancePrintView({
                   <Input
                     value={header}
                     onChange={(e) =>
-                      setColumns((columns) =>
-                        columns.map((c) =>
-                          c.id == id
-                            ? {
-                                id: id,
-                                header: e.target.value,
-                                enabled: Boolean(e.target.value),
-                              }
-                            : c,
-                        ),
-                      )
+                      updateColumn({
+                        id,
+                        header: e.target.value,
+                        enabled: Boolean(e.target.value),
+                      })
                     }
                   />
                 </Label>
@@ -120,13 +115,14 @@ export function AttendancePrintView({
                   <th className="border border-black p-2 text-left">Address</th>
                   <th className="border border-black p-2 text-left">Phone</th>
                   <th className="border border-black p-2 text-left">Email</th>
-                  {columns.map(({ id, header }) => {
-                    if (!header) return <></>;
-                    return (
-                      <th className="border border-black p-1 text-center w-20">
-                        {header}
-                      </th>
-                    );
+                  {columns.map(({ id, header, enabled }) => {
+                    if (enabled) {
+                      return (
+                        <th className="border border-black p-1 text-center w-20">
+                          {header}
+                        </th>
+                      );
+                    }
                   })}
                 </tr>
               </thead>
@@ -153,9 +149,12 @@ export function AttendancePrintView({
                       {entry.phoneNumber ?? "-"}
                     </td>
                     <td className="border border-black p-2">{entry.email}</td>
-                    {columns.map(({ id, header }) => {
-                      if (!header) return <></>;
-                      return <td className="border border-black p-2 h-12"></td>;
+                    {columns.map(({ id, header, enabled }) => {
+                      if (enabled) {
+                        return (
+                          <td className="border border-black p-2 h-12"></td>
+                        );
+                      }
                     })}
                   </tr>
                 ))}
