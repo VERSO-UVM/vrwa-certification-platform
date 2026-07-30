@@ -4,7 +4,7 @@
 import { PageHeader } from "~/components/page-header";
 import { useTRPC } from "~/utils/trpc";
 import { useQuery } from "@tanstack/react-query";
-import { ClassInfoCard } from "./home/class-info-card";
+import { ClassInfoCard } from "./class-info-card";
 
 export function meta() {
   return [{ title: "Instructor Dashboard" }];

@@ -2,13 +2,13 @@
  * Instructor class attendance page.
  */
 import { Link } from "react-router";
+import { ArrowLeft } from "lucide-react";
 import type { Route } from "./+types/attendance";
 import { useSearchParamEntry } from "~/hooks/use-search-param-entry";
 import { Button } from "~/components/ui/button";
-import { AttendancePrintView } from "./attendance/attendance-print-view";
-import { AttendanceEditView } from "./attendance/attendance-edit-view";
+import { AttendancePrintView } from "./attendance-print-view";
+import { AttendanceEditView } from "./attendance-edit-view";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { ArrowLeft } from "lucide-react";
 
 export default function AttendancePage({
   params: { courseEventId },
