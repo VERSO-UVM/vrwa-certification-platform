@@ -8,7 +8,12 @@ import {
   reservation,
   type PaymentStatus,
 } from "~/database/schema";
-import { adminProcedure, instructorProcedure, router } from "~/utils/trpc";
+import {
+  adminProcedure,
+  instructorProcedure,
+  traineeProcedure,
+  router,
+} from "~/utils/trpc";
 
 import { createUpdateSchema } from "drizzle-zod";
 import z from "zod";
@@ -162,6 +167,19 @@ export const reservationRouter = router({
           });
         }
         return updated[0];
+      }),
+  }),
+  trainee: router({
+    listTrainee: traineeProcedure
+      .input(
+        z.object({
+          profileId: z.string(),
+        }),
+      )
+      .query(({ input }): Promise<ReservationDto[]> => {
+        return reservationQuery().where(
+          eq(reservation.profileId, input.profileId),
+        );
       }),
   }),
 });

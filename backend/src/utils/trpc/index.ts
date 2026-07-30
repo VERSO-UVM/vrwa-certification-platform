@@ -54,7 +54,7 @@ export const instructorProcedure = protectedProcedure.use(({ ctx, next }) => {
 
 export const traineeProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (
-    ctx.account.role !== "trainee" &&
+    ctx.account.role !== "user" &&
     ctx.account.role !== "admin" &&
     ctx.account.role !== "instructor"
   ) {
