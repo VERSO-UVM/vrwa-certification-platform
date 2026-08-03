@@ -78,6 +78,7 @@ export function usersWithProfilesQuery() {
     with: {
       profiles: true,
     },
-    orderBy: user.name,
-  }) satisfies Promise<UserDto[]>;
+    orderBy: (user, { asc }) => [asc(user.name)],
+  // Drizzle findMany types not working
+  }) as unknown as Promise<UserDto[]>;
 }
