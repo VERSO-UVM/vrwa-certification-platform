@@ -54,7 +54,7 @@ export function CourseEventForm({ onCreate, event } : CourseEventFormProps) {
         seats: event.seats,
         physicalAddress: event.physicalAddress ?? "",
         virtualLink: event.virtualLink ?? "",
-        date: date,
+        date,
         time: format(date, "HH:mm"),
       };
     }
@@ -78,7 +78,7 @@ export function CourseEventForm({ onCreate, event } : CourseEventFormProps) {
       courseId: values.courseId,
       locationType: values.locationType as CourseLocation,
       seats: values.seats,
-      classStartDatetime: classStartDatetime.toString(),
+      classStartDatetime,
       physicalAddress: values.physicalAddress.trim() || null,
       virtualLink: values.virtualLink.trim() || null,
     });

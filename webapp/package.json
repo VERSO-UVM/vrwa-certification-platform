@@ -31,6 +31,7 @@
     "react-day-picker": "^10.0.1",
     "react-dom": "catalog:",
     "react-router": "^7.13.1",
+    "superjson": "catalog:",
     "tailwind-merge": "^3.5.0",
     "vaul": "^1.1.2"
   },

@@ -18,6 +18,7 @@ import { TRPCProvider, type AppRouter } from "~/utils/trpc";
 import type { Route } from "./+types/root";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { getTrpcUrl } from "./utils/env";
+import superjson from "superjson";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -71,6 +72,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       links: [
         httpBatchStreamLink({
           url: getTrpcUrl(),
+          transformer: superjson,
           fetch(url, options) {
             // Use regular JS fetch() and make sure to pass
             // all headers and credentials

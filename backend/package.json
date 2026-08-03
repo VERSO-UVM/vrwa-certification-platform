@@ -37,6 +37,7 @@
     "nestjs-zod": "^5.1.1",
     "pg": "^8.18.0",
     "react": "catalog:",
+    "superjson": "catalog:",
     "zod": "^4.3.6"
   },
   "devDependencies": {

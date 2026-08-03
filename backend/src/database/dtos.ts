@@ -17,18 +17,12 @@ import z from "zod";
 export type ReservationDto = Reservation &
   Omit<Profile, "id"> &
   Pick<User, "email"> &
-  Pick<CourseEvent, "seats"> & {
+  Pick<CourseEvent, "seats" | "classStartDatetime"> & {
     course: Pick<Course, "courseName" | "creditHours" | "id">;
-    // TODO: use superjson (see below)
-    classStartDatetime: string | null;
   };
 
-export type CourseEventDto = Omit<CourseEvent, "classStartDatetime"> &
-  Pick<Course, "courseName" | "description" | "creditHours" | "priceCents"> & {
-    // TODO: use superjson library so this can be serialized/deserialized as a Date
-    // and avoid typescript linting errors
-    classStartDatetime: string | null;
-  };
+export type CourseEventDto = CourseEvent &
+  Pick<Course, "courseName" | "description" | "creditHours" | "priceCents">;
 
 export const ProfileDtoSchema = createSelectSchema(profile);
 export type ProfileDto = z.infer<typeof ProfileDtoSchema>;
