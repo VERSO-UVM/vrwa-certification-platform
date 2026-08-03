@@ -19,7 +19,7 @@ export function SidebarLayout({ sidebar: Sidebar }: SidebarLayoutPRops) {
           <div className="flex-1">
             {/* See https://tailwindcss.com/docs/responsive-design#container-queries
                   Inside @container we can use @sm, @md, @lg, etc */}
-            <main className="flex-1 flex flex-col pl-7 pr-3 py-10 z-40 @container">
+            <main className="flex-1 flex flex-col pl-5 pr-5 py-10 z-40 @container">
               <Outlet />
             </main>
           </div>
