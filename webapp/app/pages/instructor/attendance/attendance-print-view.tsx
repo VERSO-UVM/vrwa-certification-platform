@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { Car, Printer } from "lucide-react";
+import { Printer } from "lucide-react";
 import { ClassTitle } from "./class-title";
 import { useState } from "react";
 import { Input } from "~/components/ui/input";
@@ -119,7 +119,7 @@ export function AttendancePrintView({
                   {columns.map(({ id, header, enabled }) => {
                     if (enabled) {
                       return (
-                        <th className="border border-black p-1 text-center w-20">
+                        <th key={id} className="border border-black p-1 text-center w-20">
                           {header}
                         </th>
                       );

@@ -18,17 +18,16 @@ export const attendanceFieldDefs = [
   reservationDefs.lastName,
   reservationDefs.email,
   reservationDefs.paymentStatus,
-  reservationFieldHelper.display({
+  reservationFieldHelper.accessor(({ creditHours }) => Number(creditHours) !== 0, {
     id: "present",
     header: "Present?",
-    cell: ({ row }) => {
+    cell: ({ row, getValue: isPresent }) => {
       const item = row.original;
-      const present = Number(item.creditHours) !== 0;
       const creditHoursUpdate = useCreditHoursUpdate(item.courseEventId);
       return (
         <div className="flex items-center space-x-2">
           <Switch
-            checked={present}
+            checked={isPresent()}
             onCheckedChange={(checked) =>
               creditHoursUpdate.mutate({
                 courseEventId: item.courseEventId,
