@@ -16,7 +16,7 @@ const updateSchema = createUpdateSchema(user, {
 // https://better-auth.com/docs/plugins/admin
 
 export const userRouter = router({
-  getUsers: adminProcedure.query(() => {
+  getUsers: adminProcedure.query((): Promise<UserDto[]> => {
     return usersWithProfilesQuery();
   }),
 

@@ -1,7 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { PaymentStatus, Profile } from "@backend/database/schema";
-import { useParams } from "react-router";
 import { type ColumnDef } from "@tanstack/react-table";
 import type { ReservationDto } from "@backend/database/dtos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
@@ -38,13 +37,13 @@ import {
   DrawerDescription,
 } from "~/components/ui/drawer";
 import { NewCourseForm } from "~/pages/admin/course-manager/course-form";
+import type { Route } from "./+types/course-details";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
 }
 
-export default function CourseDetails() {
-  const { courseId } = useParams<{ courseId: string }>();
+export default function CourseDetails({ params: { courseId } }: Route.ComponentProps) {
   const trpc = useTRPC();
   const client = useTRPCClient();
   const queryClient = useQueryClient();
@@ -120,7 +119,7 @@ export default function CourseDetails() {
   const date = Date.now();
 
   for (let i = 0; i < reservationsList.length; i++) {
-    let eventTime = new Date(reservationsList[i].classStartDatetime).getTime();
+    let eventTime = new Date(reservationsList[i]?.classStartDatetime ?? "").getTime();
 
     if (eventTime > date) {
       upcomingEvents.push(reservationsList[i]);
@@ -277,7 +276,7 @@ export default function CourseDetails() {
                   <dt className="font-medium text-muted-foreground">
                     Enrollment Fee
                   </dt>
-                  <dd>${course.data?.priceCents / 100}</dd>
+                  <dd>${course.data?.priceCents && course.data?.priceCents / 100}</dd>
                 </div>
 
                 <div>

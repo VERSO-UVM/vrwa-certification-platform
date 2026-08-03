@@ -15,7 +15,7 @@ import {
 import { Button } from "~/components/ui/button";
 import { ButtonGroup } from "~/components/ui/button-group";
 import { DataTable } from "~/components/data-table";
-import type { CourseLocation, CourseEvent } from "@backend/database/schema";
+import type { CourseLocation, Course } from "@backend/database/schema";
 import {
   Drawer,
   DrawerContent,
@@ -27,6 +27,7 @@ import {
 import { LocationTypeBadge } from "~/components/location-type-badge";
 import { PageHeader } from "~/components/page-header";
 import { Link } from "react-router";
+import type { CourseEventDto } from "@backend/database/dtos";
 
 export function meta() {
   return [{ title: "Course Manager - VRWA Training Database" }];
@@ -58,7 +59,7 @@ export default function CourseManager() {
     });
   }
 
-  const columnsCourseEvents: ColumnDef<CourseEvent>[] = [
+  const columnsCourseEvents: ColumnDef<CourseEventDto>[] = [
     {
       accessorKey: "courseName",
       header: "Course",
@@ -135,7 +136,7 @@ export default function CourseManager() {
     ).length;
   }
 
-  const columnsCourses: ColumnDef<CourseEvent>[] = [
+  const columnsCourses: ColumnDef<Course>[] = [
     {
       accessorKey: "courseName",
       header: "Course",
@@ -170,7 +171,7 @@ export default function CourseManager() {
 
   const [courseDrawerOpen, setCourseDrawerOpen] = useState(false);
   const [courseEventDrawerOpen, setCourseEventDrawerOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<CourseEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<CourseEventDto | null>(null);
   return (
     <div className="flex-1">
       <PageHeader>Course Manager</PageHeader>
@@ -229,7 +230,7 @@ export default function CourseManager() {
                           queryKey: trpc.courseEvents.admin.list.queryKey(),
                         });
                       } else {
-                        await client.courses.admin.mutate(data);
+                        await client.courses.admin.create.mutate(data as CourseEventDto);
                         await queryClient.invalidateQueries({
                           queryKey: trpc.courseEvents.admin.list.queryKey(),
                         });
