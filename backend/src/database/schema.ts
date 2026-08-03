@@ -15,8 +15,21 @@ import { prefixedIdGenerator } from "~/utils/id";
 // in ~/auth/server.ts. Then the drizzle schema must be re-generated
 // through the instructions in the README.
 import * as authSchema from "../../drizzle/auth-schema";
-export * from "../../drizzle/auth-schema";
-const { user, account } = authSchema;
+export {
+  user,
+  account,
+  session,
+  verification,
+  organization,
+  member,
+  invitation,
+  sessionRelations,
+  accountRelations,
+  organizationRelations,
+  memberRelations,
+  invitationRelations,
+} from "../../drizzle/auth-schema";
+const { user, account, session, member, invitation } = authSchema;
 
 export type User = typeof user.$inferSelect;
 
@@ -49,8 +62,14 @@ export const profileUserRelation = relations(profile, ({ one }) => ({
     references: [user.id],
   }),
 }));
-export const userProfilesRelation = relations(user, ({ many }) => ({
+
+// Only allowed 1 relations for a given table. Need to merge in better-auth relations.
+export const userRelations = relations(user, ({ many }) => ({
   profiles: many(profile),
+  sessions: many(session),
+  accounts: many(account),
+  members: many(member),
+  invitations: many(invitation),
 }));
 
 export const course = pgTable("course", {

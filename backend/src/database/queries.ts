@@ -79,6 +79,5 @@ export function usersWithProfilesQuery() {
       profiles: true,
     },
     orderBy: (user, { asc }) => [asc(user.name)],
-  // Drizzle findMany types not working
-  }) as unknown as Promise<UserDto[]>;
+  }) satisfies Promise<UserDto[]>;
 }
