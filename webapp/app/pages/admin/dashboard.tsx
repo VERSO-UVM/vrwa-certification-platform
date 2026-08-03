@@ -7,11 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import {
-  Menubar,
-  MenubarMenu,
-  MenubarTrigger
-} from "~/components/ui/menubar"
 import type { CourseEventDto, ReservationDto } from "@backend/database/dtos";
 import { DataTable } from "~/components/data-table";
 import { Link, useNavigate } from "react-router";
@@ -33,12 +28,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex-1">
-      <Menubar className="rounded-none absolute top-0 left-0 w-full">
-        <MenubarMenu>
-          <MenubarTrigger></MenubarTrigger>
-          <MenubarTrigger>File</MenubarTrigger>
-        </MenubarMenu>
-      </Menubar>
 
       <PageHeader>Admin Dashboard</PageHeader>
 
