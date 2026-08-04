@@ -1,17 +1,12 @@
 import { useState } from "react";
 import { useTRPC } from "~/utils/trpc";
-import {
-  Form,
-  FormControl,
-  FormMessage,
-  FormSubmit,
-} from "@radix-ui/react-form";
+import { Form } from "@radix-ui/react-form";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import { Calendar } from "~/components/ui/calendar";
 import { Button } from "~/components/ui/button";
 import { format } from "date-fns";
-import type { Course } from "@backend/database/schema";
+import type { Course, CourseLocation } from "@backend/database/schema";
 import { useQuery } from "@tanstack/react-query";
 import {
   Select,
@@ -22,13 +17,19 @@ import {
   SelectValue,
   SelectLabel,
 } from "~/components/ui/select";
+import type { CourseEventDto } from "@backend/database/dtos";
 
 function useCourses() {
   const trpc = useTRPC();
   return useQuery(trpc.courses.admin.list.queryOptions());
 }
 
-export function CourseEventForm({ onCreate, event }) {
+export interface CourseEventFormProps {
+  onCreate: (data: Partial<CourseEventDto>) => void;
+  event: Partial<CourseEventDto> | null;
+}
+
+export function CourseEventForm({ onCreate, event }: CourseEventFormProps) {
   const courses = useCourses();
 
   const [values, setValues] = useState(() => {
@@ -43,7 +44,7 @@ export function CourseEventForm({ onCreate, event }) {
         time: "12:00",
       };
     } else {
-      const date = new Date(event.classStartDatetime);
+      const date = new Date(event.classStartDatetime || "");
 
       return {
         courseId: event.courseId,
@@ -51,7 +52,7 @@ export function CourseEventForm({ onCreate, event }) {
         seats: event.seats,
         physicalAddress: event.physicalAddress ?? "",
         virtualLink: event.virtualLink ?? "",
-        date: date,
+        date,
         time: format(date, "HH:mm"),
       };
     }
@@ -60,8 +61,8 @@ export function CourseEventForm({ onCreate, event }) {
   function combineDateAndTime(date: Date, time: string) {
     const [hours, mins] = time.split(":").map(Number);
     const combo = new Date(date);
-    combo.setHours(hours);
-    combo.setMinutes(mins);
+    combo.setHours(hours!);
+    combo.setMinutes(mins!);
     combo.setSeconds(0);
     return combo;
   }
@@ -73,7 +74,7 @@ export function CourseEventForm({ onCreate, event }) {
 
     onCreate({
       courseId: values.courseId,
-      locationType: values.locationType,
+      locationType: values.locationType as CourseLocation,
       seats: values.seats,
       classStartDatetime,
       physicalAddress: values.physicalAddress.trim() || null,
@@ -118,7 +119,7 @@ export function CourseEventForm({ onCreate, event }) {
             type="number"
             min={1}
             required
-            value={values.seats}
+            value={values.seats ?? ""}
             onChange={(e) =>
               setValues({ ...values, seats: Number(e.target.value) })
             }
@@ -130,7 +131,9 @@ export function CourseEventForm({ onCreate, event }) {
           </FieldLabel>
           <Select
             value={values.locationType}
-            onValueChange={(v) => setValues({ ...values, locationType: v })}
+            onValueChange={(v) =>
+              setValues({ ...values, locationType: v as CourseLocation })
+            }
           >
             <SelectTrigger id="locationType" className="w-full">
               <SelectValue placeholder="Select a Location Type" />

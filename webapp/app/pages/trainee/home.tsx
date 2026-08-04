@@ -10,11 +10,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { DataTable } from "~/components/data-table";
-import { Link, useNavigate } from "react-router";
-import { Button } from "~/components/ui/button";
-import { courseEventDefPresets } from "~/utils/field-defs/course-event";
 import { reservationDefPresets } from "~/utils/field-defs/reservation";
-import type { CourseEventDto, ReservationDto } from "@backend/database/dtos";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "VRWA Certifications" }];
@@ -34,7 +30,7 @@ export default function TraineeHome() {
   const profileId = activeProfileQuery.data?.id;
 
   // We are telling queryOptions that the profileId input will not be null, which is fine to do in this case because of the enabled line right below.
-  const reservations = useQuery(
+  const { data: reservations } = useQuery(
     trpc.reservations.trainee.listTrainee.queryOptions(
       { profileId: profileId! },
       { enabled: Boolean(profileId) },
@@ -55,7 +51,7 @@ export default function TraineeHome() {
           <CardContent>
             <DataTable
               columns={reservationDefPresets.basic}
-              data={(reservations.data as ReservationDto[]) ?? []}
+              data={reservations}
               table={{ enableRowSelection: false }}
             />
           </CardContent>
