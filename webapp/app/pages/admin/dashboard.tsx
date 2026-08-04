@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import type { CourseEventDto, ReservationDto } from "@backend/database/dtos";
 import { DataTable } from "~/components/data-table";
 import { Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
@@ -22,8 +21,8 @@ export function meta() {
 
 export default function AdminDashboard() {
   const trpc = useTRPC();
-  const courseEvents = useQuery(trpc.courseEvents.admin.list.queryOptions());
-  const reservations = useQuery(trpc.reservations.admin.list.queryOptions());
+  const { data: courseEvents } = useQuery(trpc.courseEvents.admin.list.queryOptions());
+  const { data: reservations } = useQuery(trpc.reservations.admin.list.queryOptions());
   const navigate = useNavigate();
 
   return (
@@ -47,7 +46,7 @@ export default function AdminDashboard() {
           <CardContent>
             <DataTable
               columns={courseEventDefPresets.default}
-              data={(courseEvents.data as CourseEventDto[]) ?? []}
+              data={courseEvents}
               table={{
                 enableRowSelection: false,
               }}
@@ -96,7 +95,7 @@ export default function AdminDashboard() {
           <CardContent>
             <DataTable
               columns={reservationDefPresets.all}
-              data={(reservations.data as ReservationDto[]) ?? []}
+              data={reservations}
               table={{
                 onRowSelectionChange: (selection) => {
                   // For now let's just make clicking a row
@@ -106,9 +105,9 @@ export default function AdminDashboard() {
                   const id = Object.keys(value)?.[0];
                   if (!id) return null;
                   const row = parseInt(id);
-                  if (reservations.data?.[row]) {
+                  if (reservations?.[row]) {
                     navigate(
-                      "/admin/trainees#" + reservations.data[row].profileId,
+                      "/admin/trainees#" + reservations[row].profileId,
                     );
                   }
                 },

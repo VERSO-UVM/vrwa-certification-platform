@@ -48,8 +48,8 @@ export default function CourseManager() {
   const client = useTRPCClient();
   const queryClient = useQueryClient();
 
-  const courseEvents = useCourseEvents();
-  const courses = useCourses();
+  const { data: courseEvents } = useCourseEvents();
+  const { data: courses } = useCourses();
 
   async function deleteRow(id: string) {
     await client.courseEvents.admin.delete.mutate({ id });
@@ -131,7 +131,7 @@ export default function CourseManager() {
   ];
 
   function getNumberOfClasses(courseId: string) {
-    return (courseEvents.data ?? []).filter(
+    return (courseEvents ?? []).filter(
       (event) => event.courseId === courseId,
     ).length;
   }
@@ -188,7 +188,7 @@ export default function CourseManager() {
           <CardContent>
             <DataTable
               columns={columnsCourseEvents}
-              data={courseEvents.data ?? []}
+              data={courseEvents}
             />
           </CardContent>
           <div className="flex justify-end mb-4 pr-4">
@@ -255,7 +255,7 @@ export default function CourseManager() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <DataTable columns={columnsCourses} data={courses.data ?? []} />
+            <DataTable columns={columnsCourses} data={courses} />
           </CardContent>
           <div className="flex justify-end mb-4 pr-4">
             <Drawer
