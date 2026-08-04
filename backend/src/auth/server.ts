@@ -48,7 +48,6 @@ export const auth = betterAuth({
       // within the authenticated session.
       activeProfileId: {
         type: "string",
-        input: true,
       },
     },
   },
