@@ -15,6 +15,7 @@ import { prefixedIdGenerator } from "~/utils/id";
 // in ~/auth/server.ts. Then the drizzle schema must be re-generated
 // through the instructions in the README.
 import * as authSchema from "../../drizzle/auth-schema";
+// Don't export all the relations. We want to customize them.
 export {
   user,
   account,
