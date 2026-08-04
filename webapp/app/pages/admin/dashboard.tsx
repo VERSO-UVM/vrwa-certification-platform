@@ -21,8 +21,12 @@ export function meta() {
 
 export default function AdminDashboard() {
   const trpc = useTRPC();
-  const { data: courseEvents } = useQuery(trpc.courseEvents.admin.list.queryOptions());
-  const { data: reservations } = useQuery(trpc.reservations.admin.list.queryOptions());
+  const { data: courseEvents } = useQuery(
+    trpc.courseEvents.admin.list.queryOptions(),
+  );
+  const { data: reservations } = useQuery(
+    trpc.reservations.admin.list.queryOptions(),
+  );
   const navigate = useNavigate();
 
   return (
@@ -106,9 +110,7 @@ export default function AdminDashboard() {
                   if (!id) return null;
                   const row = parseInt(id);
                   if (reservations?.[row]) {
-                    navigate(
-                      "/admin/trainees#" + reservations[row].profileId,
-                    );
+                    navigate("/admin/trainees#" + reservations[row].profileId);
                   }
                 },
               }}

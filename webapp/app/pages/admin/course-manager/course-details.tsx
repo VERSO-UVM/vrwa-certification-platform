@@ -403,9 +403,7 @@ export default function CourseDetails({
                     <CardContent>
                       <DataTable
                         columns={rosterTableDef}
-                        data={
-                          reservationsByEvent[event.id] as ReservationDto[]
-                        }
+                        data={reservationsByEvent[event.id] as ReservationDto[]}
                       />
                     </CardContent>
                   </Card>

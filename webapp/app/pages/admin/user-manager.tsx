@@ -40,7 +40,7 @@ export function meta() {
 
 export default function UserManager() {
   const trpc = useTRPC();
-  const { data: users  } = useQuery(trpc.users.getUsers.queryOptions());
+  const { data: users } = useQuery(trpc.users.getUsers.queryOptions());
   return (
     <>
       <PageHeader>Users</PageHeader>

@@ -131,9 +131,8 @@ export default function CourseManager() {
   ];
 
   function getNumberOfClasses(courseId: string) {
-    return (courseEvents ?? []).filter(
-      (event) => event.courseId === courseId,
-    ).length;
+    return (courseEvents ?? []).filter((event) => event.courseId === courseId)
+      .length;
   }
 
   const columnsCourses: ColumnDef<Course>[] = [
@@ -186,10 +185,7 @@ export default function CourseManager() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <DataTable
-              columns={columnsCourseEvents}
-              data={courseEvents}
-            />
+            <DataTable columns={columnsCourseEvents} data={courseEvents} />
           </CardContent>
           <div className="flex justify-end mb-4 pr-4">
             <Button
