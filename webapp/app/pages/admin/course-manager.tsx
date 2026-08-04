@@ -171,7 +171,9 @@ export default function CourseManager() {
 
   const [courseDrawerOpen, setCourseDrawerOpen] = useState(false);
   const [courseEventDrawerOpen, setCourseEventDrawerOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<CourseEventDto | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<CourseEventDto | null>(
+    null,
+  );
   return (
     <div className="flex-1">
       <PageHeader>Course Manager</PageHeader>
@@ -230,7 +232,9 @@ export default function CourseManager() {
                           queryKey: trpc.courseEvents.admin.list.queryKey(),
                         });
                       } else {
-                        await client.courses.admin.create.mutate(data as CourseEventDto);
+                        await client.courses.admin.create.mutate(
+                          data as CourseEventDto,
+                        );
                         await queryClient.invalidateQueries({
                           queryKey: trpc.courseEvents.admin.list.queryKey(),
                         });

@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useTRPC } from "~/utils/trpc";
-import {
-  Form,
-} from "@radix-ui/react-form";
+import { Form } from "@radix-ui/react-form";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import { Calendar } from "~/components/ui/calendar";
@@ -27,11 +25,11 @@ function useCourses() {
 }
 
 export interface CourseEventFormProps {
-  onCreate: (data: Partial<CourseEventDto>) => void,
-  event: Partial<CourseEventDto> | null,
+  onCreate: (data: Partial<CourseEventDto>) => void;
+  event: Partial<CourseEventDto> | null;
 }
 
-export function CourseEventForm({ onCreate, event } : CourseEventFormProps) {
+export function CourseEventForm({ onCreate, event }: CourseEventFormProps) {
   const courses = useCourses();
 
   const [values, setValues] = useState(() => {
@@ -133,7 +131,9 @@ export function CourseEventForm({ onCreate, event } : CourseEventFormProps) {
           </FieldLabel>
           <Select
             value={values.locationType}
-            onValueChange={(v) => setValues({ ...values, locationType: v as CourseLocation })}
+            onValueChange={(v) =>
+              setValues({ ...values, locationType: v as CourseLocation })
+            }
           >
             <SelectTrigger id="locationType" className="w-full">
               <SelectValue placeholder="Select a Location Type" />

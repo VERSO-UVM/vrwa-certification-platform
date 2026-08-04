@@ -43,7 +43,9 @@ export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
 }
 
-export default function CourseDetails({ params: { courseId } }: Route.ComponentProps) {
+export default function CourseDetails({
+  params: { courseId },
+}: Route.ComponentProps) {
   const trpc = useTRPC();
   const client = useTRPCClient();
   const queryClient = useQueryClient();
@@ -119,7 +121,9 @@ export default function CourseDetails({ params: { courseId } }: Route.ComponentP
   const date = Date.now();
 
   for (let i = 0; i < reservationsList.length; i++) {
-    let eventTime = new Date(reservationsList[i]?.classStartDatetime ?? "").getTime();
+    let eventTime = new Date(
+      reservationsList[i]?.classStartDatetime ?? "",
+    ).getTime();
 
     if (eventTime > date) {
       upcomingEvents.push(reservationsList[i]);
@@ -276,7 +280,9 @@ export default function CourseDetails({ params: { courseId } }: Route.ComponentP
                   <dt className="font-medium text-muted-foreground">
                     Enrollment Fee
                   </dt>
-                  <dd>${course.data?.priceCents && course.data?.priceCents / 100}</dd>
+                  <dd>
+                    ${course.data?.priceCents && course.data?.priceCents / 100}
+                  </dd>
                 </div>
 
                 <div>
