@@ -78,6 +78,6 @@ export function usersWithProfilesQuery() {
     with: {
       profiles: true,
     },
-    orderBy: user.name,
+    orderBy: (user, { asc }) => [asc(user.name)],
   }) satisfies Promise<UserDto[]>;
 }

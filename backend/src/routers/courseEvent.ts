@@ -12,6 +12,18 @@ import { z } from "zod";
 import type { CourseEventDto } from "~/database/dtos";
 import { courseEventQuery } from "~/database/queries";
 import { TRPCError } from "@trpc/server";
+import { createUpdateSchema } from "drizzle-zod";
+
+export const courseEventUpdateSchema = z.object({
+  id: z.string(),
+  classStartDatetime: z.coerce.date().optional().nullable(),
+  seats: z.number().int().positive().nullable().optional(),
+  locationType: z.enum(["in-person", "virtual", "hybrid"]).optional(),
+  physicalAddress: z.string().nullable().optional(),
+  virtualLink: z.url().optional().nullable(),
+});
+
+export type CourseEventUpdateDto = z.infer<typeof courseEventUpdateSchema>;
 
 export const courseEventRouter = router({
   admin: router({
@@ -54,16 +66,7 @@ export const courseEventRouter = router({
       }),
 
     update: adminProcedure
-      .input(
-        z.object({
-          id: z.string(),
-          classStartDatetime: z.coerce.date().optional().nullable(),
-          seats: z.number().int().positive().nullable().optional(),
-          locationType: z.enum(["in-person", "virtual", "hybrid"]).optional(),
-          physicalAddress: z.string().nullable().optional(),
-          virtualLink: z.url().optional().nullable(),
-        }),
-      )
+      .input(courseEventUpdateSchema)
       .mutation(async ({ input }) => {
         const { id, ...update } = input;
 

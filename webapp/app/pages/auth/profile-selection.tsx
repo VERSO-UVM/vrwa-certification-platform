@@ -30,7 +30,8 @@ export default function ProfileSelection() {
     // Update active profile for the current session
     await authClient.updateSession({
       activeProfileId: profileId,
-    });
+      // Note: Better-Auth updateSession not typing correctly
+    } as unknown as any);
     const { data: sessionData } = await getSession();
     // TODO: Does this invalidate all needed queries?
     await queryClient.invalidateQueries({
