@@ -20,6 +20,7 @@ import {
   courseEventFieldHelper,
 } from "~/utils/field-defs/course-event";
 import { Link } from "react-router";
+import { useMemo } from "react";
 
 export function meta() {
   return [{ title: "Instructor Dashboard" }];
@@ -48,35 +49,42 @@ const columnDefs = [
 
 export default function InstructorHome() {
   const trpc = useTRPC();
-  const { data: courseEvents = [], isPending } = useQuery(
+  const { data: courseEvents, isPending } = useQuery(
     trpc.courseEvents.instructor.listUpcoming.queryOptions(),
   );
 
-  const pastClasses = courseEvents.filter(
-    (courseEvent) =>
-      new Date(courseEvent.classStartDatetime ?? "") < new Date(),
+  const pastClasses = useMemo(
+    () =>
+      (courseEvents ?? []).filter(
+        (courseEvent) =>
+          new Date(courseEvent.classStartDatetime ?? "") < new Date(),
+      ),
+    [courseEvents],
   );
   const today = new Date();
   today.setHours(0);
   today.setMinutes(0);
   today.setSeconds(0);
-  const upcomingClasses = courseEvents.filter((courseEvent) => {
-    return (
-      courseEvent.classStartDatetime &&
-      new Date(courseEvent.classStartDatetime) > today
-    );
-  });
+  const upcomingClasses = useMemo(
+    () =>
+      (courseEvents ?? []).filter((courseEvent) => {
+        return (
+          courseEvent.classStartDatetime &&
+          new Date(courseEvent.classStartDatetime) > today
+        );
+      }),
+    [courseEvents],
+  );
 
   return (
-    <div className="space-y-6">
+    <div>
       <PageHeader>My Classes</PageHeader>
-
-      <h2 className="text-xl font-medium">Upcoming Classes</h2>
+      <h2 className="text-xl font-medium pb-5">Upcoming Classes</h2>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {upcomingClasses?.map((session, i) => (
+        {upcomingClasses.map((session, i) => (
           <ClassInfoCard key={session.id} session={session} index={i} />
         ))}
-        {upcomingClasses?.length === 0 &&
+        {upcomingClasses.length === 0 &&
           (isPending ? (
             <div className="p-10">Fetching upcoming classes...</div>
           ) : (
@@ -86,7 +94,8 @@ export default function InstructorHome() {
           ))}
       </div>
 
-      <h2 className="text-xl font-medium">Past Classes</h2>
+      <h2 className="text-xl font-medium pt-8 pb-5">Past Classes</h2>
+
       <Card className="@xl:col-span-5" variant="blue">
         <CardHeader>
           <CardTitle>Past Classes</CardTitle>
@@ -97,7 +106,7 @@ export default function InstructorHome() {
         <CardContent>
           <DataTable
             columns={columnDefs}
-            data={(courseEvents as CourseEventDto[]) ?? []}
+            data={pastClasses}
             table={{
               enableRowSelection: false,
             }}

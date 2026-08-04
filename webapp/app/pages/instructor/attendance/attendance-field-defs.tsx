@@ -18,30 +18,33 @@ export const attendanceFieldDefs = [
   reservationDefs.lastName,
   reservationDefs.email,
   reservationDefs.paymentStatus,
-  reservationFieldHelper.accessor(({ creditHours }) => Number(creditHours) !== 0, {
-    id: "present",
-    header: "Present?",
-    cell: ({ row, getValue: isPresent }) => {
-      const item = row.original;
-      const creditHoursUpdate = useCreditHoursUpdate(item.courseEventId);
-      return (
-        <div className="flex items-center space-x-2">
-          <Switch
-            checked={isPresent()}
-            onCheckedChange={(checked) =>
-              creditHoursUpdate.mutate({
-                courseEventId: item.courseEventId,
-                profileId: item.profileId,
-                creditHours: checked ? item.course.creditHours : 0,
-              })
-            }
-            id="is-present"
-          />
-          <Label htmlFor="is-present">Present</Label>
-        </div>
-      );
+  reservationFieldHelper.accessor(
+    ({ creditHours }) => Number(creditHours) !== 0,
+    {
+      id: "present",
+      header: "Present?",
+      cell: ({ row, getValue: isPresent }) => {
+        const item = row.original;
+        const creditHoursUpdate = useCreditHoursUpdate(item.courseEventId);
+        return (
+          <div className="flex items-center space-x-2">
+            <Switch
+              checked={isPresent()}
+              onCheckedChange={(checked) =>
+                creditHoursUpdate.mutate({
+                  courseEventId: item.courseEventId,
+                  profileId: item.profileId,
+                  creditHours: checked ? item.course.creditHours : 0,
+                })
+              }
+              id="is-present"
+            />
+            <Label htmlFor="is-present">Present</Label>
+          </div>
+        );
+      },
     },
-  }),
+  ),
   reservationFieldHelper.display({
     id: "creditHours",
     header: "Earned Hours",

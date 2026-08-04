@@ -119,7 +119,10 @@ export function AttendancePrintView({
                   {columns.map(({ id, header, enabled }) => {
                     if (enabled) {
                       return (
-                        <th key={id} className="border border-black p-1 text-center w-20">
+                        <th
+                          key={id}
+                          className="border border-black p-1 text-center w-20"
+                        >
                           {header}
                         </th>
                       );
