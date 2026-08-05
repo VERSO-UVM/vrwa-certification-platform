@@ -35,7 +35,7 @@ const columnDefs = [
     cell: ({ row }) => {
       return (
         <Button variant="outline" className="my-4 py-4" asChild>
-          <Link to={`/certificates/${row.original.courseEventId}`}>
+          <Link to={`${row.original.courseEventId}`}>
             View Certificate
           </Link>
         </Button>
