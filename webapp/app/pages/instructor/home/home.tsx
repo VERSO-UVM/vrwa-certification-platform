@@ -12,18 +12,28 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import type { CourseEventDto } from "@backend/database/dtos";
 import { DataTable } from "~/components/data-table";
 import {
-  courseEventDefPresets,
   courseEventDefs,
   courseEventFieldHelper,
 } from "~/utils/field-defs/course-event";
 import { Link } from "react-router";
 import { useMemo } from "react";
+import { SkeletonCard } from "~/components/ui/skeleton";
 
 export function meta() {
   return [{ title: "Instructor Dashboard" }];
+}
+
+/**
+ * Use start of the day instead of the current time so that
+ * a class on the current day is still at the top of the page
+ * in Upcoming Classes.
+ */
+function startOfToday() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
 }
 
 const columnDefs = [
@@ -52,26 +62,22 @@ export default function InstructorHome() {
   const { data: courseEvents, isPending } = useQuery(
     trpc.courseEvents.instructor.listUpcoming.queryOptions(),
   );
+  const today = startOfToday();
 
   const pastClasses = useMemo(
     () =>
-      (courseEvents ?? []).filter(
-        (courseEvent) =>
-          new Date(courseEvent.classStartDatetime ?? "") < new Date(),
+      courseEvents?.filter(
+        ({ classStartDatetime }) =>
+          classStartDatetime != null && classStartDatetime < today,
       ),
     [courseEvents],
   );
-  const today = new Date();
-  today.setHours(0);
-  today.setMinutes(0);
-  today.setSeconds(0);
   const upcomingClasses = useMemo(
     () =>
-      (courseEvents ?? []).filter((courseEvent) => {
-        return (
-          courseEvent.classStartDatetime &&
-          new Date(courseEvent.classStartDatetime) > today
-        );
+      (courseEvents ?? []).filter(({ classStartDatetime }) => {
+        // Consider a null classStartDatetime as a class which has not yet
+        // been scheduled. Thus it is a future class.
+        return classStartDatetime == null || classStartDatetime > today;
       }),
     [courseEvents],
   );
@@ -79,16 +85,22 @@ export default function InstructorHome() {
   return (
     <div>
       <PageHeader>My Classes</PageHeader>
+
       <h2 className="text-xl font-medium pb-5">Upcoming Classes</h2>
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {upcomingClasses.map((session, i) => (
           <ClassInfoCard key={session.id} session={session} index={i} />
         ))}
         {upcomingClasses.length === 0 &&
           (isPending ? (
-            <div className="p-10">Fetching upcoming classes...</div>
+            <>
+              <SkeletonCard variant="blue" />
+              <SkeletonCard variant="green" />
+              <SkeletonCard variant="yellow" />
+            </>
           ) : (
-            <div className="col-span-full py-20 text-center text-muted-foreground bg-muted/20 rounded-lg border-2 border-dashed">
+            <div className="col-span-full py-20 text-center text-muted-foreground bg-muted/20 rounded-lg">
               No upcoming classes right now!
             </div>
           ))}
@@ -100,7 +112,7 @@ export default function InstructorHome() {
         <CardHeader>
           <CardTitle>Past Classes</CardTitle>
           <CardDescription>
-            Click on a class to get to attendance page.
+            Click on a class name to manage attendance.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -109,6 +121,14 @@ export default function InstructorHome() {
             data={pastClasses}
             table={{
               enableRowSelection: false,
+              initialState: {
+                sorting: [
+                  {
+                    id: "classStartDatetime",
+                    desc: true,
+                  },
+                ],
+              },
             }}
           />
         </CardContent>
