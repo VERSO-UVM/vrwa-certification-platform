@@ -9,6 +9,7 @@ import {
   SelectItem,
 } from "~/components/ui/select";
 import { Field, FieldLabel } from "~/components/ui/field";
+import { useMemo } from "react";
 
 interface DataTablePageSizeSelectProps<
   TData,
@@ -25,7 +26,8 @@ export function smartPageSizeOptions<TData>(
   table: Table<TData>,
   pageSizeOptions: PageSizeOption[],
 ): PageSizeOption[] {
-  const totalRows = table.getCoreRowModel().rows.length;
+  // Use size of raw data to not cause react rendering issues or other bugs
+  const totalRows = table.options.data.length;
   return [
     ...pageSizeOptions.filter((option) => option.value < totalRows),
     {
@@ -52,7 +54,10 @@ export function DataTablePageSizeSelect<TData>({
     table.setPageSize(Number(value));
   };
   const currentSize = table.getState().pagination.pageSize;
-  const pageSizeOptions = table.options.meta?.pageSizeOptions(table);
+  const pageSizeOptions = useMemo(
+    () => table.options.meta?.pageSizeOptions(table),
+    [table],
+  );
   if (!pageSizeOptions || pageSizeOptions.length <= 1) {
     return <div></div>;
   }
