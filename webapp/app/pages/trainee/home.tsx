@@ -31,7 +31,7 @@ export default function TraineeHome() {
 
   // We are telling queryOptions that the profileId input will not be null, which is fine to do in this case because of the enabled line right below.
   const { data: reservations } = useQuery(
-    trpc.reservations.trainee.listTrainee.queryOptions(
+    trpc.reservations.trainee.listUpcoming.queryOptions(
       { profileId: profileId! },
       { enabled: Boolean(profileId) },
     ),

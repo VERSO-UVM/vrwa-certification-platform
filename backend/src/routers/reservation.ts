@@ -170,7 +170,7 @@ export const reservationRouter = router({
       }),
   }),
   trainee: router({
-    listTrainee: traineeProcedure
+    listUpcoming: traineeProcedure
       .input(
         z.object({
           profileId: z.string(),
