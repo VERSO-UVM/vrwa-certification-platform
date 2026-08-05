@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, gt, ne } from "drizzle-orm";
 
 import db from "~/database";
 import {
@@ -17,9 +17,13 @@ import {
 
 import { createUpdateSchema } from "drizzle-zod";
 import z from "zod";
-import { courseEventQuery, reservationQuery } from "~/database/queries";
+import {
+  courseEventQuery,
+  reservationQuery,
+} from "~/database/queries";
 import type { ReservationDto } from "~/database/dtos";
 import { TRPCError } from "@trpc/server";
+import { hasAttended, isFutureClass, isPastClass } from "~/database/filters";
 
 const updateSchema = createUpdateSchema(reservation, {
   courseEventId: z.string(),
@@ -178,7 +182,23 @@ export const reservationRouter = router({
       )
       .query(({ input }): Promise<ReservationDto[]> => {
         return reservationQuery().where(
-          eq(reservation.profileId, input.profileId),
+          and(isFutureClass(), eq(reservation.profileId, input.profileId)),
+        );
+      }),
+
+    listCompleted: traineeProcedure
+      .input(
+        z.object({
+          profileId: z.string(),
+        }),
+      )
+      .query(({ input }): Promise<ReservationDto[]> => {
+        return reservationQuery().where(
+          and(
+            isPastClass(),
+            hasAttended(),
+            eq(reservation.profileId, input.profileId),
+          ),
         );
       }),
   }),
