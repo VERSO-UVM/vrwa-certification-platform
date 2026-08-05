@@ -1,3 +1,4 @@
+import { BookOpenText, Home, Scroll, Star, Trophy } from "lucide-react";
 import { Link } from "react-router";
 import { ActiveProfileIndicator } from "~/components/active-profile-indicator";
 import { LogOutButton } from "~/components/logout-button";
@@ -23,16 +24,33 @@ export function TraineeSidebar() {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link to="/trainee">Home</Link>
+                <Link to="/trainee">
+                  <Home />
+                  Home
+                </Link>
               </SidebarMenuButton>
               <SidebarMenuButton asChild>
-                <Link to="/trainee/courses">Course Sign-up</Link>
+                <Link to="/trainee/courses">
+                  <BookOpenText />
+                  Registration
+                </Link>
               </SidebarMenuButton>
               <SidebarMenuButton asChild>
-                <Link to="/trainee/invoices">Payments</Link>
+                <Link to="/trainee/certificates">
+                  <Trophy />
+                  Certificates
+                </Link>
               </SidebarMenuButton>
               <SidebarMenuButton asChild>
-                <Link to="/trainee/member">Member Portal</Link>
+                <Link to="/trainee/invoices">
+                  <Scroll />
+                  Payments
+                </Link>
+              </SidebarMenuButton>
+              <SidebarMenuButton asChild>
+                <Link to="/trainee/member">
+                  <Star />
+                  Member Portal</Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
