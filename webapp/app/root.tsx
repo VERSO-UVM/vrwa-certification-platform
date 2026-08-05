@@ -63,6 +63,9 @@ function getQueryClient() {
 
 const asyncStoragePersister = createAsyncStoragePersister({
   storage: typeof window !== "undefined" ? window.localStorage : undefined,
+  // Serialize JavaScript types like Date correctly in caching
+  serialize: superjson.stringify,
+  deserialize: superjson.parse,
 });
 
 export function Layout({ children }: { children: React.ReactNode }) {
