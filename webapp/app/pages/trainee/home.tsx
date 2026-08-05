@@ -17,7 +17,6 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function TraineeHome() {
-  // Code to get the active profile - taken from part of the ActiveProfileIndicator in active-profile-indicator.tsx
   const trpc = useTRPC();
   const activeProfileQuery = useQuery(
     trpc.profiles.getActiveProfile.queryOptions(),
@@ -27,14 +26,8 @@ export default function TraineeHome() {
     " " +
     activeProfileQuery.data?.lastName;
 
-  const profileId = activeProfileQuery.data?.id;
-
-  // We are telling queryOptions that the profileId input will not be null, which is fine to do in this case because of the enabled line right below.
   const { data: reservations } = useQuery(
-    trpc.reservations.trainee.listUpcoming.queryOptions(
-      { profileId: profileId! },
-      { enabled: Boolean(profileId) },
-    ),
+    trpc.reservations.trainee.listUpcoming.queryOptions(),
   );
 
   return (

@@ -1,4 +1,4 @@
-import { and, eq, gt, ne } from "drizzle-orm";
+import { and, asc, desc, eq, gt, ne } from "drizzle-orm";
 
 import db from "~/database";
 import {
@@ -17,10 +17,7 @@ import {
 
 import { createUpdateSchema } from "drizzle-zod";
 import z from "zod";
-import {
-  courseEventQuery,
-  reservationQuery,
-} from "~/database/queries";
+import { courseEventQuery, reservationQuery } from "~/database/queries";
 import type { ReservationDto } from "~/database/dtos";
 import { TRPCError } from "@trpc/server";
 import { hasAttended, isFutureClass, isPastClass } from "~/database/filters";
@@ -174,32 +171,31 @@ export const reservationRouter = router({
       }),
   }),
   trainee: router({
-    listUpcoming: traineeProcedure
-      .input(
-        z.object({
-          profileId: z.string(),
-        }),
-      )
-      .query(({ input }): Promise<ReservationDto[]> => {
-        return reservationQuery().where(
-          and(isFutureClass(), eq(reservation.profileId, input.profileId)),
-        );
-      }),
+    listUpcoming: traineeProcedure.query(
+      ({ ctx }): Promise<ReservationDto[]> => {
+        return reservationQuery()
+          .where(
+            and(
+              isFutureClass(),
+              eq(reservation.profileId, ctx.session.activeProfileId),
+            ),
+          )
+          .orderBy(asc(courseEvent.classStartDatetime));
+      },
+    ),
 
-    listCompleted: traineeProcedure
-      .input(
-        z.object({
-          profileId: z.string(),
-        }),
-      )
-      .query(({ input }): Promise<ReservationDto[]> => {
-        return reservationQuery().where(
-          and(
-            isPastClass(),
-            hasAttended(),
-            eq(reservation.profileId, input.profileId),
-          ),
-        );
-      }),
+    listCompleted: traineeProcedure.query(
+      ({ ctx }): Promise<ReservationDto[]> => {
+        return reservationQuery()
+          .where(
+            and(
+              isPastClass(),
+              hasAttended(),
+              eq(reservation.profileId, ctx.session.activeProfileId),
+            ),
+          )
+          .orderBy(desc(courseEvent.classStartDatetime));
+      },
+    ),
   }),
 });
