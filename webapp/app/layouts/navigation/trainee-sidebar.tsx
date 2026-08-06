@@ -30,7 +30,7 @@ export function TraineeSidebar() {
                 </Link>
               </SidebarMenuButton>
               <SidebarMenuButton asChild>
-                <Link to="/trainee/courses">
+                <Link to="/trainee/registration">
                   <BookOpenText />
                   Registration
                 </Link>
