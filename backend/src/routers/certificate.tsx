@@ -5,6 +5,12 @@ import { CertificateDocument } from "~/pdf/pdf_template";
 import { eq } from "drizzle-orm";
 import db from "~/database";
 
+/**
+ * For now we are returning a Blob directly embedded as a base64 string
+ * within a tRPC JSON output. The "correct" way to return files is to
+ * create a direct file URL. These are currently small enough PDFs
+ * that this method works well enough.
+ */
 const generateCertificate = async (input: {
   profileId: string;
   courseEventId: string;
