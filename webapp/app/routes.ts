@@ -23,7 +23,10 @@ export default [
     route("certificates", "pages/trainee/certificates.tsx"),
     route("certificates/:courseEventId", "pages/trainee/view-certificate.tsx"),
     route("registration", "pages/trainee/registration.tsx"),
-    route("registration/:courseEventId", "pages/trainee/registration-details.tsx"),
+    route(
+      "registration/:courseEventId",
+      "pages/trainee/registration-details.tsx",
+    ),
     route("*", "pages/trainee/not-found.tsx"),
   ]),
   route("instructor", "layouts/instructor.tsx", [

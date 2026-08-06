@@ -42,7 +42,9 @@ export default function RegistrationDetailsPage({
             <CardTitle>{courseEvent?.courseName}</CardTitle>
             <CardDescription></CardDescription>
           </CardHeader>
-          <CardContent className="min-h-64">{courseEvent?.description}</CardContent>
+          <CardContent className="min-h-64">
+            {courseEvent?.description}
+          </CardContent>
         </Card>
       </div>
       <div></div>

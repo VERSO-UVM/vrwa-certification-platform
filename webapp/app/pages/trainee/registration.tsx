@@ -46,9 +46,7 @@ export default function CourseRegistrationPage() {
                     </div>
                     <div className="flex space-x-2">
                       <dt className="font-medium">Time: </dt>
-                      <dd>
-                        {timeFormat(training.classStartDatetime)}
-                      </dd>
+                      <dd>{timeFormat(training.classStartDatetime)}</dd>
                     </div>
                     <div className="flex space-x-2">
                       <dt className="font-medium">Seats: </dt>
