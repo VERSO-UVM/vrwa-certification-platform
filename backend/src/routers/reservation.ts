@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, asc, desc, eq, gt, ne } from "drizzle-orm";
 
 import db from "~/database";
 import {
@@ -20,6 +20,7 @@ import z from "zod";
 import { courseEventQuery, reservationQuery } from "~/database/queries";
 import type { ReservationDto } from "~/database/dtos";
 import { TRPCError } from "@trpc/server";
+import { hasAttended, isFutureClass, isPastClass } from "~/database/filters";
 
 const updateSchema = createUpdateSchema(reservation, {
   courseEventId: z.string(),
@@ -170,16 +171,31 @@ export const reservationRouter = router({
       }),
   }),
   trainee: router({
-    listTrainee: traineeProcedure
-      .input(
-        z.object({
-          profileId: z.string(),
-        }),
-      )
-      .query(({ input }): Promise<ReservationDto[]> => {
-        return reservationQuery().where(
-          eq(reservation.profileId, input.profileId),
-        );
-      }),
+    listUpcoming: traineeProcedure.query(
+      ({ ctx }): Promise<ReservationDto[]> => {
+        return reservationQuery()
+          .where(
+            and(
+              isFutureClass(),
+              eq(reservation.profileId, ctx.session.activeProfileId),
+            ),
+          )
+          .orderBy(asc(courseEvent.classStartDatetime));
+      },
+    ),
+
+    listCompleted: traineeProcedure.query(
+      ({ ctx }): Promise<ReservationDto[]> => {
+        return reservationQuery()
+          .where(
+            and(
+              isPastClass(),
+              hasAttended(),
+              eq(reservation.profileId, ctx.session.activeProfileId),
+            ),
+          )
+          .orderBy(desc(courseEvent.classStartDatetime));
+      },
+    ),
   }),
 });

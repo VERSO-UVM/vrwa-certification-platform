@@ -20,6 +20,8 @@ export default [
   ]),
   route("trainee", "layouts/trainee.tsx", [
     index("pages/trainee/home.tsx"),
+    route("certificates", "pages/trainee/certificates.tsx"),
+    route("certificates/:courseEventId", "pages/trainee/view-certificate.tsx"),
     route("*", "pages/trainee/not-found.tsx"),
   ]),
   route("instructor", "layouts/instructor.tsx", [

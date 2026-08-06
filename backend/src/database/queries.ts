@@ -38,7 +38,6 @@ export function reservationQuery() {
     .innerJoin(user, eq(profile.userId, user.id))
     .innerJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
     .innerJoin(course, eq(course.id, courseEvent.courseId))
-    .orderBy(courseEvent.classStartDatetime, profile.lastName)
     .$dynamic() satisfies Promise<ReservationDto[]>;
 }
 
