@@ -4,14 +4,14 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "~/utils/utils";
 
 const cardVariants = cva(
-  "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm",
+  "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-md",
   {
     variants: {
       variant: {
-        blue: "vrwa-light:bg-[#5a8acc22] dark:bg-[#15338344]",
-        green: "vrwa-light:bg-[#90B76622] dark:bg-[#2f5e2844]",
-        yellow: "vrwa-light:bg-[#ffd66633] dark:bg-[#91752944]",
-        orange: "vrwa-light:bg-[#c7883333] dark:bg-[#d77b2535]",
+        blue: "vrwa-light:bg-[#5a8acc22] dark:bg-[#15338344] border-0",
+        green: "vrwa-light:bg-[#90B76622] dark:bg-[#2f5e2844] border-0",
+        yellow: "vrwa-light:bg-[#ffd66633] dark:bg-[#91752944] border-0",
+        orange: "vrwa-light:bg-[#c7883333] dark:bg-[#d77b2535] border-0",
         default:
           "vrwa-light:bg-white vrwa-light:text-gray-700 rounded-lg px-6 py-8 ring shadow-xl ring-gray-900/5 dark:text-gray-400 dark:bg-gray-900",
       },
