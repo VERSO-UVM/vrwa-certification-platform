@@ -139,6 +139,26 @@ export const courseEventRouter = router({
   }),
 
   trainee: router({
+    get: traineeProcedure
+      .input(
+        z.object({
+          courseEventId: z.string(),
+        }),
+      )
+      .query(async ({ input }) => {
+        const events = await courseEventQuery().where(
+          eq(courseEvent.id, input.courseEventId),
+        );
+        const event = events?.[0];
+        if (event == null) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Course event not found.",
+          });
+        }
+        return event;
+      }),
+
     listFuture: traineeProcedure.query(() => {
       return courseEventQuery()
         .where(isFutureClass())
