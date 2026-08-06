@@ -50,7 +50,8 @@ export function TraineeSidebar() {
               <SidebarMenuButton asChild>
                 <Link to="/trainee/member">
                   <Star />
-                  Member Portal</Link>
+                  Member Portal
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
