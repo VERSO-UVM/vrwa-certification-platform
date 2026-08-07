@@ -144,8 +144,7 @@ export default function CertificationsPage() {
           <CardHeader>
             <CardTitle>Select Trainees</CardTitle>
             <CardDescription>
-              First, search for a course. Then, select trainees or choose Add
-              All.
+              First, search for a course. Then, select trainees to send certificates to or choose Add All.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -175,6 +174,7 @@ export default function CertificationsPage() {
 
             {/* Trainee selection */}
 
+          {selectedCourse && (<>
             <DataTable
               columns={traineeTableDefs}
               data={trainees}
@@ -208,6 +208,8 @@ export default function CertificationsPage() {
                 Add All ({trainees.length})
               </Button>
             </div>
+          </>
+            )}
           </CardContent>
         </Card>
 
