@@ -56,7 +56,7 @@ export function DataTablePageSizeSelect<TData>({
   const currentSize = table.getState().pagination.pageSize;
   const pageSizeOptions = useMemo(
     () => table.options.meta?.pageSizeOptions(table),
-    [table],
+    [table.options.data.length],
   );
   if (!pageSizeOptions || pageSizeOptions.length <= 1) {
     return <div></div>;
