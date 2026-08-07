@@ -1,29 +1,59 @@
+import type { ReservationDto } from "@backend/database/dtos";
 import type { Course } from "@backend/database/schema";
 import { useQuery } from "@tanstack/react-query";
+import type { RowSelectionState } from "@tanstack/react-table";
+import React from "react";
 import { useState } from "react";
 import { DataTable } from "~/components/data-table";
 import { PageHeader } from "~/components/page-header";
 import { Button } from "~/components/ui/button";
+import { ButtonGroup } from "~/components/ui/button-group";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Checkbox } from "~/components/ui/checkbox";
 import {
   Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxChipsInput,
   ComboboxContent,
   ComboboxEmpty,
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
+  ComboboxValue,
+  useComboboxAnchor,
 } from "~/components/ui/combobox";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import {
-  reservationDefPresets,
   reservationDefs,
   reservationFieldHelper,
 } from "~/utils/field-defs/reservation";
 import { useTRPC } from "~/utils/trpc";
+import { profileFullName } from "~/utils/utils";
 
 const traineeTableDefs = [
+  reservationFieldHelper.display({
+    id: "select",
+    enableMultiSort: false,
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected()}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  }),
   reservationDefs.firstName,
   reservationDefs.lastName,
   reservationDefs.email,
@@ -48,6 +78,10 @@ export default function CertificationsPage() {
     ),
   );
 
+  const recipientsAnchor = useComboboxAnchor();
+
+  const [recipients, setRecipients] = useState<ReservationDto[]>([]);
+
   const [emailSubject, setEmailSubject] = useState(
     "Your VRWA Certificate of Completion",
   );
@@ -56,6 +90,36 @@ export default function CertificationsPage() {
   );
   const [emailCc, setEmailCc] = useState("");
   const [emailBcc, setEmailBcc] = useState("");
+
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
+  const addSelectedRecipients = () => {
+    const newRecipients = [];
+    for (const [index, isSelected] of Object.entries(rowSelection)) {
+      const i = parseInt(index);
+      if (
+        isSelected &&
+        trainees[i] &&
+        !recipients.find(
+          (item) =>
+            item.profileId == trainees[i]?.profileId ||
+            item.courseEventId == trainees[i]?.courseEventId,
+        )
+      ) {
+        newRecipients.push(trainees[i]);
+      }
+    }
+    setRecipients([...recipients, ...newRecipients]);
+    // Reset row selection
+    setRowSelection({});
+  };
+
+  const addAllRecipients = () => {
+    setRecipients([
+      ...recipients.filter((rec) => rec.course.id !== selectedCourse?.id),
+      ...trainees,
+    ]);
+  };
 
   return (
     <>
@@ -95,7 +159,39 @@ export default function CertificationsPage() {
 
             {/* Trainee selection */}
 
-            <DataTable columns={traineeTableDefs} data={trainees} />
+            <DataTable
+              columns={traineeTableDefs}
+              data={trainees}
+              table={{
+                enableMultiRowSelection: true,
+                initialState: {
+                  pagination: {
+                    pageSize: 10,
+                  },
+                },
+                onRowSelectionChange: (updater) => {
+                  setRowSelection((prev) =>
+                    typeof updater === "function" ? updater(prev) : updater,
+                  );
+                },
+                state: { rowSelection },
+              }}
+            />
+
+            <div className="flex justify-between">
+              <Button
+                disabled={Object.entries(rowSelection).length == 0}
+                onClick={() => addSelectedRecipients()}
+              >
+                Add Selected ({Object.entries(rowSelection).length})
+              </Button>
+              <Button
+                disabled={trainees.length == 0}
+                onClick={() => addAllRecipients()}
+              >
+                Add All ({trainees.length})
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
@@ -105,6 +201,52 @@ export default function CertificationsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4 rounded-md">
+              <Combobox
+                multiple
+                autoHighlight
+                items={trainees}
+                itemToStringLabel={profileFullName}
+                itemToStringValue={profileFullName}
+                value={recipients}
+                onValueChange={setRecipients}
+              >
+                <ComboboxChips
+                  ref={recipientsAnchor}
+                  className="w-full max-w-xs"
+                >
+                  <ComboboxValue>
+                    {(values) => (
+                      <React.Fragment>
+                        {values.map((item: ReservationDto) => (
+                          <ComboboxChip
+                            key={item.profileId + item.courseEventId}
+                          >
+                            {profileFullName(item)}
+                          </ComboboxChip>
+                        ))}
+                        <ComboboxChipsInput />
+                      </React.Fragment>
+                    )}
+                  </ComboboxValue>
+                </ComboboxChips>
+                <ComboboxContent anchor={recipientsAnchor}>
+                  <ComboboxEmpty>No items found.</ComboboxEmpty>
+                  <ComboboxList>
+                    {(item: ReservationDto) => (
+                      <ComboboxItem
+                        key={item.profileId + item.courseEventId}
+                        value={item}
+                      >
+                        {profileFullName(item)}
+                      </ComboboxItem>
+                    )}
+                  </ComboboxList>
+                </ComboboxContent>
+              </Combobox>
+              <Button variant="edit" onClick={() => setRecipients([])}>
+                Clear all
+              </Button>
+
               <div className="space-y-2">
                 <Label>Email Subject</Label>
                 <Input
@@ -134,7 +276,7 @@ export default function CertificationsPage() {
                   rows={6}
                 />
               </div>
-              <Button>{"Send Certificates"}</Button>
+              <Button>Send Certificates</Button>
             </div>
           </CardContent>
         </Card>
