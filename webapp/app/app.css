@@ -21,6 +21,8 @@ body {
   @media (prefers-color-scheme: vrwa-light) {
     color-scheme: vrwa-light;
   }
+
+  scrollbar-color: var(--muted-foreground) transparent; 
 }
 
 @theme inline {
