@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type { RowSelectionState } from "@tanstack/react-table";
 import type { ReservationDto } from "@backend/database/dtos";
 import type { Course } from "@backend/database/schema";
@@ -69,6 +69,10 @@ export default function CertificationsPage() {
     ),
   );
 
+  const batchEmailMutation = useMutation(
+    trpc.certificates.admin.batchEmail.mutationOptions(),
+  );
+
   /* Needed for multi-select Combobox */
   const recipientsAnchor = useComboboxAnchor();
 
@@ -112,6 +116,21 @@ export default function CertificationsPage() {
       ...trainees,
     ]);
     setRowSelection({}); /* Reset row selection */
+  };
+
+  const sendCertificates = () => {
+    batchEmailMutation.mutate(
+      recipients.map(({ profileId, courseEventId }) => ({
+        profileId,
+        courseEventId,
+      })),
+      {
+        onSuccess: () => {
+          setRecipients([]);
+          setSelectedCourse(null);
+        },
+      },
+    );
   };
 
   return (
@@ -279,7 +298,12 @@ export default function CertificationsPage() {
                   rows={6}
                 />
               </div>
-              <Button>Send Certificates</Button>
+              <Button
+                onClick={() => sendCertificates()}
+                disabled={recipients.length == 0}
+              >
+                Send Certificates
+              </Button>
             </div>
           </CardContent>
         </Card>
