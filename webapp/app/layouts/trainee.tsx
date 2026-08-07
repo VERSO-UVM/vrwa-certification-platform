@@ -4,7 +4,7 @@ import { SidebarLayout } from "~/components/sidebar-layout";
 export default function TraineeLayout() {
   return (
     <div>
-      <SidebarLayout sidebar={TraineeSidebar} />
+      <SidebarLayout sidebar={TraineeSidebar} homeUrl="../trainee" />
     </div>
   );
 }
