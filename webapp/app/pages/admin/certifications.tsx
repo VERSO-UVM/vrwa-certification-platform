@@ -1,14 +1,19 @@
-import type { ReservationDto } from "@backend/database/dtos";
-import type { Course } from "@backend/database/schema";
-import { useQuery } from "@tanstack/react-query";
-import type { RowSelectionState } from "@tanstack/react-table";
 import React from "react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import type { RowSelectionState } from "@tanstack/react-table";
+import type { ReservationDto } from "@backend/database/dtos";
+import type { Course } from "@backend/database/schema";
 import { DataTable } from "~/components/data-table";
 import { PageHeader } from "~/components/page-header";
 import { Button } from "~/components/ui/button";
-import { ButtonGroup } from "~/components/ui/button-group";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
   Combobox,
@@ -32,28 +37,10 @@ import {
 } from "~/utils/field-defs/reservation";
 import { useTRPC } from "~/utils/trpc";
 import { profileFullName } from "~/utils/utils";
+import { checkboxSelectorColumn } from "~/utils/field-defs/extra";
 
 const traineeTableDefs = [
-  reservationFieldHelper.display({
-    id: "select",
-    enableMultiSort: false,
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  }),
+  checkboxSelectorColumn<ReservationDto>(),
   reservationDefs.firstName,
   reservationDefs.lastName,
   reservationDefs.email,
@@ -64,7 +51,7 @@ const traineeTableDefs = [
 
 export default function CertificationsPage() {
   const trpc = useTRPC();
-  // TODO: finished courses (all courseEvent in the past)
+  // TODO: show only finished courses (all courseEvent in the past)
   const { data: courses = [] } = useQuery(
     trpc.courses.admin.list.queryOptions(),
   );
@@ -74,12 +61,18 @@ export default function CertificationsPage() {
   const { data: trainees = [] } = useQuery(
     trpc.reservations.admin.listCourse.queryOptions(
       { courseId: selectedCourse?.id! },
-      { enabled: Boolean(selectedCourse?.id) },
+      {
+        enabled: Boolean(selectedCourse?.id),
+        select: (reservations) =>
+          reservations.filter((item) => item.creditHours !== "0"),
+      },
     ),
   );
 
+  /* Needed for multi-select Combobox */
   const recipientsAnchor = useComboboxAnchor();
 
+  /* The actual recipients we are sending to */
   const [recipients, setRecipients] = useState<ReservationDto[]>([]);
 
   const [emailSubject, setEmailSubject] = useState(
@@ -110,8 +103,7 @@ export default function CertificationsPage() {
       }
     }
     setRecipients([...recipients, ...newRecipients]);
-    // Reset row selection
-    setRowSelection({});
+    setRowSelection({}); /* Reset row selection */
   };
 
   const addAllRecipients = () => {
@@ -119,6 +111,7 @@ export default function CertificationsPage() {
       ...recipients.filter((rec) => rec.course.id !== selectedCourse?.id),
       ...trainees,
     ]);
+    setRowSelection({}); /* Reset row selection */
   };
 
   return (
@@ -131,6 +124,10 @@ export default function CertificationsPage() {
         <Card className="@xl:col-span-6" variant="blue">
           <CardHeader>
             <CardTitle>Select Trainees</CardTitle>
+            <CardDescription>
+              First, search for a course. Then, select trainees or choose Add
+              All.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <Label htmlFor="course-selection">Course</Label>
@@ -201,23 +198,27 @@ export default function CertificationsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4 rounded-md">
+              <Label className="mb-2" htmlFor="recipient-list">
+                Trainees
+              </Label>
               <Combobox
-                multiple
-                autoHighlight
+                multiple /* Support multiple recipients */
+                autoHighlight /* Use enter to select after typing in value */
                 items={trainees}
                 itemToStringLabel={profileFullName}
                 itemToStringValue={profileFullName}
                 value={recipients}
                 onValueChange={setRecipients}
+                id="recipient-list"
               >
                 <ComboboxChips
                   ref={recipientsAnchor}
                   className="w-full max-w-xs"
                 >
                   <ComboboxValue>
-                    {(values) => (
+                    {(values: ReservationDto[]) => (
                       <React.Fragment>
-                        {values.map((item: ReservationDto) => (
+                        {values.map((item) => (
                           <ComboboxChip
                             key={item.profileId + item.courseEventId}
                           >
@@ -230,7 +231,9 @@ export default function CertificationsPage() {
                   </ComboboxValue>
                 </ComboboxChips>
                 <ComboboxContent anchor={recipientsAnchor}>
-                  <ComboboxEmpty>No items found.</ComboboxEmpty>
+                  <ComboboxEmpty>
+                    Select a course to search for trainees.
+                  </ComboboxEmpty>
                   <ComboboxList>
                     {(item: ReservationDto) => (
                       <ComboboxItem
