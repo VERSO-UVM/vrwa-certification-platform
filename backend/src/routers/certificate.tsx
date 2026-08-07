@@ -70,6 +70,20 @@ export const certificateRouter = router({
         }),
       )
       .mutation(async ({ input }) => generateCertificate(input)),
+
+    batchEmail: adminProcedure
+      .input(
+        z.array(
+          z.object({
+            profileId: z.string(),
+            courseEventId: z.string(),
+          }),
+        ),
+      )
+      .mutation(async ({ input }) => {
+        console.log("%%%% batchEmail triggered! %%%%");
+        console.log(input);
+      }),
   },
 
   trainee: {

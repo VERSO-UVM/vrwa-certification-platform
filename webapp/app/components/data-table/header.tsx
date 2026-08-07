@@ -14,26 +14,39 @@ export function DataTableHeader<TData>({ table }: DataTableHeaderProps<TData>) {
       {table.getHeaderGroups().map((headerGroup) => (
         <TableRow key={headerGroup.id}>
           {headerGroup.headers.map((header) => {
-            return (
-              <TableHead key={header.id}>
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    header.column.toggleSorting(
-                      header.column.getIsSorted() == "asc",
-                    )
-                  }
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                  <SortIcon sorted={header.column.getIsSorted()} />
-                </Button>
-              </TableHead>
+            const Render = () => (
+              <>
+                {header.isPlaceholder
+                  ? null
+                  : flexRender(
+                      header.column.columnDef.header,
+                      header.getContext(),
+                    )}
+              </>
             );
+            if (header.column.getCanSort()) {
+              return (
+                <TableHead key={header.id}>
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      header.column.toggleSorting(
+                        header.column.getIsSorted() == "asc",
+                      )
+                    }
+                  >
+                    <Render />
+                    <SortIcon sorted={header.column.getIsSorted()} />
+                  </Button>
+                </TableHead>
+              );
+            } else {
+              return (
+                <TableHead key={header.id}>
+                  <Render />
+                </TableHead>
+              );
+            }
           })}
         </TableRow>
       ))}
