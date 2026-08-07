@@ -31,7 +31,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex-1">
-
       <PageHeader>Admin Dashboard</PageHeader>
 
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
