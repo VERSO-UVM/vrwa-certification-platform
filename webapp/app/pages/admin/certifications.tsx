@@ -215,7 +215,7 @@ export default function CertificationsPage() {
 
         <Card className="@xl:col-span-4" variant="green">
           <CardHeader>
-            <CardTitle>Email Send-Out</CardTitle>
+            <CardTitle>Batch Email</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4 rounded-md">
