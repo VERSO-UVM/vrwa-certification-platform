@@ -22,7 +22,7 @@ function SkeletonCard({ ...props }: React.ComponentProps<typeof Card>) {
         <Skeleton className="aspect-video w-full" />
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export { Skeleton, SkeletonCard };

@@ -7,12 +7,14 @@ import {
   basicProcedure,
   instructorProcedure,
   router,
+  traineeProcedure,
 } from "~/utils/trpc";
 import { z } from "zod";
 import type { CourseEventDto } from "~/database/dtos";
 import { courseEventQuery } from "~/database/queries";
 import { TRPCError } from "@trpc/server";
 import { createUpdateSchema } from "drizzle-zod";
+import { isFutureClass } from "~/database/filters";
 
 export const courseEventUpdateSchema = z.object({
   id: z.string(),
@@ -133,6 +135,34 @@ export const courseEventRouter = router({
         .orderBy(asc(courseEvent.classStartDatetime)) satisfies Promise<
         CourseEventDto[]
       >;
+    }),
+  }),
+
+  trainee: router({
+    get: traineeProcedure
+      .input(
+        z.object({
+          courseEventId: z.string(),
+        }),
+      )
+      .query(async ({ input }) => {
+        const events = await courseEventQuery().where(
+          eq(courseEvent.id, input.courseEventId),
+        );
+        const event = events?.[0];
+        if (event == null) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Course event not found.",
+          });
+        }
+        return event;
+      }),
+
+    listFuture: traineeProcedure.query(() => {
+      return courseEventQuery()
+        .where(isFutureClass())
+        .orderBy(asc(courseEvent.classStartDatetime));
     }),
   }),
 });
