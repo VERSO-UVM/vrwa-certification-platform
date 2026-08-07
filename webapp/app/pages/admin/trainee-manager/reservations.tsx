@@ -27,12 +27,11 @@ const columnDefs = [
 
 export function TraineeReservations({ profileId }: { profileId: string }) {
   const trpc = useTRPC();
-  const query = useQuery(
+  const { data: reservations } = useQuery(
     trpc.reservations.admin.listTrainee.queryOptions({
       profileId: profileId,
     }),
   );
-  const reservations = (query.data ?? []) as ReservationDto[];
 
   return (
     <DataTable

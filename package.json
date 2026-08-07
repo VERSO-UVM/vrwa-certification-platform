@@ -11,13 +11,15 @@
       "react": "^19.2.4",
       "react-dom": "^19.2.4",
       "typescript": "^5.9.3",
-      "better-auth": "^1.6.20"
+      "better-auth": "^1.6.20",
+      "superjson": "^2.2.6"
     }
   },
   "scripts": {
     "dev": "bun --filter=\"*\" run dev",
     "lint": "eslint \"{backend,webapp}/{src,app}/**/*.ts*\" --fix",
     "format": "prettier --write \"{backend,webapp}/{src,app}/**/*.ts*\"",
+    "typecheck": "bun run --filter '*' typecheck",
     "db:dev": "bun --filter=backend run db:dev"
   },
   "devDependencies": {

@@ -10,6 +10,7 @@
     "ui": "shadcn"
   },
   "dependencies": {
+    "@base-ui/react": "^1.7.0",
     "@daypicker/react": "^10.0.1",
     "@react-router/node": "^7.13.1",
     "@react-router/serve": "^7.13.1",
@@ -23,12 +24,15 @@
     "better-auth": "catalog:",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
     "isbot": "^5.1.35",
     "lucide-react": "^0.575.0",
     "radix-ui": "^1.4.3",
     "react": "catalog:",
+    "react-day-picker": "^10.0.1",
     "react-dom": "catalog:",
     "react-router": "^7.13.1",
+    "superjson": "catalog:",
     "tailwind-merge": "^3.5.0",
     "vaul": "^1.1.2"
   },

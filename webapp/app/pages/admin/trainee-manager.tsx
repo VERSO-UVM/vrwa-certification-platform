@@ -10,6 +10,7 @@ import {
 import { Trainee } from "./trainee-manager/trainee";
 import { useHashString } from "~/hooks/use-hash-string";
 import { TraineeEditButton } from "./trainee-manager/edit-profile";
+import type { ProfileDto } from "@backend/database/dtos";
 
 const columnDefs = (() => {
   const { firstName, lastName, city, postalCode, isMember } = profileDefs;
@@ -32,12 +33,12 @@ export function meta() {
   return [{ title: "Admin - Trainee Manager" }];
 }
 
+const fallbackTrainees = [] as ProfileDto[];
 export default function TraineeManager() {
   const trpc = useTRPC();
-  const traineesQuery = useQuery(
+  const { data: trainees = fallbackTrainees } = useQuery(
     trpc.profiles.admin.listTrainees.queryOptions(),
   );
-  const trainees = traineesQuery.data ?? [];
 
   const [selectedId, setSelectedId] = useHashString(null);
   const match = trainees.findIndex((x) => x.id == selectedId);

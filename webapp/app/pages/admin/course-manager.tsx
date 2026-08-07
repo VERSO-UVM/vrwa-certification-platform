@@ -15,7 +15,7 @@ import {
 import { Button } from "~/components/ui/button";
 import { ButtonGroup } from "~/components/ui/button-group";
 import { DataTable } from "~/components/data-table";
-import type { CourseLocation, CourseEvent } from "@backend/database/schema";
+import type { CourseLocation, Course } from "@backend/database/schema";
 import {
   Drawer,
   DrawerContent,
@@ -27,6 +27,7 @@ import {
 import { LocationTypeBadge } from "~/components/location-type-badge";
 import { PageHeader } from "~/components/page-header";
 import { Link } from "react-router";
+import type { CourseEventDto } from "@backend/database/dtos";
 
 export function meta() {
   return [{ title: "Course Manager - VRWA Training Database" }];
@@ -47,8 +48,8 @@ export default function CourseManager() {
   const client = useTRPCClient();
   const queryClient = useQueryClient();
 
-  const courseEvents = useCourseEvents();
-  const courses = useCourses();
+  const { data: courseEvents } = useCourseEvents();
+  const { data: courses } = useCourses();
 
   async function deleteRow(id: string) {
     await client.courseEvents.admin.delete.mutate({ id });
@@ -58,7 +59,7 @@ export default function CourseManager() {
     });
   }
 
-  const columnsCourseEvents: ColumnDef<CourseEvent>[] = [
+  const columnsCourseEvents: ColumnDef<CourseEventDto>[] = [
     {
       accessorKey: "courseName",
       header: "Course",
@@ -130,12 +131,11 @@ export default function CourseManager() {
   ];
 
   function getNumberOfClasses(courseId: string) {
-    return (courseEvents.data ?? []).filter(
-      (event) => event.courseId === courseId,
-    ).length;
+    return (courseEvents ?? []).filter((event) => event.courseId === courseId)
+      .length;
   }
 
-  const columnsCourses: ColumnDef<CourseEvent>[] = [
+  const columnsCourses: ColumnDef<Course>[] = [
     {
       accessorKey: "courseName",
       header: "Course",
@@ -170,7 +170,9 @@ export default function CourseManager() {
 
   const [courseDrawerOpen, setCourseDrawerOpen] = useState(false);
   const [courseEventDrawerOpen, setCourseEventDrawerOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<CourseEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<CourseEventDto | null>(
+    null,
+  );
   return (
     <div className="flex-1">
       <PageHeader>Course Manager</PageHeader>
@@ -183,10 +185,7 @@ export default function CourseManager() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <DataTable
-              columns={columnsCourseEvents}
-              data={courseEvents.data ?? []}
-            />
+            <DataTable columns={columnsCourseEvents} data={courseEvents} />
           </CardContent>
           <div className="flex justify-end mb-4 pr-4">
             <Button
@@ -229,7 +228,9 @@ export default function CourseManager() {
                           queryKey: trpc.courseEvents.admin.list.queryKey(),
                         });
                       } else {
-                        await client.courses.admin.mutate(data);
+                        await client.courses.admin.create.mutate(
+                          data as CourseEventDto,
+                        );
                         await queryClient.invalidateQueries({
                           queryKey: trpc.courseEvents.admin.list.queryKey(),
                         });
@@ -250,7 +251,7 @@ export default function CourseManager() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <DataTable columns={columnsCourses} data={courses.data ?? []} />
+            <DataTable columns={columnsCourses} data={courses} />
           </CardContent>
           <div className="flex justify-end mb-4 pr-4">
             <Drawer

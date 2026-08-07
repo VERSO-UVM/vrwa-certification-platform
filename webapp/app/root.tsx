@@ -18,6 +18,7 @@ import { TRPCProvider, type AppRouter } from "~/utils/trpc";
 import type { Route } from "./+types/root";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { getTrpcUrl } from "./utils/env";
+import superjson from "superjson";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -62,6 +63,9 @@ function getQueryClient() {
 
 const asyncStoragePersister = createAsyncStoragePersister({
   storage: typeof window !== "undefined" ? window.localStorage : undefined,
+  // Serialize JavaScript types like Date correctly in caching
+  serialize: superjson.stringify,
+  deserialize: superjson.parse,
 });
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -71,6 +75,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       links: [
         httpBatchStreamLink({
           url: getTrpcUrl(),
+          transformer: superjson,
           fetch(url, options) {
             // Use regular JS fetch() and make sure to pass
             // all headers and credentials

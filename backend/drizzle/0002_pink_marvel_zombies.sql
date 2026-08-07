@@ -1,0 +1,1 @@
+ALTER TABLE "courseEvent" ALTER COLUMN "instructorId" DROP NOT NULL;

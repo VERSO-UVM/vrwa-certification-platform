@@ -21,6 +21,7 @@ import {
 import { DataTablePagination } from "./data-table/pagination";
 import { Table } from "~/components/ui/table";
 import { DataTableInfoText } from "./data-table/info-text";
+import { useMemo } from "react";
 
 export type DataTableDecorationProps<TData> = {
   table: ReactTable<TData>;
@@ -35,7 +36,9 @@ declare module "@tanstack/table-core" {
 }
 
 export interface DataTableProps<TData> {
-  data: TData[];
+  // Allow defaulting to an empty array to simplify a common pattern
+  // important: data this must be a stable reference
+  data?: TData[];
   // Defining the ColumnDefs using `createColumnHelper` makes them more typesafe,
   // but we're then forced to an `any` in TValue when passing them around...
   // Reference: https://github.com/TanStack/table/issues/4382
@@ -63,6 +66,9 @@ export function DataTable<TData>({
   bottomDecorations = [DataTablePagination, DataTableInfoText],
   table: tableOptions,
 }: DataTableProps<TData>) {
+  // important: need a *stable* reference to data
+  data = useMemo(() => data ?? [], [data]);
+
   const table = useReactTable({
     data,
     columns,
