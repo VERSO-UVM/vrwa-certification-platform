@@ -1,4 +1,5 @@
-import { BookOpenText, Home, Scroll, Star, Trophy } from "lucide-react";
+import * as React from "react";
+import { BookOpenText, Home, Scroll, Star, Trophy, Sun, Moon, Cog } from "lucide-react";
 import { Link } from "react-router";
 import { ActiveProfileIndicator } from "~/components/active-profile-indicator";
 import { LogOutButton } from "~/components/logout-button";
@@ -13,8 +14,36 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "~/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { Button } from "~/components/ui/button";
 
 export function TraineeSidebar() {
+  const [theme, setTheme] = React.useState("vrwa-light")
+
+  React.useEffect(() => {
+    document.body.classList = "dark";
+    const oldTheme = window.localStorage.getItem("theme")
+    if (oldTheme == null) {
+      document.body.classList.add(theme)
+      console.log("null")
+      console.log(theme)
+    } else {
+      document.body.classList.replace(oldTheme, theme)
+      console.log("not null")
+      console.log(theme)
+      console.log(oldTheme)
+    }
+    window.localStorage.setItem("theme", theme)
+  }, [theme])
+
   return (
     <Sidebar>
       <SidebarHeader />
@@ -58,6 +87,33 @@ export function TraineeSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-3 w-20">Theme</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="min-w-56 ml-3">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Select website theme:</DropdownMenuLabel>
+              <DropdownMenuRadioGroup
+                value={theme}
+                onValueChange={setTheme}
+              >
+                <DropdownMenuRadioItem value="vrwa-light">
+                  <Sun />
+                  Light
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="dark">
+                  <Moon />
+                  Dark
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="system">
+                  <Cog />
+                  System
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <SidebarMenuButton asChild>
           <ActiveProfileIndicator />
         </SidebarMenuButton>
