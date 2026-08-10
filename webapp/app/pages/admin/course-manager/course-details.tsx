@@ -250,7 +250,7 @@ export default function CourseDetails({
             </div>
           </CardContent>
         </Card>
-        <Card className="@xl:col-span-1" variant="green">
+        <Card className="@xl:col-span-1" variant="yellow">
           <CardContent className="p-6 flex items-center gap-4">
             <CreditCard className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
@@ -261,7 +261,7 @@ export default function CourseDetails({
             </div>
           </CardContent>
         </Card>
-        <Card className="@xl:col-span-1" variant="green">
+        <Card className="@xl:col-span-1" variant="blue">
           <CardContent className="p-6 flex items-center gap-4">
             <Calendar className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
@@ -270,7 +270,7 @@ export default function CourseDetails({
             </div>
           </CardContent>
         </Card>
-        <Card className="col-span-full" variant="green">
+        <Card className="col-span-full" variant="orange">
           <CardHeader className="pb-3">
             <CardTitle className="text-xl flex justify-between">
               <div className="font-semibold underline">Course Overview</div>
@@ -423,7 +423,7 @@ export default function CourseDetails({
             </Tabs>
           </CardContent>
         </Card>
-        <Card className="@xl:col-span-6" variant="green">
+        <Card className="col-span-full" variant="yellow">
           <CardHeader className="pb-3">
             <CardTitle>
               Class Roster{" "}
