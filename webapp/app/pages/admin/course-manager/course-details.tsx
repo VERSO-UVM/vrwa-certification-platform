@@ -398,7 +398,7 @@ export default function CourseDetails({
                     );
                   })}
                 </TabsList>
-                <UpdateCourseEventButton courseEvent={null} />
+                <UpdateCourseEventButton />
               </div>
               {courseEvents.data?.map((event) => (
                 <TabsContent key={event.id} value={event.id}>

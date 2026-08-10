@@ -8,7 +8,7 @@ import {
   primaryKey,
   decimal,
 } from "drizzle-orm/pg-core";
-import { relations, SQL, sql as creditHourFields } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { prefixedIdGenerator } from "~/utils/id";
 
 // Auth schema must only be modified through the better-auth configuration
@@ -85,14 +85,61 @@ export type CourseStatus = (typeof CourseStatus)[keyof typeof CourseStatus];
 /* Round values to nearest thousandth: between 0.000 and 999.999 */
 const creditHourPrecision = decimal({ precision: 6, scale: 3 });
 
-/* This is the most crude way to implement credit hour types and it's
- * a bit fugly but it's the one that enforces the most data integrity. */
-export const makeCreditHoursFields = () => ({
-  creditHoursWastewater: creditHourPrecision.notNull().default("0"),
-  creditHoursWaterCategoryOne: creditHourPrecision.notNull().default("0"),
-  creditHoursWaterCategoryTwo: creditHourPrecision.notNull().default("0"),
-  creditHoursWaterCategoryThree: creditHourPrecision.notNull().default("0"),
-});
+const CreditHourType = {
+  wastewater: "wastewater",
+  waterCategoryOne: "waterCategoryOne",
+  waterCategoryTwo: "waterCategoryTwo",
+  waterCategoryThree: "waterCategoryThree",
+};
+export type CreditHourType =
+  (typeof CreditHourType)[keyof typeof CreditHourType];
+
+/* A course's "default" credit hours */
+export const courseCredit = pgTable(
+  "courseCredit",
+  {
+    courseId: varchar()
+      .references(() => course.id)
+      .notNull(),
+    type: varchar().notNull().$type<CreditHourType>(),
+    hours: creditHourPrecision.notNull(),
+  },
+  (table) => [
+    primaryKey({ name: "id", columns: [table.courseId, table.type] }),
+  ],
+);
+
+export const courseCreditRelations = relations(courseCredit, ({ one }) => ({
+  course: one(course, {
+    fields: [courseCredit.courseId],
+    references: [course.id],
+  }),
+}));
+
+export const attendance = pgTable(
+  "attendance",
+  {
+    profileId: varchar("profileId")
+      .references(() => profile.id)
+      .notNull(),
+    courseId: varchar()
+      .references(() => course.id)
+      .notNull(),
+    type: varchar().notNull().$type<CreditHourType>(),
+    hours: creditHourPrecision.notNull(),
+  },
+  (table) => [
+    primaryKey({
+      name: "id",
+      columns: [table.profileId, table.courseId, table.type],
+    }),
+  ],
+);
+
+export const attendanceRelations = relations(attendance, ({ one }) => ({
+  profile: one(profile),
+  course: one(profile),
+}));
 
 export const course = pgTable("course", {
   // This field may already exist as a different type in the VRWA db - it may change in the future
@@ -111,9 +158,15 @@ export const course = pgTable("course", {
   tags: text()
     .array()
     .notNull()
-    .default(creditHourFields`ARRAY[]::text[]`),
-  ...makeCreditHoursFields(),
+    .default(sql`ARRAY[]::text[]`),
 });
+
+export const courseRelations = relations(course, ({ many }) => ({
+  credits: many(courseCredit),
+  sessions: many(courseEvent),
+  // reservations: many(reservation), // TODO: change reservation to course
+  attendance: many(attendance),
+}));
 
 export type Course = typeof course.$inferSelect;
 
@@ -133,6 +186,13 @@ export const courseEvent = pgTable("courseEvent", {
   classStartDatetime: timestamp({ withTimezone: true }),
   instructorId: varchar().references(() => profile.id), // MOVE TO instructorId
 });
+
+export const courseEventRelations = relations(courseEvent, ({ one }) => ({
+  course: one(course, {
+    fields: [courseEvent.courseId],
+    references: [course.id],
+  }),
+}));
 
 export type CourseEvent = typeof courseEvent.$inferSelect;
 
@@ -154,7 +214,6 @@ export const reservation = pgTable(
       .notNull(),
     creditHours: decimal().notNull(),
     paymentStatus: varchar().notNull().$type<PaymentStatus>(),
-    ...makeCreditHoursFields(),
   },
   (table) => [
     primaryKey({ name: "id", columns: [table.profileId, table.courseEventId] }),
