@@ -96,7 +96,7 @@ export function CourseEventForm({ onCreate, event }: CourseEventFormProps) {
             defaultValue={values.courseId}
           >
             <SelectTrigger id="courses" className="w-full max-w-48">
-              <SelectValue placeholder="Select a Class" />
+              <SelectValue placeholder="Select a course" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
@@ -164,7 +164,6 @@ export function CourseEventForm({ onCreate, event }: CourseEventFormProps) {
           <FieldLabel htmlFor="virtualLink">Virtual Link </FieldLabel>
           <Input
             id="virtualLink"
-            type="url"
             placeholder="https://yourlink.com"
             value={values.virtualLink}
             onChange={(e) =>
@@ -183,7 +182,7 @@ export function CourseEventForm({ onCreate, event }: CourseEventFormProps) {
             defaultMonth={values.date}
             selected={values.date}
             onSelect={(d) => d && setValues({ ...values, date: d })}
-            className="rounded-md border"
+            className="rounded-md border max-w-sm"
           />
         </Field>
         <Field>
@@ -201,7 +200,7 @@ export function CourseEventForm({ onCreate, event }: CourseEventFormProps) {
         <Field orientation="horizontal">
           <Button type="submit" className="w-full">
             {" "}
-            {event ? "Update Course Event" : "Create Course Event"}{" "}
+            {event ? "Update Training Session" : "Add Training Session"}{" "}
           </Button>
         </Field>
       </FieldGroup>

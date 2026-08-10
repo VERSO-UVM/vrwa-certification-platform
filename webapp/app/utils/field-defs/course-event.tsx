@@ -15,7 +15,7 @@ export const courseEventDefs = {
     cell: ({ row, getValue }) => (
       <Link
         to={{
-          pathname: "/admin/course-manager",
+          pathname: `/admin/course-details/${row.original.courseId}`,
           search: `?class=${row.original.id}`,
         }}
         className="font-medium hover:underline"
