@@ -6,5 +6,5 @@ import { protectedLoader } from "~/utils/session";
 export const loader = protectedLoader("admin");
 
 export default function AdminLayout() {
-  return <SidebarLayout sidebar={AdminSidebar} homeUrl="../admin/" />;
+  return <SidebarLayout sidebar={AdminSidebar} homeUrl="/admin/" />;
 }

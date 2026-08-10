@@ -3,8 +3,6 @@ import { SidebarLayout } from "~/components/sidebar-layout";
 
 export default function TraineeLayout() {
   return (
-    <div>
-      <SidebarLayout sidebar={TraineeSidebar} homeUrl="../trainee" />
-    </div>
+      <SidebarLayout sidebar={TraineeSidebar} homeUrl="/trainee" />
   );
 }
