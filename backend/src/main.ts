@@ -13,6 +13,9 @@ import { appRouter } from "~/routers";
 import { TRUSTED_ORIGINS } from "./constants";
 const app = Fastify({
   logger: true,
+  // This needs to be high so tRPC batch requests aren't rejected
+  // See https://trpc.io/docs/server/adapters/fastify
+  maxParamLength: 5000,
 });
 
 app.register(cors, {
