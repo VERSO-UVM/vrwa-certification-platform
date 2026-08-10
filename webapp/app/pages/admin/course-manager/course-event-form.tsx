@@ -200,7 +200,7 @@ export function CourseEventForm({ onCreate, event }: CourseEventFormProps) {
         <Field orientation="horizontal">
           <Button type="submit" className="w-full">
             {" "}
-            {event ? "Update Course Event" : "Create Course Event"}{" "}
+            {event ? "Update Training Session" : "Add Training Session"}{" "}
           </Button>
         </Field>
       </FieldGroup>

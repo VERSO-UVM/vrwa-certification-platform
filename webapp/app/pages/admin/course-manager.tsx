@@ -217,7 +217,7 @@ export default function CourseManager() {
               <DrawerContent>
                 <DrawerHeader>
                   <DrawerTitle>
-                    {selectedEvent ? "Edit Course Event" : "New Course Event"}
+                    {selectedEvent ? "Edit Training Session" : "New Training Session"}
                   </DrawerTitle>
                   <DrawerDescription>
                     {selectedEvent

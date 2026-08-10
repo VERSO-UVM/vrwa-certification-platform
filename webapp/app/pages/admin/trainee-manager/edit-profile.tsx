@@ -19,6 +19,9 @@ export function TraineeEditButton({
         queryClient.invalidateQueries({
           queryKey: trpc.profiles.admin.listTrainees.queryKey(),
         });
+        queryClient.invalidateQueries({
+          queryKey: trpc.reservations.admin.listCourse.queryKey(),
+        });
       },
     }),
   );

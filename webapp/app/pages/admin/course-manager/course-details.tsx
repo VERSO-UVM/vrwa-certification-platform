@@ -34,7 +34,15 @@ import {
 import { PaymentStatusBadge } from "~/components/payment-status-badge";
 import { Badge } from "~/components/ui/badge";
 import { Link } from "react-router";
-import { Users, CreditCard, Calendar, TriangleAlert, FileExclamationPoint, Trash } from "lucide-react";
+import {
+  Users,
+  CreditCard,
+  Calendar,
+  TriangleAlert,
+  FileExclamationPoint,
+  Trash,
+  ArrowLeft,
+} from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -46,7 +54,7 @@ import { NewCourseForm } from "~/pages/admin/course-manager/course-form";
 import type { Route } from "./+types/course-details";
 import { EditTraineeReservation } from "../trainee-manager/edit-reservation";
 import { CourseEventForm } from "./course-event-form";
-import { AddCourseEventButton } from "./add-course-event-button";
+import { AddCourseEventButton as UpdateCourseEventButton } from "./add-course-event-button";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
@@ -59,7 +67,13 @@ export default function CourseDetails({
   const client = useTRPCClient();
   const queryClient = useQueryClient();
   const updateMutation = useMutation(
-    trpc.courseEvents.admin.update.mutationOptions(),
+    trpc.courseEvents.admin.update.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.courseEvents.admin.listCourse.queryKey(),
+        });
+      },
+    }),
   );
 
   const course = useQuery(
@@ -220,6 +234,11 @@ export default function CourseDetails({
 
   return (
     <div className="flex-1">
+      <Button className="p-6" variant="ghost" asChild>
+        <Link to="/admin/course-manager">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Courses
+        </Link>
+      </Button>
       <PageHeader>{course.data?.courseName}</PageHeader>
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-3">
         <Card className="@xl:col-span-1" variant="green">
@@ -379,7 +398,7 @@ export default function CourseDetails({
                     );
                   })}
                 </TabsList>
-                <AddCourseEventButton courseEvent={null} />
+                <UpdateCourseEventButton courseEvent={null} />
               </div>
               {courseEvents.data?.map((event) => (
                 <TabsContent key={event.id} value={event.id}>
