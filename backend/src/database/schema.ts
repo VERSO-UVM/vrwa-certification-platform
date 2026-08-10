@@ -105,7 +105,7 @@ export const courseCredit = pgTable(
     hours: creditHourPrecision.notNull(),
   },
   (table) => [
-    primaryKey({ name: "id", columns: [table.courseId, table.type] }),
+    primaryKey({ columns: [table.courseId, table.type] }),
   ],
 );
 
@@ -130,7 +130,6 @@ export const attendance = pgTable(
   },
   (table) => [
     primaryKey({
-      name: "id",
       columns: [table.profileId, table.courseId, table.type],
     }),
   ],
