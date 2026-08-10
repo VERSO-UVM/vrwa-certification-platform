@@ -61,7 +61,7 @@ export function NewCourseForm({ onCreate, course }: NewCourseFormProps) {
       <FieldGroup>
         <Field>
           <FieldLabel htmlFor="courseName">
-            Course <span className="text-destructive">*</span>
+            Course Name <span className="text-destructive">*</span>
           </FieldLabel>
           <Input
             id="courseName"

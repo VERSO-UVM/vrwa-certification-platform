@@ -1,11 +1,17 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import type { PaymentStatus, Profile } from "@backend/database/schema";
 import { type ColumnDef } from "@tanstack/react-table";
 import type { ReservationDto } from "@backend/database/dtos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { PageHeader } from "~/components/page-header";
-import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "~/components/ui/card";
 import { useTRPC, useTRPCClient } from "~/utils/trpc";
 import { DataTable } from "~/components/data-table";
 import { Button } from "~/components/ui/button";
@@ -28,7 +34,7 @@ import {
 import { PaymentStatusBadge } from "~/components/payment-status-badge";
 import { Badge } from "~/components/ui/badge";
 import { Link } from "react-router";
-import { Users, CreditCard, Calendar, History } from "lucide-react";
+import { Users, CreditCard, Calendar, TriangleAlert, FileExclamationPoint, Trash } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -38,6 +44,9 @@ import {
 } from "~/components/ui/drawer";
 import { NewCourseForm } from "~/pages/admin/course-manager/course-form";
 import type { Route } from "./+types/course-details";
+import { EditTraineeReservation } from "../trainee-manager/edit-reservation";
+import { CourseEventForm } from "./course-event-form";
+import { AddCourseEventButton } from "./add-course-event-button";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
@@ -49,6 +58,9 @@ export default function CourseDetails({
   const trpc = useTRPC();
   const client = useTRPCClient();
   const queryClient = useQueryClient();
+  const updateMutation = useMutation(
+    trpc.courseEvents.admin.update.mutationOptions(),
+  );
 
   const course = useQuery(
     trpc.courses.admin.get.queryOptions({ id: courseId! }),
@@ -115,23 +127,6 @@ export default function CourseDetails({
     return (paid / reservationsList.length) * 100;
   }
 
-  //separating upcoming and past events
-  const upcomingEvents = [];
-  const pastEvents = [];
-  const date = Date.now();
-
-  for (let i = 0; i < reservationsList.length; i++) {
-    let eventTime = new Date(
-      reservationsList[i]?.classStartDatetime ?? "",
-    ).getTime();
-
-    if (eventTime > date) {
-      upcomingEvents.push(reservationsList[i]);
-    } else {
-      pastEvents.push(reservationsList[i]);
-    }
-  }
-
   //for if the course gets deleted
   const [courseDeleted, setCourseDeleted] = useState<boolean | false>(false);
 
@@ -143,6 +138,8 @@ export default function CourseDetails({
   );
   const activeEventId = selectedTab ?? eventIds[0] ?? "";
 
+  const selectedEvent =
+    events.find((event) => event.id == activeEventId) || null;
   const openRoster = activeEventId
     ? (reservationsByEvent[activeEventId] ?? [])
     : [];
@@ -156,52 +153,56 @@ export default function CourseDetails({
   );
 
   //Data Table
-  const rosterTableDef: ColumnDef<ReservationDto>[] = [
-    {
-      accessorKey: "lastName",
-      header: "Last Name",
-    },
-    {
-      accessorKey: "firstName",
-      header: "First Name",
-    },
-    {
-      accessorKey: "creditHours",
-      header: "Awarded Hours",
-    },
-    {
-      accessorKey: "isMember",
-      header: "Member Status",
-      cell: ({ getValue }) =>
-        getValue() == true ? (
-          <Badge variant="member"> Member</Badge>
-        ) : (
-          <Badge variant="not_member"> Non-Member</Badge>
-        ),
-    },
-    {
-      accessorKey: "paymentStatus",
-      header: "Payment Status",
-      cell: ({ getValue }) => (
-        <PaymentStatusBadge value={getValue() as PaymentStatus} />
-      ),
-    },
-    {
-      id: "actions",
-      cell: ({ row }) => {
-        return (
-          <Button
-            variant="destructive"
-            onClick={() =>
-              deleteRow(row.original.profileId, row.original.courseEventId)
-            }
-          >
-            Remove Trainee
-          </Button>
-        );
+  const rosterTableDef: ColumnDef<ReservationDto>[] = useMemo(
+    () => [
+      {
+        accessorKey: "lastName",
+        header: "Last Name",
       },
-    },
-  ];
+      {
+        accessorKey: "firstName",
+        header: "First Name",
+      },
+      {
+        accessorKey: "creditHours",
+        header: "Awarded Hours",
+      },
+      {
+        accessorKey: "isMember",
+        header: "Member Status",
+        cell: ({ getValue }) =>
+          getValue() == true ? (
+            <Badge variant="member"> Member</Badge>
+          ) : (
+            <Badge variant="not_member"> Non-Member</Badge>
+          ),
+      },
+      {
+        accessorKey: "paymentStatus",
+        header: "Payment Status",
+        cell: ({ getValue }) => (
+          <PaymentStatusBadge value={getValue() as PaymentStatus} />
+        ),
+      },
+      {
+        id: "actions",
+        cell: ({ row }) => {
+          return <EditTraineeReservation reservation={row.original} />;
+          return (
+            <Button
+              variant="destructive"
+              onClick={() =>
+                deleteRow(row.original.profileId, row.original.courseEventId)
+              }
+            >
+              Remove Trainee
+            </Button>
+          );
+        },
+      },
+    ],
+    [],
+  );
 
   if (courseDeleted) {
     return (
@@ -220,8 +221,8 @@ export default function CourseDetails({
   return (
     <div className="flex-1">
       <PageHeader>{course.data?.courseName}</PageHeader>
-      <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
-        <Card className="@xl: col-span-2" variant="green">
+      <div className="grid gap-4 grid-cols-1 @xl:grid-cols-3">
+        <Card className="@xl:col-span-1" variant="green">
           <CardContent className="p-6 flex items-center gap-4">
             <Users className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
@@ -230,7 +231,7 @@ export default function CourseDetails({
             </div>
           </CardContent>
         </Card>
-        <Card className="@xl: col-span-2" variant="green">
+        <Card className="@xl:col-span-1" variant="green">
           <CardContent className="p-6 flex items-center gap-4">
             <CreditCard className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
@@ -241,29 +242,43 @@ export default function CourseDetails({
             </div>
           </CardContent>
         </Card>
-        <Card className="@xl: col-span-2" variant="green">
+        <Card className="@xl:col-span-1" variant="green">
           <CardContent className="p-6 flex items-center gap-4">
             <Calendar className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
-              <p className="text-sm text-muted-foreground">Upcoming Events</p>
-              <p className="text-3xl font-bold">{upcomingEvents.length}</p>
+              <p className="text-sm text-muted-foreground"># Sessions</p>
+              <p className="text-3xl font-bold">{reservationsList.length}</p>
             </div>
           </CardContent>
         </Card>
-        <Card className="@xl: col-span-2" variant="green">
-          <CardContent className="p-6 flex items-center gap-4">
-            <History className="w-10 h-10 text-muted-foreground" />
-            <div className="flex flex-col">
-              <p className="text-sm text-muted-foreground">Past Events</p>
-              <p className="text-3xl font-bold">{pastEvents.length}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="@xl:col-span-2" variant="green">
+        <Card className="col-span-full" variant="green">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-semibold">
-              {" "}
-              <u>Course Overview</u>
+            <CardTitle className="text-xl flex justify-between">
+              <div className="font-semibold underline">Course Overview</div>
+              <Button
+                variant="destructive"
+                size="lg"
+                className=""
+                onClick={async () => {
+                  if (
+                    confirm(
+                      "Are you sure you want to delete this course? All course information and reservations will be lost.",
+                    )
+                  ) {
+                    await client.courses.admin.delete.mutate({
+                      id: courseId!,
+                    });
+                    await queryClient.invalidateQueries({
+                      queryKey: trpc.courses.admin.list.queryKey(),
+                    });
+                    setCourseDeleted(true);
+                  } else {
+                    return;
+                  }
+                }}
+              >
+                <Trash /> Delete Course
+              </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -335,36 +350,58 @@ export default function CourseDetails({
                     setCourseDrawerOpen(true);
                   }}
                 >
-                  Update Course
+                  Update Details
                 </Button>
               </div>
-              <div>
-                <Button
-                  variant="destructive"
-                  size="lg"
-                  className="w-full"
-                  onClick={async () => {
-                    if (
-                      confirm(
-                        "Are you sure you want to delete this course? All course information and reservations will be lost.",
-                      )
-                    ) {
-                      await client.courses.admin.delete.mutate({
-                        id: courseId!,
-                      });
-                      await queryClient.invalidateQueries({
-                        queryKey: trpc.courses.admin.list.queryKey(),
-                      });
-                      setCourseDeleted(true);
-                    } else {
-                      return;
-                    }
-                  }}
-                >
-                  Delete Course
-                </Button>
-              </div>
+              <div></div>
             </div>
+          </CardContent>
+        </Card>
+        <Card variant="green" className="col-span-full">
+          <CardHeader>
+            <CardTitle>Training Sessions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs
+              value={selectedTab ?? eventIds[0] ?? ""}
+              onValueChange={setSelectedTab}
+            >
+              <div className="flex justify-between">
+                <TabsList variant="line">
+                  {courseEvents.data?.map((event) => {
+                    const date = event.classStartDatetime
+                      ? new Date(event.classStartDatetime)
+                      : null;
+                    return (
+                      <TabsTrigger key={event.id} value={event.id}>
+                        {date ? date.toLocaleDateString() : "-"}
+                      </TabsTrigger>
+                    );
+                  })}
+                </TabsList>
+                <AddCourseEventButton courseEvent={null} />
+              </div>
+              {courseEvents.data?.map((event) => (
+                <TabsContent key={event.id} value={event.id}>
+                  <CourseEventForm
+                    key={selectedEvent?.courseId ?? "new"}
+                    event={selectedEvent}
+                    onCreate={async (data) => {
+                      console.log("heyyy", selectedEvent, data);
+                      if (selectedEvent) {
+                        await updateMutation.mutate({
+                          id: selectedEvent.id,
+                          ...data,
+                        });
+                        await queryClient.invalidateQueries({
+                          queryKey: trpc.courseEvents.admin.list.queryKey(),
+                        });
+                      }
+                    }}
+                  />
+                </TabsContent>
+              ))}
+            </Tabs>
           </CardContent>
         </Card>
         <Card className="@xl:col-span-6" variant="green">
@@ -379,37 +416,13 @@ export default function CourseDetails({
                 </Badge>
               }
             </CardTitle>
+            <CardDescription></CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs
-              value={selectedTab ?? eventIds[0] ?? ""}
-              onValueChange={setSelectedTab}
-            >
-              <TabsList variant="line">
-                {courseEvents.data?.map((event) => {
-                  const date = event.classStartDatetime
-                    ? new Date(event.classStartDatetime)
-                    : null;
-                  return (
-                    <TabsTrigger key={event.id} value={event.id}>
-                      {date ? date.toLocaleDateString() : "-"}
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
-              {courseEvents.data?.map((event) => (
-                <TabsContent key={event.id} value={event.id}>
-                  <Card variant="green">
-                    <CardContent>
-                      <DataTable
-                        columns={rosterTableDef}
-                        data={reservationsByEvent[event.id] as ReservationDto[]}
-                      />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              ))}
-            </Tabs>
+            <DataTable
+              columns={rosterTableDef}
+              data={reservationsByEvent[activeEventId]}
+            />
             <div className="flex justify-end mt-4 pr-4">
               <Dialog
                 open={traineePopupOpen}

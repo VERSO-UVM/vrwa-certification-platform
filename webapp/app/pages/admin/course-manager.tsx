@@ -63,6 +63,11 @@ export default function CourseManager() {
     {
       accessorKey: "courseName",
       header: "Course",
+      cell: ({ row, getValue }) => (
+        <Link to={`/admin/course-details/${row.original.courseId}`} className="font-medium">
+          {getValue() as string}
+        </Link>
+      ),
     },
 
     {
@@ -179,13 +184,19 @@ export default function CourseManager() {
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-8">
         <Card className="@xl:col-span-8" variant="blue">
           <CardHeader>
-            <CardTitle>Classes Overview</CardTitle>
+            <CardTitle>Courses Overview</CardTitle>
             <CardDescription>
-              Quickly edit or remove existing course events.
+              Click on a course to see more details!
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <DataTable columns={columnsCourseEvents} data={courseEvents} />
+            <DataTable
+              columns={columnsCourseEvents}
+              data={courseEvents}
+              table={{
+                enableRowSelection: false,
+              }}
+            />
           </CardContent>
           <div className="flex justify-end mb-4 pr-4">
             <Button
@@ -196,7 +207,7 @@ export default function CourseManager() {
                 setCourseEventDrawerOpen(true);
               }}
             >
-              + Create New Course Event
+              + Create New Course
             </Button>
             <Drawer
               direction="right"
@@ -236,47 +247,6 @@ export default function CourseManager() {
                         });
                       }
                       setCourseEventDrawerOpen(false);
-                    }}
-                  />
-                </div>
-              </DrawerContent>
-            </Drawer>
-          </div>
-        </Card>
-        <Card className="@xl:col-span-8" variant="yellow">
-          <CardHeader>
-            <CardTitle>Courses Overview</CardTitle>
-            <CardDescription>
-              Click on a course to see more details!
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <DataTable columns={columnsCourses} data={courses} />
-          </CardContent>
-          <div className="flex justify-end mb-4 pr-4">
-            <Drawer
-              direction="right"
-              open={courseDrawerOpen}
-              onOpenChange={setCourseDrawerOpen}
-            >
-              <DrawerTrigger asChild>
-                <Button variant="secondary" size="lg">
-                  + Create New Course{" "}
-                </Button>
-              </DrawerTrigger>
-              <DrawerContent>
-                <DrawerHeader>
-                  <DrawerTitle>New Course</DrawerTitle>
-                  <DrawerDescription>Create a new course</DrawerDescription>
-                </DrawerHeader>
-                <div className="no-scrollbar overflow-y-auto px-4">
-                  <NewCourseForm
-                    onCreate={async (data) => {
-                      await client.courses.admin.create.mutate(data);
-                      await queryClient.invalidateQueries({
-                        queryKey: trpc.courses.admin.list.queryKey(),
-                      });
-                      setCourseDrawerOpen(false);
                     }}
                   />
                 </div>
