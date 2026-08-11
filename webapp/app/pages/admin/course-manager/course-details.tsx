@@ -88,17 +88,8 @@ export default function CourseDetails({
   );
 
   //grouping reservations by courseEventId to easily access rosters
-  const reservationsList = reservations.data ?? [];
+  const roster = reservations.data ?? [];
   const events = courseEvents.data ?? [];
-
-  const reservationsByEvent: Record<string, ReservationDto[]> =
-    Object.fromEntries(events.map((e) => [e.id, []]));
-
-  for (const r of reservationsList) {
-    if (r.courseEventId && reservationsByEvent[r.courseEventId]) {
-      reservationsByEvent[r.courseEventId]?.push(r);
-    }
-  }
 
   //getting courseEvents for tabs
   const eventIds = courseEvents.data?.map((e) => e.id) ?? [];
@@ -115,22 +106,16 @@ export default function CourseDetails({
     });
   }
 
-  //determining if a roster has reached capacity
-  function classFull(courseEventId: string) {
-    const roster = reservationsByEvent[courseEventId] ?? [];
-
-    const seats = course.data?.seats ?? 0;
-
-    return roster.length >= seats;
-  }
+  const seats = course.data?.seats ?? 0;
+  const classFull = roster.length >= seats;
 
   //what percentage of trainees enrolled have paid their fees
   function percentagePaid() {
     let paid = 0;
-    for (let i = 0; i < reservationsList.length; i++) {
-      if (reservationsList[i]?.paymentStatus == "paid") paid++;
+    for (let i = 0; i < roster.length; i++) {
+      if (roster[i]?.paymentStatus == "paid") paid++;
     }
-    return (paid / reservationsList.length) * 100;
+    return (paid / roster.length) * 100;
   }
 
   //for if the course gets deleted
@@ -146,10 +131,7 @@ export default function CourseDetails({
 
   const selectedEvent =
     events.find((event) => event.id == activeEventId) || null;
-  const openRoster = activeEventId
-    ? (reservationsByEvent[activeEventId] ?? [])
-    : [];
-  const rosterIds = new Set(openRoster.map((r) => r.profileId));
+  const rosterIds = new Set(roster.map((r) => r.profileId));
   const availableTrainees =
     trainees.data?.filter((t) => !rosterIds.has(t.id)) ?? [];
 
@@ -240,7 +222,7 @@ export default function CourseDetails({
             <Users className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
               <p className="text-sm text-muted-foreground">Total Enrollment</p>
-              <p className="text-3xl font-bold">{reservationsList.length}</p>
+              <p className="text-3xl font-bold">{roster.length}</p>
             </div>
           </CardContent>
         </Card>
@@ -260,7 +242,7 @@ export default function CourseDetails({
             <Calendar className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
               <p className="text-sm text-muted-foreground"># Sessions</p>
-              <p className="text-3xl font-bold">{reservationsList.length}</p>
+              <p className="text-3xl font-bold">{roster.length}</p>
             </div>
           </CardContent>
         </Card>
@@ -422,20 +404,15 @@ export default function CourseDetails({
             <CardTitle>
               Class Roster{" "}
               {
-                <Badge
-                  variant={classFull(activeEventId) ? "destructive" : "outline"}
-                >
-                  {classFull(activeEventId) ? "Full" : "Open"}
+                <Badge variant={classFull ? "destructive" : "outline"}>
+                  {classFull ? "Full" : "Open"}
                 </Badge>
               }
             </CardTitle>
             <CardDescription></CardDescription>
           </CardHeader>
           <CardContent>
-            <DataTable
-              columns={rosterTableDef}
-              data={reservationsByEvent[activeEventId]}
-            />
+            <DataTable columns={rosterTableDef} data={roster} />
             <div className="flex justify-end mt-4 pr-4">
               <Dialog
                 open={traineePopupOpen}
@@ -476,20 +453,20 @@ export default function CourseDetails({
 
                       await client.reservations.admin.create.mutate({
                         profileId: selectedTrainee,
-                        courseId: course.data?.id,
+                        courseId: courseId,
                         creditHours: course.data?.creditHours ?? 0,
                         paymentStatus: "unpaid",
                       });
 
                       await queryClient.invalidateQueries({
                         queryKey: trpc.reservations.admin.listCourse.queryKey({
-                          courseId: courseId!,
+                          courseId: courseId,
                         }),
                       });
 
                       setTraineePopupOpen(false);
                     }}
-                    disabled={classFull(activeEventId)}
+                    disabled={classFull}
                   >
                     add to roster
                   </Button>

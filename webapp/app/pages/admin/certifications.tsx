@@ -100,7 +100,7 @@ export default function CertificationsPage() {
         !recipients.find(
           (item) =>
             item.profileId == trainees[i]?.profileId ||
-            item.courseEventId == trainees[i]?.courseEventId,
+            item.courseId == trainees[i]?.courseId,
         )
       ) {
         newRecipients.push(trainees[i]);
@@ -120,9 +120,9 @@ export default function CertificationsPage() {
 
   const sendCertificates = () => {
     batchEmailMutation.mutate(
-      recipients.map(({ profileId, courseEventId }) => ({
+      recipients.map(({ profileId, courseId }) => ({
         profileId,
-        courseEventId,
+        courseId,
       })),
       {
         onSuccess: () => {
@@ -241,7 +241,7 @@ export default function CertificationsPage() {
                       <React.Fragment>
                         {values.map((item) => (
                           <ComboboxChip
-                            key={item.profileId + item.courseEventId}
+                            key={item.profileId + item.courseId}
                           >
                             {profileFullName(item)}
                           </ComboboxChip>
@@ -258,7 +258,7 @@ export default function CertificationsPage() {
                   <ComboboxList>
                     {(item: ReservationDto) => (
                       <ComboboxItem
-                        key={item.profileId + item.courseEventId}
+                        key={item.profileId + item.courseId}
                         value={item}
                       >
                         {profileFullName(item)}

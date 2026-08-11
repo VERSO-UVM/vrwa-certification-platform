@@ -39,6 +39,7 @@ export const profile = pgTable("profile", {
   phoneNumber: text().notNull(),
   isMember: boolean().notNull(),
 });
+
 export type Profile = typeof profile.$inferSelect;
 
 /* Round values to nearest thousandth: between 0.000 and 999.999 */

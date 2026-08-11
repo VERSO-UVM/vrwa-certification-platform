@@ -77,7 +77,7 @@ export const certificateRouter = router({
         z.array(
           z.object({
             profileId: z.string(),
-            courseEventId: z.string(),
+            courseId: z.string(),
           }),
         ),
       )

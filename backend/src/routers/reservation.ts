@@ -70,8 +70,8 @@ export const reservationRouter = router({
 
     list: adminProcedure.query(() =>
       reservationQuery().orderBy(
-        courseStartQuery.courseStart,
-        profile.firstName,
+        desc(courseStartQuery.courseStart),
+        asc(profile.lastName),
       ),
     ),
 
