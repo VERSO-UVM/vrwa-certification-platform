@@ -13,7 +13,12 @@ import {
   user,
   type Profile,
 } from "~/database/schema";
-import type { CourseEventDto, ReservationDto, UserDto } from "./dtos";
+import type {
+  CourseDto,
+  CourseEventDto,
+  ReservationDto,
+  UserDto,
+} from "./dtos";
 import db from ".";
 
 const { id: _, ...profileFields } = getColumns(profile);
@@ -92,7 +97,7 @@ export function usersWithProfilesQuery() {
     with: {
       profiles: true,
     },
-    orderBy: (user, { asc }) => [asc(user.name)],
+    orderBy: (user, { asc }) => [asc(user.email)],
   }) satisfies Promise<UserDto[]>;
 }
 
@@ -106,5 +111,5 @@ export function courseFindFirst(courseId?: string) {
         orderBy: (t, { asc }) => asc(t.id),
       },
     },
-  });
+  }) satisfies Promise<CourseDto | undefined>;
 }

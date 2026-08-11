@@ -24,6 +24,10 @@ export type ReservationDto = Reservation &
 export type CourseEventDto = CourseEvent &
   Pick<Course, "courseName" | "description" | "creditHours" | "priceCents" | "seats" | "instructorId">;
 
+export type CourseDto = Course & {
+  sessions: CourseEvent[],
+};
+
 export const ProfileDtoSchema = createSelectSchema(profile);
 export type ProfileDto = z.infer<typeof ProfileDtoSchema>;
 
