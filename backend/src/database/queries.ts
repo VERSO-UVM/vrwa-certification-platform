@@ -4,7 +4,7 @@
  * when possible. These are like database views but database views
  * add a lot of hassle for little benefit for our use cases.
  */
-import { asc, eq, getTableColumns, min } from "drizzle-orm";
+import { asc, eq, getColumns, min } from "drizzle-orm";
 import {
   course,
   courseEvent,
@@ -16,8 +16,8 @@ import {
 import type { CourseEventDto, ReservationDto, UserDto } from "./dtos";
 import db from ".";
 
-const { id: _, ...profileFields } = getTableColumns(profile);
-const reservationFields = getTableColumns(reservation);
+const { id: _, ...profileFields } = getColumns(profile);
+const reservationFields = getColumns(reservation);
 
 export function reservationQuery() {
   // Subquery: want date of first course session
@@ -54,7 +54,7 @@ export function reservationQuery() {
 export function courseEventQuery() {
   return db.client
     .select({
-      ...getTableColumns(courseEvent),
+      ...getColumns(courseEvent),
       seats: course.seats,
       instructorId: course.instructorId,
       courseName: course.courseName,
@@ -71,7 +71,7 @@ export function courseEventQuery() {
 export function profilesQuery() {
   return db.client
     .select({
-      ...getTableColumns(profile),
+      ...getColumns(profile),
     })
     .from(profile)
     .orderBy(asc(profile.lastName))
