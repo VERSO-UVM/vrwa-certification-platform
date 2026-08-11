@@ -1,0 +1,1 @@
+CREATE TYPE "creditHourType" AS ENUM('wastewater', 'waterCategoryOne', 'waterCategoryTwo', 'waterCategoryThree');
