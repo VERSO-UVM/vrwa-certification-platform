@@ -1,11 +1,21 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "7b58c0dc-8d92-46db-9b66-3e0b1478cec7",
+  "id": "1dbc274e-463b-475d-bfc1-509736d2c9c8",
   "prevIds": [
-    "7abec418-b89a-4ac3-a687-b5dbaa52378a"
+    "00000000-0000-0000-0000-000000000000"
   ],
   "ddl": [
+    {
+      "values": [
+        "in-person",
+        "virtual",
+        "hybrid"
+      ],
+      "name": "courseLocation",
+      "entityType": "enums",
+      "schema": "public"
+    },
     {
       "values": [
         "active",
@@ -13,6 +23,26 @@
         "canceled"
       ],
       "name": "courseStatus",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "wastewater",
+        "waterCategoryOne",
+        "waterCategoryTwo",
+        "waterCategoryThree"
+      ],
+      "name": "creditHourType",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "paid",
+        "unpaid"
+      ],
+      "name": "paymentStatus",
       "entityType": "enums",
       "schema": "public"
     },
@@ -30,13 +60,13 @@
     },
     {
       "isRlsEnabled": false,
-      "name": "courseCredit",
+      "name": "courseEvent",
       "entityType": "tables",
       "schema": "public"
     },
     {
       "isRlsEnabled": false,
-      "name": "courseEvent",
+      "name": "courseCredit",
       "entityType": "tables",
       "schema": "public"
     },
@@ -271,45 +301,6 @@
       "default": null,
       "generated": null,
       "identity": null,
-      "name": "courseId",
-      "entityType": "columns",
-      "schema": "public",
-      "table": "courseCredit"
-    },
-    {
-      "type": "varchar",
-      "typeSchema": null,
-      "notNull": true,
-      "dimensions": 0,
-      "default": null,
-      "generated": null,
-      "identity": null,
-      "name": "type",
-      "entityType": "columns",
-      "schema": "public",
-      "table": "courseCredit"
-    },
-    {
-      "type": "numeric(6,3)",
-      "typeSchema": null,
-      "notNull": true,
-      "dimensions": 0,
-      "default": null,
-      "generated": null,
-      "identity": null,
-      "name": "hours",
-      "entityType": "columns",
-      "schema": "public",
-      "table": "courseCredit"
-    },
-    {
-      "type": "varchar",
-      "typeSchema": null,
-      "notNull": true,
-      "dimensions": 0,
-      "default": null,
-      "generated": null,
-      "identity": null,
       "name": "id",
       "entityType": "columns",
       "schema": "public",
@@ -379,6 +370,58 @@
       "entityType": "columns",
       "schema": "public",
       "table": "courseEvent"
+    },
+    {
+      "type": "interval",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "duration",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "courseEvent"
+    },
+    {
+      "type": "varchar",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "courseId",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "courseCredit"
+    },
+    {
+      "type": "creditHourType",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "type",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "courseCredit"
+    },
+    {
+      "type": "numeric(6,3)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "hours",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "courseCredit"
     },
     {
       "type": "varchar",
@@ -550,14 +593,27 @@
       "table": "reservation"
     },
     {
-      "type": "varchar",
-      "typeSchema": null,
+      "type": "paymentStatus",
+      "typeSchema": "public",
       "notNull": true,
       "dimensions": 0,
       "default": null,
       "generated": null,
       "identity": null,
       "name": "paymentStatus",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "reservation"
+    },
+    {
+      "type": "timestamp",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "createdAt",
       "entityType": "columns",
       "schema": "public",
       "table": "reservation"
@@ -1563,7 +1619,7 @@
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
-      "name": "attendance_profileId_profile_id_fk",
+      "name": "attendance_profileId_profile_id_fkey",
       "entityType": "fks",
       "schema": "public",
       "table": "attendance"
@@ -1580,7 +1636,7 @@
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
-      "name": "attendance_courseId_course_id_fk",
+      "name": "attendance_courseId_course_id_fkey",
       "entityType": "fks",
       "schema": "public",
       "table": "attendance"
@@ -1597,7 +1653,7 @@
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
-      "name": "course_instructorId_profile_id_fk",
+      "name": "course_instructorId_profile_id_fkey",
       "entityType": "fks",
       "schema": "public",
       "table": "course"
@@ -1613,11 +1669,11 @@
         "id"
       ],
       "onUpdate": "NO ACTION",
-      "onDelete": "NO ACTION",
-      "name": "courseCredit_courseId_course_id_fk",
+      "onDelete": "CASCADE",
+      "name": "courseEvent_courseId_course_id_fkey",
       "entityType": "fks",
       "schema": "public",
-      "table": "courseCredit"
+      "table": "courseEvent"
     },
     {
       "nameExplicit": false,
@@ -1630,11 +1686,11 @@
         "id"
       ],
       "onUpdate": "NO ACTION",
-      "onDelete": "CASCADE",
-      "name": "courseEvent_courseId_course_id_fk",
+      "onDelete": "NO ACTION",
+      "name": "courseCredit_courseId_course_id_fkey",
       "entityType": "fks",
       "schema": "public",
-      "table": "courseEvent"
+      "table": "courseCredit"
     },
     {
       "nameExplicit": false,
@@ -1648,7 +1704,7 @@
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
-      "name": "profile_userId_user_id_fk",
+      "name": "profile_userId_user_id_fkey",
       "entityType": "fks",
       "schema": "public",
       "table": "profile"
@@ -1665,7 +1721,7 @@
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
-      "name": "reservation_profileId_profile_id_fk",
+      "name": "reservation_profileId_profile_id_fkey",
       "entityType": "fks",
       "schema": "public",
       "table": "reservation"
@@ -1699,7 +1755,7 @@
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
-      "name": "account_user_id_user_id_fk",
+      "name": "account_user_id_user_id_fkey",
       "entityType": "fks",
       "schema": "public",
       "table": "account"
@@ -1716,7 +1772,7 @@
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
-      "name": "invitation_organization_id_organization_id_fk",
+      "name": "invitation_organization_id_organization_id_fkey",
       "entityType": "fks",
       "schema": "public",
       "table": "invitation"
@@ -1733,7 +1789,7 @@
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
-      "name": "invitation_inviter_id_user_id_fk",
+      "name": "invitation_inviter_id_user_id_fkey",
       "entityType": "fks",
       "schema": "public",
       "table": "invitation"
@@ -1750,7 +1806,7 @@
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
-      "name": "member_organization_id_organization_id_fk",
+      "name": "member_organization_id_organization_id_fkey",
       "entityType": "fks",
       "schema": "public",
       "table": "member"
@@ -1767,7 +1823,7 @@
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
-      "name": "member_user_id_user_id_fk",
+      "name": "member_user_id_user_id_fkey",
       "entityType": "fks",
       "schema": "public",
       "table": "member"
@@ -1784,7 +1840,7 @@
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
-      "name": "session_user_id_user_id_fk",
+      "name": "session_user_id_user_id_fkey",
       "entityType": "fks",
       "schema": "public",
       "table": "session"
@@ -1796,7 +1852,7 @@
         "type"
       ],
       "nameExplicit": false,
-      "name": "attendance_profileId_courseId_type_pk",
+      "name": "attendance_pkey",
       "entityType": "pks",
       "schema": "public",
       "table": "attendance"
@@ -1807,7 +1863,7 @@
         "type"
       ],
       "nameExplicit": false,
-      "name": "courseCredit_courseId_type_pk",
+      "name": "courseCredit_pkey",
       "entityType": "pks",
       "schema": "public",
       "table": "courseCredit"
@@ -1929,7 +1985,7 @@
         "slug"
       ],
       "nullsNotDistinct": false,
-      "name": "organization_slug_unique",
+      "name": "organization_slug_key",
       "schema": "public",
       "table": "organization",
       "entityType": "uniques"
@@ -1940,7 +1996,7 @@
         "token"
       ],
       "nullsNotDistinct": false,
-      "name": "session_token_unique",
+      "name": "session_token_key",
       "schema": "public",
       "table": "session",
       "entityType": "uniques"
@@ -1951,7 +2007,7 @@
         "email"
       ],
       "nullsNotDistinct": false,
-      "name": "user_email_unique",
+      "name": "user_email_key",
       "schema": "public",
       "table": "user",
       "entityType": "uniques"

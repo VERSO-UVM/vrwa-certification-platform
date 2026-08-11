@@ -1,1 +1,0 @@
-ALTER TABLE "courseCredit" ALTER COLUMN "type" SET DATA TYPE "creditHourType" USING "type"::"creditHourType";
