@@ -4,7 +4,6 @@ import {
   text,
   integer,
   timestamp,
-  boolean,
   primaryKey,
   decimal,
   pgEnum,
@@ -20,14 +19,9 @@ import { prefixedIdGenerator } from "~/utils/id";
 // through the instructions in the README.
 export * from "../../drizzle/auth-schema";
 import { user, account } from "../../drizzle/auth-schema";
-export type User = typeof user.$inferSelect;
-export type Account = typeof account.$inferSelect;
 
 /*----------------*/
 /* --- Enums --- */
-
-// Drizzle-posgres currently works best with inference and validation
-// (and performance) using proper DB enums.
 
 /* Rather than deleting whole courses from the database
  * it's much better to just mark them as deleted. */
@@ -55,6 +49,8 @@ export enum CreditHourType {
   WaterCategoryThree = "waterCategoryThree",
 }
 
+// Drizzle-posgres currently works best with inference and validation using proper
+// DB enums. Also has better performance than a string and support for migrations.
 export const courseStatusEnum = pgEnum("courseStatus", CourseStatus);
 export const courseLocationEnum = pgEnum("courseLocation", CourseLocation);
 export const paymentStatusEnum = pgEnum("paymentStatus", PaymentStatus);
@@ -80,7 +76,10 @@ export const profile = pgTable("profile", {
   state: text().notNull(),
   postalCode: text().notNull(),
   phoneNumber: text().notNull(),
-  isMember: boolean().notNull(),
+  /* Match VRWA's existing organization/association field
+   * This is user supplied. Admins can reference this when
+   * they put people in actual member organizations. */
+  association: text(),
 });
 
 /**
@@ -90,16 +89,16 @@ export const profile = pgTable("profile", {
  * from a previous course, but it is a distinct course.
  */
 export const course = pgTable("course", {
-  // This field may already exist as a different type in the VRWA db - it may change in the future
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("course")),
   courseName: text().notNull(),
   description: text(),
+    // refactor: remove course.creditHours
   creditHours: integer().notNull(),
   priceCents: integer().notNull(),
   seats: integer().notNull(),
-  instructorId: varchar().references(() => profile.id), // MOVE TO instructorId
+  instructorId: varchar().references(() => profile.id),
   status: courseStatusEnum().notNull().default(CourseStatus.Active),
-  /* Eg. "exam" */
+  /* Some courses have tags, like, "exam" */
   tags: text()
     .array()
     .notNull()
@@ -119,7 +118,7 @@ export const courseEvent = pgTable("courseEvent", {
   locationType: varchar().notNull().$type<CourseLocation>(),
   virtualLink: text(),
   physicalAddress: text(),
-  // refactor: rename to startsAt
+  // refactor: rename to startDate or startsAt
   classStartDatetime: timestamp({ withTimezone: true }),
   duration: interval(),
 });
@@ -147,10 +146,10 @@ export const reservation = pgTable(
   ],
 );
 
-/* A course's "default" credit hours. It is a type and a number of hours
- * and it enforces uniqueness by the type for a given course. */
-export const courseOffering = pgTable(
-  "courseCredit",
+/* A course's "default" credit hours. It is a type and a number of credit
+ * hours. It enforces uniqueness by the type for a given course. */
+export const courseMatter = pgTable(
+  "courseMatter",
   {
     courseId: varchar()
       .references(() => course.id)
@@ -158,7 +157,7 @@ export const courseOffering = pgTable(
     type: creditHourTypeEnum().notNull(),
 
     /* Round values to nearest thousandth: between 0.000 and 999.999 */
-    hours: decimal({ precision: 6, scale: 3 }).notNull(),
+    creditHours: decimal({ precision: 6, scale: 3 }).notNull(),
   },
   (table) => [primaryKey({ columns: [table.courseId, table.type] })],
 );
@@ -168,7 +167,7 @@ export const courseOffering = pgTable(
  * This is for the whole course and not a courseEvent
  * because VRWA keeps track of credit hours by the course.
  */
-export const attendance = pgTable(
+export const attendanceRecord = pgTable(
   "attendance",
   {
     profileId: varchar("profileId")
@@ -180,7 +179,7 @@ export const attendance = pgTable(
     type: varchar().notNull().$type<CreditHourType>(),
 
     /* Round values to nearest thousandth: between 0.000 and 999.999 */
-    hours: decimal({ precision: 6, scale: 3 }).notNull(),
+    creditHours: decimal({ precision: 6, scale: 3 }).notNull(),
   },
   (table) => [
     primaryKey({
@@ -189,9 +188,11 @@ export const attendance = pgTable(
   ],
 );
 
+export type User = typeof user.$inferSelect;
+export type Account = typeof account.$inferSelect;
 export type Profile = typeof profile.$inferSelect;
 export type CourseEvent = typeof courseEvent.$inferSelect;
 export type Reservation = typeof reservation.$inferSelect;
 export type Course = typeof course.$inferSelect;
-export type CourseOffering = typeof courseOffering.$inferSelect;
-export type Attendance = typeof attendance.$inferSelect;
+export type CourseMatter = typeof courseMatter.$inferSelect;
+export type AttendanceRecord = typeof attendanceRecord.$inferSelect;

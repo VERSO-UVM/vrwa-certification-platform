@@ -6,7 +6,7 @@ CREATE TABLE "attendance" (
 	"profileId" varchar,
 	"courseId" varchar,
 	"type" varchar,
-	"hours" numeric(6,3) NOT NULL,
+	"creditHours" numeric(6,3) NOT NULL,
 	CONSTRAINT "attendance_pkey" PRIMARY KEY("profileId","courseId","type")
 );
 --> statement-breakpoint
@@ -32,11 +32,11 @@ CREATE TABLE "courseEvent" (
 	"duration" interval
 );
 --> statement-breakpoint
-CREATE TABLE "courseCredit" (
+CREATE TABLE "courseMatter" (
 	"courseId" varchar,
 	"type" "creditHourType",
-	"hours" numeric(6,3) NOT NULL,
-	CONSTRAINT "courseCredit_pkey" PRIMARY KEY("courseId","type")
+	"creditHours" numeric(6,3) NOT NULL,
+	CONSTRAINT "courseMatter_pkey" PRIMARY KEY("courseId","type")
 );
 --> statement-breakpoint
 CREATE TABLE "profile" (
@@ -49,7 +49,7 @@ CREATE TABLE "profile" (
 	"state" text NOT NULL,
 	"postalCode" text NOT NULL,
 	"phoneNumber" text NOT NULL,
-	"isMember" boolean NOT NULL
+	"association" text
 );
 --> statement-breakpoint
 CREATE TABLE "reservation" (
@@ -156,7 +156,7 @@ ALTER TABLE "attendance" ADD CONSTRAINT "attendance_profileId_profile_id_fkey" F
 ALTER TABLE "attendance" ADD CONSTRAINT "attendance_courseId_course_id_fkey" FOREIGN KEY ("courseId") REFERENCES "course"("id");--> statement-breakpoint
 ALTER TABLE "course" ADD CONSTRAINT "course_instructorId_profile_id_fkey" FOREIGN KEY ("instructorId") REFERENCES "profile"("id");--> statement-breakpoint
 ALTER TABLE "courseEvent" ADD CONSTRAINT "courseEvent_courseId_course_id_fkey" FOREIGN KEY ("courseId") REFERENCES "course"("id") ON DELETE CASCADE;--> statement-breakpoint
-ALTER TABLE "courseCredit" ADD CONSTRAINT "courseCredit_courseId_course_id_fkey" FOREIGN KEY ("courseId") REFERENCES "course"("id");--> statement-breakpoint
+ALTER TABLE "courseMatter" ADD CONSTRAINT "courseMatter_courseId_course_id_fkey" FOREIGN KEY ("courseId") REFERENCES "course"("id");--> statement-breakpoint
 ALTER TABLE "profile" ADD CONSTRAINT "profile_userId_user_id_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id");--> statement-breakpoint
 ALTER TABLE "reservation" ADD CONSTRAINT "reservation_profileId_profile_id_fkey" FOREIGN KEY ("profileId") REFERENCES "profile"("id");--> statement-breakpoint
 ALTER TABLE "reservation" ADD CONSTRAINT "reservation_courseId_course_id_fkey" FOREIGN KEY ("courseId") REFERENCES "course"("id") ON DELETE CASCADE;--> statement-breakpoint

@@ -1,7 +1,7 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "1dbc274e-463b-475d-bfc1-509736d2c9c8",
+  "id": "3d7e4532-89bb-4534-8cac-7a4574c064d2",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -66,7 +66,7 @@
     },
     {
       "isRlsEnabled": false,
-      "name": "courseCredit",
+      "name": "courseMatter",
       "entityType": "tables",
       "schema": "public"
     },
@@ -171,7 +171,7 @@
       "default": null,
       "generated": null,
       "identity": null,
-      "name": "hours",
+      "name": "creditHours",
       "entityType": "columns",
       "schema": "public",
       "table": "attendance"
@@ -395,7 +395,7 @@
       "name": "courseId",
       "entityType": "columns",
       "schema": "public",
-      "table": "courseCredit"
+      "table": "courseMatter"
     },
     {
       "type": "creditHourType",
@@ -408,7 +408,7 @@
       "name": "type",
       "entityType": "columns",
       "schema": "public",
-      "table": "courseCredit"
+      "table": "courseMatter"
     },
     {
       "type": "numeric(6,3)",
@@ -418,10 +418,10 @@
       "default": null,
       "generated": null,
       "identity": null,
-      "name": "hours",
+      "name": "creditHours",
       "entityType": "columns",
       "schema": "public",
-      "table": "courseCredit"
+      "table": "courseMatter"
     },
     {
       "type": "varchar",
@@ -541,14 +541,14 @@
       "table": "profile"
     },
     {
-      "type": "boolean",
+      "type": "text",
       "typeSchema": null,
-      "notNull": true,
+      "notNull": false,
       "dimensions": 0,
       "default": null,
       "generated": null,
       "identity": null,
-      "name": "isMember",
+      "name": "association",
       "entityType": "columns",
       "schema": "public",
       "table": "profile"
@@ -1687,10 +1687,10 @@
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
-      "name": "courseCredit_courseId_course_id_fkey",
+      "name": "courseMatter_courseId_course_id_fkey",
       "entityType": "fks",
       "schema": "public",
-      "table": "courseCredit"
+      "table": "courseMatter"
     },
     {
       "nameExplicit": false,
@@ -1863,10 +1863,10 @@
         "type"
       ],
       "nameExplicit": false,
-      "name": "courseCredit_pkey",
+      "name": "courseMatter_pkey",
       "entityType": "pks",
       "schema": "public",
-      "table": "courseCredit"
+      "table": "courseMatter"
     },
     {
       "columns": [
