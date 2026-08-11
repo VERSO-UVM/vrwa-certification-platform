@@ -47,6 +47,7 @@ import type { Route } from "./+types/course-details";
 import { EditTraineeReservation } from "../trainee-manager/edit-reservation";
 import { CourseEventForm } from "./course-event-form";
 import { AddCourseEventButton as UpdateCourseEventButton } from "./add-course-event-button";
+import { ButtonGroup } from "~/components/ui/button-group";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
@@ -193,8 +194,8 @@ export default function CourseDetails({
         id: "actions",
         cell: ({ row }) => {
           return (
-            <>
-              <EditTraineeReservation reservation={row.original} />;
+            <ButtonGroup>
+              <EditTraineeReservation reservation={row.original} />
               <Button
                 variant="destructive"
                 onClick={() =>
@@ -203,7 +204,7 @@ export default function CourseDetails({
               >
                 Remove Trainee
               </Button>
-            </>
+            </ButtonGroup>
           );
         },
       },
