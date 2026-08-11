@@ -48,6 +48,7 @@ export const auth = betterAuth({
       // within the authenticated session.
       activeProfileId: {
         type: "string",
+        required: false, // Can't always be filled in on a new record
       },
     },
   },
