@@ -18,11 +18,11 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function RegistrationDetailsPage({
-  params: { courseEventId },
+  params: { courseId },
 }: Route.ComponentProps) {
   const trpc = useTRPC();
   const { data: courseEvent } = useQuery(
-    trpc.courseEvents.trainee.get.queryOptions({ courseEventId }),
+    trpc.courses.trainee.get.queryOptions({ courseId }),
   );
 
   return (

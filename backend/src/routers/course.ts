@@ -95,4 +95,16 @@ export const courseRouter = router({
         return courseFindFirst(input.courseId);
       }),
   }),
+
+  trainee: router({
+    get: instructorProcedure
+      .input(
+        z.object({
+          courseId: z.string(),
+        }),
+      )
+      .query(({ input }) => {
+        return courseFindFirst(input.courseId);
+      }),
+  }),
 });
