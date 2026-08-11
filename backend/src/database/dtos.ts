@@ -17,12 +17,12 @@ import z from "zod";
 export type ReservationDto = Reservation &
   Omit<Profile, "id"> &
   Pick<User, "email"> &
-  Pick<CourseEvent, "seats" | "classStartDatetime"> & {
-    course: Pick<Course, "courseName" | "creditHours" | "id">;
+  Pick<CourseEvent, "classStartDatetime"> & {
+    course: Pick<Course, "courseName" | "creditHours" | "id" | "seats">;
   };
 
 export type CourseEventDto = CourseEvent &
-  Pick<Course, "courseName" | "description" | "creditHours" | "priceCents">;
+  Pick<Course, "courseName" | "description" | "creditHours" | "priceCents" | "seats" | "instructorId">;
 
 export const ProfileDtoSchema = createSelectSchema(profile);
 export type ProfileDto = z.infer<typeof ProfileDtoSchema>;

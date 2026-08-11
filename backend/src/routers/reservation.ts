@@ -137,11 +137,16 @@ export const reservationRouter = router({
         }),
       )
       .mutation(async ({ input, ctx }) => {
-        const [event] = await db.client
-          .select({ instructorId: courseEvent.instructorId })
-          .from(courseEvent)
-          .where(eq(courseEvent.id, input.courseEventId));
-        if (!event || event.instructorId !== ctx.session.activeProfileId) {
+        const event = await db.client.query.courseEvent.findFirst({
+          where: eq(courseEvent.id, input.courseEventId),
+          with: {
+            course: true,
+          },
+        });
+        if (
+          !event ||
+          event.course.instructorId !== ctx.session.activeProfileId
+        ) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "Unauthorized event access.",

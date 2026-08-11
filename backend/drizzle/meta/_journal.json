@@ -29,6 +29,13 @@
       "when": 1786391770118,
       "tag": "0003_amazing_secret_warriors",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1786456578773,
+      "tag": "0004_modern_network",
+      "breakpoints": true
     }
   ]
 }

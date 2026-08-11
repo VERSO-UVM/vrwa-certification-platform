@@ -25,12 +25,12 @@ export function reservationQuery() {
       ...reservationFields,
       ...profileFields,
       classStartDatetime: courseEvent.classStartDatetime,
-      seats: courseEvent.seats,
       email: user.email,
       course: {
         id: course.id,
         courseName: course.courseName,
         creditHours: course.creditHours,
+        seats: course.seats,
       },
     })
     .from(reservation)
@@ -45,6 +45,8 @@ export function courseEventQuery() {
   return db.client
     .select({
       ...getTableColumns(courseEvent),
+      seats: course.seats,
+      instructorId: course.instructorId,
       courseName: course.courseName,
       description: course.description,
       creditHours: course.creditHours,

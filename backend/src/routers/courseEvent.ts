@@ -136,7 +136,7 @@ export const courseEventRouter = router({
         });
       }
       return courseEventQuery()
-        .where(eq(courseEvent.instructorId, session.activeProfileId))
+        .where(eq(course.instructorId, session.activeProfileId))
         .orderBy(asc(courseEvent.classStartDatetime)) satisfies Promise<
         CourseEventDto[]
       >;

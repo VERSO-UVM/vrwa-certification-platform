@@ -104,7 +104,8 @@ async function main() {
   const courseIds: string[] = [];
   console.log("Creating courses...");
   //create courses
-  for (const courseInfo of data.courses) {
+  for (const [i, courseInfo] of data.courses.entries()) {
+    const instructorId = instructorIds[i % instructorIds.length]!;
     const [newCourse] = await db.client
       .insert(db.schema.course)
       .values({
@@ -112,6 +113,8 @@ async function main() {
         description: courseInfo.description,
         creditHours: courseInfo.creditHours,
         priceCents: courseInfo.priceCents,
+        instructorId,
+        seats: Math.trunc(profileIds.length / 2),
       })
       .returning();
     courseIds.push(newCourse!.id);
@@ -128,13 +131,11 @@ async function main() {
     //past event
     const thePast = new Date(now);
     thePast.setMonth(now.getMonth() - num);
-    const instructorId = instructorIds[num % instructorIds.length]!;
 
     const [pastEvent] = await db.client
       .insert(db.schema.courseEvent)
       .values({
         courseId,
-        instructorId,
         locationType: locations[num % locations.length]!,
         virtualLink:
           locations[num % locations.length] !== "in-person"
@@ -144,7 +145,6 @@ async function main() {
           locations[num % locations.length] !== "virtual"
             ? "67 Address Road"
             : null,
-        seats: Math.trunc(profileIds.length / 2),
         classStartDatetime: thePast,
       })
       .returning();
@@ -158,7 +158,6 @@ async function main() {
       .insert(db.schema.courseEvent)
       .values({
         courseId,
-        instructorId,
         locationType: locations[num % locations.length]!,
         virtualLink:
           locations[num % locations.length] !== "in-person"
@@ -168,7 +167,6 @@ async function main() {
           locations[num % locations.length] !== "virtual"
             ? "67 Address Road"
             : null,
-        seats: Math.trunc(profileIds.length / 2),
         classStartDatetime: theFuture,
       })
       .returning();

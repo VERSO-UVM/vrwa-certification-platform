@@ -7,6 +7,7 @@ import {
   boolean,
   primaryKey,
   decimal,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 import { prefixedIdGenerator } from "~/utils/id";
@@ -73,15 +74,6 @@ export const userRelations = relations(user, ({ many }) => ({
   invitations: many(invitation),
 }));
 
-/* Rather than deleting whole courses from the database
- * it's much better to just mark them as deleted. */
-export const CourseStatus = {
-  Active: "active",
-  Deleted: "deleted",
-  Canceled: "canceled",
-} as const;
-export type CourseStatus = (typeof CourseStatus)[keyof typeof CourseStatus];
-
 /* Round values to nearest thousandth: between 0.000 and 999.999 */
 const creditHourPrecision = decimal({ precision: 6, scale: 3 });
 
@@ -104,9 +96,7 @@ export const courseCredit = pgTable(
     type: varchar().notNull().$type<CreditHourType>(),
     hours: creditHourPrecision.notNull(),
   },
-  (table) => [
-    primaryKey({ columns: [table.courseId, table.type] }),
-  ],
+  (table) => [primaryKey({ columns: [table.courseId, table.type] })],
 );
 
 export const courseCreditRelations = relations(courseCredit, ({ one }) => ({
@@ -140,6 +130,16 @@ export const attendanceRelations = relations(attendance, ({ one }) => ({
   course: one(profile),
 }));
 
+
+/* Rather than deleting whole courses from the database
+ * it's much better to just mark them as deleted. */
+export enum CourseStatus {
+  Active = "active",
+  Deleted = "deleted",
+  Canceled = "canceled",
+}
+
+export const courseStatusEnum = pgEnum("courseStatus", ["active", "deleted", "canceled"]);
 export const course = pgTable("course", {
   // This field may already exist as a different type in the VRWA db - it may change in the future
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("course")),
@@ -147,11 +147,10 @@ export const course = pgTable("course", {
   description: text(),
   creditHours: integer().notNull(),
   priceCents: integer().notNull(),
-  // seats: integer().notNull(),
-  // instructorId: varchar().references(() => profile.id), // MOVE TO instructorId
-  status: varchar()
+  seats: integer().notNull(),
+  instructorId: varchar().references(() => profile.id), // MOVE TO instructorId
+  status: courseStatusEnum()
     .notNull()
-    .$type<CourseStatus>()
     .default(CourseStatus.Active),
   /* Eg. "exam" */
   tags: text()
@@ -181,9 +180,7 @@ export const courseEvent = pgTable("courseEvent", {
   locationType: varchar().notNull().$type<CourseLocation>(),
   virtualLink: text(),
   physicalAddress: text(),
-  seats: integer(), // MOVE TO course.seats
   classStartDatetime: timestamp({ withTimezone: true }),
-  instructorId: varchar().references(() => profile.id), // MOVE TO instructorId
 });
 
 export const courseEventRelations = relations(courseEvent, ({ one }) => ({
