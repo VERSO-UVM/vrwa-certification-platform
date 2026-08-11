@@ -37,9 +37,9 @@ export const attendanceFieldDefs = [
                   creditHours: checked ? item.course.creditHours : 0,
                 })
               }
-              id="is-present"
+              id={`present-${item.profileId}`}
             />
-            <Label htmlFor="is-present">Present</Label>
+            <Label htmlFor={`present-${item.profileId}`}>Present</Label>
           </div>
         );
       },
