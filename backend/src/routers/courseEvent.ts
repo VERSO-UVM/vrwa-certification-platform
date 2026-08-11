@@ -13,7 +13,7 @@ import { z } from "zod";
 import type { CourseEventDto } from "~/database/dtos";
 import { courseEventQuery } from "~/database/queries";
 import { TRPCError } from "@trpc/server";
-import { createUpdateSchema } from "drizzle-zod";
+import { createUpdateSchema } from "drizzle-orm/zod";
 import { isFutureClass } from "~/database/filters";
 
 export const courseEventUpdateSchema = z.object({

@@ -4,7 +4,7 @@ import { course } from "~/database/schema";
 import type { Course } from "~/database/schema";
 import { adminProcedure, router } from "~/utils/trpc";
 import { z } from "zod";
-import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
+import { createInsertSchema, createUpdateSchema } from "drizzle-orm/zod";
 
 const updateSchema = createUpdateSchema(course, {
   id: z.string(),

@@ -9,32 +9,17 @@ import {
   decimal,
   pgEnum,
 } from "drizzle-orm/pg-core";
-import { relations, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { prefixedIdGenerator } from "~/utils/id";
 
 // Auth schema must only be modified through the better-auth configuration
 // in ~/auth/server.ts. Then the drizzle schema must be re-generated
 // through the instructions in the README.
-import * as authSchema from "../../drizzle/auth-schema";
+import { user, account } from "../../drizzle/auth-schema";
 // Don't export all the relations. We want to customize them.
-export {
-  user,
-  account,
-  session,
-  verification,
-  organization,
-  member,
-  invitation,
-  sessionRelations,
-  accountRelations,
-  organizationRelations,
-  memberRelations,
-  invitationRelations,
-} from "../../drizzle/auth-schema";
-const { user, account, session, member, invitation } = authSchema;
+export * from "../../drizzle/auth-schema";
 
 export type User = typeof user.$inferSelect;
-
 export type Account = typeof account.$inferSelect;
 // Should only use AccountInfo, not Account, in API and Client.
 // Maybe create a separate types file?
@@ -55,24 +40,6 @@ export const profile = pgTable("profile", {
   isMember: boolean().notNull(),
 });
 export type Profile = typeof profile.$inferSelect;
-
-// We have to define the relation both ways for drizzle to understand it.
-// TODO: this whole syntax changes when we update Drizzle to new v1.0
-export const profileUserRelation = relations(profile, ({ one }) => ({
-  user: one(user, {
-    fields: [profile.userId],
-    references: [user.id],
-  }),
-}));
-
-// Only allowed 1 relations for a given table. Need to merge in better-auth relations.
-export const userRelations = relations(user, ({ many }) => ({
-  profiles: many(profile),
-  sessions: many(session),
-  accounts: many(account),
-  members: many(member),
-  invitations: many(invitation),
-}));
 
 /* Round values to nearest thousandth: between 0.000 and 999.999 */
 const creditHourPrecision = decimal({ precision: 6, scale: 3 });
@@ -99,13 +66,6 @@ export const courseCredit = pgTable(
   (table) => [primaryKey({ columns: [table.courseId, table.type] })],
 );
 
-export const courseCreditRelations = relations(courseCredit, ({ one }) => ({
-  course: one(course, {
-    fields: [courseCredit.courseId],
-    references: [course.id],
-  }),
-}));
-
 export const attendance = pgTable(
   "attendance",
   {
@@ -125,12 +85,6 @@ export const attendance = pgTable(
   ],
 );
 
-export const attendanceRelations = relations(attendance, ({ one }) => ({
-  profile: one(profile),
-  course: one(profile),
-}));
-
-
 /* Rather than deleting whole courses from the database
  * it's much better to just mark them as deleted. */
 export enum CourseStatus {
@@ -139,7 +93,11 @@ export enum CourseStatus {
   Canceled = "canceled",
 }
 
-export const courseStatusEnum = pgEnum("courseStatus", ["active", "deleted", "canceled"]);
+export const courseStatusEnum = pgEnum("courseStatus", [
+  "active",
+  "deleted",
+  "canceled",
+]);
 export const course = pgTable("course", {
   // This field may already exist as a different type in the VRWA db - it may change in the future
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("course")),
@@ -149,22 +107,13 @@ export const course = pgTable("course", {
   priceCents: integer().notNull(),
   seats: integer().notNull(),
   instructorId: varchar().references(() => profile.id), // MOVE TO instructorId
-  status: courseStatusEnum()
-    .notNull()
-    .default(CourseStatus.Active),
+  status: courseStatusEnum().notNull().default(CourseStatus.Active),
   /* Eg. "exam" */
   tags: text()
     .array()
     .notNull()
     .default(sql`ARRAY[]::text[]`),
 });
-
-export const courseRelations = relations(course, ({ many }) => ({
-  credits: many(courseCredit),
-  sessions: many(courseEvent),
-  // reservations: many(reservation), // TODO: change reservation to course
-  attendance: many(attendance),
-}));
 
 export type Course = typeof course.$inferSelect;
 
@@ -182,13 +131,6 @@ export const courseEvent = pgTable("courseEvent", {
   physicalAddress: text(),
   classStartDatetime: timestamp({ withTimezone: true }),
 });
-
-export const courseEventRelations = relations(courseEvent, ({ one }) => ({
-  course: one(course, {
-    fields: [courseEvent.courseId],
-    references: [course.id],
-  }),
-}));
 
 export type CourseEvent = typeof courseEvent.$inferSelect;
 

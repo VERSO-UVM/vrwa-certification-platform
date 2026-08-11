@@ -4,7 +4,7 @@ import db from "~/database";
 import { profile, user, type Profile } from "~/database/schema";
 import { adminProcedure, protectedProcedure, router } from "~/utils/trpc";
 
-import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
+import { createInsertSchema, createUpdateSchema } from "drizzle-orm/zod";
 import z from "zod";
 import { profilesQuery } from "~/database/queries";
 import { TRPCError } from "@trpc/server";

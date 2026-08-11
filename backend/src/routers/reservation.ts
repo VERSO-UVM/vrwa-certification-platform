@@ -15,7 +15,7 @@ import {
   router,
 } from "~/utils/trpc";
 
-import { createUpdateSchema } from "drizzle-zod";
+import { createUpdateSchema } from "drizzle-orm/zod";
 import z from "zod";
 import { courseEventQuery, reservationQuery } from "~/database/queries";
 import type { ReservationDto } from "~/database/dtos";
@@ -138,7 +138,7 @@ export const reservationRouter = router({
       )
       .mutation(async ({ input, ctx }) => {
         const event = await db.client.query.courseEvent.findFirst({
-          where: eq(courseEvent.id, input.courseEventId),
+          where: { id: input.courseEventId },
           with: {
             course: true,
           },

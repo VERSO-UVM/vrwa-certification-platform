@@ -17,10 +17,10 @@ const generateCertificate = async (input: {
   courseEventId: string;
 }) => {
   const profile = await db.client.query.profile.findFirst({
-    where: eq(db.schema.profile.id, input.profileId),
+    where: { id: input.profileId },
   });
   const courseEvent = await db.client.query.courseEvent.findFirst({
-    where: eq(db.schema.courseEvent.id, input.courseEventId),
+    where: { id: input.courseEventId },
   });
 
   if (!profile) {
@@ -34,7 +34,7 @@ const generateCertificate = async (input: {
   }
 
   const course = await db.client.query.course.findFirst({
-    where: eq(db.schema.course.id, courseEvent.courseId),
+    where: { id: courseEvent.courseId },
   });
 
   if (!course) {
@@ -98,7 +98,7 @@ export const certificateRouter = router({
         if (ctx.session.activeProfileId == null) {
           throw new TRPCError({
             code: "BAD_REQUEST",
-            message: "No currently active profile.",
+            message: "Course event not found.",
           });
         }
         return generateCertificate({
