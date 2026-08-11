@@ -25,14 +25,14 @@ export const attendanceFieldDefs = [
       header: "Present?",
       cell: ({ row, getValue: isPresent }) => {
         const item = row.original;
-        const creditHoursUpdate = useCreditHoursUpdate(item.courseEventId);
+        const creditHoursUpdate = useCreditHoursUpdate(item.courseId);
         return (
           <div className="flex items-center space-x-2">
             <Switch
               checked={isPresent()}
               onCheckedChange={(checked) =>
                 creditHoursUpdate.mutate({
-                  courseEventId: item.courseEventId,
+                  courseId: item.courseId,
                   profileId: item.profileId,
                   creditHours: checked ? item.course.creditHours : 0,
                 })
@@ -51,7 +51,7 @@ export const attendanceFieldDefs = [
     cell: ({ row }) => {
       const item = row.original;
       const [creditHours, setCreditHours] = useState(item.creditHours);
-      const creditHoursUpdate = useCreditHoursUpdate(item.courseEventId);
+      const creditHoursUpdate = useCreditHoursUpdate(item.courseId);
       // Sync actual credit hours with input
       useEffect(() => setCreditHours(item.creditHours), [item.creditHours]);
       return (
@@ -67,7 +67,7 @@ export const attendanceFieldDefs = [
             const number = event.target.valueAsNumber;
             if (!Number.isFinite(number) || number < 0) return;
             creditHoursUpdate.mutate({
-              courseEventId: item.courseEventId,
+              courseId: item.courseId,
               profileId: item.profileId,
               creditHours: number,
             });

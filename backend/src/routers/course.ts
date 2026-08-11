@@ -2,9 +2,10 @@ import { asc, eq } from "drizzle-orm";
 import db from "~/database";
 import { course } from "~/database/schema";
 import type { Course } from "~/database/schema";
-import { adminProcedure, router } from "~/utils/trpc";
+import { adminProcedure, instructorProcedure, router } from "~/utils/trpc";
 import { z } from "zod";
 import { createInsertSchema, createUpdateSchema } from "drizzle-orm/zod";
+import { courseFindFirst } from "~/database/queries";
 
 const updateSchema = createUpdateSchema(course, {
   id: z.string(),
@@ -81,5 +82,17 @@ export const courseRouter = router({
 
       return updatedCourse;
     }),
+  }),
+
+  instructor: router({
+    get: instructorProcedure
+      .input(
+        z.object({
+          courseId: z.string(),
+        }),
+      )
+      .query(({ input }) => {
+        return courseFindFirst(input.courseId);
+      }),
   }),
 });

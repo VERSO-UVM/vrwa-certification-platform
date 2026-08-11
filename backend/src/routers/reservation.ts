@@ -16,7 +16,11 @@ import {
 } from "~/utils/trpc";
 import { createUpdateSchema } from "drizzle-orm/zod";
 import z from "zod";
-import { courseEventQuery, courseStartQuery, reservationQuery } from "~/database/queries";
+import {
+  courseEventQuery,
+  courseStartQuery,
+  reservationQuery,
+} from "~/database/queries";
 import type { ReservationDto } from "~/database/dtos";
 import { TRPCError } from "@trpc/server";
 import { hasAttended } from "~/database/filters";
@@ -139,39 +143,31 @@ export const reservationRouter = router({
   }),
 
   instructor: router({
-    listCourseEvent: instructorProcedure
+    listCourse: instructorProcedure
       .input(
         z.object({
-          courseEventId: z.string(),
+          courseId: z.string(),
         }),
       )
-      .query(async ({ input }) => {
-        const courseId = await getCourseId(input.courseEventId);
+      .query(async ({ input: { courseId } }) => {
         return await reservationQuery().where(
           eq(reservation.courseId, courseId),
-        );
+        ).orderBy(asc(profile.lastName));
       }),
 
-    // TODO: migrate all procedures to use courseId instead of courseEventId
     updateCreditHours: instructorProcedure
       .input(
         z.object({
-          courseEventId: z.string(),
+          courseId: z.string(),
           profileId: z.string(),
           creditHours: z.number().min(0).max(24),
         }),
       )
       .mutation(async ({ input, ctx }) => {
-        const event = await db.client.query.courseEvent.findFirst({
-          where: { id: input.courseEventId },
-          with: {
-            course: true,
-          },
+        const course = await db.client.query.course.findFirst({
+          where: { id: input.courseId },
         });
-        if (
-          !event ||
-          event.course.instructorId !== ctx.session.activeProfileId
-        ) {
+        if (!course || course.instructorId !== ctx.session.activeProfileId) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "Unauthorized event access.",
@@ -185,7 +181,7 @@ export const reservationRouter = router({
           })
           .where(
             and(
-              eq(reservation.courseId, event.courseId),
+              eq(reservation.courseId, course.id),
               eq(reservation.profileId, input.profileId),
             ),
           )

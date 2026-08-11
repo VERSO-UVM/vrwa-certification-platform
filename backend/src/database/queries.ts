@@ -95,3 +95,16 @@ export function usersWithProfilesQuery() {
     orderBy: (user, { asc }) => [asc(user.name)],
   }) satisfies Promise<UserDto[]>;
 }
+
+export function courseFindFirst(courseId?: string) {
+  return db.client.query.course.findFirst({
+    where: {
+      id: courseId,
+    },
+    with: {
+      sessions: {
+        orderBy: (t, { asc }) => asc(t.id),
+      },
+    },
+  });
+}

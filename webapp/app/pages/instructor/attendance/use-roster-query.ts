@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "~/utils/trpc";
 
-export function useRosterQuery(courseEventId: string) {
+export function useRosterQuery(courseId: string) {
   const trpc = useTRPC();
 
   return useQuery(
-    trpc.reservations.instructor.listCourseEvent.queryOptions({
-      courseEventId,
+    trpc.reservations.instructor.listCourse.queryOptions({
+      courseId,
     }),
   );
 }

@@ -22,10 +22,10 @@ export default [
   route("trainee", "layouts/trainee.tsx", [
     index("pages/trainee/home.tsx"),
     route("certificates", "pages/trainee/certificates.tsx"),
-    route("certificates/:courseEventId", "pages/trainee/view-certificate.tsx"),
+    route("certificates/:courseId", "pages/trainee/view-certificate.tsx"),
     route("registration", "pages/trainee/registration.tsx"),
     route(
-      "registration/:courseEventId",
+      "registration/:courseId",
       "pages/trainee/registration-details.tsx",
     ),
     route("*", "pages/trainee/not-found.tsx"),
@@ -33,7 +33,7 @@ export default [
   route("instructor", "layouts/instructor.tsx", [
     index("pages/instructor/home/home.tsx"),
     route(
-      "attendance/:courseEventId",
+      "attendance/:courseId",
       "pages/instructor/attendance/attendance.tsx",
     ),
     route("*", "pages/instructor/not-found.tsx"),
