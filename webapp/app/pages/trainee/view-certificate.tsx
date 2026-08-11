@@ -11,11 +11,11 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function ViewCertificate({
-  params: { courseEventId },
+  params: { courseId },
 }: Route.ComponentProps) {
   const trpc = useTRPC();
   const { data: certificate } = useQuery(
-    trpc.certificates.trainee.get.queryOptions({ courseEventId }),
+    trpc.certificates.trainee.get.queryOptions({ courseId }),
   );
   if (!certificate) {
     return (
