@@ -15,16 +15,16 @@ import { prefixedIdGenerator } from "~/utils/id";
 // Auth schema must only be modified through the better-auth configuration
 // in ~/auth/server.ts. Then the drizzle schema must be re-generated
 // through the instructions in the README.
-import { user, account } from "../../drizzle/auth-schema";
-// Don't export all the relations. We want to customize them.
 export * from "../../drizzle/auth-schema";
-
+import { user, account } from "../../drizzle/auth-schema";
 export type User = typeof user.$inferSelect;
 export type Account = typeof account.$inferSelect;
-// Should only use AccountInfo, not Account, in API and Client.
-// Maybe create a separate types file?
-export type AccountInfo = Omit<Account, "passwordHash">;
 
+/**
+ * Profiles are independent from users/accounts. Admins may create profiles
+ * not tied to specific accounts. Or a single account ay be associated with
+ * many profiles.
+ */
 export const profile = pgTable("profile", {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("profile")),
   userId: varchar()
