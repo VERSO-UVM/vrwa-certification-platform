@@ -17,7 +17,6 @@ import {
 import { createUpdateSchema } from "drizzle-orm/zod";
 import z from "zod";
 import {
-  courseEventQuery,
   courseStartQuery,
   reservationQuery,
 } from "~/database/queries";
@@ -31,22 +30,6 @@ function isFutureClass() {
 
 function isPastClass() {
   return lt(courseStartQuery.courseStart, new Date());
-}
-
-// TODO: migrate all procedures to use courseId instead of courseEventId
-async function getCourseId(courseEventId: string) {
-  const courseEvent = await db.client.query.courseEvent.findFirst({
-    where: {
-      id: courseEventId,
-    },
-  });
-  if (courseEvent?.courseId == null) {
-    throw new TRPCError({
-      code: "BAD_REQUEST",
-      message: "Course not found.",
-    });
-  }
-  return courseEvent?.courseId;
 }
 
 const updateSchema = createUpdateSchema(reservation, {
