@@ -4,7 +4,7 @@
  * when possible. These are like database views but database views
  * add a lot of hassle for little benefit for our use cases.
  */
-import { asc, eq, getTableColumns } from "drizzle-orm";
+import { asc, eq, getTableColumns, min } from "drizzle-orm";
 import {
   course,
   courseEvent,
@@ -20,12 +20,22 @@ const { id: _, ...profileFields } = getTableColumns(profile);
 const reservationFields = getTableColumns(reservation);
 
 export function reservationQuery() {
+  // Subquery: want date of first course session
+  const classes = db.client
+    .select({
+      courseId: courseEvent.courseId,
+      courseStart: min(courseEvent.classStartDatetime).as("courseStart"),
+    })
+    .from(courseEvent)
+    .groupBy(courseEvent.courseId)
+    .as("class_counts");
+
   return db.client
     .select({
       ...reservationFields,
       ...profileFields,
-      classStartDatetime: courseEvent.classStartDatetime,
       email: user.email,
+      classStartDatetime: classes.courseStart,
       course: {
         id: course.id,
         courseName: course.courseName,
@@ -36,8 +46,8 @@ export function reservationQuery() {
     .from(reservation)
     .innerJoin(profile, eq(reservation.profileId, profile.id))
     .innerJoin(user, eq(profile.userId, user.id))
-    .innerJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
-    .innerJoin(course, eq(course.id, courseEvent.courseId))
+    .innerJoin(course, eq(reservation.courseId, course.id))
+    .leftJoin(classes, eq(reservation.courseId, classes.courseId))
     .$dynamic() satisfies Promise<ReservationDto[]>;
 }
 

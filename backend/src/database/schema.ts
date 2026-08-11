@@ -147,14 +147,14 @@ export const reservation = pgTable(
     profileId: varchar("profileId")
       .references(() => profile.id)
       .notNull(),
-    courseEventId: varchar()
-      .references(() => courseEvent.id, { onDelete: "cascade" })
+    courseId: varchar()
+      .references(() => course.id, { onDelete: "cascade" })
       .notNull(),
     creditHours: decimal().notNull(),
     paymentStatus: varchar().notNull().$type<PaymentStatus>(),
   },
   (table) => [
-    primaryKey({ name: "id", columns: [table.profileId, table.courseEventId] }),
+    primaryKey({ name: "id", columns: [table.profileId, table.courseId] }),
   ],
 );
 
