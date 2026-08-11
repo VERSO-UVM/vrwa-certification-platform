@@ -19,23 +19,23 @@ import db from ".";
 const { id: _, ...profileFields } = getColumns(profile);
 const reservationFields = getColumns(reservation);
 
+export const courseStartQuery = db.client
+  .select({
+    courseId: courseEvent.courseId,
+    courseStart: min(courseEvent.classStartDatetime).as("courseStart"),
+  })
+  .from(courseEvent)
+  .groupBy(courseEvent.courseId)
+  .as("course_start");
+
 export function reservationQuery() {
   // Subquery: want date of first course session
-  const classes = db.client
-    .select({
-      courseId: courseEvent.courseId,
-      courseStart: min(courseEvent.classStartDatetime).as("courseStart"),
-    })
-    .from(courseEvent)
-    .groupBy(courseEvent.courseId)
-    .as("class_counts");
-
   return db.client
     .select({
       ...reservationFields,
       ...profileFields,
       email: user.email,
-      classStartDatetime: classes.courseStart,
+      classStartDatetime: courseStartQuery.courseStart,
       course: {
         id: course.id,
         courseName: course.courseName,
@@ -47,7 +47,10 @@ export function reservationQuery() {
     .innerJoin(profile, eq(reservation.profileId, profile.id))
     .innerJoin(user, eq(profile.userId, user.id))
     .innerJoin(course, eq(reservation.courseId, course.id))
-    .leftJoin(classes, eq(reservation.courseId, classes.courseId))
+    .leftJoin(
+      courseStartQuery,
+      eq(reservation.courseId, courseStartQuery.courseId),
+    )
     .$dynamic() satisfies Promise<ReservationDto[]>;
 }
 

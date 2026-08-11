@@ -103,10 +103,10 @@ export default function CourseDetails({
   //getting courseEvents for tabs
   const eventIds = courseEvents.data?.map((e) => e.id) ?? [];
 
-  async function deleteRow(profileId: string, courseEventId: string) {
+  async function deleteRow(profileId: string, courseId: string) {
     await client.reservations.admin.delete.mutate({
       profileId,
-      courseEventId,
+      courseId,
     });
     await queryClient.invalidateQueries({
       queryKey: trpc.reservations.admin.listCourse.queryKey({
@@ -199,7 +199,7 @@ export default function CourseDetails({
               <Button
                 variant="destructive"
                 onClick={() =>
-                  deleteRow(row.original.profileId, row.original.courseEventId)
+                  deleteRow(row.original.profileId, row.original.courseId)
                 }
               >
                 Remove Trainee
@@ -476,7 +476,7 @@ export default function CourseDetails({
 
                       await client.reservations.admin.create.mutate({
                         profileId: selectedTrainee,
-                        courseEventId: activeEventId ?? "",
+                        courseId: course.data?.id,
                         creditHours: course.data?.creditHours ?? 0,
                         paymentStatus: "unpaid",
                       });

@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, ne } from "drizzle-orm";
+import { and, asc, desc, eq, gt, lt } from "drizzle-orm";
 
 import db from "~/database";
 import {
@@ -14,16 +14,39 @@ import {
   traineeProcedure,
   router,
 } from "~/utils/trpc";
-
 import { createUpdateSchema } from "drizzle-orm/zod";
 import z from "zod";
-import { courseEventQuery, reservationQuery } from "~/database/queries";
+import { courseEventQuery, courseStartQuery, reservationQuery } from "~/database/queries";
 import type { ReservationDto } from "~/database/dtos";
 import { TRPCError } from "@trpc/server";
-import { hasAttended, isFutureClass, isPastClass } from "~/database/filters";
+import { hasAttended } from "~/database/filters";
+
+function isFutureClass() {
+  return gt(courseStartQuery.courseStart, new Date());
+}
+
+function isPastClass() {
+  return lt(courseStartQuery.courseStart, new Date());
+}
+
+// TODO: migrate all procedures to use courseId instead of courseEventId
+async function getCourseId(courseEventId: string) {
+  const courseEvent = await db.client.query.courseEvent.findFirst({
+    where: {
+      id: courseEventId,
+    },
+  });
+  if (courseEvent?.courseId == null) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Course not found.",
+    });
+  }
+  return courseEvent?.courseId;
+}
 
 const updateSchema = createUpdateSchema(reservation, {
-  courseEventId: z.string(),
+  courseId: z.string(),
   profileId: z.string(),
 });
 
@@ -39,7 +62,7 @@ export const reservationRouter = router({
         .where(
           and(
             eq(reservation.profileId, input.profileId),
-            eq(reservation.courseEventId, input.courseEventId),
+            eq(reservation.courseId, input.courseId),
           ),
         )
         .returning();
@@ -47,7 +70,7 @@ export const reservationRouter = router({
 
     list: adminProcedure.query(() =>
       reservationQuery().orderBy(
-        courseEvent.classStartDatetime,
+        courseStartQuery.courseStart,
         profile.firstName,
       ),
     ),
@@ -60,7 +83,7 @@ export const reservationRouter = router({
       )
       .query(({ input }): Promise<ReservationDto[]> => {
         return reservationQuery()
-          .orderBy()
+          .orderBy(courseStartQuery.courseStart)
           .where(eq(reservation.profileId, input.profileId));
       }),
 
@@ -69,14 +92,14 @@ export const reservationRouter = router({
       .query(({ input }) =>
         reservationQuery()
           .where(eq(course.id, input.courseId))
-          .orderBy(courseEvent.classStartDatetime),
+          .orderBy(courseStartQuery.courseStart),
       ),
 
     create: adminProcedure
       .input(
         z.object({
           profileId: z.string(),
-          courseEventId: z.string(),
+          courseId: z.string(),
           creditHours: z.number().positive(),
           paymentStatus: z.enum(["paid", "unpaid"]),
         }),
@@ -97,7 +120,7 @@ export const reservationRouter = router({
       .input(
         z.object({
           profileId: z.string(),
-          courseEventId: z.string(),
+          courseId: z.string(),
         }),
       )
       .mutation(async ({ input }) => {
@@ -105,7 +128,7 @@ export const reservationRouter = router({
           .delete(reservation)
           .where(
             and(
-              eq(reservation.courseEventId, input.courseEventId),
+              eq(reservation.courseId, input.courseId),
               eq(reservation.profileId, input.profileId),
             ),
           )
@@ -122,12 +145,14 @@ export const reservationRouter = router({
           courseEventId: z.string(),
         }),
       )
-      .query(({ input }) => {
-        return reservationQuery().where(
-          eq(reservation.courseEventId, input.courseEventId),
+      .query(async ({ input }) => {
+        const courseId = await getCourseId(input.courseEventId);
+        return await reservationQuery().where(
+          eq(reservation.courseId, courseId),
         );
       }),
 
+    // TODO: migrate all procedures to use courseId instead of courseEventId
     updateCreditHours: instructorProcedure
       .input(
         z.object({
@@ -160,7 +185,7 @@ export const reservationRouter = router({
           })
           .where(
             and(
-              eq(reservation.courseEventId, input.courseEventId),
+              eq(reservation.courseId, event.courseId),
               eq(reservation.profileId, input.profileId),
             ),
           )
