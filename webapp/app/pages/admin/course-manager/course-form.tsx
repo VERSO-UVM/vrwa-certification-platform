@@ -3,9 +3,9 @@ import { Form } from "@radix-ui/react-form";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Button } from "~/components/ui/button";
 import type { Course } from "@backend/database/schema";
-import type { CourseUpdateInput } from "@backend/routers/course";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
+import type { CourseUpdate } from "@backend/routers/course";
 
 //for input validation of tuition fee
 function textToDollars(userInput: string) {
@@ -17,7 +17,7 @@ function textToDollars(userInput: string) {
 }
 
 export interface NewCourseFormProps {
-  onCreate: (data: CourseUpdateInput) => void;
+  onCreate: (data: Omit<CourseUpdate, "id">) => void;
   course?: Course | null;
 }
 

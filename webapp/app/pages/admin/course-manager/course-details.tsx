@@ -34,15 +34,7 @@ import {
 import { PaymentStatusBadge } from "~/components/payment-status-badge";
 import { Badge } from "~/components/ui/badge";
 import { Link } from "react-router";
-import {
-  Users,
-  CreditCard,
-  Calendar,
-  TriangleAlert,
-  FileExclamationPoint,
-  Trash,
-  ArrowLeft,
-} from "lucide-react";
+import { Users, CreditCard, Calendar, Trash, ArrowLeft } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -125,9 +117,8 @@ export default function CourseDetails({
   //determining if a roster has reached capacity
   function classFull(courseEventId: string) {
     const roster = reservationsByEvent[courseEventId] ?? [];
-    const event = courseEvents.data?.find((e) => e.id === courseEventId);
 
-    const seats = event?.seats ?? 0;
+    const seats = course.data?.seats ?? 0;
 
     return roster.length >= seats;
   }
@@ -201,16 +192,18 @@ export default function CourseDetails({
       {
         id: "actions",
         cell: ({ row }) => {
-          return <EditTraineeReservation reservation={row.original} />;
           return (
-            <Button
-              variant="destructive"
-              onClick={() =>
-                deleteRow(row.original.profileId, row.original.courseEventId)
-              }
-            >
-              Remove Trainee
-            </Button>
+            <>
+              <EditTraineeReservation reservation={row.original} />;
+              <Button
+                variant="destructive"
+                onClick={() =>
+                  deleteRow(row.original.profileId, row.original.courseEventId)
+                }
+              >
+                Remove Trainee
+              </Button>
+            </>
           );
         },
       },
@@ -345,8 +338,8 @@ export default function CourseDetails({
                         course={course.data}
                         onCreate={async (data) => {
                           await client.courses.admin.update.mutate({
-                            id: courseId,
                             ...data,
+                            id: courseId,
                           });
                           await queryClient.invalidateQueries({
                             queryKey: trpc.courses.admin.get.queryKey({
@@ -408,7 +401,7 @@ export default function CourseDetails({
                     onCreate={async (data) => {
                       console.log("heyyy", selectedEvent, data);
                       if (selectedEvent) {
-                        await updateMutation.mutate({
+                        updateMutation.mutate({
                           id: selectedEvent.id,
                           ...data,
                         });

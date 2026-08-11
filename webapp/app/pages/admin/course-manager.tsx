@@ -239,7 +239,7 @@ export default function CourseManager() {
                           queryKey: trpc.courseEvents.admin.list.queryKey(),
                         });
                       } else {
-                        await client.courses.admin.create.mutate(
+                        await client.courseEvents.admin.create.mutate(
                           data as CourseEventDto,
                         );
                         await queryClient.invalidateQueries({
