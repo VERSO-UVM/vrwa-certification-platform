@@ -7,6 +7,7 @@ import { adminProcedure, protectedProcedure, router } from "~/utils/trpc";
 import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import z from "zod";
 import { profilesQuery } from "~/database/queries";
+import { TRPCError } from "@trpc/server";
 
 const updateSchema = createUpdateSchema(profile, {
   id: z.string(),
@@ -65,6 +66,12 @@ export const profileRouter = router({
    * Get the entry for the currently active profile.
    */
   getActiveProfile: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.session.activeProfileId == null) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "No currently active profile.",
+      });
+    }
     const profiles = await db.client
       .select()
       .from(profile)

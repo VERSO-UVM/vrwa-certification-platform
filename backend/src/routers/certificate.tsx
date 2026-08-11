@@ -4,6 +4,7 @@ import z from "zod";
 import { CertificateDocument } from "~/pdf/pdf_template";
 import { eq } from "drizzle-orm";
 import db from "~/database";
+import { TRPCError } from "@trpc/server";
 
 /**
  * For now we are returning a Blob directly embedded as a base64 string
@@ -93,11 +94,17 @@ export const certificateRouter = router({
           courseEventId: z.string(),
         }),
       )
-      .query(async ({ input, ctx }) =>
-        generateCertificate({
+      .query(async ({ input, ctx }) => {
+        if (ctx.session.activeProfileId == null) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "No currently active profile.",
+          });
+        }
+        return generateCertificate({
           profileId: ctx.session.activeProfileId,
           courseEventId: input.courseEventId,
-        }),
-      ),
+        });
+      }),
   },
 });

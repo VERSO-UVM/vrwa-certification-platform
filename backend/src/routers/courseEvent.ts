@@ -36,8 +36,9 @@ export const courseEventRouter = router({
     listCourse: adminProcedure
       .input(z.object({ courseId: z.string() }))
       .query(async ({ input }) => {
-        const courseEvents = await courseEventQuery()
-          .where(eq(courseEvent.courseId, input.courseId));
+        const courseEvents = await courseEventQuery().where(
+          eq(courseEvent.courseId, input.courseId),
+        );
         return courseEvents ?? [];
       }),
 
@@ -128,6 +129,12 @@ export const courseEventRouter = router({
       }),
 
     listUpcoming: instructorProcedure.query(({ ctx: { session } }) => {
+      if (session.activeProfileId == null) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "No currently active profile.",
+        });
+      }
       return courseEventQuery()
         .where(eq(courseEvent.instructorId, session.activeProfileId))
         .orderBy(asc(courseEvent.classStartDatetime)) satisfies Promise<

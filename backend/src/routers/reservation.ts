@@ -173,6 +173,12 @@ export const reservationRouter = router({
   trainee: router({
     listUpcoming: traineeProcedure.query(
       ({ ctx }): Promise<ReservationDto[]> => {
+        if (ctx.session.activeProfileId == null) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "No currently active profile.",
+          });
+        }
         return reservationQuery()
           .where(
             and(
@@ -186,6 +192,12 @@ export const reservationRouter = router({
 
     listCompleted: traineeProcedure.query(
       ({ ctx }): Promise<ReservationDto[]> => {
+        if (ctx.session.activeProfileId == null) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "No currently active profile.",
+          });
+        }
         return reservationQuery()
           .where(
             and(
