@@ -1,7 +1,5 @@
 import db from "~/database/index";
-import fs from "fs/promises";
-import path from "path";
-import type { CourseLocation } from "../src/database/schema";
+import { CourseLocation, PaymentStatus, ReservationStatus } from "../src/database/schema";
 import { generatePrefixedId } from "~/utils/id";
 import { auth } from "~/auth/server";
 import { eq } from "drizzle-orm";
@@ -117,7 +115,7 @@ async function main() {
 
   //create course events
   const courseEventIds: string[] = [];
-  const locations: CourseLocation[] = ["in-person", "virtual", "hybrid"];
+  const locations: CourseLocation[] = Object.values(CourseLocation);
   const now = new Date();
   let num = 1;
 
@@ -182,7 +180,8 @@ async function main() {
         profileId,
         courseId,
         creditHours: n % 2 == 0 ? "2.5" : "0",
-        paymentStatus: n % 2 === 0 ? "paid" : "unpaid",
+        paymentStatus: n % 2 === 0 ? PaymentStatus.Paid : PaymentStatus.Draft,
+        reservationStatus: ReservationStatus.Accepted,
       });
     }
   }
