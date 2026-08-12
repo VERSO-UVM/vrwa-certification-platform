@@ -1,25 +1,31 @@
-import { asc, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import db from "~/database";
-import { course } from "~/database/schema";
+import { course, CourseStatus } from "~/database/schema";
 import type { Course } from "~/database/schema";
 import { adminProcedure, instructorProcedure, router } from "~/utils/trpc";
 import { z } from "zod";
 import { createInsertSchema, createUpdateSchema } from "drizzle-orm/zod";
-import { courseFindFirst } from "~/database/queries";
+import { courseFindFirst, courseFindMany } from "~/database/queries";
+import type { CourseDto } from "~/database/dtos.ts";
 
 const updateSchema = createUpdateSchema(course, {
   id: z.string(),
+  status: z.enum(CourseStatus),
 });
 
-const insertSchema = createInsertSchema(course);
+const insertSchema = createInsertSchema(course, {
+  status: z.enum(CourseStatus),
+});
 
 export type CourseUpdate = z.infer<typeof updateSchema>;
 export type CourseInsert = z.infer<typeof insertSchema>;
 
 export const courseRouter = router({
   admin: router({
-    list: adminProcedure.query((): Promise<Course[]> => {
-      return db.client.select().from(course).orderBy(asc(course.courseName));
+    list: adminProcedure.query((): Promise<CourseDto[]> => {
+      return courseFindMany({
+        courseName: "hey",
+      });
     }),
 
     get: adminProcedure
@@ -91,8 +97,10 @@ export const courseRouter = router({
           courseId: z.string(),
         }),
       )
-      .query(({ input }) => {
-        return courseFindFirst(input.courseId);
+      .query(async ({ input }) => {
+        const course = await courseFindFirst(input.courseId);
+        console.log("okkk START DATE", course?.startDate, new Date());
+        return course;
       }),
   }),
 

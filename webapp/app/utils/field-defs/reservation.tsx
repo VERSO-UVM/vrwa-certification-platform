@@ -1,7 +1,7 @@
 import type { ReservationDto } from "@backend/database/dtos";
 import { createColumnHelper } from "@tanstack/react-table";
 import { selectOptionsEditor, textInputEditor } from "../field-editors";
-import { Status as PaymentStatus } from "@backend/database/schema";
+import { PaymentStatus } from "@backend/database/schema";
 import { PaymentStatusBadge } from "~/components/payment-status-badge";
 
 export const reservationFieldHelper = createColumnHelper<ReservationDto>();

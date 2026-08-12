@@ -10,10 +10,13 @@ import {
   type Profile,
   type CourseEvent,
   type Course,
+  type CourseMatter, type AttendanceRecord,
 } from "./schema";
 import { createSelectSchema } from "drizzle-orm/zod";
 import z from "zod";
 
+// refactor: follow format of course: make profile fields accessed with
+// .profile and user fields with .user
 export type ReservationDto = Reservation &
   Omit<Profile, "id"> &
   Pick<User, "email"> &
@@ -22,11 +25,18 @@ export type ReservationDto = Reservation &
   };
 
 export type CourseEventDto = CourseEvent &
-  Pick<Course, "courseName" | "description" | "creditHours" | "priceCents" | "seats" | "instructorId">;
+  Omit<Course, "id">;
 
 export type CourseDto = Course & {
-  sessions: CourseEvent[],
+  sessions: CourseEvent[];
+  credits: CourseMatter[];
+  numReservations: number;
 };
+
+export type AttendanceDto = AttendanceRecord & {
+  profile: Profile,
+  courseMatter: CourseMatter,
+}
 
 export const ProfileDtoSchema = createSelectSchema(profile);
 export type ProfileDto = z.infer<typeof ProfileDtoSchema>;

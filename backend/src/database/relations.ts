@@ -14,12 +14,13 @@ export const relations = defineRelations(schema, (r) => ({
     profiles: r.many.profile(),
   },
 
-  courseCredit: {
+  courseMatter: {
     course: r.one.course({
       from: r.courseMatter.courseId,
       to: r.course.id,
       optional: false,
     }),
+    attendance: r.many.attendanceRecord(),
   },
 
   attendanceRecord: {
@@ -28,9 +29,9 @@ export const relations = defineRelations(schema, (r) => ({
       to: r.profile.id,
       optional: false,
     }),
-    course: r.one.course({
-      from: r.attendanceRecord.courseId,
-      to: r.course.id,
+    courseMatter: r.one.courseMatter({
+      from: r.attendanceRecord.courseMatterId,
+      to: r.courseMatter.id,
       optional: false,
     }),
   },
@@ -38,7 +39,7 @@ export const relations = defineRelations(schema, (r) => ({
   course: {
     credits: r.many.courseMatter(),
     sessions: r.many.courseEvent(),
-    attendance: r.many.attendanceRecord(),
+    reservations: r.many.reservation(),
   },
 
   courseEvent: {
@@ -59,13 +60,6 @@ export const relations = defineRelations(schema, (r) => ({
       from: r.reservation.profileId,
       to: r.profile.id,
       optional: false,
-    })
+    }),
   },
-
-  courseMatter: {
-    course: r.one.course({
-      from: r.courseMatter.courseId,
-      to: r.course.id,
-    })
-  }
 }));

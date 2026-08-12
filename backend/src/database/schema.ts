@@ -18,7 +18,7 @@ import { prefixedIdGenerator } from "~/utils/id";
 // in ~/auth/server.ts. Then the drizzle schema must be re-generated
 // through the instructions in the README.
 export * from "../../drizzle/auth-schema";
-import { user, account } from "../../drizzle/auth-schema";
+import { user, type account } from "../../drizzle/auth-schema";
 
 /*----------------*/
 /* --- Enums --- */
@@ -38,8 +38,12 @@ export enum CourseLocation {
 }
 
 export enum PaymentStatus {
+  Draft = "draft",
+  Open = "open",
   Paid = "paid",
-  Unpaid = "unpaid",
+  Refunded = "refunded",
+  Void = "void",
+  Uncollectible = "uncollectible",
 }
 
 export enum CreditHourType {
@@ -49,12 +53,19 @@ export enum CreditHourType {
   WaterCategoryThree = "waterCategoryThree",
 }
 
+export enum ReservationStatus {
+  Accepted = "accepted",
+  Declined = "declined",
+  Waitlisted = "waitlisted",
+}
+
 // Drizzle-posgres currently works best with inference and validation using proper
 // DB enums. Also has better performance than a string and support for migrations.
 export const courseStatusEnum = pgEnum("courseStatus", CourseStatus);
 export const courseLocationEnum = pgEnum("courseLocation", CourseLocation);
 export const paymentStatusEnum = pgEnum("paymentStatus", PaymentStatus);
 export const creditHourTypeEnum = pgEnum("creditHourType", CreditHourType);
+export const reservationStatusEnum = pgEnum("reservationStatus", ReservationStatus);
 
 /*----------------*/
 /* --- Tables --- */
@@ -80,6 +91,7 @@ export const profile = pgTable("profile", {
    * This is user supplied. Admins can reference this when
    * they put people in actual member organizations. */
   association: text(),
+  createdAt: timestamp().defaultNow().notNull(),
 });
 
 /**
@@ -115,11 +127,13 @@ export const courseEvent = pgTable("courseEvent", {
   courseId: varchar()
     .references(() => course.id, { onDelete: "cascade" })
     .notNull(),
-  locationType: varchar().notNull().$type<CourseLocation>(),
+  locationType: courseLocationEnum().notNull(),
   virtualLink: text(),
   physicalAddress: text(),
+  town: text(),
+  venue: text(),
   // refactor: rename to startDate or startsAt
-  classStartDatetime: timestamp({ withTimezone: true }),
+  classStartDatetime: timestamp({ withTimezone: true, mode: "date" }),
   duration: interval(),
 });
 
@@ -138,34 +152,39 @@ export const reservation = pgTable(
       .notNull(),
     // refactor: remove reservation.creditHours
     creditHours: decimal().notNull(),
+    reservationStatus: reservationStatusEnum().notNull(),
+    statusUpdatedAt: timestamp().defaultNow().notNull(),
     paymentStatus: paymentStatusEnum().notNull(),
-    createdAt: timestamp(),
+    createdAt: timestamp().defaultNow().notNull(),
+    stripeInvoiceId: varchar(),
   },
   (table) => [
     primaryKey({ name: "id", columns: [table.profileId, table.courseId] }),
   ],
 );
 
-/* A course's "default" credit hours. It is a type and a number of credit
- * hours. It enforces uniqueness by the type for a given course. */
-export const courseMatter = pgTable(
-  "courseMatter",
-  {
-    courseId: varchar()
-      .references(() => course.id)
-      .notNull(),
-    type: creditHourTypeEnum().notNull(),
-
-    /* Round values to nearest thousandth: between 0.000 and 999.999 */
-    creditHours: decimal({ precision: 6, scale: 3 }).notNull(),
-  },
-  (table) => [primaryKey({ columns: [table.courseId, table.type] })],
-);
+/**
+ * A courseMatter defines the credit reward for a course. Many courses will
+ * just have one courseMatter associated with them. Generally, a course
+ * will have one courseMatter for each type of credit hour the course
+ * provides. However, admins may wish to use courseMatter to divide the
+ * course up in different ways. */
+export const courseMatter = pgTable("courseMatter", {
+  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("courseMatter")),
+  courseId: varchar()
+    .references(() => course.id)
+    .notNull(),
+  type: creditHourTypeEnum(),
+  /* Round values to nearest thousandth: between 0.000 and 999.999 */
+  creditHours: decimal({ precision: 6, scale: 3 }).notNull(),
+  description: text(),
+});
 
 /**
- * Keeps tracks of a trainee's attendance at a course.
- * This is for the whole course and not a courseEvent
- * because VRWA keeps track of credit hours by the course.
+ * Keeps tracks of a trainee's attendance at a course for a given courseMatter.
+ * The type of the credit hour earned is that of the associated courseMatter,
+ * whereas the actual number of credit hours earned may be different from the
+ * "full" or "default" credit hours in the courseMatter.
  */
 export const attendanceRecord = pgTable(
   "attendance",
@@ -173,17 +192,18 @@ export const attendanceRecord = pgTable(
     profileId: varchar("profileId")
       .references(() => profile.id)
       .notNull(),
-    courseId: varchar()
-      .references(() => course.id)
+    courseMatterId: varchar()
+      .references(() => courseMatter.id)
       .notNull(),
-    type: varchar().notNull().$type<CreditHourType>(),
 
     /* Round values to nearest thousandth: between 0.000 and 999.999 */
     creditHours: decimal({ precision: 6, scale: 3 }).notNull(),
+    notes: text(),
+    createdAt: timestamp().defaultNow().notNull(),
   },
   (table) => [
     primaryKey({
-      columns: [table.profileId, table.courseId, table.type],
+      columns: [table.profileId, table.courseMatterId],
     }),
   ],
 );

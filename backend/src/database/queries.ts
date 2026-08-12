@@ -4,7 +4,13 @@
  * when possible. These are like database views but database views
  * add a lot of hassle for little benefit for our use cases.
  */
-import { asc, eq, getColumns, min } from "drizzle-orm";
+import {
+  asc,
+  eq,
+  getColumns,
+  min,
+  sql,
+} from "drizzle-orm";
 import {
   course,
   courseEvent,
@@ -21,9 +27,9 @@ import type {
 } from "./dtos";
 import db from ".";
 
-const { id: _, ...profileFields } = getColumns(profile);
 const reservationFields = getColumns(reservation);
 
+// Subquery: want date of first course session
 export const courseStartQuery = db.client
   .select({
     courseId: courseEvent.courseId,
@@ -33,8 +39,19 @@ export const courseStartQuery = db.client
   .groupBy(courseEvent.courseId)
   .as("course_start");
 
+const courseStartDate = (t: typeof course) =>
+  sql<Date>`(
+        select ${courseStartQuery.courseStart}
+        from ${courseStartQuery}
+        where ${courseStartQuery.courseId} = ${t.id}
+      )`
+    .mapWith(courseEvent.classStartDatetime);
+
+const courseReservations = (t: typeof course) =>
+  db.client.$count(reservation, eq(reservation.courseId, t.id))
+
 export function reservationQuery() {
-  // Subquery: want date of first course session
+  const { id: _, ...profileFields } = getColumns(profile);
   return db.client
     .select({
       ...reservationFields,
@@ -60,15 +77,11 @@ export function reservationQuery() {
 }
 
 export function courseEventQuery() {
+  const { id: _, ...courseFields } = getColumns(course);
   return db.client
     .select({
       ...getColumns(courseEvent),
-      seats: course.seats,
-      instructorId: course.instructorId,
-      courseName: course.courseName,
-      description: course.description,
-      creditHours: course.creditHours,
-      priceCents: course.priceCents,
+      ...courseFields,
     })
     .from(courseEvent)
     .orderBy(asc(courseEvent.classStartDatetime))
@@ -110,6 +123,33 @@ export function courseFindFirst(courseId?: string) {
       sessions: {
         orderBy: (t, { asc }) => asc(t.id),
       },
+      credits: true,
+    },
+    extras: {
+      startDate: courseStartDate,
+      numReservations: courseReservations,
     },
   }) satisfies Promise<CourseDto | undefined>;
+}
+
+export type UsersQueryConfig = NonNullable<
+  Parameters<typeof db.client.query.course.findMany>[0]
+>;export type UsersWhereField = UsersQueryConfig["where"];
+
+export function courseFindMany(where: UsersWhereField) {
+  return db.client.query.course.findMany({
+    where: {
+      ...where,
+    },
+    with: {
+      sessions: {
+        orderBy: (t, { asc }) => asc(t.id),
+      },
+      credits: true,
+    },
+    extras: {
+      startDate: courseStartDate,
+      numReservations: courseReservations,
+    },
+  }) satisfies Promise<CourseDto[]>;
 }

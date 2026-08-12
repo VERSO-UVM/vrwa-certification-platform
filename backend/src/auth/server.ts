@@ -53,6 +53,14 @@ export const auth = betterAuth({
     },
   },
 
+  user: {
+    additionalFields: {
+      stripeCustomerId: {
+        type: "string",
+      }
+    }
+  },
+
   // Fill in activeProfileId if it can be determined automatically
   databaseHooks: {
     session: {
