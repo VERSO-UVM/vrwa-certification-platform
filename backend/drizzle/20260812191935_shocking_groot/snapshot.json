@@ -1,7 +1,7 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "b4dccad0-a9dd-4237-9d24-176939769f56",
+  "id": "a504fede-c28c-4919-92ba-a7f52aac6dab",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -34,6 +34,15 @@
         "waterCategoryThree"
       ],
       "name": "creditHourType",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "active",
+        "inactive"
+      ],
+      "name": "membershipStatus",
       "entityType": "enums",
       "schema": "public"
     },
@@ -81,6 +90,12 @@
     {
       "isRlsEnabled": false,
       "name": "courseMatter",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "memberGroup",
       "entityType": "tables",
       "schema": "public"
     },
@@ -513,6 +528,58 @@
       "name": "id",
       "entityType": "columns",
       "schema": "public",
+      "table": "memberGroup"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "name",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "memberGroup"
+    },
+    {
+      "type": "membershipStatus",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "membershipStatus",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "memberGroup"
+    },
+    {
+      "type": "timestamp",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "createdAt",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "memberGroup"
+    },
+    {
+      "type": "varchar",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
       "table": "profile"
     },
     {
@@ -524,6 +591,19 @@
       "generated": null,
       "identity": null,
       "name": "userId",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "profile"
+    },
+    {
+      "type": "varchar",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "memberGroupId",
       "entityType": "columns",
       "schema": "public",
       "table": "profile"
@@ -1856,6 +1936,23 @@
     {
       "nameExplicit": false,
       "columns": [
+        "memberGroupId"
+      ],
+      "schemaTo": "public",
+      "tableTo": "memberGroup",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "profile_memberGroupId_memberGroup_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "profile"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
         "profileId"
       ],
       "schemaTo": "public",
@@ -2039,6 +2136,16 @@
       "name": "courseMatter_pkey",
       "schema": "public",
       "table": "courseMatter",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "memberGroup_pkey",
+      "schema": "public",
+      "table": "memberGroup",
       "entityType": "pks"
     },
     {

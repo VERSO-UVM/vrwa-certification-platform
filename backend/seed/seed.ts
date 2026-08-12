@@ -5,16 +5,10 @@ import type { CourseLocation } from "../src/database/schema";
 import { generatePrefixedId } from "~/utils/id";
 import { auth } from "~/auth/server";
 import { eq } from "drizzle-orm";
+import data from "./seedData";
 
 async function main() {
-  console.log("Seeding database..");
-
-  //load in data
-  const filePath = path.join(__dirname, "seedData.json");
-  const file = await fs.readFile(filePath, "utf-8");
-  const data = JSON.parse(file);
-
-  //delete existing data
+  // delete existing data
   console.log("Clearing existing data..");
   await db.client.delete(db.schema.reservation);
   await db.client.delete(db.schema.courseEvent);
@@ -25,7 +19,7 @@ async function main() {
   await db.client.delete(db.schema.user);
   await db.client.delete(db.schema.organization);
 
-  //get organization(s)
+  // get organization(s)
   const orgIds: string[] = [];
 
   console.log("Creating organizations..");
@@ -43,7 +37,7 @@ async function main() {
     console.log(`Created ${newOrg!.name}`);
   }
 
-  //create accounts + profiles
+  // create accounts + profiles
   console.log("Creating accounts...");
   const profileIds: string[] = [];
   const instructorIds: string[] = [];
@@ -79,7 +73,7 @@ async function main() {
       const [newProfile] = await db.client
         .insert(db.schema.profile)
         .values({
-          id: prof.id ?? generatePrefixedId("profile"),
+          id: generatePrefixedId("profile"),
           userId: newUser.id,
           firstName: prof.firstName,
           lastName: prof.lastName,
@@ -88,7 +82,7 @@ async function main() {
           state: prof.state,
           postalCode: prof.postalCode,
           phoneNumber: prof.phoneNumber,
-          isMember: prof.isMember,
+          association: prof.association,
         })
         .returning();
       if (role == "user") {

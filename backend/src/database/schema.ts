@@ -59,13 +59,25 @@ export enum ReservationStatus {
   Waitlisted = "waitlisted",
 }
 
+export enum MembershipStatus {
+  Active = "active",
+  Inactive = "inactive",
+}
+
 // Drizzle-posgres currently works best with inference and validation using proper
 // DB enums. Also has better performance than a string and support for migrations.
 export const courseStatusEnum = pgEnum("courseStatus", CourseStatus);
 export const courseLocationEnum = pgEnum("courseLocation", CourseLocation);
 export const paymentStatusEnum = pgEnum("paymentStatus", PaymentStatus);
 export const creditHourTypeEnum = pgEnum("creditHourType", CreditHourType);
-export const reservationStatusEnum = pgEnum("reservationStatus", ReservationStatus);
+export const reservationStatusEnum = pgEnum(
+  "reservationStatus",
+  ReservationStatus,
+);
+export const membershipStatusEnum = pgEnum(
+  "membershipStatus",
+  MembershipStatus,
+);
 
 /*----------------*/
 /* --- Tables --- */
@@ -80,6 +92,7 @@ export const profile = pgTable("profile", {
   userId: varchar()
     .notNull()
     .references(() => user.id),
+  memberGroupId: varchar().references(() => memberGroup.id),
   firstName: text().notNull(),
   lastName: text().notNull(),
   address: text().notNull(),
@@ -104,7 +117,7 @@ export const course = pgTable("course", {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("course")),
   courseName: text().notNull(),
   description: text(),
-    // refactor: remove course.creditHours
+  // refactor: remove course.creditHours
   creditHours: integer().notNull(),
   priceCents: integer().notNull(),
   seats: integer().notNull(),
@@ -208,6 +221,17 @@ export const attendanceRecord = pgTable(
   ],
 );
 
+/**
+ * At the moment we have somewhat different needs here than what Better-Auth's
+ * "organization" plugin offers, which seems to be intended for something different.
+ */
+export const memberGroup = pgTable("memberGroup", {
+  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("memberGroup")),
+  name: text(),
+  membershipStatus: membershipStatusEnum().notNull(),
+  createdAt: timestamp().defaultNow(),
+});
+
 export type User = typeof user.$inferSelect;
 export type Account = typeof account.$inferSelect;
 export type Profile = typeof profile.$inferSelect;
@@ -216,3 +240,4 @@ export type Reservation = typeof reservation.$inferSelect;
 export type Course = typeof course.$inferSelect;
 export type CourseMatter = typeof courseMatter.$inferSelect;
 export type AttendanceRecord = typeof attendanceRecord.$inferSelect;
+export type MemberGroup = typeof memberGroup.$inferSelect;

@@ -8,6 +8,11 @@ export const relations = defineRelations(schema, (r) => ({
       to: r.user.id,
       optional: true,
     }),
+    memberGroup: r.one.memberGroup({
+      from: r.profile.memberGroupId,
+      to: r.memberGroup.id,
+      optional: true,
+    }),
   },
 
   user: {
@@ -61,5 +66,9 @@ export const relations = defineRelations(schema, (r) => ({
       to: r.profile.id,
       optional: false,
     }),
+  },
+
+  memberGroup: {
+    profiles: r.many.profile(),
   },
 }));

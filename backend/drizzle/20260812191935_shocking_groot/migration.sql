@@ -1,6 +1,7 @@
 CREATE TYPE "courseLocation" AS ENUM('in-person', 'virtual', 'hybrid');--> statement-breakpoint
 CREATE TYPE "courseStatus" AS ENUM('active', 'deleted', 'canceled');--> statement-breakpoint
 CREATE TYPE "creditHourType" AS ENUM('wastewater', 'waterCategoryOne', 'waterCategoryTwo', 'waterCategoryThree');--> statement-breakpoint
+CREATE TYPE "membershipStatus" AS ENUM('active', 'inactive');--> statement-breakpoint
 CREATE TYPE "paymentStatus" AS ENUM('draft', 'open', 'paid', 'refunded', 'void', 'uncollectible');--> statement-breakpoint
 CREATE TYPE "reservationStatus" AS ENUM('accepted', 'declined', 'waitlisted');--> statement-breakpoint
 CREATE TABLE "attendance" (
@@ -44,9 +45,17 @@ CREATE TABLE "courseMatter" (
 	"description" text
 );
 --> statement-breakpoint
+CREATE TABLE "memberGroup" (
+	"id" varchar PRIMARY KEY,
+	"name" text,
+	"membershipStatus" "membershipStatus" NOT NULL,
+	"createdAt" timestamp DEFAULT now()
+);
+--> statement-breakpoint
 CREATE TABLE "profile" (
 	"id" varchar PRIMARY KEY,
 	"userId" varchar NOT NULL,
+	"memberGroupId" varchar,
 	"firstName" text NOT NULL,
 	"lastName" text NOT NULL,
 	"address" text NOT NULL,
@@ -168,6 +177,7 @@ ALTER TABLE "course" ADD CONSTRAINT "course_instructorId_profile_id_fkey" FOREIG
 ALTER TABLE "courseEvent" ADD CONSTRAINT "courseEvent_courseId_course_id_fkey" FOREIGN KEY ("courseId") REFERENCES "course"("id") ON DELETE CASCADE;--> statement-breakpoint
 ALTER TABLE "courseMatter" ADD CONSTRAINT "courseMatter_courseId_course_id_fkey" FOREIGN KEY ("courseId") REFERENCES "course"("id");--> statement-breakpoint
 ALTER TABLE "profile" ADD CONSTRAINT "profile_userId_user_id_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id");--> statement-breakpoint
+ALTER TABLE "profile" ADD CONSTRAINT "profile_memberGroupId_memberGroup_id_fkey" FOREIGN KEY ("memberGroupId") REFERENCES "memberGroup"("id");--> statement-breakpoint
 ALTER TABLE "reservation" ADD CONSTRAINT "reservation_profileId_profile_id_fkey" FOREIGN KEY ("profileId") REFERENCES "profile"("id");--> statement-breakpoint
 ALTER TABLE "reservation" ADD CONSTRAINT "reservation_courseId_course_id_fkey" FOREIGN KEY ("courseId") REFERENCES "course"("id") ON DELETE CASCADE;--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE CASCADE;--> statement-breakpoint
