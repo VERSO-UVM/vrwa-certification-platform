@@ -57,8 +57,9 @@ export const auth = betterAuth({
     additionalFields: {
       stripeCustomerId: {
         type: "string",
-      }
-    }
+        required: false,
+      },
+    },
   },
 
   // Fill in activeProfileId if it can be determined automatically
