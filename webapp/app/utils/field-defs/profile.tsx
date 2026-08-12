@@ -74,14 +74,6 @@ export const profileDefs = {
           return <Badge variant="not_member">No</Badge>;
       }
     },
-    meta: {
-      editor: selectOptionsEditor({
-        options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
-        ],
-      }),
-    },
   }),
 };
 

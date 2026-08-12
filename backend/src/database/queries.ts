@@ -36,7 +36,7 @@ export const courseStartQuery = db.client
   .groupBy(courseEvent.courseId)
   .as("course_start");
 
-const isMemberFilter = sql<boolean>`${memberGroup.membershipStatus} = ${MembershipStatus.Active}`;
+const isMemberFilter = sql<boolean>`${memberGroup.membershipStatus} = ${MembershipStatus.Active}`.mapWith(Boolean);
 
 const courseStartDate = (t: typeof course) =>
   sql<Date>`(
