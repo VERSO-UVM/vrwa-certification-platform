@@ -1,4 +1,4 @@
-{
+export default {
   "organizations": [
     {
       "orgName": "ThisIsAnOrganization"
@@ -19,7 +19,8 @@
           "state": "VT",
           "postalCode": "05405",
           "phoneNumber": "888-888-8888",
-          "isMember": false
+          "isMember": false,
+          "association": ""
         }
       ]
     },
@@ -38,7 +39,6 @@
           "postalCode": "05405",
           "phoneNumber": "667-667-6667",
           "isMember": true,
-          "id": "instructor_1"
         }
       ]
     },
@@ -172,7 +172,8 @@
           "state": "VT",
           "postalCode": "05701",
           "phoneNumber": "123-456-7890",
-          "isMember": false
+          "isMember": false,
+          "association": "Rutland Municipal Water",
         },
         {
           "firstName": "Passion",
@@ -182,7 +183,8 @@
           "state": "VT",
           "postalCode": "05495",
           "phoneNumber": "123-456-7890",
-          "isMember": true
+          "isMember": true,
+          "association": "Chittenden County"
         },
         {
           "firstName": "Water",
@@ -192,7 +194,8 @@
           "state": "VT",
           "postalCode": "05445",
           "phoneNumber": "123-456-7890",
-          "isMember": false
+          "isMember": false,
+          "association": "Chittenden County"
         }
       ]
     },
@@ -209,7 +212,8 @@
           "state": "VT",
           "postalCode": "05405",
           "phoneNumber": "802-679-6676",
-          "isMember": false
+          "isMember": false,
+          "association": "Chittenden County"
         }
       ]
     },
@@ -226,7 +230,8 @@
           "state": "VT",
           "postalCode": "05402",
           "phoneNumber": "802-111-2222",
-          "isMember": false
+          "isMember": false,
+          "association": "Chittenden County"
         }
       ]
     },
@@ -243,7 +248,8 @@
           "state": "VT",
           "postalCode": "05402",
           "phoneNumber": "802-111-2222",
-          "isMember": false
+          "isMember": false,
+          "association": "Chittenden County"
         }
       ]
     },
@@ -260,7 +266,8 @@
           "state": "VT",
           "postalCode": "05405",
           "phoneNumber": "802-679-6676",
-          "isMember": true
+          "isMember": true,
+          "association": "Chittenden County"
         }
       ]
     }
@@ -298,4 +305,4 @@
       "priceCents": 1200
     }
   ]
-}
+} as const;
