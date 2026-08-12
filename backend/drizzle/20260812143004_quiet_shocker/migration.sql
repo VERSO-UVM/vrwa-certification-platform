@@ -1,13 +1,15 @@
 CREATE TYPE "courseLocation" AS ENUM('in-person', 'virtual', 'hybrid');--> statement-breakpoint
 CREATE TYPE "courseStatus" AS ENUM('active', 'deleted', 'canceled');--> statement-breakpoint
 CREATE TYPE "creditHourType" AS ENUM('wastewater', 'waterCategoryOne', 'waterCategoryTwo', 'waterCategoryThree');--> statement-breakpoint
-CREATE TYPE "paymentStatus" AS ENUM('paid', 'unpaid');--> statement-breakpoint
+CREATE TYPE "paymentStatus" AS ENUM('draft', 'open', 'paid', 'refunded', 'void', 'uncollectible');--> statement-breakpoint
+CREATE TYPE "reservationStatus" AS ENUM('accepted', 'declined', 'waitlisted');--> statement-breakpoint
 CREATE TABLE "attendance" (
 	"profileId" varchar,
-	"courseId" varchar,
-	"type" varchar,
+	"courseMatterId" varchar,
 	"creditHours" numeric(6,3) NOT NULL,
-	CONSTRAINT "attendance_pkey" PRIMARY KEY("profileId","courseId","type")
+	"notes" text,
+	"createdAt" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "attendance_pkey" PRIMARY KEY("profileId","courseMatterId")
 );
 --> statement-breakpoint
 CREATE TABLE "course" (
@@ -25,18 +27,21 @@ CREATE TABLE "course" (
 CREATE TABLE "courseEvent" (
 	"id" varchar PRIMARY KEY,
 	"courseId" varchar NOT NULL,
-	"locationType" varchar NOT NULL,
+	"locationType" "courseLocation" NOT NULL,
 	"virtualLink" text,
 	"physicalAddress" text,
+	"town" text,
+	"venue" text,
 	"classStartDatetime" timestamp with time zone,
 	"duration" interval
 );
 --> statement-breakpoint
 CREATE TABLE "courseMatter" (
-	"courseId" varchar,
+	"id" varchar PRIMARY KEY,
+	"courseId" varchar NOT NULL,
 	"type" "creditHourType",
 	"creditHours" numeric(6,3) NOT NULL,
-	CONSTRAINT "courseMatter_pkey" PRIMARY KEY("courseId","type")
+	"description" text
 );
 --> statement-breakpoint
 CREATE TABLE "profile" (
@@ -49,15 +54,19 @@ CREATE TABLE "profile" (
 	"state" text NOT NULL,
 	"postalCode" text NOT NULL,
 	"phoneNumber" text NOT NULL,
-	"association" text
+	"association" text,
+	"createdAt" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "reservation" (
 	"profileId" varchar,
 	"courseId" varchar,
 	"creditHours" numeric NOT NULL,
+	"reservationStatus" "reservationStatus" NOT NULL,
+	"statusUpdatedAt" timestamp DEFAULT now() NOT NULL,
 	"paymentStatus" "paymentStatus" NOT NULL,
-	"createdAt" timestamp,
+	"createdAt" timestamp DEFAULT now() NOT NULL,
+	"stripeInvoiceId" varchar,
 	CONSTRAINT "id" PRIMARY KEY("profileId","courseId")
 );
 --> statement-breakpoint
@@ -131,7 +140,8 @@ CREATE TABLE "user" (
 	"role" text,
 	"banned" boolean DEFAULT false,
 	"ban_reason" text,
-	"ban_expires" timestamp
+	"ban_expires" timestamp,
+	"stripe_customer_id" text
 );
 --> statement-breakpoint
 CREATE TABLE "verification" (
@@ -153,7 +163,7 @@ CREATE UNIQUE INDEX "organization_slug_uidx" ON "organization" ("slug");--> stat
 CREATE INDEX "session_userId_idx" ON "session" ("user_id");--> statement-breakpoint
 CREATE INDEX "verification_identifier_idx" ON "verification" ("identifier");--> statement-breakpoint
 ALTER TABLE "attendance" ADD CONSTRAINT "attendance_profileId_profile_id_fkey" FOREIGN KEY ("profileId") REFERENCES "profile"("id");--> statement-breakpoint
-ALTER TABLE "attendance" ADD CONSTRAINT "attendance_courseId_course_id_fkey" FOREIGN KEY ("courseId") REFERENCES "course"("id");--> statement-breakpoint
+ALTER TABLE "attendance" ADD CONSTRAINT "attendance_courseMatterId_courseMatter_id_fkey" FOREIGN KEY ("courseMatterId") REFERENCES "courseMatter"("id");--> statement-breakpoint
 ALTER TABLE "course" ADD CONSTRAINT "course_instructorId_profile_id_fkey" FOREIGN KEY ("instructorId") REFERENCES "profile"("id");--> statement-breakpoint
 ALTER TABLE "courseEvent" ADD CONSTRAINT "courseEvent_courseId_course_id_fkey" FOREIGN KEY ("courseId") REFERENCES "course"("id") ON DELETE CASCADE;--> statement-breakpoint
 ALTER TABLE "courseMatter" ADD CONSTRAINT "courseMatter_courseId_course_id_fkey" FOREIGN KEY ("courseId") REFERENCES "course"("id");--> statement-breakpoint

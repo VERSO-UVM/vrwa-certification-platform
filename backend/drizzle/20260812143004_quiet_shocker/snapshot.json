@@ -1,7 +1,7 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "3d7e4532-89bb-4534-8cac-7a4574c064d2",
+  "id": "b4dccad0-a9dd-4237-9d24-176939769f56",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -39,10 +39,24 @@
     },
     {
       "values": [
+        "draft",
+        "open",
         "paid",
-        "unpaid"
+        "refunded",
+        "void",
+        "uncollectible"
       ],
       "name": "paymentStatus",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "accepted",
+        "declined",
+        "waitlisted"
+      ],
+      "name": "reservationStatus",
       "entityType": "enums",
       "schema": "public"
     },
@@ -145,20 +159,7 @@
       "default": null,
       "generated": null,
       "identity": null,
-      "name": "courseId",
-      "entityType": "columns",
-      "schema": "public",
-      "table": "attendance"
-    },
-    {
-      "type": "varchar",
-      "typeSchema": null,
-      "notNull": true,
-      "dimensions": 0,
-      "default": null,
-      "generated": null,
-      "identity": null,
-      "name": "type",
+      "name": "courseMatterId",
       "entityType": "columns",
       "schema": "public",
       "table": "attendance"
@@ -172,6 +173,32 @@
       "generated": null,
       "identity": null,
       "name": "creditHours",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "attendance"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "notes",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "attendance"
+    },
+    {
+      "type": "timestamp",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "createdAt",
       "entityType": "columns",
       "schema": "public",
       "table": "attendance"
@@ -320,8 +347,8 @@
       "table": "courseEvent"
     },
     {
-      "type": "varchar",
-      "typeSchema": null,
+      "type": "courseLocation",
+      "typeSchema": "public",
       "notNull": true,
       "dimensions": 0,
       "default": null,
@@ -354,6 +381,32 @@
       "generated": null,
       "identity": null,
       "name": "physicalAddress",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "courseEvent"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "town",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "courseEvent"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "venue",
       "entityType": "columns",
       "schema": "public",
       "table": "courseEvent"
@@ -392,6 +445,19 @@
       "default": null,
       "generated": null,
       "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "courseMatter"
+    },
+    {
+      "type": "varchar",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
       "name": "courseId",
       "entityType": "columns",
       "schema": "public",
@@ -400,7 +466,7 @@
     {
       "type": "creditHourType",
       "typeSchema": "public",
-      "notNull": true,
+      "notNull": false,
       "dimensions": 0,
       "default": null,
       "generated": null,
@@ -419,6 +485,19 @@
       "generated": null,
       "identity": null,
       "name": "creditHours",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "courseMatter"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "description",
       "entityType": "columns",
       "schema": "public",
       "table": "courseMatter"
@@ -554,6 +633,19 @@
       "table": "profile"
     },
     {
+      "type": "timestamp",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "createdAt",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "profile"
+    },
+    {
       "type": "varchar",
       "typeSchema": null,
       "notNull": true,
@@ -593,6 +685,32 @@
       "table": "reservation"
     },
     {
+      "type": "reservationStatus",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "reservationStatus",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "reservation"
+    },
+    {
+      "type": "timestamp",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "statusUpdatedAt",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "reservation"
+    },
+    {
       "type": "paymentStatus",
       "typeSchema": "public",
       "notNull": true,
@@ -608,12 +726,25 @@
     {
       "type": "timestamp",
       "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "createdAt",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "reservation"
+    },
+    {
+      "type": "varchar",
+      "typeSchema": null,
       "notNull": false,
       "dimensions": 0,
       "default": null,
       "generated": null,
       "identity": null,
-      "name": "createdAt",
+      "name": "stripeInvoiceId",
       "entityType": "columns",
       "schema": "public",
       "table": "reservation"
@@ -1336,6 +1467,19 @@
     {
       "type": "text",
       "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "stripe_customer_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
       "notNull": true,
       "dimensions": 0,
       "default": null,
@@ -1627,16 +1771,16 @@
     {
       "nameExplicit": false,
       "columns": [
-        "courseId"
+        "courseMatterId"
       ],
       "schemaTo": "public",
-      "tableTo": "course",
+      "tableTo": "courseMatter",
       "columnsTo": [
         "id"
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
-      "name": "attendance_courseId_course_id_fkey",
+      "name": "attendance_courseMatterId_courseMatter_id_fkey",
       "entityType": "fks",
       "schema": "public",
       "table": "attendance"
@@ -1848,25 +1992,13 @@
     {
       "columns": [
         "profileId",
-        "courseId",
-        "type"
+        "courseMatterId"
       ],
       "nameExplicit": false,
       "name": "attendance_pkey",
       "entityType": "pks",
       "schema": "public",
       "table": "attendance"
-    },
-    {
-      "columns": [
-        "courseId",
-        "type"
-      ],
-      "nameExplicit": false,
-      "name": "courseMatter_pkey",
-      "entityType": "pks",
-      "schema": "public",
-      "table": "courseMatter"
     },
     {
       "columns": [
@@ -1897,6 +2029,16 @@
       "name": "courseEvent_pkey",
       "schema": "public",
       "table": "courseEvent",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "courseMatter_pkey",
+      "schema": "public",
+      "table": "courseMatter",
       "entityType": "pks"
     },
     {
