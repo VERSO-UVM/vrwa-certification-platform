@@ -4,9 +4,10 @@ import db from "~/database";
 import {
   course,
   courseEvent,
+  PaymentStatus,
   profile,
   reservation,
-  type PaymentStatus,
+  ReservationStatus,
 } from "~/database/schema";
 import {
   adminProcedure,
@@ -88,7 +89,7 @@ export const reservationRouter = router({
           profileId: z.string(),
           courseId: z.string(),
           creditHours: z.number().positive(),
-          paymentStatus: z.enum(["paid", "unpaid"]),
+          paymentStatus: z.enum(PaymentStatus),
         }),
       )
       .mutation(async ({ input }) => {
@@ -97,6 +98,7 @@ export const reservationRouter = router({
           .values({
             ...input,
             creditHours: input.creditHours.toString(),
+            reservationStatus: ReservationStatus.Accepted,
           })
           .returning();
 

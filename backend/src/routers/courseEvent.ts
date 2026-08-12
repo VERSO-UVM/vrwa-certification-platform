@@ -1,10 +1,8 @@
-import { asc, eq, and } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import db from "~/database";
-import { courseEvent, course, reservation, profile } from "~/database/schema";
-import type { Course } from "~/database/schema";
+import { course, courseEvent, CourseLocation } from "~/database/schema";
 import {
   adminProcedure,
-  basicProcedure,
   instructorProcedure,
   router,
   traineeProcedure,
@@ -13,7 +11,6 @@ import { z } from "zod";
 import type { CourseEventDto } from "~/database/dtos";
 import { courseEventQuery } from "~/database/queries";
 import { TRPCError } from "@trpc/server";
-import { createUpdateSchema } from "drizzle-orm/zod";
 import { isFutureClass } from "~/database/filters";
 
 export const courseEventUpdateSchema = z.object({
@@ -46,7 +43,7 @@ export const courseEventRouter = router({
       .input(
         z.object({
           courseId: z.string(),
-          locationType: z.enum(["in-person", "virtual", "hybrid"]),
+          locationType: z.enum(CourseLocation),
           classStartDatetime: z.coerce.date(),
           seats: z.number().int().positive().optional().nullable(),
           virtualLink: z.url().optional().nullable(),
