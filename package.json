@@ -20,7 +20,7 @@
     "dev": "FORCE_COLOR=1 bun --elide-lines=0 --filter=\"*\" run dev",
     "lint": "eslint \"{backend,webapp}/{src,app}/**/*.ts*\" --fix",
     "format": "prettier --write \"{backend,webapp}/{src,app}/**/*.ts*\"",
-    "typecheck": "bun run --filter '*' typecheck",
+    "typecheck": "bun tsc -p backend; bun tsc -p webapp",
     "db:dev": "FORCE_COLOR=1 bun --elide-lines=0 --filter=backend run db:dev"
   },
   "devDependencies": {
