@@ -23,9 +23,7 @@ export type CourseInsert = z.infer<typeof insertSchema>;
 export const courseRouter = router({
   admin: router({
     list: adminProcedure.query((): Promise<CourseDto[]> => {
-      return courseFindMany({
-        courseName: "hey",
-      });
+      return courseFindMany();
     }),
 
     get: adminProcedure

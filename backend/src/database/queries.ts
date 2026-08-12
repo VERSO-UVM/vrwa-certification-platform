@@ -134,16 +134,8 @@ export function courseFindFirst(courseId?: string) {
   }) satisfies Promise<CourseDto | undefined>;
 }
 
-export type UsersQueryConfig = NonNullable<
-  Parameters<typeof db.client.query.course.findMany>[0]
->;
-export type UsersWhereField = UsersQueryConfig["where"];
-
-export function courseFindMany(where: UsersWhereField) {
+export function courseFindMany() {
   return db.client.query.course.findMany({
-    where: {
-      ...where,
-    },
     with: {
       sessions: {
         orderBy: (t, { asc }) => asc(t.id),
