@@ -37,7 +37,7 @@ export const reservationDefs = {
       editor: selectOptionsEditor({
         options: [
           { label: "Paid", value: PaymentStatus.Paid },
-          { label: "Unpaid", value: PaymentStatus.Unpaid },
+          { label: "Draft", value: PaymentStatus.Draft },
         ],
       }),
     },

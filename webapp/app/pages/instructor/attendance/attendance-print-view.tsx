@@ -137,7 +137,7 @@ export function AttendancePrintView({
                       {entry.firstName} {entry.lastName}
                     </td>
                     <td className="border border-black p-2">
-                      {entry.isMember ? "VRWA Member" : "Non-Member"}
+                      {entry.association}
                     </td>
                     <td className="border border-black p-2">
                       {[

@@ -1,4 +1,4 @@
-import type { Profile } from "@backend/database/schema";
+import type { ProfileDto } from "@backend/database/dtos";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { EditDrawer } from "~/components/entry-views/edit-drawer";
 import { profileDefPresets } from "~/utils/field-defs/profile";
@@ -8,7 +8,7 @@ export function TraineeEditButton({
   trainee,
   label,
 }: {
-  trainee: Profile;
+  trainee: ProfileDto;
   label: string;
 }) {
   const trpc = useTRPC();

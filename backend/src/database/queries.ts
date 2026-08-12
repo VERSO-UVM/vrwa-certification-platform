@@ -4,16 +4,13 @@
  * when possible. These are like database views but database views
  * add a lot of hassle for little benefit for our use cases.
  */
-import {
-  asc,
-  eq,
-  getColumns,
-  min,
-  sql,
-} from "drizzle-orm";
+import { asc, eq, getColumns, min, sql } from "drizzle-orm";
 import {
   course,
   courseEvent,
+  member,
+  memberGroup,
+  MembershipStatus,
   profile,
   reservation,
   user,
@@ -39,16 +36,17 @@ export const courseStartQuery = db.client
   .groupBy(courseEvent.courseId)
   .as("course_start");
 
+const isMemberFilter = sql<boolean>`${memberGroup.membershipStatus} = ${MembershipStatus.Active}`;
+
 const courseStartDate = (t: typeof course) =>
   sql<Date>`(
         select ${courseStartQuery.courseStart}
         from ${courseStartQuery}
         where ${courseStartQuery.courseId} = ${t.id}
-      )`
-    .mapWith(courseEvent.classStartDatetime);
+      )`.mapWith(courseEvent.classStartDatetime);
 
 const courseReservations = (t: typeof course) =>
-  db.client.$count(reservation, eq(reservation.courseId, t.id))
+  db.client.$count(reservation, eq(reservation.courseId, t.id));
 
 export function reservationQuery() {
   const { id: _, ...profileFields } = getColumns(profile);
@@ -64,11 +62,13 @@ export function reservationQuery() {
         creditHours: course.creditHours,
         seats: course.seats,
       },
+      isMember: isMemberFilter,
     })
     .from(reservation)
     .innerJoin(profile, eq(reservation.profileId, profile.id))
     .innerJoin(user, eq(profile.userId, user.id))
     .innerJoin(course, eq(reservation.courseId, course.id))
+    .leftJoin(memberGroup, eq(profile.memberGroupId, memberGroup.id))
     .leftJoin(
       courseStartQuery,
       eq(reservation.courseId, courseStartQuery.courseId),
@@ -93,10 +93,12 @@ export function profilesQuery() {
   return db.client
     .select({
       ...getColumns(profile),
+      isMember: isMemberFilter,
     })
     .from(profile)
     .orderBy(asc(profile.lastName))
     .leftJoin(user, eq(profile.userId, user.id))
+    .leftJoin(memberGroup, eq(profile.memberGroupId, memberGroup.id))
     .$dynamic() satisfies Promise<Profile[]>;
 }
 
@@ -134,7 +136,8 @@ export function courseFindFirst(courseId?: string) {
 
 export type UsersQueryConfig = NonNullable<
   Parameters<typeof db.client.query.course.findMany>[0]
->;export type UsersWhereField = UsersQueryConfig["where"];
+>;
+export type UsersWhereField = UsersQueryConfig["where"];
 
 export function courseFindMany(where: UsersWhereField) {
   return db.client.query.course.findMany({

@@ -14,6 +14,7 @@ import {
 } from "./schema";
 import { createSelectSchema } from "drizzle-orm/zod";
 import z from "zod";
+import { create } from "node:domain";
 
 // refactor: follow format of course: make profile fields accessed with
 // .profile and user fields with .user
@@ -22,6 +23,7 @@ export type ReservationDto = Reservation &
   Pick<User, "email"> &
   Pick<CourseEvent, "classStartDatetime"> & {
     course: Pick<Course, "courseName" | "creditHours" | "id" | "seats">;
+    isMember: boolean,
   };
 
 export type CourseEventDto = CourseEvent &
@@ -38,7 +40,11 @@ export type AttendanceDto = AttendanceRecord & {
   courseMatter: CourseMatter,
 }
 
-export const ProfileDtoSchema = createSelectSchema(profile);
+export const ProfileDtoSchema = createSelectSchema(profile).extend({
+  isMember: z.boolean(),
+}).omit({
+  createdAt: true,
+});
 export type ProfileDto = z.infer<typeof ProfileDtoSchema>;
 
 export const UserDtoSchema = createSelectSchema(user)
@@ -48,6 +54,6 @@ export const UserDtoSchema = createSelectSchema(user)
     role: true,
   })
   .extend({
-    profiles: z.array(ProfileDtoSchema),
+    profiles: z.array(createSelectSchema(profile)),
   });
 export type UserDto = z.infer<typeof UserDtoSchema>;

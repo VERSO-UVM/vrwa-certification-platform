@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Form } from "@radix-ui/react-form";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Button } from "~/components/ui/button";
-import type { Course } from "@backend/database/schema";
+import { CourseStatus, type Course } from "@backend/database/schema";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import type { CourseUpdate } from "@backend/routers/course";
@@ -53,6 +53,7 @@ export function NewCourseForm({ onCreate, course }: NewCourseFormProps) {
       description: values.description?.trim() ?? null,
       creditHours: values.creditHours,
       priceCents: textToDollars(values.price),
+      status: CourseStatus.Active,
     });
   }
 

@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import type { PaymentStatus, Profile } from "@backend/database/schema";
+import { PaymentStatus } from "@backend/database/schema";
 import { type ColumnDef } from "@tanstack/react-table";
-import type { ReservationDto } from "@backend/database/dtos";
+import type { ProfileDto, ReservationDto } from "@backend/database/dtos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { PageHeader } from "~/components/page-header";
 import {
@@ -439,7 +439,7 @@ export default function CourseDetails({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {availableTrainees.map((trainee: Profile) => (
+                        {availableTrainees.map((trainee: ProfileDto) => (
                           <SelectItem key={trainee.id} value={trainee.id}>
                             {trainee.firstName} {trainee.lastName}
                           </SelectItem>
@@ -455,7 +455,7 @@ export default function CourseDetails({
                         profileId: selectedTrainee,
                         courseId: courseId,
                         creditHours: course.data?.creditHours ?? 0,
-                        paymentStatus: "unpaid",
+                        paymentStatus: PaymentStatus.Draft,
                       });
 
                       await queryClient.invalidateQueries({
