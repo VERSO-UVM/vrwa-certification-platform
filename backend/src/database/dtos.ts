@@ -32,7 +32,8 @@ export type CourseEventDto = CourseEvent & Omit<Course, "id">;
 export type CourseDto = Course & {
   sessions: CourseEvent[];
   credits: CourseMatter[];
-  numReservations: number;
+  spotsFilled: number;
+  waitlistSize: number;
 };
 
 export type AttendanceDto = AttendanceRecord & {

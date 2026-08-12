@@ -4,7 +4,7 @@
  * when possible. These are like database views but database views
  * add a lot of hassle for little benefit for our use cases.
  */
-import { asc, eq, getColumns, min, sql } from "drizzle-orm";
+import { and, asc, eq, getColumns, min, sql } from "drizzle-orm";
 import {
   course,
   courseEvent,
@@ -13,6 +13,7 @@ import {
   MembershipStatus,
   profile,
   reservation,
+  ReservationStatus,
   user,
   type Profile,
 } from "~/database/schema";
@@ -50,8 +51,15 @@ const isMemberFilter =
     Boolean,
   );
 
-const courseReservations = (t: typeof course) =>
-  db.client.$count(reservation, eq(reservation.courseId, t.id));
+// Virtual field
+const courseReservations = (status: ReservationStatus) => (t: typeof course) =>
+  db.client.$count(
+    reservation,
+    and(
+      eq(reservation.courseId, t.id),
+      eq(reservation.reservationStatus, ReservationStatus.Accepted),
+    ),
+  );
 
 export function reservationQuery() {
   const { id: _, ...profileFields } = getColumns(profile);
@@ -134,7 +142,8 @@ export function courseFindFirst(courseId?: string) {
     },
     extras: {
       startDate: courseStartDate,
-      numReservations: courseReservations,
+      spotsFilled: courseReservations(ReservationStatus.Accepted),
+      waitlistSize: courseReservations(ReservationStatus.Waitlisted),
     },
   }) satisfies Promise<CourseDto | undefined>;
 }
@@ -149,7 +158,8 @@ export function courseFindMany() {
     },
     extras: {
       startDate: courseStartDate,
-      numReservations: courseReservations,
+      spotsFilled: courseReservations(ReservationStatus.Accepted),
+      waitlistSize: courseReservations(ReservationStatus.Waitlisted),
     },
   }) satisfies Promise<CourseDto[]>;
 }
