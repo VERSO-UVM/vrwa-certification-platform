@@ -32,11 +32,7 @@ const defaultColumns: Column[] = [
   { header: "", enabled: false, id: 4 },
 ];
 
-export function AttendancePrintView({
-  courseId,
-}: {
-  courseId: string;
-}) {
+export function AttendancePrintView({ courseId }: { courseId: string }) {
   const { data: details } = useClassDetailsQuery(courseId);
   const { data: roster = [] } = useRosterQuery(courseId);
   const [columns, setColumns] = useState<Column[]>(defaultColumns);

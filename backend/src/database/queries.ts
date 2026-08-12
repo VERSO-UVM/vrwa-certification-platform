@@ -36,14 +36,19 @@ export const courseStartQuery = db.client
   .groupBy(courseEvent.courseId)
   .as("course_start");
 
-const isMemberFilter = sql<boolean>`${memberGroup.membershipStatus} = ${MembershipStatus.Active}`.mapWith(Boolean);
-
+// To use for Relations Queries
 const courseStartDate = (t: typeof course) =>
   sql<Date>`(
         select ${courseStartQuery.courseStart}
         from ${courseStartQuery}
         where ${courseStartQuery.courseId} = ${t.id}
       )`.mapWith(courseEvent.classStartDatetime);
+
+// We can create a virtual isMember field for backwards compatibility
+const isMemberFilter =
+  sql<boolean>`${memberGroup.membershipStatus} = ${MembershipStatus.Active}`.mapWith(
+    Boolean,
+  );
 
 const courseReservations = (t: typeof course) =>
   db.client.$count(reservation, eq(reservation.courseId, t.id));

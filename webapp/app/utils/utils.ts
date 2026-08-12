@@ -30,6 +30,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function profileFullName(profile: Profile|ProfileDto|ReservationDto) {
+export function profileFullName(
+  profile: Profile | ProfileDto | ReservationDto,
+) {
   return profile.firstName + " " + profile.lastName;
 }

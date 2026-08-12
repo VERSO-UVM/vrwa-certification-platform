@@ -18,11 +18,7 @@ import {
 import { MAX_PAGE_SIZE } from "~/components/data-table/page-size-select";
 import { ClassTitle } from "./class-title";
 
-export function AttendanceEditView({
-  courseId,
-}: {
-  courseId: string;
-}) {
+export function AttendanceEditView({ courseId }: { courseId: string }) {
   const { data: roster = [] } = useRosterQuery(courseId);
 
   return (

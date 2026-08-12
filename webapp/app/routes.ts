@@ -24,18 +24,12 @@ export default [
     route("certificates", "pages/trainee/certificates.tsx"),
     route("certificates/:courseId", "pages/trainee/view-certificate.tsx"),
     route("registration", "pages/trainee/registration.tsx"),
-    route(
-      "registration/:courseId",
-      "pages/trainee/registration-details.tsx",
-    ),
+    route("registration/:courseId", "pages/trainee/registration-details.tsx"),
     route("*", "pages/trainee/not-found.tsx"),
   ]),
   route("instructor", "layouts/instructor.tsx", [
     index("pages/instructor/home/home.tsx"),
-    route(
-      "attendance/:courseId",
-      "pages/instructor/attendance/attendance.tsx",
-    ),
+    route("attendance/:courseId", "pages/instructor/attendance/attendance.tsx"),
     route("*", "pages/instructor/not-found.tsx"),
   ]),
   layout("layouts/auth.tsx", [

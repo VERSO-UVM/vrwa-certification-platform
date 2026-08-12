@@ -144,7 +144,8 @@ export default function CertificationsPage() {
           <CardHeader>
             <CardTitle>Select Trainees</CardTitle>
             <CardDescription>
-              First, search for a course. Then, select trainees to send certificates to or choose Add All.
+              First, search for a course. Then, select trainees to send
+              certificates to or choose Add All.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -174,41 +175,42 @@ export default function CertificationsPage() {
 
             {/* Trainee selection */}
 
-          {selectedCourse && (<>
-            <DataTable
-              columns={traineeTableDefs}
-              data={trainees}
-              table={{
-                enableMultiRowSelection: true,
-                initialState: {
-                  pagination: {
-                    pageSize: 10,
-                  },
-                },
-                onRowSelectionChange: (updater) => {
-                  setRowSelection((prev) =>
-                    typeof updater === "function" ? updater(prev) : updater,
-                  );
-                },
-                state: { rowSelection },
-              }}
-            />
+            {selectedCourse && (
+              <>
+                <DataTable
+                  columns={traineeTableDefs}
+                  data={trainees}
+                  table={{
+                    enableMultiRowSelection: true,
+                    initialState: {
+                      pagination: {
+                        pageSize: 10,
+                      },
+                    },
+                    onRowSelectionChange: (updater) => {
+                      setRowSelection((prev) =>
+                        typeof updater === "function" ? updater(prev) : updater,
+                      );
+                    },
+                    state: { rowSelection },
+                  }}
+                />
 
-            <div className="flex justify-between">
-              <Button
-                disabled={Object.entries(rowSelection).length == 0}
-                onClick={() => addSelectedRecipients()}
-              >
-                Add Selected ({Object.entries(rowSelection).length})
-              </Button>
-              <Button
-                disabled={trainees.length == 0}
-                onClick={() => addAllRecipients()}
-              >
-                Add All ({trainees.length})
-              </Button>
-            </div>
-          </>
+                <div className="flex justify-between">
+                  <Button
+                    disabled={Object.entries(rowSelection).length == 0}
+                    onClick={() => addSelectedRecipients()}
+                  >
+                    Add Selected ({Object.entries(rowSelection).length})
+                  </Button>
+                  <Button
+                    disabled={trainees.length == 0}
+                    onClick={() => addAllRecipients()}
+                  >
+                    Add All ({trainees.length})
+                  </Button>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>
@@ -240,9 +242,7 @@ export default function CertificationsPage() {
                     {(values: ReservationDto[]) => (
                       <React.Fragment>
                         {values.map((item) => (
-                          <ComboboxChip
-                            key={item.profileId + item.courseId}
-                          >
+                          <ComboboxChip key={item.profileId + item.courseId}>
                             {profileFullName(item)}
                           </ComboboxChip>
                         ))}

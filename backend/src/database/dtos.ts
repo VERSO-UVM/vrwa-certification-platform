@@ -10,7 +10,8 @@ import {
   type Profile,
   type CourseEvent,
   type Course,
-  type CourseMatter, type AttendanceRecord,
+  type CourseMatter,
+  type AttendanceRecord,
 } from "./schema";
 import { createSelectSchema } from "drizzle-orm/zod";
 import z from "zod";
@@ -23,11 +24,10 @@ export type ReservationDto = Reservation &
   Pick<User, "email"> &
   Pick<CourseEvent, "classStartDatetime"> & {
     course: Pick<Course, "courseName" | "creditHours" | "id" | "seats">;
-    isMember: boolean,
+    isMember: boolean;
   };
 
-export type CourseEventDto = CourseEvent &
-  Omit<Course, "id">;
+export type CourseEventDto = CourseEvent & Omit<Course, "id">;
 
 export type CourseDto = Course & {
   sessions: CourseEvent[];
@@ -36,15 +36,17 @@ export type CourseDto = Course & {
 };
 
 export type AttendanceDto = AttendanceRecord & {
-  profile: Profile,
-  courseMatter: CourseMatter,
-}
+  profile: Profile;
+  courseMatter: CourseMatter;
+};
 
-export const ProfileDtoSchema = createSelectSchema(profile).extend({
-  isMember: z.boolean(),
-}).omit({
-  createdAt: true,
-});
+export const ProfileDtoSchema = createSelectSchema(profile)
+  .extend({
+    isMember: z.boolean(),
+  })
+  .omit({
+    createdAt: true,
+  });
 export type ProfileDto = z.infer<typeof ProfileDtoSchema>;
 
 export const UserDtoSchema = createSelectSchema(user)

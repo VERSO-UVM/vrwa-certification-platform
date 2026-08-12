@@ -64,7 +64,10 @@ export default function CourseManager() {
       accessorKey: "courseName",
       header: "Course",
       cell: ({ row, getValue }) => (
-        <Link to={`/admin/course-details/${row.original.courseId}`} className="font-medium">
+        <Link
+          to={`/admin/course-details/${row.original.courseId}`}
+          className="font-medium"
+        >
           {getValue() as string}
         </Link>
       ),
@@ -217,7 +220,9 @@ export default function CourseManager() {
               <DrawerContent>
                 <DrawerHeader>
                   <DrawerTitle>
-                    {selectedEvent ? "Edit Training Session" : "New Training Session"}
+                    {selectedEvent
+                      ? "Edit Training Session"
+                      : "New Training Session"}
                   </DrawerTitle>
                   <DrawerDescription>
                     {selectedEvent

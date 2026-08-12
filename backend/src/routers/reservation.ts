@@ -17,10 +17,7 @@ import {
 } from "~/utils/trpc";
 import { createUpdateSchema } from "drizzle-orm/zod";
 import z from "zod";
-import {
-  courseStartQuery,
-  reservationQuery,
-} from "~/database/queries";
+import { courseStartQuery, reservationQuery } from "~/database/queries";
 import type { ReservationDto } from "~/database/dtos";
 import { TRPCError } from "@trpc/server";
 import { hasAttended } from "~/database/filters";
@@ -135,9 +132,9 @@ export const reservationRouter = router({
         }),
       )
       .query(async ({ input: { courseId } }) => {
-        return await reservationQuery().where(
-          eq(reservation.courseId, courseId),
-        ).orderBy(asc(profile.lastName));
+        return await reservationQuery()
+          .where(eq(reservation.courseId, courseId))
+          .orderBy(asc(profile.lastName));
       }),
 
     updateCreditHours: instructorProcedure
