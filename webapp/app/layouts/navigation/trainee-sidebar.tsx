@@ -106,7 +106,7 @@ export function TraineeSidebar() {
                   <Moon />
                   Dark
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="system">
+                <DropdownMenuRadioItem value="system" disabled>
                   <Cog />
                   System
                 </DropdownMenuRadioItem>
