@@ -1,23 +1,15 @@
 CREATE TYPE "courseLocation" AS ENUM('in-person', 'virtual', 'hybrid');--> statement-breakpoint
 CREATE TYPE "courseStatus" AS ENUM('active', 'deleted', 'canceled');--> statement-breakpoint
-CREATE TYPE "creditHourType" AS ENUM('wastewater', 'waterCategoryOne', 'waterCategoryTwo', 'waterCategoryThree');--> statement-breakpoint
+CREATE TYPE "creditHourCategory" AS ENUM('wastewater', 'water', 'water:C1', 'water:C2', 'water:C3', 'water:D1', 'water:D2', 'water:D3');--> statement-breakpoint
 CREATE TYPE "membershipStatus" AS ENUM('active', 'inactive');--> statement-breakpoint
 CREATE TYPE "paymentStatus" AS ENUM('draft', 'open', 'paid', 'refunded', 'void', 'uncollectible');--> statement-breakpoint
 CREATE TYPE "reservationStatus" AS ENUM('accepted', 'declined', 'waitlisted');--> statement-breakpoint
-CREATE TABLE "attendance" (
-	"profileId" varchar,
-	"courseMatterId" varchar,
-	"creditHours" numeric(6,3) NOT NULL,
-	"notes" text,
-	"createdAt" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "attendance_pkey" PRIMARY KEY("profileId","courseMatterId")
-);
---> statement-breakpoint
 CREATE TABLE "course" (
 	"id" varchar PRIMARY KEY,
 	"courseName" text NOT NULL,
 	"description" text,
-	"creditHours" integer NOT NULL,
+	"creditHours" numeric(6,3) NOT NULL,
+	"creditHourCategories" "creditHourCategory"[] DEFAULT ARRAY[]::"creditHourCategory"[] NOT NULL,
 	"priceCents" integer NOT NULL,
 	"seats" integer NOT NULL,
 	"instructorId" varchar,
@@ -35,14 +27,6 @@ CREATE TABLE "courseEvent" (
 	"venue" text,
 	"classStartDatetime" timestamp with time zone,
 	"duration" interval
-);
---> statement-breakpoint
-CREATE TABLE "courseMatter" (
-	"id" varchar PRIMARY KEY,
-	"courseId" varchar NOT NULL,
-	"type" "creditHourType",
-	"creditHours" numeric(6,3) NOT NULL,
-	"description" text
 );
 --> statement-breakpoint
 CREATE TABLE "memberGroup" (
@@ -70,12 +54,12 @@ CREATE TABLE "profile" (
 CREATE TABLE "reservation" (
 	"profileId" varchar,
 	"courseId" varchar,
-	"creditHours" numeric NOT NULL,
 	"reservationStatus" "reservationStatus" NOT NULL,
 	"statusUpdatedAt" timestamp DEFAULT now() NOT NULL,
 	"paymentStatus" "paymentStatus" NOT NULL,
-	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"stripeInvoiceId" varchar,
+	"createdAt" timestamp DEFAULT now() NOT NULL,
+	"creditHours" numeric NOT NULL,
 	CONSTRAINT "id" PRIMARY KEY("profileId","courseId")
 );
 --> statement-breakpoint
@@ -171,11 +155,8 @@ CREATE INDEX "member_userId_idx" ON "member" ("user_id");--> statement-breakpoin
 CREATE UNIQUE INDEX "organization_slug_uidx" ON "organization" ("slug");--> statement-breakpoint
 CREATE INDEX "session_userId_idx" ON "session" ("user_id");--> statement-breakpoint
 CREATE INDEX "verification_identifier_idx" ON "verification" ("identifier");--> statement-breakpoint
-ALTER TABLE "attendance" ADD CONSTRAINT "attendance_profileId_profile_id_fkey" FOREIGN KEY ("profileId") REFERENCES "profile"("id");--> statement-breakpoint
-ALTER TABLE "attendance" ADD CONSTRAINT "attendance_courseMatterId_courseMatter_id_fkey" FOREIGN KEY ("courseMatterId") REFERENCES "courseMatter"("id");--> statement-breakpoint
 ALTER TABLE "course" ADD CONSTRAINT "course_instructorId_profile_id_fkey" FOREIGN KEY ("instructorId") REFERENCES "profile"("id");--> statement-breakpoint
 ALTER TABLE "courseEvent" ADD CONSTRAINT "courseEvent_courseId_course_id_fkey" FOREIGN KEY ("courseId") REFERENCES "course"("id") ON DELETE CASCADE;--> statement-breakpoint
-ALTER TABLE "courseMatter" ADD CONSTRAINT "courseMatter_courseId_course_id_fkey" FOREIGN KEY ("courseId") REFERENCES "course"("id");--> statement-breakpoint
 ALTER TABLE "profile" ADD CONSTRAINT "profile_userId_user_id_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id");--> statement-breakpoint
 ALTER TABLE "profile" ADD CONSTRAINT "profile_memberGroupId_memberGroup_id_fkey" FOREIGN KEY ("memberGroupId") REFERENCES "memberGroup"("id");--> statement-breakpoint
 ALTER TABLE "reservation" ADD CONSTRAINT "reservation_profileId_profile_id_fkey" FOREIGN KEY ("profileId") REFERENCES "profile"("id");--> statement-breakpoint
