@@ -1,7 +1,7 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "319dca71-655f-4d48-8634-fce151b8eb3f",
+  "id": "4fa5849d-0e4a-42fd-a37f-a2a065acc994",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -185,7 +185,7 @@
       "table": "course"
     },
     {
-      "type": "numeric(6,3)",
+      "type": "numeric",
       "typeSchema": null,
       "notNull": true,
       "dimensions": 0,

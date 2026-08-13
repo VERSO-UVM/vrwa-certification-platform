@@ -121,7 +121,7 @@ export const course = pgTable("course", {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("course")),
   courseName: text().notNull(),
   description: text(),
-  creditHours: decimal({ precision: 6, scale: 3 }).notNull(),
+  creditHours: decimal().notNull(),
   creditHourCategories: creditHourCategoryEnum().array().notNull()
     .default(sql`ARRAY[]::${creditHourCategoryEnum}[]`),
   /* Round values to nearest thousandth: between 0.000 and 999.999 */

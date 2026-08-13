@@ -60,7 +60,7 @@ export const attendanceFieldDefs = [
           step={0.25}
           min={0}
           value={creditHours}
-          placeholder={String(item.course.creditHours)}
+          placeholder={item.course.creditHours}
           className="w-28"
           onChange={(event) => {
             setCreditHours(event.target.value);

@@ -94,7 +94,7 @@ export const reservationRouter = router({
           .insert(reservation)
           .values({
             ...input,
-            creditHours: input.creditHours.toString(),
+            creditHours: input.creditHours,
             reservationStatus: ReservationStatus.Accepted,
           })
           .returning();
@@ -159,7 +159,7 @@ export const reservationRouter = router({
         const updated = await db.client
           .update(reservation)
           .set({
-            creditHours: input.creditHours.toString(),
+            creditHours: input.creditHours,
           })
           .where(
             and(

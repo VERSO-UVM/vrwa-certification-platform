@@ -8,7 +8,7 @@ CREATE TABLE "course" (
 	"id" varchar PRIMARY KEY,
 	"courseName" text NOT NULL,
 	"description" text,
-	"creditHours" numeric(6,3) NOT NULL,
+	"creditHours" numeric NOT NULL,
 	"creditHourCategories" "creditHourCategory"[] DEFAULT ARRAY[]::"creditHourCategory"[] NOT NULL,
 	"priceCents" integer NOT NULL,
 	"seats" integer NOT NULL,
