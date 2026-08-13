@@ -1,3 +1,8 @@
+/**
+ * This is the ORM part of drizzle-orm. Relations are mainly used for
+ * findFirst and findMany relational queries, where they can be quite
+ * powerful. See Drizzle docs for definition syntax.
+ */
 import { defineRelations } from "drizzle-orm";
 import * as schema from "./schema";
 
