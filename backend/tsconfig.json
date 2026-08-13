@@ -5,7 +5,6 @@
       "~/*": ["./src/*"],
       "@webapp/*": ["../webapp/app/*"]
     },
-    "baseUrl": ".",
     "outDir": "./dist"
   }
 }
