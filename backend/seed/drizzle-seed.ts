@@ -2,7 +2,7 @@ import "dotenv/config";
 
 import { eq } from "drizzle-orm";
 import { milliseconds } from "date-fns";
-import { seed } from "drizzle-seed";
+import { reset, seed } from "drizzle-seed";
 import db from "~/database/index";
 import { uniformInt } from "pure-rand/distribution/uniformInt";
 import { xoroshiro128plus } from "pure-rand/generator/xoroshiro128plus";
@@ -18,6 +18,10 @@ import {
   profile,
   reservation,
   ReservationStatus,
+  memberGroup,
+  MembershipStatus,
+  user,
+  account,
 } from "~/database/schema";
 import { auth } from "~/auth/server";
 import { generatePrefixedId } from "~/utils/id";
@@ -26,6 +30,7 @@ import type { Role } from "~/auth/permissions";
 type IdPrefix = Parameters<typeof generatePrefixedId>[0];
 
 const COUNTS = {
+  users: 24,
   admins: 1,
   instructors: 3,
   trainees: 20,
@@ -36,6 +41,7 @@ const COUNTS = {
   courseMatters: 15,
   reservations: 60,
   attendance: 40,
+  memberGroups: 5,
 } as const;
 
 const SEED_PASSWORD = "Password123!";
@@ -43,6 +49,11 @@ const RNG_SEED = 42;
 const COURSE_EVENT_WINDOW_MS = milliseconds({ weeks: 3 });
 const ONE_YEAR_MS = milliseconds({ years: 1 });
 const rng = xoroshiro128plus(RNG_SEED);
+
+const profileIds = generateIdArray("profile", COUNTS.profiles);
+const courseIds = generateIdArray("course", COUNTS.courses);
+const courseMatterIds = generateIdArray("courseMatter", COUNTS.courseMatters);
+const memberGroupIds = generateIdArray("memberGroup", COUNTS.memberGroups);
 
 const VRWA_ASSOCIATIONS = [
   "Town of Burlington Water Dept",
@@ -60,7 +71,7 @@ const COURSE_TITLES = [
   "Filter Surveilance",
   "Basic Wastewater Course",
   "Basic Math for Water and Wastewater Operators",
-  "Water Bending"
+  "Water Bending",
 ] as const;
 
 const VENUE_NAMES = [
@@ -76,25 +87,6 @@ const VENUE_NAMES = [
 /* Generate array of random IDs using our custom ID generator */
 function generateIdArray(prefix: IdPrefix, count: number): string[] {
   return Array.from({ length: count }, () => generatePrefixedId(prefix));
-}
-
-async function clearDatabase() {
-  console.log("Clearing existing data..");
-  const { schema } = db;
-
-  await db.client.delete(schema.attendanceRecord);
-  await db.client.delete(schema.reservation);
-  await db.client.delete(schema.courseMatter);
-  await db.client.delete(schema.courseEvent);
-  await db.client.delete(schema.course);
-  await db.client.delete(schema.profile);
-  await db.client.delete(schema.member);
-  await db.client.delete(schema.invitation);
-  await db.client.delete(schema.session);
-  await db.client.delete(schema.account);
-  await db.client.delete(schema.verification);
-  await db.client.delete(schema.organization);
-  await db.client.delete(schema.user);
 }
 
 async function signUpUsers(): Promise<string[]> {
@@ -141,12 +133,7 @@ async function signUpUsers(): Promise<string[]> {
   return userIds;
 }
 
-async function seedAppTables(
-  userIds: string[],
-  profileIds: string[],
-  courseIds: string[],
-  courseMatterIds: string[],
-) {
+async function seedAppTables() {
   const reservationCount = Math.min(
     COUNTS.reservations,
     profileIds.length * courseIds.length,
@@ -156,6 +143,14 @@ async function seedAppTables(
     profileIds.length * courseMatterIds.length,
   );
 
+  const existingInstructorIds = await db.client.query.profile
+    .findMany({
+      where: { user: { role: "instructor" } },
+    })
+    .then((profs) => profs.map((p) => p.id));
+
+  const instructorIds = [...existingInstructorIds, profileIds[0]];
+
   console.log(
     `Seeding app tables (${reservationCount} reservations, ${attendanceCount} attendance records)..`,
   );
@@ -163,19 +158,68 @@ async function seedAppTables(
   await seed(
     db.client,
     {
+      memberGroup,
       profile,
       course,
       courseMatter,
       reservation,
       attendanceRecord,
+      user,
+      account,
     },
     { seed: RNG_SEED },
   ).refine((funcs) => ({
+    user: {
+      count: COUNTS.users,
+      columns: {
+        email: funcs.email(),
+        name: funcs.companyName(),
+        role: funcs.weightedRandom([
+          {
+            weight: 0.1,
+            value: funcs.default({ defaultValue: "admin" }),
+          },
+          {
+            weight: 0.7,
+            value: funcs.default({ defaultValue: "user" }),
+          },
+          {
+            weight: 0.2,
+            value: funcs.default({ defaultValue: "instructor" }),
+          },
+        ]),
+      },
+    },
+    account: {
+      count: COUNTS.users,
+    },
+    memberGroup: {
+      count: COUNTS.memberGroups,
+      columns: {
+        id: funcs.valuesFromArray({
+          values: memberGroupIds,
+          isUnique: true,
+        }),
+        membershipStatus: funcs.valuesFromArray({
+          values: Object.values(MembershipStatus),
+        }),
+        name: funcs.valuesFromArray({
+          values: [
+            "City of Burlington",
+            "Town of Rutland",
+            "Town of Middlebury",
+            "Town of Shelburne",
+            "Town of South Burlington",
+          ],
+          isUnique: true,
+        }),
+      },
+    },
     profile: {
       count: COUNTS.profiles,
       columns: {
         id: funcs.valuesFromArray({ values: profileIds, isUnique: true }),
-        userId: funcs.valuesFromArray({ values: userIds }),
+        memberGroupId: funcs.valuesFromArray({ values: memberGroupIds }),
         firstName: funcs.firstName(),
         lastName: funcs.lastName(),
         address: funcs.streetAddress(),
@@ -196,7 +240,7 @@ async function seedAppTables(
         creditHours: funcs.int({ minValue: 1, maxValue: 8 }),
         priceCents: funcs.int({ minValue: 5000, maxValue: 50000 }),
         seats: funcs.int({ minValue: 10, maxValue: 40 }),
-        instructorId: funcs.valuesFromArray({ values: profileIds }),
+        instructorId: funcs.valuesFromArray({ values: instructorIds }),
         status: funcs.weightedRandom([
           {
             weight: 0.8,
@@ -271,9 +315,9 @@ async function seedCourseEventsPerCourse(courseIds: string[]): Promise<number> {
 
   for (const [index, courseId] of courseIds.entries()) {
     const eventsPerCourse =
+      COUNTS.courseEventsPerCourseMin +
       (index %
-        (COUNTS.courseEventsPerCourseMin + COUNTS.courseEventsPerCourseMax)) -
-      COUNTS.courseEventsPerCourseMin;
+        (COUNTS.courseEventsPerCourseMin + COUNTS.courseEventsPerCourseMax));
 
     const eventIds = generateIdArray("courseEvent", eventsPerCourse);
 
@@ -319,21 +363,15 @@ async function seedCourseEventsPerCourse(courseIds: string[]): Promise<number> {
   return totalEvents;
 }
 
-async function main() {
+export async function drizzleSeed() {
   console.log("Seeding database with drizzle-seed..");
 
-  await clearDatabase();
+  // const userIds = await signUpUsers();
+  // if (userIds.length === 0) {
+  // throw new Error("No users were created; cannot seed dependent tables.");
+  // }
 
-  const userIds = await signUpUsers();
-  if (userIds.length === 0) {
-    throw new Error("No users were created; cannot seed dependent tables.");
-  }
-
-  const profileIds = generateIdArray("profile", COUNTS.profiles);
-  const courseIds = generateIdArray("course", COUNTS.courses);
-  const courseMatterIds = generateIdArray("courseMatter", COUNTS.courseMatters);
-
-  await seedAppTables(userIds, profileIds, courseIds, courseMatterIds);
+  await seedAppTables();
   const courseEventCount = await seedCourseEventsPerCourse(courseIds);
 
   const reservationCount = Math.min(
@@ -346,7 +384,7 @@ async function main() {
   );
 
   console.log("Seeding summary:");
-  console.log(`  users: ${userIds.length}`);
+  // console.log(`  users: ${userIds.length}`);
   console.log(`  profiles: ${COUNTS.profiles}`);
   console.log(`  courses: ${COUNTS.courses}`);
   console.log(`  courseEvents: ${courseEventCount}`);
@@ -355,12 +393,15 @@ async function main() {
   console.log(`  attendance: ${attendanceCount}`);
 }
 
-main()
-  .then(() => {
-    console.log("Seeding process complete!");
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error("Error:", error);
-    process.exit(1);
-  });
+if (import.meta.main) {
+  reset(db.client, db.schema)
+    .then(() => drizzleSeed())
+    .then(() => {
+      console.log("Seeding process complete!");
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      process.exit(1);
+    });
+}

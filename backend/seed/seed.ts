@@ -1,22 +1,16 @@
 import db from "~/database/index";
-import { CourseLocation, PaymentStatus, ReservationStatus } from "../src/database/schema";
+import {
+  CourseLocation,
+  PaymentStatus,
+  ReservationStatus,
+} from "../src/database/schema";
 import { generatePrefixedId } from "~/utils/id";
 import { auth } from "~/auth/server";
 import { eq } from "drizzle-orm";
 import data from "./seedData";
+import { reset } from "drizzle-seed";
 
-async function main() {
-  // delete existing data
-  console.log("Clearing existing data..");
-  await db.client.delete(db.schema.reservation);
-  await db.client.delete(db.schema.courseEvent);
-  await db.client.delete(db.schema.course);
-  await db.client.delete(db.schema.profile);
-  await db.client.delete(db.schema.account);
-  await db.client.delete(db.schema.session);
-  await db.client.delete(db.schema.user);
-  await db.client.delete(db.schema.organization);
-
+export async function seedDatabase() {
   // get organization(s)
   const orgIds: string[] = [];
 
@@ -187,12 +181,15 @@ async function main() {
   }
 }
 
-main()
-  .then(() => {
-    console.log("Seeding process complete!");
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error("Error:", error);
-    process.exit(1);
-  });
+if (import.meta.main) {
+  reset(db.client, db.schema)
+    .then(() => seedDatabase())
+    .then(() => {
+      console.log("Seeding process complete!");
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      process.exit(1);
+    });
+}
