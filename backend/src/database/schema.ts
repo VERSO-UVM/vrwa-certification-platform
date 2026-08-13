@@ -56,7 +56,10 @@ export enum CreditHourCategories {
   WaterD2 = CreditHourCategories.Water + ":D2",
   WaterD3 = CreditHourCategories.Water + ":D3",
 }
-export const creditHourCategoryEnum = pgEnum("creditHourCategory", CreditHourCategories);
+export const creditHourCategoryEnum = pgEnum(
+  "creditHourCategory",
+  CreditHourCategories,
+);
 
 export enum ReservationStatus {
   Accepted = "accepted",
@@ -122,7 +125,9 @@ export const course = pgTable("course", {
   courseName: text().notNull(),
   description: text(),
   creditHours: decimal().notNull(),
-  creditHourCategories: creditHourCategoryEnum().array().notNull()
+  creditHourCategories: creditHourCategoryEnum()
+    .array()
+    .notNull()
     .default(sql`ARRAY[]::${creditHourCategoryEnum}[]`),
   /* Round values to nearest thousandth: between 0.000 and 999.999 */
   priceCents: integer().notNull(),
