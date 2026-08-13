@@ -8,7 +8,6 @@ import { and, asc, eq, getColumns, min, sql } from "drizzle-orm";
 import {
   course,
   courseEvent,
-  member,
   memberGroup,
   MembershipStatus,
   profile,
@@ -57,7 +56,7 @@ const courseReservations = (status: ReservationStatus) => (t: typeof course) =>
     reservation,
     and(
       eq(reservation.courseId, t.id),
-      eq(reservation.reservationStatus, ReservationStatus.Accepted),
+      eq(reservation.reservationStatus, status),
     ),
   );
 
@@ -138,7 +137,6 @@ export function courseFindFirst(courseId?: string) {
       sessions: {
         orderBy: (t, { asc }) => asc(t.id),
       },
-      credits: true,
     },
     extras: {
       startDate: courseStartDate,
@@ -154,7 +152,6 @@ export function courseFindMany() {
       sessions: {
         orderBy: (t, { asc }) => asc(t.id),
       },
-      credits: true,
     },
     extras: {
       startDate: courseStartDate,

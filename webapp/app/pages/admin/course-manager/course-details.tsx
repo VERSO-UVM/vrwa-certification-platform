@@ -454,7 +454,7 @@ export default function CourseDetails({
                       await client.reservations.admin.create.mutate({
                         profileId: selectedTrainee,
                         courseId: courseId,
-                        creditHours: course.data?.creditHours ?? 0,
+                        creditHours: course.data?.creditHours ?? "0",
                         paymentStatus: PaymentStatus.Draft,
                       });
 

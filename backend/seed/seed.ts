@@ -103,7 +103,7 @@ async function main() {
       .values({
         courseName: courseInfo.courseName,
         description: courseInfo.description,
-        creditHours: courseInfo.creditHours,
+        creditHours: courseInfo.creditHours.toString(),
         priceCents: courseInfo.priceCents,
         instructorId,
         seats: Math.trunc(profileIds.length / 2),

@@ -46,12 +46,17 @@ export enum PaymentStatus {
   Uncollectible = "uncollectible",
 }
 
-export enum CreditHourType {
+export enum CreditHourCategories {
   Wastewater = "wastewater",
-  WaterCategoryOne = "waterCategoryOne",
-  WaterCategoryTwo = "waterCategoryTwo",
-  WaterCategoryThree = "waterCategoryThree",
+  Water = "water",
+  WaterC1 = CreditHourCategories.Water + ":C1",
+  WaterC2 = CreditHourCategories.Water + ":C2",
+  WaterC3 = CreditHourCategories.Water + ":C3",
+  WaterD1 = CreditHourCategories.Water + ":D1",
+  WaterD2 = CreditHourCategories.Water + ":D2",
+  WaterD3 = CreditHourCategories.Water + ":D3",
 }
+export const creditHourCategoryEnum = pgEnum("creditHourCategory", CreditHourCategories);
 
 export enum ReservationStatus {
   Accepted = "accepted",
@@ -69,7 +74,6 @@ export enum MembershipStatus {
 export const courseStatusEnum = pgEnum("courseStatus", CourseStatus);
 export const courseLocationEnum = pgEnum("courseLocation", CourseLocation);
 export const paymentStatusEnum = pgEnum("paymentStatus", PaymentStatus);
-export const creditHourTypeEnum = pgEnum("creditHourType", CreditHourType);
 export const reservationStatusEnum = pgEnum(
   "reservationStatus",
   ReservationStatus,
@@ -117,8 +121,10 @@ export const course = pgTable("course", {
   id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("course")),
   courseName: text().notNull(),
   description: text(),
-  // refactor: remove course.creditHours
-  creditHours: integer().notNull(),
+  creditHours: decimal({ precision: 6, scale: 3 }).notNull(),
+  creditHourCategories: creditHourCategoryEnum().array().notNull()
+    .default(sql`ARRAY[]::${creditHourCategoryEnum}[]`),
+  /* Round values to nearest thousandth: between 0.000 and 999.999 */
   priceCents: integer().notNull(),
   seats: integer().notNull(),
   instructorId: varchar().references(() => profile.id),
@@ -163,61 +169,19 @@ export const reservation = pgTable(
     courseId: varchar()
       .references(() => course.id, { onDelete: "cascade" })
       .notNull(),
-    // refactor: remove reservation.creditHours
-    creditHours: decimal().notNull(),
+
+    /* Registration fields */
     reservationStatus: reservationStatusEnum().notNull(),
     statusUpdatedAt: timestamp().defaultNow().notNull(),
     paymentStatus: paymentStatusEnum().notNull(),
-    createdAt: timestamp().defaultNow().notNull(),
     stripeInvoiceId: varchar(),
+    createdAt: timestamp().defaultNow().notNull(),
+
+    /* Attendance fields */
+    creditHours: decimal().notNull(),
   },
   (table) => [
     primaryKey({ name: "id", columns: [table.profileId, table.courseId] }),
-  ],
-);
-
-/**
- * A courseMatter defines the credit reward for a course. Many courses will
- * just have one courseMatter associated with them. Generally, a course
- * will have one courseMatter for each type of credit hour the course
- * provides. However, admins may wish to use courseMatter to divide the
- * course up in different ways. */
-export const courseMatter = pgTable("courseMatter", {
-  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("courseMatter")),
-  courseId: varchar()
-    .references(() => course.id)
-    .notNull(),
-  type: creditHourTypeEnum(),
-  /* Round values to nearest thousandth: between 0.000 and 999.999 */
-  creditHours: decimal({ precision: 6, scale: 3 }).notNull(),
-  description: text(),
-});
-
-/**
- * Keeps tracks of a trainee's attendance at a course for a given courseMatter.
- * The type of the credit hour earned is that of the associated courseMatter,
- * whereas the actual number of credit hours earned may be different from the
- * "full" or "default" credit hours in the courseMatter.
- */
-export const attendanceRecord = pgTable(
-  "attendance",
-  {
-    profileId: varchar("profileId")
-      .references(() => profile.id)
-      .notNull(),
-    courseMatterId: varchar()
-      .references(() => courseMatter.id)
-      .notNull(),
-
-    /* Round values to nearest thousandth: between 0.000 and 999.999 */
-    creditHours: decimal({ precision: 6, scale: 3 }).notNull(),
-    notes: text(),
-    createdAt: timestamp().defaultNow().notNull(),
-  },
-  (table) => [
-    primaryKey({
-      columns: [table.profileId, table.courseMatterId],
-    }),
   ],
 );
 
@@ -238,6 +202,4 @@ export type Profile = typeof profile.$inferSelect;
 export type CourseEvent = typeof courseEvent.$inferSelect;
 export type Reservation = typeof reservation.$inferSelect;
 export type Course = typeof course.$inferSelect;
-export type CourseMatter = typeof courseMatter.$inferSelect;
-export type AttendanceRecord = typeof attendanceRecord.$inferSelect;
 export type MemberGroup = typeof memberGroup.$inferSelect;

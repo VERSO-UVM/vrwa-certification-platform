@@ -51,7 +51,7 @@ export function NewCourseForm({ onCreate, course }: NewCourseFormProps) {
     onCreate({
       courseName: values.courseName.trim(),
       description: values.description?.trim() ?? null,
-      creditHours: values.creditHours,
+      creditHours: values.creditHours.toString(),
       priceCents: textToDollars(values.price),
       status: CourseStatus.Active,
     });
@@ -95,7 +95,7 @@ export function NewCourseForm({ onCreate, course }: NewCourseFormProps) {
             required
             value={values.creditHours}
             onChange={(e) =>
-              setValues({ ...values, creditHours: Number(e.target.value) })
+              setValues({ ...values, creditHours: e.target.value })
             }
           ></Input>
         </Field>

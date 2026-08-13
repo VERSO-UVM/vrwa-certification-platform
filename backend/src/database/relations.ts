@@ -19,30 +19,7 @@ export const relations = defineRelations(schema, (r) => ({
     profiles: r.many.profile(),
   },
 
-  courseMatter: {
-    course: r.one.course({
-      from: r.courseMatter.courseId,
-      to: r.course.id,
-      optional: false,
-    }),
-    attendance: r.many.attendanceRecord(),
-  },
-
-  attendanceRecord: {
-    profile: r.one.profile({
-      from: r.attendanceRecord.profileId,
-      to: r.profile.id,
-      optional: false,
-    }),
-    courseMatter: r.one.courseMatter({
-      from: r.attendanceRecord.courseMatterId,
-      to: r.courseMatter.id,
-      optional: false,
-    }),
-  },
-
   course: {
-    credits: r.many.courseMatter(),
     sessions: r.many.courseEvent(),
     reservations: r.many.reservation(),
   },

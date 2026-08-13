@@ -85,7 +85,7 @@ export const reservationRouter = router({
         z.object({
           profileId: z.string(),
           courseId: z.string(),
-          creditHours: z.number().positive(),
+          creditHours: z.string(),
           paymentStatus: z.enum(PaymentStatus),
         }),
       )
@@ -142,7 +142,7 @@ export const reservationRouter = router({
         z.object({
           courseId: z.string(),
           profileId: z.string(),
-          creditHours: z.number().min(0).max(24),
+          creditHours: z.string(),
         }),
       )
       .mutation(async ({ input, ctx }) => {

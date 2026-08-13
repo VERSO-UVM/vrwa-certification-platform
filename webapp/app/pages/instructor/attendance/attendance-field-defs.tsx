@@ -34,7 +34,7 @@ export const attendanceFieldDefs = [
                 creditHoursUpdate.mutate({
                   courseId: item.courseId,
                   profileId: item.profileId,
-                  creditHours: checked ? item.course.creditHours : 0,
+                  creditHours: checked ? item.course.creditHours : "0",
                 })
               }
               id={`present-${item.profileId}`}
@@ -69,7 +69,7 @@ export const attendanceFieldDefs = [
             creditHoursUpdate.mutate({
               courseId: item.courseId,
               profileId: item.profileId,
-              creditHours: number,
+              creditHours: number.toString(),
             });
           }}
         />
