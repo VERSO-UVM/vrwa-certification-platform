@@ -56,10 +56,6 @@ export enum CreditHourCategories {
   WaterD2 = CreditHourCategories.Water + ":D2",
   WaterD3 = CreditHourCategories.Water + ":D3",
 }
-export const creditHourCategoryEnum = pgEnum(
-  "creditHourCategory",
-  CreditHourCategories,
-);
 
 export enum ReservationStatus {
   Accepted = "accepted",
@@ -84,6 +80,10 @@ export const reservationStatusEnum = pgEnum(
 export const membershipStatusEnum = pgEnum(
   "membershipStatus",
   MembershipStatus,
+);
+export const creditHourCategoryEnum = pgEnum(
+  "creditHourCategory",
+  CreditHourCategories,
 );
 
 /*----------------*/
