@@ -36,9 +36,7 @@ export const courseEventRouter = router({
     listCourse: adminProcedure
       .input(z.object({ courseId: z.string() }))
       .query(async ({ input }) => {
-        const courseEvents = await db.client
-          .select()
-          .from(courseEvent)
+        const courseEvents = await courseEventQuery()
           .where(eq(courseEvent.courseId, input.courseId));
         return courseEvents ?? [];
       }),
@@ -49,7 +47,7 @@ export const courseEventRouter = router({
           courseId: z.string(),
           locationType: z.enum(["in-person", "virtual", "hybrid"]),
           classStartDatetime: z.coerce.date(),
-          seats: z.number().int().positive(),
+          seats: z.number().int().positive().optional().nullable(),
           virtualLink: z.url().optional().nullable(),
           physicalAddress: z.string().nullable().optional(),
         }),

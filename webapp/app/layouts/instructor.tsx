@@ -6,5 +6,5 @@ import { protectedLoader } from "~/utils/session";
 export const loader = protectedLoader("instructor");
 
 export default function InstructorLayout() {
-  return <SidebarLayout sidebar={InstructorSidebar} />;
+  return <SidebarLayout sidebar={InstructorSidebar} homeUrl="/instructor/" />;
 }

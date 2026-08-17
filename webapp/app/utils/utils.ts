@@ -1,3 +1,4 @@
+import type { ReservationDto } from "@backend/database/dtos";
 import type { Profile } from "@backend/database/schema";
 import clsx, { type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -29,6 +30,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function profileFullName(profile: Profile) {
+export function profileFullName(profile: Profile|ReservationDto) {
   return profile.firstName + " " + profile.lastName;
 }
