@@ -26,10 +26,19 @@ import {
 import { Button } from "~/components/ui/button";
 
 export function TraineeSidebar() {
-  const [theme, setTheme] = React.useState("vrwa-light")
+  // if (document.cookie == null) {
+  //   document.cookie = "vrwa-light"
+  // }
+
+  document.cookie = "vrwa-light"
+
+  let savedTheme = document.cookie;
+
+  const [theme, setTheme] = React.useState(savedTheme.toString())
 
   React.useEffect(() => {
-    document.body.classList = "dark";
+    console.log("TEST")
+    console.log(theme)
     const oldTheme = window.localStorage.getItem("theme")
     if (oldTheme == null) {
       document.body.classList.add(theme)
