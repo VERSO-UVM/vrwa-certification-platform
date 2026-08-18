@@ -13,6 +13,7 @@ const ID_PREFIXES = {
   session: "sid",
   organization: "org",
   verification: "verif",
+  courseMatter: "subject",
   user: "user",
   memberGroup: "assoc",
   reservation: "reserv",
