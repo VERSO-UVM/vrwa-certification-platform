@@ -1,6 +1,5 @@
 /**
  * PRNG realistic seeding using drizzle-seed library.
- * All passwords are .
  */
 
 import { milliseconds } from "date-fns";
