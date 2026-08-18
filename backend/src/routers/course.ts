@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import db from "~/database";
-import { course, CourseStatus, CreditHourCategories } from "~/database/schema";
+import { course, CourseStatus, CreditHourCategory } from "~/database/schema";
 import type { Course } from "~/database/schema";
 import { adminProcedure, instructorProcedure, router } from "~/utils/trpc";
 import { z } from "zod";
@@ -15,7 +15,7 @@ const updateSchema = createUpdateSchema(course, {
 
 const insertSchema = createInsertSchema(course, {
   status: z.enum(CourseStatus),
-  creditHourCategories: z.array(z.enum(CreditHourCategories)).optional(),
+  creditHourCategories: z.array(z.enum(CreditHourCategory)).optional(),
 });
 
 export type CourseUpdate = z.infer<typeof updateSchema>;

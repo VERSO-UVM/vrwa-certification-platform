@@ -6,14 +6,13 @@ import { reset, seed } from "drizzle-seed";
 import db from "~/database/index";
 import { uniformInt } from "pure-rand/distribution/uniformInt";
 import { xoroshiro128plus } from "pure-rand/generator/xoroshiro128plus";
+import { hashPassword } from "better-auth/crypto";
 import {
-  attendanceRecord,
   course,
   courseEvent,
-  courseMatter,
   CourseLocation,
   CourseStatus,
-  CreditHourType,
+  CreditHourCategory,
   PaymentStatus,
   profile,
   reservation,
@@ -54,6 +53,8 @@ const profileIds = generateIdArray("profile", COUNTS.profiles);
 const courseIds = generateIdArray("course", COUNTS.courses);
 const courseMatterIds = generateIdArray("courseMatter", COUNTS.courseMatters);
 const memberGroupIds = generateIdArray("memberGroup", COUNTS.memberGroups);
+const userIds = generateIdArray("user", COUNTS.users);
+const accountIds = generateIdArray("account", COUNTS.users);
 
 const VRWA_ASSOCIATIONS = [
   "Town of Burlington Water Dept",
@@ -89,50 +90,6 @@ function generateIdArray(prefix: IdPrefix, count: number): string[] {
   return Array.from({ length: count }, () => generatePrefixedId(prefix));
 }
 
-async function signUpUsers(): Promise<string[]> {
-  console.log("Creating better-auth users..");
-  const userIds: string[] = [];
-
-  const rolePlans: {
-    role: Role;
-    count: number;
-    label: string;
-  }[] = [
-    { role: "admin", count: COUNTS.admins, label: "admin" },
-    { role: "instructor", count: COUNTS.instructors, label: "instructor" },
-    { role: "user", count: COUNTS.trainees, label: "trainee" },
-  ];
-
-  for (const { role, count, label } of rolePlans) {
-    for (let i = 0; i < count; i++) {
-      const email = `${label}-${i + 1}@seed.local`;
-
-      const result = await auth.api.signUpEmail({
-        body: {
-          email,
-          password: SEED_PASSWORD,
-          name: email,
-        },
-      });
-
-      if (!result?.user) {
-        console.error(`Failed to create account for ${email}:`, result);
-        continue;
-      }
-
-      await db.client
-        .update(db.schema.user)
-        .set({ role })
-        .where(eq(db.schema.user.id, result.user.id));
-
-      userIds.push(result.user.id);
-      console.log(`Created ${role}: ${email} (password: ${SEED_PASSWORD})`);
-    }
-  }
-
-  return userIds;
-}
-
 async function seedAppTables() {
   const reservationCount = Math.min(
     COUNTS.reservations,
@@ -155,15 +112,15 @@ async function seedAppTables() {
     `Seeding app tables (${reservationCount} reservations, ${attendanceCount} attendance records)..`,
   );
 
+  const passwordHash = await hashPassword(SEED_PASSWORD);
+
   await seed(
     db.client,
     {
       memberGroup,
       profile,
       course,
-      courseMatter,
       reservation,
-      attendanceRecord,
       user,
       account,
     },
@@ -172,6 +129,7 @@ async function seedAppTables() {
     user: {
       count: COUNTS.users,
       columns: {
+        id: funcs.valuesFromArray({ values: userIds, isUnique: true }),
         email: funcs.email(),
         name: funcs.companyName(),
         role: funcs.weightedRandom([
@@ -192,6 +150,10 @@ async function seedAppTables() {
     },
     account: {
       count: COUNTS.users,
+      columns: {
+        id: funcs.valuesFromArray({ values: accountIds, isUnique: true }),
+        password: funcs.default({ defaultValue: passwordHash }),
+      },
     },
     memberGroup: {
       count: COUNTS.memberGroups,
@@ -255,24 +217,14 @@ async function seedAppTables() {
             value: funcs.default({ defaultValue: CourseStatus.Deleted }),
           },
         ]),
+        creditHourCategories: funcs.valuesFromArray({
+          values: Object.values(CreditHourCategory),
+          arraySize: 2,
+        }),
         tags: funcs.valuesFromArray({
           values: ["exam", "renewal", "intro"],
           arraySize: 2,
         }),
-      },
-    },
-    courseMatter: {
-      count: COUNTS.courseMatters,
-      columns: {
-        id: funcs.valuesFromArray({ values: courseMatterIds, isUnique: true }),
-        courseId: funcs.valuesFromArray({ values: courseIds }),
-        type: funcs.valuesFromArray({ values: Object.values(CreditHourType) }),
-        creditHours: funcs.number({
-          minValue: 0.5,
-          maxValue: 8,
-          precision: 1000,
-        }),
-        description: funcs.loremIpsum({ sentencesCount: 1 }),
       },
     },
     reservation: {
@@ -288,18 +240,6 @@ async function seedAppTables() {
         statusUpdatedAt: false,
         createdAt: false,
         stripeInvoiceId: funcs.valuesFromArray({ values: [null] }),
-      },
-    },
-    attendanceRecord: {
-      count: attendanceCount,
-      columns: {
-        creditHours: funcs.number({
-          minValue: 0,
-          maxValue: 8,
-          precision: 1000,
-        }),
-        notes: funcs.loremIpsum({ sentencesCount: 1 }),
-        createdAt: false,
       },
     },
   }));
@@ -383,14 +323,16 @@ export async function drizzleSeed() {
     profileIds.length * courseMatterIds.length,
   );
 
-  console.log("Seeding summary:");
+  console.log("Summary:");
   // console.log(`  users: ${userIds.length}`);
-  console.log(`  profiles: ${COUNTS.profiles}`);
-  console.log(`  courses: ${COUNTS.courses}`);
+  console.log(`  accounts: ${COUNTS.users}`);
+  console.log(`  attendance: ${attendanceCount}`);
   console.log(`  courseEvents: ${courseEventCount}`);
   console.log(`  courseMatters: ${COUNTS.courseMatters}`);
+  console.log(`  courses: ${COUNTS.courses}`);
+  console.log(`  profiles: ${COUNTS.profiles}`);
   console.log(`  reservations: ${reservationCount}`);
-  console.log(`  attendance: ${attendanceCount}`);
+  console.log(`  users: ${COUNTS.users}`);
 }
 
 if (import.meta.main) {

@@ -47,15 +47,15 @@ export enum PaymentStatus {
   Uncollectible = "uncollectible",
 }
 
-export enum CreditHourCategories {
+export enum CreditHourCategory {
   Wastewater = "wastewater",
   Water = "water",
-  WaterC1 = CreditHourCategories.Water + ":C1",
-  WaterC2 = CreditHourCategories.Water + ":C2",
-  WaterC3 = CreditHourCategories.Water + ":C3",
-  WaterD1 = CreditHourCategories.Water + ":D1",
-  WaterD2 = CreditHourCategories.Water + ":D2",
-  WaterD3 = CreditHourCategories.Water + ":D3",
+  WaterC1 = CreditHourCategory.Water + ":C1",
+  WaterC2 = CreditHourCategory.Water + ":C2",
+  WaterC3 = CreditHourCategory.Water + ":C3",
+  WaterD1 = CreditHourCategory.Water + ":D1",
+  WaterD2 = CreditHourCategory.Water + ":D2",
+  WaterD3 = CreditHourCategory.Water + ":D3",
 }
 
 export enum ReservationStatus {
@@ -84,7 +84,7 @@ export const membershipStatusEnum = pgEnum(
 );
 export const creditHourCategoryEnum = pgEnum(
   "creditHourCategory",
-  CreditHourCategories,
+  CreditHourCategory,
 );
 
 /*----------------*/
@@ -169,6 +169,7 @@ export const courseEvent = pgTable("courseEvent", {
 export const reservation = pgTable(
   "reservation",
   {
+    id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("reservation")),
     profileId: varchar("profileId")
       .references(() => profile.id)
       .notNull(),
@@ -186,11 +187,10 @@ export const reservation = pgTable(
     /* Attendance fields */
     creditHours: decimal().notNull(),
   },
-  (table) => [
-    primaryKey({ name: "id", columns: [table.profileId, table.courseId] }),
-    // Declared for drizzle-seed composite-key detection (mirrors the PK above).
-    unique("reservation_profile_course_uidx").on(table.profileId, table.courseId),
-  ],
+  // Drizzle-seed recognizes unique() but not composite primary key uniqueness.
+  // May as well switch to a regular reservation id with a unique() constraint,
+  // it is more consistent anyways and holds the same invariant.
+  (table) => [unique().on(table.profileId, table.courseId)],
 );
 
 /**

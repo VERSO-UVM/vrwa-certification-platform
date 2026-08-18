@@ -7,7 +7,7 @@ import {
 import { generatePrefixedId } from "~/utils/id";
 import { auth } from "~/auth/server";
 import { eq } from "drizzle-orm";
-import data from "./seedData";
+import data from "./seed-data";
 import { reset } from "drizzle-seed";
 
 export async function seedDatabase() {
