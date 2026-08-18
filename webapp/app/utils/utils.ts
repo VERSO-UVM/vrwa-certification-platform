@@ -1,6 +1,11 @@
-import type { ProfileDto, ReservationDto } from "@backend/database/dtos";
+import type {
+  CourseDto,
+  ProfileDto,
+  ReservationDto,
+} from "@backend/database/dtos";
 import type { Profile } from "@backend/database/schema";
 import clsx, { type ClassValue } from "clsx";
+import { format } from "date-fns";
 import { twMerge } from "tailwind-merge";
 
 /**
@@ -34,4 +39,17 @@ export function profileFullName(
   profile: Profile | ProfileDto | ReservationDto,
 ) {
   return profile.firstName + " " + profile.lastName;
+}
+
+export function courseStartDate(course: CourseDto) {
+  // sessions field should always be in chronological order
+  return course.sessions?.[0]?.classStartDatetime;
+}
+
+export function dateFormat(date: Date) {
+  return format(date, "eee, LLLL M, Y");
+}
+
+export function timeFormat(date: Date) {
+  return format(date, "p");
 }
