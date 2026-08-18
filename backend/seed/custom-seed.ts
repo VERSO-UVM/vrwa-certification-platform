@@ -1,22 +1,16 @@
 import db from "~/database/index";
-import { CourseLocation, PaymentStatus, ReservationStatus } from "../src/database/schema";
+import {
+  CourseLocation,
+  PaymentStatus,
+  ReservationStatus,
+} from "../src/database/schema";
 import { generatePrefixedId } from "~/utils/id";
 import { auth } from "~/auth/server";
 import { eq } from "drizzle-orm";
-import data from "./seedData";
+import data from "./seed-data";
+import { reset } from "drizzle-seed";
 
-async function main() {
-  // delete existing data
-  console.log("Clearing existing data..");
-  await db.client.delete(db.schema.reservation);
-  await db.client.delete(db.schema.courseEvent);
-  await db.client.delete(db.schema.course);
-  await db.client.delete(db.schema.profile);
-  await db.client.delete(db.schema.account);
-  await db.client.delete(db.schema.session);
-  await db.client.delete(db.schema.user);
-  await db.client.delete(db.schema.organization);
-
+export async function seedDatabase() {
   // get organization(s)
   const orgIds: string[] = [];
 
@@ -32,7 +26,6 @@ async function main() {
       })
       .returning();
     orgIds.push(newOrg!.id);
-    console.log(`Created ${newOrg!.name}`);
   }
 
   // create accounts + profiles
@@ -64,8 +57,7 @@ async function main() {
       .set({ role })
       .where(eq(db.schema.user.id, newUser.id));
 
-    console.log(`Created account under email ${acct.email}`);
-    console.log(`password: ${acct.password}`);
+    console.log(`\t${acct.email} :: ${acct.password}`);
 
     for (const prof of acct.profiles) {
       const [newProfile] = await db.client
@@ -88,7 +80,6 @@ async function main() {
       } else if (role == "instructor") {
         instructorIds.push(newProfile!.id);
       }
-      console.log(`profile: ${prof.firstName} ${prof.lastName}`);
     }
   }
 
@@ -110,7 +101,6 @@ async function main() {
       })
       .returning();
     courseIds.push(newCourse!.id);
-    console.log(`${courseInfo.courseName} created`);
   }
 
   //create course events
@@ -122,7 +112,7 @@ async function main() {
   for (const courseId of courseIds) {
     //past event
     const thePast = new Date(now);
-    thePast.setMonth(now.getMonth() - num);
+    thePast.setDate(now.getDate() - num);
 
     const [pastEvent] = await db.client
       .insert(db.schema.courseEvent)
@@ -144,7 +134,7 @@ async function main() {
 
     //future event
     const theFuture = new Date(now);
-    theFuture.setMonth(now.getMonth() + num);
+    theFuture.setDate(now.getDate() + num);
 
     const [futureEvent] = await db.client
       .insert(db.schema.courseEvent)
@@ -166,8 +156,6 @@ async function main() {
     num++;
   }
 
-  console.log(`Created ${courseIds.length * 2} course events!`);
-
   //create reservations + link to profiles
   console.log(`Creating reservations...`);
   const NUM_RESERVATIONS_PER_CLASS = 10;
@@ -187,12 +175,15 @@ async function main() {
   }
 }
 
-main()
-  .then(() => {
-    console.log("Seeding process complete!");
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error("Error:", error);
-    process.exit(1);
-  });
+if (import.meta.main) {
+  reset(db.client, db.schema)
+    .then(() => seedDatabase())
+    .then(() => {
+      console.log("Seeding process complete!");
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      process.exit(1);
+    });
+}

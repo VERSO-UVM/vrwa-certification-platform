@@ -16,6 +16,7 @@ const ID_PREFIXES = {
   courseMatter: "subject",
   user: "user",
   memberGroup: "assoc",
+  reservation: "reserv",
 } as const;
 
 type IdPrefixNames = keyof typeof ID_PREFIXES;
