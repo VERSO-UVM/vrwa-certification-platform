@@ -8,6 +8,7 @@ import {
   decimal,
   pgEnum,
   interval,
+  unique,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { prefixedIdGenerator } from "~/utils/id";
@@ -187,6 +188,8 @@ export const reservation = pgTable(
   },
   (table) => [
     primaryKey({ name: "id", columns: [table.profileId, table.courseId] }),
+    // Declared for drizzle-seed composite-key detection (mirrors the PK above).
+    unique("reservation_profile_course_uidx").on(table.profileId, table.courseId),
   ],
 );
 

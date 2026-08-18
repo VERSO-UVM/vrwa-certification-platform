@@ -10,7 +10,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:drop": "drizzle-kit drop",
-    "db:seed": "bun run seed/seed.ts",
+    "db:seed": "bun run seed/drizzle-seed.ts",
     "db:dev": "bun run tool/developer-database.ts"
   },
   "dependencies": {
@@ -36,6 +36,7 @@
     "nanoid": "^5.1.6",
     "nestjs-zod": "^5.1.1",
     "pg": "^8.18.0",
+    "pure-rand": "^8.4.2",
     "react": "catalog:",
     "superjson": "catalog:",
     "zod": "^4.3.6"
@@ -43,6 +44,7 @@
   "devDependencies": {
     "@types/node": "^25.3.0",
     "auth": "catalog:",
+    "drizzle-seed": "^1.0.0-rc.4",
     "typescript": "catalog:"
   }
 }
