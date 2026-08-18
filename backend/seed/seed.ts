@@ -26,7 +26,6 @@ export async function seedDatabase() {
       })
       .returning();
     orgIds.push(newOrg!.id);
-    console.log(`Created ${newOrg!.name}`);
   }
 
   // create accounts + profiles
@@ -58,8 +57,7 @@ export async function seedDatabase() {
       .set({ role })
       .where(eq(db.schema.user.id, newUser.id));
 
-    console.log(`Created account under email ${acct.email}`);
-    console.log(`password: ${acct.password}`);
+    console.log(`\t${acct.email} :: ${acct.password}`);
 
     for (const prof of acct.profiles) {
       const [newProfile] = await db.client
@@ -82,7 +80,6 @@ export async function seedDatabase() {
       } else if (role == "instructor") {
         instructorIds.push(newProfile!.id);
       }
-      console.log(`profile: ${prof.firstName} ${prof.lastName}`);
     }
   }
 
@@ -104,7 +101,6 @@ export async function seedDatabase() {
       })
       .returning();
     courseIds.push(newCourse!.id);
-    console.log(`${courseInfo.courseName} created`);
   }
 
   //create course events
@@ -116,7 +112,7 @@ export async function seedDatabase() {
   for (const courseId of courseIds) {
     //past event
     const thePast = new Date(now);
-    thePast.setMonth(now.getMonth() - num);
+    thePast.setDate(now.getDate() - num);
 
     const [pastEvent] = await db.client
       .insert(db.schema.courseEvent)
@@ -138,7 +134,7 @@ export async function seedDatabase() {
 
     //future event
     const theFuture = new Date(now);
-    theFuture.setMonth(now.getMonth() + num);
+    theFuture.setDate(now.getDate() + num);
 
     const [futureEvent] = await db.client
       .insert(db.schema.courseEvent)
@@ -159,8 +155,6 @@ export async function seedDatabase() {
     courseEventIds.push(futureEvent!.id);
     num++;
   }
-
-  console.log(`Created ${courseIds.length * 2} course events!`);
 
   //create reservations + link to profiles
   console.log(`Creating reservations...`);

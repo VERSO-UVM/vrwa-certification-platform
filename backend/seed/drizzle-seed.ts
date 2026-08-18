@@ -1,6 +1,8 @@
-import "dotenv/config";
+/**
+ * PRNG realistic seeding using drizzle-seed library.
+ * All passwords are .
+ */
 
-import { eq } from "drizzle-orm";
 import { milliseconds } from "date-fns";
 import { reset, seed } from "drizzle-seed";
 import db from "~/database/index";
@@ -21,10 +23,9 @@ import {
   MembershipStatus,
   user,
   account,
+  session,
 } from "~/database/schema";
-import { auth } from "~/auth/server";
 import { generatePrefixedId } from "~/utils/id";
-import type { Role } from "~/auth/permissions";
 
 type IdPrefix = Parameters<typeof generatePrefixedId>[0];
 
@@ -43,7 +44,7 @@ const COUNTS = {
   memberGroups: 5,
 } as const;
 
-const SEED_PASSWORD = "Password123!";
+const SEED_PASSWORD = "seedpassword";
 const RNG_SEED = 42;
 const COURSE_EVENT_WINDOW_MS = milliseconds({ weeks: 3 });
 const ONE_YEAR_MS = milliseconds({ years: 1 });
@@ -51,14 +52,13 @@ const rng = xoroshiro128plus(RNG_SEED);
 
 const profileIds = generateIdArray("profile", COUNTS.profiles);
 const courseIds = generateIdArray("course", COUNTS.courses);
-const courseMatterIds = generateIdArray("courseMatter", COUNTS.courseMatters);
 const memberGroupIds = generateIdArray("memberGroup", COUNTS.memberGroups);
 const userIds = generateIdArray("user", COUNTS.users);
 const accountIds = generateIdArray("account", COUNTS.users);
 
 const VRWA_ASSOCIATIONS = [
-  "Town of Burlington Water Dept",
-  "Chittenden County SD",
+  "City of Burlington",
+  "Chittenden County Wastewater",
   "Rutland Wastewater Utility",
   "Montpelier Public Works",
   null,
@@ -91,26 +91,25 @@ function generateIdArray(prefix: IdPrefix, count: number): string[] {
 }
 
 async function seedAppTables() {
-  const reservationCount = Math.min(
+  const numReservations = Math.min(
     COUNTS.reservations,
     profileIds.length * courseIds.length,
   );
-  const attendanceCount = Math.min(
-    COUNTS.attendance,
-    profileIds.length * courseMatterIds.length,
-  );
 
+  /* Use existing instructors if they exist from custom seeding */
   const existingInstructorIds = await db.client.query.profile
     .findMany({
       where: { user: { role: "instructor" } },
     })
     .then((profs) => profs.map((p) => p.id));
 
-  const instructorIds = [...existingInstructorIds, profileIds[0]];
+  const instructorIds = [
+    ...existingInstructorIds,
+    profileIds[0],
+    profileIds[1],
+  ];
 
-  console.log(
-    `Seeding app tables (${reservationCount} reservations, ${attendanceCount} attendance records)..`,
-  );
+  console.log(`Password: ${SEED_PASSWORD}`);
 
   const passwordHash = await hashPassword(SEED_PASSWORD);
 
@@ -123,6 +122,7 @@ async function seedAppTables() {
       reservation,
       user,
       account,
+      session,
     },
     { seed: RNG_SEED },
   ).refine((funcs) => ({
@@ -132,6 +132,12 @@ async function seedAppTables() {
         id: funcs.valuesFromArray({ values: userIds, isUnique: true }),
         email: funcs.email(),
         name: funcs.companyName(),
+        emailVerified: funcs.default({ defaultValue: true }),
+        image: funcs.default({ defaultValue: null }),
+        banned: funcs.default({ defaultValue: false }),
+        banExpires: funcs.default({ defaultValue: null }),
+        banReason: funcs.default({ defaultValue: null }),
+        stripeCustomerId: funcs.default({ defaultValue: null }),
         role: funcs.weightedRandom([
           {
             weight: 0.1,
@@ -153,7 +159,19 @@ async function seedAppTables() {
       columns: {
         id: funcs.valuesFromArray({ values: accountIds, isUnique: true }),
         password: funcs.default({ defaultValue: passwordHash }),
+        accessToken: funcs.default({ defaultValue: null }),
+        accessTokenExpiresAt: funcs.default({ defaultValue: null }),
+        idToken: funcs.default({ defaultValue: null }),
+        issuer: funcs.default({ defaultValue: "local:credential" }),
+        refreshToken: funcs.default({ defaultValue: null }),
+        refreshTokenExpiresAt: funcs.default({ defaultValue: null }),
+        providerId: funcs.default({ defaultValue: "credential" }),
+        scope: funcs.default({ defaultValue: null }),
       },
+    },
+    session: {
+      count: COUNTS.users,
+      columns: {},
     },
     memberGroup: {
       count: COUNTS.memberGroups,
@@ -228,7 +246,7 @@ async function seedAppTables() {
       },
     },
     reservation: {
-      count: reservationCount,
+      count: numReservations,
       columns: {
         creditHours: funcs.number({ minValue: 0, maxValue: 8, precision: 100 }),
         reservationStatus: funcs.valuesFromArray({
@@ -245,11 +263,11 @@ async function seedAppTables() {
   }));
 }
 
+/**
+ * Don't want courseEvents to be spread out randomly. They should stay within a three-week
+ * timespan.
+ */
 async function seedCourseEventsPerCourse(courseIds: string[]): Promise<number> {
-  console.log(
-    `Seeding course events per course (${COUNTS.courseEventsPerCourseMin}–${COUNTS.courseEventsPerCourseMax} each, 3-week window)..`,
-  );
-
   const now = Date.now();
   let totalEvents = 0;
 
@@ -304,12 +322,7 @@ async function seedCourseEventsPerCourse(courseIds: string[]): Promise<number> {
 }
 
 export async function drizzleSeed() {
-  console.log("Seeding database with drizzle-seed..");
-
-  // const userIds = await signUpUsers();
-  // if (userIds.length === 0) {
-  // throw new Error("No users were created; cannot seed dependent tables.");
-  // }
+  console.log("== Running drizzle-seed ==");
 
   await seedAppTables();
   const courseEventCount = await seedCourseEventsPerCourse(courseIds);
@@ -318,32 +331,24 @@ export async function drizzleSeed() {
     COUNTS.reservations,
     profileIds.length * courseIds.length,
   );
-  const attendanceCount = Math.min(
-    COUNTS.attendance,
-    profileIds.length * courseMatterIds.length,
-  );
 
-  console.log("Summary:");
-  // console.log(`  users: ${userIds.length}`);
-  console.log(`  accounts: ${COUNTS.users}`);
-  console.log(`  attendance: ${attendanceCount}`);
-  console.log(`  courseEvents: ${courseEventCount}`);
-  console.log(`  courseMatters: ${COUNTS.courseMatters}`);
-  console.log(`  courses: ${COUNTS.courses}`);
+  console.log("PRNG Seed:");
   console.log(`  profiles: ${COUNTS.profiles}`);
-  console.log(`  reservations: ${reservationCount}`);
   console.log(`  users: ${COUNTS.users}`);
+  console.log(`  courses: ${COUNTS.courses}`);
+  console.log(`  courseEvents: ${courseEventCount}`);
+  console.log(`  reservations: ${reservationCount}`);
 }
 
 if (import.meta.main) {
   reset(db.client, db.schema)
     .then(() => drizzleSeed())
     .then(() => {
-      console.log("Seeding process complete!");
+      console.log("DONE - seeding process");
       process.exit(0);
     })
     .catch((error) => {
-      console.error("Error:", error);
+      console.error("ERROR:", error);
       process.exit(1);
     });
 }
