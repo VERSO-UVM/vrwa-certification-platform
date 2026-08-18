@@ -2,8 +2,9 @@ import { adminProcedure, router, traineeProcedure } from "~/utils/trpc";
 import { pdf } from "@react-pdf/renderer";
 import z from "zod";
 import { CertificateDocument } from "~/pdf/pdf_template";
-import { eq } from "drizzle-orm";
 import db from "~/database";
+import { TRPCError } from "@trpc/server";
+import { courseFindFirst } from "~/database/queries";
 
 /**
  * For now we are returning a Blob directly embedded as a base64 string
@@ -13,31 +14,20 @@ import db from "~/database";
  */
 const generateCertificate = async (input: {
   profileId: string;
-  courseEventId: string;
+  courseId: string;
 }) => {
   const profile = await db.client.query.profile.findFirst({
-    where: eq(db.schema.profile.id, input.profileId),
+    where: { id: input.profileId },
   });
-  const courseEvent = await db.client.query.courseEvent.findFirst({
-    where: eq(db.schema.courseEvent.id, input.courseEventId),
-  });
+  const course = await courseFindFirst(input.courseId);
 
   if (!profile) {
     // No profile found
     return null;
   }
 
-  if (!courseEvent) {
-    // No course event found
-    return null;
-  }
-
-  const course = await db.client.query.course.findFirst({
-    where: eq(db.schema.course.id, courseEvent.courseId),
-  });
-
   if (!course) {
-    // No course found
+    // No course event found
     return null;
   }
 
@@ -47,8 +37,8 @@ const generateCertificate = async (input: {
   const blob = await pdf(
     <CertificateDocument
       name={name}
-      date={courseEvent?.classStartDatetime?.toDateString()}
-      course={courseEvent?.courseId}
+      date={course?.sessions?.[0]?.classStartDatetime?.toDateString()}
+      course={course?.id}
     />,
   ).toBlob();
 
@@ -66,7 +56,7 @@ export const certificateRouter = router({
       .input(
         z.object({
           profileId: z.string(),
-          courseEventId: z.string(),
+          courseId: z.string(),
         }),
       )
       .mutation(async ({ input }) => generateCertificate(input)),
@@ -76,7 +66,7 @@ export const certificateRouter = router({
         z.array(
           z.object({
             profileId: z.string(),
-            courseEventId: z.string(),
+            courseId: z.string(),
           }),
         ),
       )
@@ -90,14 +80,20 @@ export const certificateRouter = router({
     get: traineeProcedure
       .input(
         z.object({
-          courseEventId: z.string(),
+          courseId: z.string(),
         }),
       )
-      .query(async ({ input, ctx }) =>
-        generateCertificate({
+      .query(async ({ input, ctx }) => {
+        if (ctx.session.activeProfileId == null) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Course event not found.",
+          });
+        }
+        return generateCertificate({
           profileId: ctx.session.activeProfileId,
-          courseEventId: input.courseEventId,
-        }),
-      ),
+          courseId: input.courseId,
+        });
+      }),
   },
 });

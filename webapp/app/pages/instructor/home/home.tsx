@@ -42,7 +42,7 @@ const columnDefs = [
     cell: ({ row, getValue }) => (
       <Link
         to={{
-          pathname: `/instructor/attendance/${row.original.id}`,
+          pathname: `/instructor/attendance/${row.original.courseId}`,
           search: `?view=edit`,
         }}
         className="font-medium hover:underline"

@@ -18,7 +18,7 @@ export function EditTraineeReservation({
   const updateData = async (updates: Partial<ReservationDto>) => {
     await reservationUpdater.mutateAsync({
       profileId: reservation.profileId,
-      courseEventId: reservation.courseEventId,
+      courseId: reservation.courseId,
       creditHours: updates.creditHours?.toString(),
       paymentStatus: updates.paymentStatus,
     });

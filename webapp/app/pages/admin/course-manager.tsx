@@ -64,7 +64,10 @@ export default function CourseManager() {
       accessorKey: "courseName",
       header: "Course",
       cell: ({ row, getValue }) => (
-        <Link to={`/admin/course-details/${row.original.courseId}`} className="font-medium">
+        <Link
+          to={`/admin/course-details/${row.original.courseId}`}
+          className="font-medium"
+        >
           {getValue() as string}
         </Link>
       ),
@@ -217,7 +220,9 @@ export default function CourseManager() {
               <DrawerContent>
                 <DrawerHeader>
                   <DrawerTitle>
-                    {selectedEvent ? "Edit Training Session" : "New Training Session"}
+                    {selectedEvent
+                      ? "Edit Training Session"
+                      : "New Training Session"}
                   </DrawerTitle>
                   <DrawerDescription>
                     {selectedEvent
@@ -239,7 +244,7 @@ export default function CourseManager() {
                           queryKey: trpc.courseEvents.admin.list.queryKey(),
                         });
                       } else {
-                        await client.courses.admin.create.mutate(
+                        await client.courseEvents.admin.create.mutate(
                           data as CourseEventDto,
                         );
                         await queryClient.invalidateQueries({

@@ -11,16 +11,17 @@
       "react": "^19.2.4",
       "react-dom": "^19.2.4",
       "typescript": "^5.9.3",
-      "better-auth": "^1.6.20",
+      "better-auth": "1.7.0-rc.5",
+      "auth": "1.7.0-rc.5",
       "superjson": "^2.2.6"
     }
   },
   "scripts": {
-    "dev": "bun --filter=\"*\" run dev",
+    "dev": "FORCE_COLOR=1 bun --elide-lines=0 --filter=\"*\" run dev",
     "lint": "eslint \"{backend,webapp}/{src,app}/**/*.ts*\" --fix",
     "format": "prettier --write \"{backend,webapp}/{src,app}/**/*.ts*\"",
-    "typecheck": "bun run --filter '*' typecheck",
-    "db:dev": "bun --filter=backend run db:dev"
+    "typecheck": "bun tsc -p backend; bun tsc -p webapp",
+    "db:dev": "FORCE_COLOR=1 bun --elide-lines=0 --filter=backend run db:dev"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

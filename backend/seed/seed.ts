@@ -1,20 +1,12 @@
 import db from "~/database/index";
-import fs from "fs/promises";
-import path from "path";
-import type { CourseLocation } from "../src/database/schema";
+import { CourseLocation, PaymentStatus, ReservationStatus } from "../src/database/schema";
 import { generatePrefixedId } from "~/utils/id";
 import { auth } from "~/auth/server";
 import { eq } from "drizzle-orm";
+import data from "./seedData";
 
 async function main() {
-  console.log("Seeding database..");
-
-  //load in data
-  const filePath = path.join(__dirname, "seedData.json");
-  const file = await fs.readFile(filePath, "utf-8");
-  const data = JSON.parse(file);
-
-  //delete existing data
+  // delete existing data
   console.log("Clearing existing data..");
   await db.client.delete(db.schema.reservation);
   await db.client.delete(db.schema.courseEvent);
@@ -25,7 +17,7 @@ async function main() {
   await db.client.delete(db.schema.user);
   await db.client.delete(db.schema.organization);
 
-  //get organization(s)
+  // get organization(s)
   const orgIds: string[] = [];
 
   console.log("Creating organizations..");
@@ -43,7 +35,7 @@ async function main() {
     console.log(`Created ${newOrg!.name}`);
   }
 
-  //create accounts + profiles
+  // create accounts + profiles
   console.log("Creating accounts...");
   const profileIds: string[] = [];
   const instructorIds: string[] = [];
@@ -79,7 +71,7 @@ async function main() {
       const [newProfile] = await db.client
         .insert(db.schema.profile)
         .values({
-          id: prof.id ?? generatePrefixedId("profile"),
+          id: generatePrefixedId("profile"),
           userId: newUser.id,
           firstName: prof.firstName,
           lastName: prof.lastName,
@@ -88,7 +80,7 @@ async function main() {
           state: prof.state,
           postalCode: prof.postalCode,
           phoneNumber: prof.phoneNumber,
-          isMember: prof.isMember,
+          association: prof.association,
         })
         .returning();
       if (role == "user") {
@@ -104,14 +96,17 @@ async function main() {
   const courseIds: string[] = [];
   console.log("Creating courses...");
   //create courses
-  for (const courseInfo of data.courses) {
+  for (const [i, courseInfo] of data.courses.entries()) {
+    const instructorId = instructorIds[i % instructorIds.length]!;
     const [newCourse] = await db.client
       .insert(db.schema.course)
       .values({
         courseName: courseInfo.courseName,
         description: courseInfo.description,
-        creditHours: courseInfo.creditHours,
+        creditHours: courseInfo.creditHours.toString(),
         priceCents: courseInfo.priceCents,
+        instructorId,
+        seats: Math.trunc(profileIds.length / 2),
       })
       .returning();
     courseIds.push(newCourse!.id);
@@ -120,7 +115,7 @@ async function main() {
 
   //create course events
   const courseEventIds: string[] = [];
-  const locations: CourseLocation[] = ["in-person", "virtual", "hybrid"];
+  const locations: CourseLocation[] = Object.values(CourseLocation);
   const now = new Date();
   let num = 1;
 
@@ -128,13 +123,11 @@ async function main() {
     //past event
     const thePast = new Date(now);
     thePast.setMonth(now.getMonth() - num);
-    const instructorId = instructorIds[num % instructorIds.length]!;
 
     const [pastEvent] = await db.client
       .insert(db.schema.courseEvent)
       .values({
         courseId,
-        instructorId,
         locationType: locations[num % locations.length]!,
         virtualLink:
           locations[num % locations.length] !== "in-person"
@@ -144,7 +137,6 @@ async function main() {
           locations[num % locations.length] !== "virtual"
             ? "67 Address Road"
             : null,
-        seats: Math.trunc(profileIds.length / 2),
         classStartDatetime: thePast,
       })
       .returning();
@@ -158,7 +150,6 @@ async function main() {
       .insert(db.schema.courseEvent)
       .values({
         courseId,
-        instructorId,
         locationType: locations[num % locations.length]!,
         virtualLink:
           locations[num % locations.length] !== "in-person"
@@ -168,7 +159,6 @@ async function main() {
           locations[num % locations.length] !== "virtual"
             ? "67 Address Road"
             : null,
-        seats: Math.trunc(profileIds.length / 2),
         classStartDatetime: theFuture,
       })
       .returning();
@@ -181,16 +171,17 @@ async function main() {
   //create reservations + link to profiles
   console.log(`Creating reservations...`);
   const NUM_RESERVATIONS_PER_CLASS = 10;
-  for (let i = 0; i < courseEventIds.length; i++) {
+  for (let i = 0; i < courseIds.length; i++) {
     for (let j = 0; j < NUM_RESERVATIONS_PER_CLASS; j++) {
-      const courseEventId = courseEventIds[i]!;
+      const courseId = courseIds[i]!;
       const n = i * NUM_RESERVATIONS_PER_CLASS + j;
       const profileId = profileIds[n % profileIds.length]!;
       await db.client.insert(db.schema.reservation).values({
         profileId,
-        courseEventId,
+        courseId,
         creditHours: n % 2 == 0 ? "2.5" : "0",
-        paymentStatus: n % 2 === 0 ? "paid" : "unpaid",
+        paymentStatus: n % 2 === 0 ? PaymentStatus.Paid : PaymentStatus.Draft,
+        reservationStatus: ReservationStatus.Accepted,
       });
     }
   }

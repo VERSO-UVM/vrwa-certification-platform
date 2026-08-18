@@ -6,12 +6,12 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { TraineeReservations } from "./reservations";
-import type { Profile } from "@backend/database/schema";
 import { TraineeEditButton } from "./edit-profile";
 import { DetailsDisplay } from "~/components/entry-views/details-display";
 import { profileDefPresets } from "~/utils/field-defs/profile";
+import type { ProfileDto } from "@backend/database/dtos";
 
-export function Trainee({ trainee }: { trainee: Profile }) {
+export function Trainee({ trainee }: { trainee: ProfileDto }) {
   return (
     <div id={trainee.id}>
       <h2 className="text-xl font-medium text-left pt-8 p-4 vrwa-light:text-gray-800 dark:text-gray-200 rounded-xl">

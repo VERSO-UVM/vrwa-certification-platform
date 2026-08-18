@@ -1,23 +1,30 @@
-import { asc, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import db from "~/database";
-import { course } from "~/database/schema";
+import { course, CourseStatus, CreditHourCategories } from "~/database/schema";
 import type { Course } from "~/database/schema";
-import { adminProcedure, router } from "~/utils/trpc";
+import { adminProcedure, instructorProcedure, router } from "~/utils/trpc";
 import { z } from "zod";
+import { createInsertSchema, createUpdateSchema } from "drizzle-orm/zod";
+import { courseFindFirst, courseFindMany } from "~/database/queries";
+import type { CourseDto } from "~/database/dtos.ts";
 
-const courseUpdateSchema = z.object({
-  courseName: z.string(),
-  description: z.string().nullable(),
-  creditHours: z.number().int().positive(),
-  priceCents: z.number().int().positive(),
+const updateSchema = createUpdateSchema(course, {
+  id: z.string(),
+  status: z.enum(CourseStatus),
 });
 
-export type CourseUpdateInput = z.infer<typeof courseUpdateSchema>;
+const insertSchema = createInsertSchema(course, {
+  status: z.enum(CourseStatus),
+  creditHourCategories: z.array(z.enum(CreditHourCategories)).optional(),
+});
+
+export type CourseUpdate = z.infer<typeof updateSchema>;
+export type CourseInsert = z.infer<typeof insertSchema>;
 
 export const courseRouter = router({
   admin: router({
-    list: adminProcedure.query((): Promise<Course[]> => {
-      return db.client.select().from(course).orderBy(asc(course.courseName));
+    list: adminProcedure.query((): Promise<CourseDto[]> => {
+      return courseFindMany();
     }),
 
     get: adminProcedure
@@ -31,19 +38,17 @@ export const courseRouter = router({
         return found[0] ?? null;
       }),
 
-    create: adminProcedure
-      .input(courseUpdateSchema)
-      .mutation(async ({ input }) => {
-        const [newCourse] = await db.client
-          .insert(course)
-          .values({
-            ...input,
-            description: input.description ?? null,
-          })
-          .returning();
+    create: adminProcedure.input(insertSchema).mutation(async ({ input }) => {
+      const [newCourse] = await db.client
+        .insert(course)
+        .values({
+          ...input,
+          description: input.description ?? null,
+        })
+        .returning();
 
-        return newCourse;
-      }),
+      return newCourse;
+    }),
 
     delete: adminProcedure
       .input(
@@ -63,34 +68,50 @@ export const courseRouter = router({
         return { success: true };
       }),
 
-    update: adminProcedure
+    update: adminProcedure.input(updateSchema).mutation(async ({ input }) => {
+      const { id, ...update } = input;
+
+      const cleanUpdate = Object.fromEntries(
+        Object.entries(update).filter(([_, value]) => value !== undefined),
+      );
+
+      if (Object.keys(cleanUpdate).length === 0) {
+        throw new Error("No fields provided to update");
+      }
+
+      const [updatedCourse] = await db.client
+        .update(course)
+        .set(cleanUpdate)
+        .where(eq(course.id, id))
+        .returning();
+
+      return updatedCourse;
+    }),
+  }),
+
+  instructor: router({
+    get: instructorProcedure
       .input(
         z.object({
-          id: z.string(),
-          courseName: z.string(),
-          description: z.string().nullable(),
-          creditHours: z.number().int().positive(),
-          priceCents: z.number().int().positive(),
+          courseId: z.string(),
         }),
       )
-      .mutation(async ({ input }) => {
-        const { id, ...update } = input;
+      .query(async ({ input }) => {
+        const course = await courseFindFirst(input.courseId);
+        console.log("okkk START DATE", course?.startDate, new Date());
+        return course;
+      }),
+  }),
 
-        const cleanUpdate = Object.fromEntries(
-          Object.entries(update).filter(([_, value]) => value !== undefined),
-        );
-
-        if (Object.keys(cleanUpdate).length === 0) {
-          throw new Error("No fields provided to update");
-        }
-
-        const [updatedCourse] = await db.client
-          .update(course)
-          .set(cleanUpdate)
-          .where(eq(course.id, id))
-          .returning();
-
-        return updatedCourse;
+  trainee: router({
+    get: instructorProcedure
+      .input(
+        z.object({
+          courseId: z.string(),
+        }),
+      )
+      .query(({ input }) => {
+        return courseFindFirst(input.courseId);
       }),
   }),
 });

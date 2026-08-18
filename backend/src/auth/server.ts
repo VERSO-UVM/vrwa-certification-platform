@@ -6,7 +6,7 @@
 
 import { eq } from "drizzle-orm";
 import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { drizzleAdapter } from "@better-auth/drizzle-adapter/relations-v2";
 import db from "~/database";
 import * as schema from "~/database/schema";
 import { admin, organization } from "better-auth/plugins";
@@ -48,6 +48,16 @@ export const auth = betterAuth({
       // within the authenticated session.
       activeProfileId: {
         type: "string",
+        required: false, // Can't always be filled in on a new record
+      },
+    },
+  },
+
+  user: {
+    additionalFields: {
+      stripeCustomerId: {
+        type: "string",
+        required: false,
       },
     },
   },

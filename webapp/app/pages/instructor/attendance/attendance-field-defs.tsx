@@ -25,21 +25,21 @@ export const attendanceFieldDefs = [
       header: "Present?",
       cell: ({ row, getValue: isPresent }) => {
         const item = row.original;
-        const creditHoursUpdate = useCreditHoursUpdate(item.courseEventId);
+        const creditHoursUpdate = useCreditHoursUpdate(item.courseId);
         return (
           <div className="flex items-center space-x-2">
             <Switch
               checked={isPresent()}
               onCheckedChange={(checked) =>
                 creditHoursUpdate.mutate({
-                  courseEventId: item.courseEventId,
+                  courseId: item.courseId,
                   profileId: item.profileId,
-                  creditHours: checked ? item.course.creditHours : 0,
+                  creditHours: checked ? item.course.creditHours : "0",
                 })
               }
-              id="is-present"
+              id={`present-${item.profileId}`}
             />
-            <Label htmlFor="is-present">Present</Label>
+            <Label htmlFor={`present-${item.profileId}`}>Present</Label>
           </div>
         );
       },
@@ -51,7 +51,7 @@ export const attendanceFieldDefs = [
     cell: ({ row }) => {
       const item = row.original;
       const [creditHours, setCreditHours] = useState(item.creditHours);
-      const creditHoursUpdate = useCreditHoursUpdate(item.courseEventId);
+      const creditHoursUpdate = useCreditHoursUpdate(item.courseId);
       // Sync actual credit hours with input
       useEffect(() => setCreditHours(item.creditHours), [item.creditHours]);
       return (
@@ -60,16 +60,16 @@ export const attendanceFieldDefs = [
           step={0.25}
           min={0}
           value={creditHours}
-          placeholder={String(item.course.creditHours)}
+          placeholder={item.course.creditHours}
           className="w-28"
           onChange={(event) => {
             setCreditHours(event.target.value);
             const number = event.target.valueAsNumber;
             if (!Number.isFinite(number) || number < 0) return;
             creditHoursUpdate.mutate({
-              courseEventId: item.courseEventId,
+              courseId: item.courseId,
               profileId: item.profileId,
-              creditHours: number,
+              creditHours: number.toString(),
             });
           }}
         />

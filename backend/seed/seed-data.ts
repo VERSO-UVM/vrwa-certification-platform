@@ -1,4 +1,4 @@
-{
+export default {
   "organizations": [
     {
       "orgName": "ThisIsAnOrganization"
@@ -19,7 +19,7 @@
           "state": "VT",
           "postalCode": "05405",
           "phoneNumber": "888-888-8888",
-          "isMember": false
+          "association": "Burlington Municipal Water"
         }
       ]
     },
@@ -37,8 +37,7 @@
           "state": "VT",
           "postalCode": "05405",
           "phoneNumber": "667-667-6667",
-          "isMember": true,
-          "id": "instructor_1"
+          "association": "",
         }
       ]
     },
@@ -57,7 +56,7 @@
           "state": "VT",
           "postalCode": "05405",
           "phoneNumber": "494-949-4949",
-          "isMember": true
+          "association": "Chittenden Wastewater",
         },
         {
           "firstName": "Thomas",
@@ -67,7 +66,8 @@
           "state": "VT",
           "postalCode": "05405",
           "phoneNumber": "123-456-7890",
-          "isMember": true
+          "association": "Chittenden Wastewater",
+
         },
         {
           "firstName": "George",
@@ -77,7 +77,8 @@
           "state": "VT",
           "postalCode": "05405",
           "phoneNumber": "111-111-1111",
-          "isMember": true
+          "association": "Chittenden Wastewater",
+
         },
         {
           "firstName": "Aaron",
@@ -87,7 +88,8 @@
           "state": "VT",
           "postalCode": "05405",
           "phoneNumber": "222-222-2222",
-          "isMember": true
+          "association": "Chittenden Wastewater",
+
         }
       ]
     },
@@ -104,7 +106,8 @@
           "state": "VT",
           "postalCode": "05402",
           "phoneNumber": "802-111-1111",
-          "isMember": true
+          "association": "Chittenden Wastewater",
+
         }
       ]
     },
@@ -121,7 +124,8 @@
           "state": "VT",
           "postalCode": "05402",
           "phoneNumber": "444-444-4444",
-          "isMember": true
+          "association": "Chittenden Wastewater",
+
         }
       ]
     },
@@ -138,7 +142,7 @@
           "state": "VT",
           "postalCode": "05402",
           "phoneNumber": "555-555-5555",
-          "isMember": true
+          "association": "Chittenden Wastewater",
         }
       ]
     },
@@ -155,7 +159,7 @@
           "state": "VT",
           "postalCode": "05402",
           "phoneNumber": "666-666-6666",
-          "isMember": true
+          "association": "Chittenden Wastewater",
         }
       ]
     },
@@ -172,7 +176,7 @@
           "state": "VT",
           "postalCode": "05701",
           "phoneNumber": "123-456-7890",
-          "isMember": false
+          "association": "Rutland Municipal Water",
         },
         {
           "firstName": "Passion",
@@ -182,7 +186,7 @@
           "state": "VT",
           "postalCode": "05495",
           "phoneNumber": "123-456-7890",
-          "isMember": true
+          "association": "Chittenden County"
         },
         {
           "firstName": "Water",
@@ -192,7 +196,7 @@
           "state": "VT",
           "postalCode": "05445",
           "phoneNumber": "123-456-7890",
-          "isMember": false
+          "association": "Chittenden County"
         }
       ]
     },
@@ -209,7 +213,7 @@
           "state": "VT",
           "postalCode": "05405",
           "phoneNumber": "802-679-6676",
-          "isMember": false
+          "association": "Chittenden County"
         }
       ]
     },
@@ -226,7 +230,7 @@
           "state": "VT",
           "postalCode": "05402",
           "phoneNumber": "802-111-2222",
-          "isMember": false
+          "association": "Chittenden County"
         }
       ]
     },
@@ -243,7 +247,7 @@
           "state": "VT",
           "postalCode": "05402",
           "phoneNumber": "802-111-2222",
-          "isMember": false
+          "association": "Chittenden County"
         }
       ]
     },
@@ -260,7 +264,7 @@
           "state": "VT",
           "postalCode": "05405",
           "phoneNumber": "802-679-6676",
-          "isMember": true
+          "association": "Chittenden County"
         }
       ]
     }
@@ -298,4 +302,4 @@
       "priceCents": 1200
     }
   ]
-}
+} as const;

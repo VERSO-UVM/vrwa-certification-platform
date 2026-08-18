@@ -7,14 +7,14 @@
  * or build off any of these structures using JS array and
  * object manipulations.
  */
-import type { Profile } from "@backend/database/schema";
+import type { ProfileDto } from "@backend/database/dtos";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Badge } from "~/components/ui/badge";
 import { textInputEditor, selectOptionsEditor } from "~/utils/field-editors";
 
 // createColumnHelper just provides a stronger typed API to define ColumnDefs
 // Note that assigning the result type becomes difficult https://github.com/TanStack/table/issues/4382
-export const profileFieldHelper = createColumnHelper<Profile>();
+export const profileFieldHelper = createColumnHelper<ProfileDto>();
 
 export const profileDefs = {
   firstName: profileFieldHelper.accessor("firstName", {
@@ -74,14 +74,6 @@ export const profileDefs = {
           return <Badge variant="not_member">No</Badge>;
       }
     },
-    meta: {
-      editor: selectOptionsEditor({
-        options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
-        ],
-      }),
-    },
   }),
 };
 
@@ -93,7 +85,7 @@ export const profileDefPresets = {
 };
 
 // Initial state when creating new profile
-export const emptyProfile: Profile = {
+export const emptyProfile: ProfileDto = {
   isMember: false,
   postalCode: "",
   address: "",
@@ -104,4 +96,6 @@ export const emptyProfile: Profile = {
   id: "",
   userId: "",
   state: "VT",
+  association: "",
+  memberGroupId: null,
 };

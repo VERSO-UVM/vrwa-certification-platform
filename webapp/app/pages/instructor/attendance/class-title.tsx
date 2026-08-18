@@ -1,19 +1,18 @@
 import { format } from "date-fns";
 import { useClassDetailsQuery } from "./use-class-details-query";
 
-export function ClassTitle({ courseEventId }: { courseEventId: string }) {
-  const { data: details } = useClassDetailsQuery(courseEventId);
+export function ClassTitle({ courseId }: { courseId: string }) {
+  const { data: details } = useClassDetailsQuery(courseId);
 
-  if (details == null) {
+  if (!details) {
     return <>Loading class...</>;
   }
+  const startDate = details.sessions[0]?.classStartDatetime;
 
   return (
     <>
       {details.courseName} -{" "}
-      {details.classStartDatetime
-        ? format(new Date(details.classStartDatetime), "PPP p")
-        : "Date TBD"}
+      {startDate ? format(startDate, "PPP p") : "Date TBD"}
     </>
   );
 }

@@ -11,7 +11,7 @@ import { AttendanceEditView } from "./attendance-edit-view";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
 export default function AttendancePage({
-  params: { courseEventId },
+  params: { courseId },
 }: Route.ComponentProps) {
   const [viewMode, setViewMode] = useSearchParamEntry("view", "edit");
 
@@ -29,10 +29,10 @@ export default function AttendancePage({
         </TabsList>
       </div>
       <TabsContent value="edit">
-        <AttendanceEditView courseEventId={courseEventId} />
+        <AttendanceEditView courseId={courseId} />
       </TabsContent>
       <TabsContent value="print">
-        <AttendancePrintView courseEventId={courseEventId} />
+        <AttendancePrintView courseId={courseId} />
       </TabsContent>
     </Tabs>
   );

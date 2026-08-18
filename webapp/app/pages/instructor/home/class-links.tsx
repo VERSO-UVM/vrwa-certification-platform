@@ -12,13 +12,13 @@ export function ClassLinks({ session }: { session: CourseEventDto }) {
     <div className="pt-4">
       <ButtonGroup className="w-full">
         <Button size="sm" className="flex-1" asChild>
-          <Link to={`/instructor/attendance/${session.id}?view=edit`}>
+          <Link to={`/instructor/attendance/${session.courseId}?view=edit`}>
             <ClipboardCheck className="mr-2 h-4 w-4" />
             Attendance
           </Link>
         </Button>
         <Button variant="outline" size="sm" className="flex-1" asChild>
-          <Link to={`/instructor/attendance/${session.id}?view=print`}>
+          <Link to={`/instructor/attendance/${session.courseId}?view=print`}>
             <Printer className="mr-2 h-4 w-4" />
             Print
           </Link>

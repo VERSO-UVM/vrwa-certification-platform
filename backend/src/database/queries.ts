@@ -4,51 +4,96 @@
  * when possible. These are like database views but database views
  * add a lot of hassle for little benefit for our use cases.
  */
-import { asc, eq, getTableColumns } from "drizzle-orm";
+import { and, asc, eq, getColumns, min, sql } from "drizzle-orm";
 import {
   course,
   courseEvent,
+  memberGroup,
+  MembershipStatus,
   profile,
   reservation,
+  ReservationStatus,
   user,
   type Profile,
 } from "~/database/schema";
-import type { CourseEventDto, ReservationDto, UserDto } from "./dtos";
+import type {
+  CourseDto,
+  CourseEventDto,
+  ReservationDto,
+  UserDto,
+} from "./dtos";
 import db from ".";
 
-const { id: _, ...profileFields } = getTableColumns(profile);
-const reservationFields = getTableColumns(reservation);
+const reservationFields = getColumns(reservation);
+
+// Subquery: want date of first course session
+export const courseStartQuery = db.client
+  .select({
+    courseId: courseEvent.courseId,
+    courseStart: min(courseEvent.classStartDatetime).as("courseStart"),
+  })
+  .from(courseEvent)
+  .groupBy(courseEvent.courseId)
+  .as("course_start");
+
+// To use for Relations Queries
+const courseStartDate = (t: typeof course) =>
+  sql<Date>`(
+        select ${courseStartQuery.courseStart}
+        from ${courseStartQuery}
+        where ${courseStartQuery.courseId} = ${t.id}
+      )`.mapWith(courseEvent.classStartDatetime);
+
+// We can create a virtual isMember field for backwards compatibility
+const isMemberFilter =
+  sql<boolean>`${memberGroup.membershipStatus} = ${MembershipStatus.Active}`.mapWith(
+    Boolean,
+  );
+
+// Virtual field
+const courseReservations = (status: ReservationStatus) => (t: typeof course) =>
+  db.client.$count(
+    reservation,
+    and(
+      eq(reservation.courseId, t.id),
+      eq(reservation.reservationStatus, status),
+    ),
+  );
 
 export function reservationQuery() {
+  const { id: _, ...profileFields } = getColumns(profile);
   return db.client
     .select({
       ...reservationFields,
       ...profileFields,
-      classStartDatetime: courseEvent.classStartDatetime,
-      seats: courseEvent.seats,
       email: user.email,
+      classStartDatetime: courseStartQuery.courseStart,
       course: {
         id: course.id,
         courseName: course.courseName,
         creditHours: course.creditHours,
+        seats: course.seats,
       },
+      isMember: isMemberFilter,
     })
     .from(reservation)
     .innerJoin(profile, eq(reservation.profileId, profile.id))
     .innerJoin(user, eq(profile.userId, user.id))
-    .innerJoin(courseEvent, eq(reservation.courseEventId, courseEvent.id))
-    .innerJoin(course, eq(course.id, courseEvent.courseId))
+    .innerJoin(course, eq(reservation.courseId, course.id))
+    .leftJoin(memberGroup, eq(profile.memberGroupId, memberGroup.id))
+    .leftJoin(
+      courseStartQuery,
+      eq(reservation.courseId, courseStartQuery.courseId),
+    )
     .$dynamic() satisfies Promise<ReservationDto[]>;
 }
 
 export function courseEventQuery() {
+  const { id: _, ...courseFields } = getColumns(course);
   return db.client
     .select({
-      ...getTableColumns(courseEvent),
-      courseName: course.courseName,
-      description: course.description,
-      creditHours: course.creditHours,
-      priceCents: course.priceCents,
+      ...getColumns(courseEvent),
+      ...courseFields,
     })
     .from(courseEvent)
     .orderBy(asc(courseEvent.classStartDatetime))
@@ -59,11 +104,13 @@ export function courseEventQuery() {
 export function profilesQuery() {
   return db.client
     .select({
-      ...getTableColumns(profile),
+      ...getColumns(profile),
+      isMember: isMemberFilter,
     })
     .from(profile)
     .orderBy(asc(profile.lastName))
     .leftJoin(user, eq(profile.userId, user.id))
+    .leftJoin(memberGroup, eq(profile.memberGroupId, memberGroup.id))
     .$dynamic() satisfies Promise<Profile[]>;
 }
 
@@ -77,6 +124,39 @@ export function usersWithProfilesQuery() {
     with: {
       profiles: true,
     },
-    orderBy: (user, { asc }) => [asc(user.name)],
+    orderBy: (user, { asc }) => [asc(user.email)],
   }) satisfies Promise<UserDto[]>;
+}
+
+export function courseFindFirst(courseId?: string) {
+  return db.client.query.course.findFirst({
+    where: {
+      id: courseId,
+    },
+    with: {
+      sessions: {
+        orderBy: (t, { asc }) => asc(t.id),
+      },
+    },
+    extras: {
+      startDate: courseStartDate,
+      spotsFilled: courseReservations(ReservationStatus.Accepted),
+      waitlistSize: courseReservations(ReservationStatus.Waitlisted),
+    },
+  }) satisfies Promise<CourseDto | undefined>;
+}
+
+export function courseFindMany() {
+  return db.client.query.course.findMany({
+    with: {
+      sessions: {
+        orderBy: (t, { asc }) => asc(t.id),
+      },
+    },
+    extras: {
+      startDate: courseStartDate,
+      spotsFilled: courseReservations(ReservationStatus.Accepted),
+      waitlistSize: courseReservations(ReservationStatus.Waitlisted),
+    },
+  }) satisfies Promise<CourseDto[]>;
 }

@@ -1,12 +1,14 @@
 import { and, eq } from "drizzle-orm";
 
 import db from "~/database";
-import { profile, user, type Profile } from "~/database/schema";
+import { profile, user } from "~/database/schema";
 import { adminProcedure, protectedProcedure, router } from "~/utils/trpc";
 
-import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
+import { createInsertSchema, createUpdateSchema } from "drizzle-orm/zod";
 import z from "zod";
 import { profilesQuery } from "~/database/queries";
+import { TRPCError } from "@trpc/server";
+import type { ProfileDto } from "~/database/dtos";
 
 const updateSchema = createUpdateSchema(profile, {
   id: z.string(),
@@ -34,7 +36,7 @@ export const profileRouter = router({
         .returning();
     }),
 
-    listTrainees: adminProcedure.query((): Promise<Profile[]> => {
+    listTrainees: adminProcedure.query((): Promise<ProfileDto[]> => {
       return profilesQuery().where(eq(user.role, "user"));
     }),
   }),
@@ -65,6 +67,12 @@ export const profileRouter = router({
    * Get the entry for the currently active profile.
    */
   getActiveProfile: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.session.activeProfileId == null) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "No currently active profile.",
+      });
+    }
     const profiles = await db.client
       .select()
       .from(profile)

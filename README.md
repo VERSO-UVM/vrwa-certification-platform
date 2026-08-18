@@ -95,7 +95,7 @@ Please see [`backend/README.md`](backend/README.md) for details on the backend.
 - `tRPC`: For defining and calling API procedures in the backend and webapp.
 - `tanstack-query`: All queries are cached with tanstack query. Used with the tRPC integration.
 - `drizzle ORM`: Database ORM layer on top of posgres.
-- `zod`: Type validation and DB query integration with `drizzle-zod`.
+- `zod`: API procedure type validation and drizzle ORM integration.
 - `better-auth`: Authentication library.
 - `shadcn/ui`: All core UI components added to [`webapp/app/components/ui`](webapp/app/components/ui).
 - `react-router`: The webapp router for webpages.

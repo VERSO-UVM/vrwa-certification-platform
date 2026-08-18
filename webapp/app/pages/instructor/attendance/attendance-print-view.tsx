@@ -32,13 +32,9 @@ const defaultColumns: Column[] = [
   { header: "", enabled: false, id: 4 },
 ];
 
-export function AttendancePrintView({
-  courseEventId,
-}: {
-  courseEventId: string;
-}) {
-  const { data: details } = useClassDetailsQuery(courseEventId);
-  const { data: roster = [] } = useRosterQuery(courseEventId);
+export function AttendancePrintView({ courseId }: { courseId: string }) {
+  const { data: details } = useClassDetailsQuery(courseId);
+  const { data: roster = [] } = useRosterQuery(courseId);
   const [columns, setColumns] = useState<Column[]>(defaultColumns);
 
   const updateColumn = ({ header, enabled, id }: Column) => {
@@ -50,7 +46,7 @@ export function AttendancePrintView({
   return (
     <>
       <PageHeader>
-        <ClassTitle courseEventId={courseEventId} />
+        <ClassTitle courseId={courseId} />
         <Button
           className="mx-4 min-w-30"
           type="button"
@@ -98,10 +94,10 @@ export function AttendancePrintView({
         <CardContent>
           <div className="print:visible print-root print:absolute print:left-0 print:top-0 print:right-0 print:m-0 print:p-3 border-black print:bg-white print:text-black p-8">
             <header className="mb-6 text-center">
-              {details != null && details.classStartDatetime != null && (
+              {details?.sessions?.[0]?.classStartDatetime != null && (
                 <h1 className="text-2xl font-bold">
                   {details?.courseName} -{" "}
-                  {new Date(details.classStartDatetime).toLocaleDateString()}
+                  {details.sessions[0].classStartDatetime.toLocaleDateString()}
                 </h1>
               )}
               <p className="mt-2 text-sm">VRWA Training - Attendance Sheet</p>
@@ -132,12 +128,12 @@ export function AttendancePrintView({
               </thead>
               <tbody>
                 {roster.map((entry) => (
-                  <tr key={`${entry.profileId}-${entry.courseEventId}`}>
+                  <tr key={`${entry.profileId}-${entry.courseId}`}>
                     <td className="border border-black p-2 font-medium">
                       {entry.firstName} {entry.lastName}
                     </td>
                     <td className="border border-black p-2">
-                      {entry.isMember ? "VRWA Member" : "Non-Member"}
+                      {entry.association}
                     </td>
                     <td className="border border-black p-2">
                       {[
@@ -151,7 +147,7 @@ export function AttendancePrintView({
                       {entry.phoneNumber ?? "-"}
                     </td>
                     <td className="border border-black p-2">{entry.email}</td>
-                    {columns.map(({ id, header, enabled }) => {
+                    {columns.map(({ header, enabled }) => {
                       if (enabled) {
                         return (
                           <td className="border border-black p-2 h-12"></td>
