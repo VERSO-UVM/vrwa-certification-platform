@@ -46,12 +46,32 @@ export type FieldEditor<TData, TValue> = (item: {
   onBlur: (value: TValue) => void;
 }) => React.ReactNode;
 
+interface HasToString {
+  toString(): string;
+}
+
 /**
  * Can override `props` for, e.g. type="number".
  */
 export function textInputEditor<T>(
   props?: React.ComponentProps<typeof Input>,
 ): FieldEditor<T, string> {
+  return _textInputEditor((x) => x, props);
+}
+
+export function intInputEditor<T>(
+  props?: React.ComponentProps<typeof Input>,
+): FieldEditor<T, number> {
+  return _textInputEditor<T, number>(parseInt, {
+    type: "number",
+    ...props,
+  });
+}
+
+export function _textInputEditor<T, U extends HasToString>(
+  parse: (x: string) => U,
+  props?: React.ComponentProps<typeof Input>,
+): FieldEditor<T, U> {
   return ({ overrides, onChange, onBlur, ctx: { getValue } }) => {
     const [value, setValue] = useState(getValue());
     // if the value's been taken out from under us
@@ -61,8 +81,9 @@ export function textInputEditor<T>(
         value={value}
         type="text"
         onChange={(event) => {
-          setValue(event.target.value);
-          onChange(event.target.value);
+          const val = parse(event.target.value);
+          setValue(val);
+          onChange(val);
         }}
         onBlur={() => onBlur(value)}
         // Default to required, can be overriden
