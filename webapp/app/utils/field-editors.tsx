@@ -78,7 +78,7 @@ export function _textInputEditor<T, U extends HasToString>(
     useEffect(() => setValue(getValue()), [getValue()]);
     return (
       <Input
-        value={value}
+        value={value?.toString() ?? ""}
         type="text"
         onChange={(event) => {
           const val = parse(event.target.value);
@@ -88,6 +88,48 @@ export function _textInputEditor<T, U extends HasToString>(
         onBlur={() => onBlur(value)}
         // Default to required, can be overriden
         required
+        {...props}
+        {...overrides}
+      />
+    );
+  };
+}
+
+export function priceCentsInputEditor<T>(
+  props?: React.ComponentProps<typeof Input>,
+): FieldEditor<T, number> {
+  return ({ overrides, onChange, onBlur, ctx: { getValue } }) => {
+    const toDisplay = (cents: number) => (cents / 100).toFixed(2).toString();
+    const toCents = (s: string) => Math.round(parseFloat(s) * 100);
+
+    const [display, setDisplay] = useState(toDisplay(getValue()));
+    // if the value's been taken out from under us
+    useEffect(() => setDisplay(toDisplay(getValue())), [getValue()]);
+
+    return (
+      <Input
+        value={display ?? ""}
+        type="number"
+        className="user-invalid:border-pink-500 focus:user-invalid:ring-pink-400"
+        onChange={(event) => {
+          setDisplay(event.target.value);
+          const val = toCents(event.target.value);
+          // Only set when it is actually valid
+          if (!isNaN(val)) {
+            onChange(val);
+          }
+        }}
+        onBlur={() => {
+          const cents = toCents(display);
+          if (!isNaN(cents)) {
+            // Blur: change input to show actual value
+            setDisplay(toDisplay(cents));
+          }
+          onBlur(cents);
+        }}
+        // Default to required, can be overriden
+        required
+        step={0.01}
         {...props}
         {...overrides}
       />

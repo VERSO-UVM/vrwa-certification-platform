@@ -2,7 +2,12 @@ import type { CourseDto } from "@backend/database/dtos";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Link } from "react-router";
 import { courseStartDate } from "../utils";
-import { intInputEditor, textInputEditor } from "../field-editors";
+import {
+  _textInputEditor,
+  intInputEditor,
+  priceCentsInputEditor,
+  textInputEditor,
+} from "../field-editors";
 import type { Course } from "@backend/database/schema";
 import type { CourseInsert } from "@backend/routers/course";
 
@@ -45,10 +50,10 @@ export const courseDefs = {
   }),
 
   priceCents: courseFieldHelper.accessor("priceCents", {
-    header: "Fee",
+    header: "Fee ($)",
     cell: ({ getValue }) => `$${(Number(getValue()) / 100).toFixed(2)}`,
     meta: {
-      editor: intInputEditor({ step: 0.01 }),
+      editor: priceCentsInputEditor(),
     },
   }),
 
@@ -62,7 +67,7 @@ export const courseDefs = {
   seats: courseFieldHelper.accessor("seats", {
     header: "Seats",
     meta: {
-      editor: intInputEditor({ step: 0.01 }),
+      editor: intInputEditor({ step: 1 }),
     },
   }),
 
