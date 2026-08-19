@@ -13,15 +13,17 @@ import { PageHeader } from "~/components/page-header";
 import {
   courseDefPresets,
   courseDefs,
-  courseFieldHelper,
+  courseDtoFieldHelper,
 } from "~/utils/field-defs/course";
 import { courseStartDate } from "~/utils/utils";
 import { CourseStatus } from "@backend/database/schema";
 import { CloneCourse } from "./course-manager/clone-course";
 import { useMemo } from "react";
-import { EditDrawer } from "~/components/entry-views/edit-drawer";
 import type { CourseDto } from "@backend/database/dtos";
 import { useNavigate } from "react-router";
+import type { ColumnDef } from "@tanstack/react-table";
+import type { CourseInsert } from "@backend/routers/course";
+import { CreateDrawer } from "~/components/entry-views/create-drawer";
 
 export function meta() {
   return [{ title: "Course Manager - VRWA Training Database" }];
@@ -29,7 +31,7 @@ export function meta() {
 
 const courseTableDefs = [
   ...courseDefPresets.table,
-  courseFieldHelper.display({
+  courseDtoFieldHelper.display({
     id: "actions",
     header: "Actions",
     cell: ({ row }) => <CloneCourse course={row.original} />,
@@ -41,30 +43,16 @@ const courseFormDefs = [
   courseDefs.description,
   courseDefs.priceCents,
   courseDefs.creditHours,
-  courseDefs.spots,
+  courseDefs.seats,
 ];
-
-const emptyCourse = {
-  courseName: "",
-  description: "",
-  priceCents: 0,
-  creditHours: "",
-  seats: 0,
-  sessions: [],
-  instructorId: null,
-  creditHourCategories: [],
-  status: CourseStatus.Active,
-  id: "",
-  spotsFilled: 0,
-  tags: [],
-  waitlistSize: 0,
-} as CourseDto;
 
 export default function CourseManager() {
   const trpc = useTRPC();
   const navigate = useNavigate();
   const { data: courses } = useQuery(trpc.courses.admin.list.queryOptions());
-  const createCourseMut = useMutation(trpc.courses.admin.create.mutationOptions())
+  const createCourseMut = useMutation(
+    trpc.courses.admin.create.mutationOptions(),
+  );
 
   // Courses going on this year
   const activeCourses = useMemo(
@@ -99,7 +87,7 @@ export default function CourseManager() {
           </CardHeader>
           <CardContent>
             <DataTable
-              columns={courseTableDefs}
+              columns={courseTableDefs as ColumnDef<CourseDto>[]}
               data={activeCourses}
               table={{
                 enableRowSelection: false,
@@ -107,17 +95,19 @@ export default function CourseManager() {
             />
           </CardContent>
           <div className="flex px-4">
-            <EditDrawer
-              item={emptyCourse}
-              columns={courseFormDefs}
-              onSave={async (updates) => {
-                createCourseMut.mutateAsync({
-                  ...updates
-                })
+            <CreateDrawer
+              columns={courseFormDefs as ColumnDef<CourseInsert>[]}
+              onSave={async (courseFields) => {
+                const newCourse = await createCourseMut.mutateAsync({
+                  ...courseFields,
+                });
+                if (newCourse) {
+                  navigate(`/admin/course-details/${newCourse.id}`);
+                }
               }}
               drawer={{
                 title: "New Course",
-                buttonText: "+ Add New Course from Scratch",
+                buttonText: "Add New Course from Scratch",
                 description: "Create new course from scratch.",
               }}
             />
@@ -131,7 +121,7 @@ export default function CourseManager() {
           </CardHeader>
           <CardContent>
             <DataTable
-              columns={courseDefPresets.table}
+              columns={courseDefPresets.table as ColumnDef<CourseDto>[]}
               data={pastCourses}
               table={{
                 enableRowSelection: false,
@@ -147,7 +137,7 @@ export default function CourseManager() {
           </CardHeader>
           <CardContent>
             <DataTable
-              columns={courseDefPresets.table}
+              columns={courseDefPresets.table as ColumnDef<CourseDto>[]}
               data={deletedCourses}
               table={{
                 enableRowSelection: false,
