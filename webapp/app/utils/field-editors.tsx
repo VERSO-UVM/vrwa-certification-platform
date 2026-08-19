@@ -80,6 +80,7 @@ export function _textInputEditor<T, U extends HasToString>(
       <Input
         value={value?.toString() ?? ""}
         type="text"
+        className="user-invalid:border-pink-500 focus:user-invalid:ring-pink-400"
         onChange={(event) => {
           const val = parse(event.target.value);
           setValue(val);
