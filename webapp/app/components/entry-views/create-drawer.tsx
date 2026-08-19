@@ -45,7 +45,7 @@ export function CreateDrawer<T extends object>({
           onSave(updates).then(() => setOpen(false))
         }
       />
-      <DrawerClose>
+      <DrawerClose asChild>
         <Button
           variant="cancel_button"
           className="flex flex-col items-center justify-center fixed bottom-4 left-4 right-4"
