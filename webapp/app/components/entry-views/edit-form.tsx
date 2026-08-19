@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { shallowEqual } from "~/utils/utils";
 import { DrawerClose } from "~/components/ui/drawer";
+import { Label } from "../ui/label";
 
 /**
  * Generate an edit form using column defs!
@@ -61,28 +62,27 @@ export function EditForm<T extends object>({
               if (header == null) return null;
               if (cell.column.columnDef.meta?.editor == null) return null;
               const htmlId = cell.column.id + "_input";
+              const ctx = cell.getContext();
               return (
                 <div key={cell.id}>
-                  <dt className="text-sm font-semibold">
+                  <Label htmlFor={htmlId} className="text-sm font-semibold">
                     {flexRender(
                       cell.column.columnDef.header,
                       header.getContext(),
                     )}
-                  </dt>
-                  <dd>
-                    {cell.column.columnDef.meta.editor({
-                      ctx: cell.getContext(),
-                      overrides: {
-                        id: htmlId,
-                      },
-                      onBlur: (_value) => {},
-                      onChange: (value) =>
-                        setUpdates({
-                          ...updates,
-                          [cell.column.id]: value,
-                        }),
-                    })}
-                  </dd>
+                  </Label>
+                  {cell.column.columnDef.meta.editor({
+                    ctx: cell.getContext(),
+                    overrides: {
+                      id: htmlId,
+                    },
+                    onBlur: (_value) => {},
+                    onChange: (value) =>
+                      setUpdates({
+                        ...updates,
+                        [cell.column.id]: value,
+                      }),
+                  })}
                 </div>
               );
             })}
