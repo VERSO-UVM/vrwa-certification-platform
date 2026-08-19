@@ -1,12 +1,19 @@
 import { eq } from "drizzle-orm";
 import db from "~/database";
-import { course, CourseStatus, CreditHourCategory } from "~/database/schema";
+import {
+  course,
+  courseEvent,
+  CourseStatus,
+  CreditHourCategory,
+} from "~/database/schema";
 import type { Course } from "~/database/schema";
 import { adminProcedure, instructorProcedure, router } from "~/utils/trpc";
 import { z } from "zod";
 import { createInsertSchema, createUpdateSchema } from "drizzle-orm/zod";
 import { courseFindFirst, courseFindMany } from "~/database/queries";
 import type { CourseDto } from "~/database/dtos.ts";
+import { TRPCError } from "@trpc/server";
+import { addMilliseconds } from "date-fns";
 
 const updateSchema = createUpdateSchema(course, {
   id: z.string(),
@@ -87,6 +94,70 @@ export const courseRouter = router({
 
       return updatedCourse;
     }),
+
+    /* Create a new course by cloning an older one. */
+    clone: adminProcedure
+      .input(
+        z.object({
+          courseId: z.string(),
+          /* Set to copy over all courseEvents to the set date. */
+          copyCourseEvents: z.date().optional(),
+        }),
+      )
+      .mutation(async ({ input }) => {
+        const orig = await courseFindFirst(input.courseId);
+        if (!orig) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Course not found.",
+          });
+        }
+
+        const [newCourse] = await db.client
+          .insert(course)
+          .values({
+            courseName: orig.courseName,
+            creditHourCategories: orig.creditHourCategories,
+            creditHours: orig.creditHours,
+            description: orig.description,
+            instructorId: orig.instructorId,
+            priceCents: orig.priceCents,
+            seats: orig.seats,
+            status: CourseStatus.Active,
+            tags: orig.tags,
+          })
+          .returning();
+        if (!newCourse) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create course.",
+          });
+        }
+
+        if (input.copyCourseEvents) {
+          // Keep same date relative to new course start date
+          const newStart = input.copyCourseEvents.getTime();
+          const origStart =
+            orig.sessions[0]?.classStartDatetime?.getTime() ?? newStart;
+          const difference = newStart - origStart;
+
+          // Combine in a single insert operation
+          const courseEventValues = orig.sessions.map((session) => ({
+            ...session,
+            id: undefined, // Ensure unset so a new id is generated
+            courseId: newCourse.id,
+            classStartDatetime: session.classStartDatetime
+              ? addMilliseconds(session.classStartDatetime, difference)
+              : null,
+          }));
+
+          await db.client.insert(courseEvent).values(courseEventValues);
+        }
+
+        return {
+          courseId: newCourse.id,
+        };
+      }),
   }),
 
   instructor: router({
