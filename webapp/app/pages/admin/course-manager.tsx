@@ -1,7 +1,5 @@
-import { useMemo, useState } from "react";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { useTRPCClient, useTRPC } from "~/utils/trpc";
-import { CourseEventForm } from "./course-manager/course-event-form";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useTRPC } from "~/utils/trpc";
 
 import {
   Card,
@@ -10,39 +8,63 @@ import {
   CardHeader,
   CardDescription,
 } from "~/components/ui/card";
-import { Button } from "~/components/ui/button";
 import { DataTable } from "~/components/data-table";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerDescription,
-  DrawerTitle,
-} from "~/components/ui/drawer";
 import { PageHeader } from "~/components/page-header";
-import type { CourseDto, CourseEventDto } from "@backend/database/dtos";
-import { courseDefPresets } from "~/utils/field-defs/course";
+import {
+  courseDefPresets,
+  courseDefs,
+  courseFieldHelper,
+} from "~/utils/field-defs/course";
 import { courseStartDate } from "~/utils/utils";
 import { CourseStatus } from "@backend/database/schema";
-import { getOnRowSelectionChange } from "~/utils/single-row-select";
-import type { TableOptions } from "@tanstack/react-table";
+import { CloneCourse } from "./course-manager/clone-course";
+import { useMemo } from "react";
+import { EditDrawer } from "~/components/entry-views/edit-drawer";
+import type { CourseDto } from "@backend/database/dtos";
 import { useNavigate } from "react-router";
 
 export function meta() {
   return [{ title: "Course Manager - VRWA Training Database" }];
 }
 
-function useCourses() {
-  const trpc = useTRPC();
-  return useQuery(trpc.courses.admin.list.queryOptions());
-}
+const courseTableDefs = [
+  ...courseDefPresets.table,
+  courseFieldHelper.display({
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => <CloneCourse course={row.original} />,
+  }),
+];
+
+const courseFormDefs = [
+  courseDefs.courseName,
+  courseDefs.description,
+  courseDefs.priceCents,
+  courseDefs.creditHours,
+  courseDefs.spots,
+];
+
+const emptyCourse = {
+  courseName: "",
+  description: "",
+  priceCents: 0,
+  creditHours: "",
+  seats: 0,
+  sessions: [],
+  instructorId: null,
+  creditHourCategories: [],
+  status: CourseStatus.Active,
+  id: "",
+  spotsFilled: 0,
+  tags: [],
+  waitlistSize: 0,
+} as CourseDto;
 
 export default function CourseManager() {
   const trpc = useTRPC();
-  const client = useTRPCClient();
-  const queryClient = useQueryClient();
-  const { data: courses } = useCourses();
   const navigate = useNavigate();
+  const { data: courses } = useQuery(trpc.courses.admin.list.queryOptions());
+  const createCourseMut = useMutation(trpc.courses.admin.create.mutationOptions())
 
   // Courses going on this year
   const activeCourses = useMemo(
@@ -64,18 +86,6 @@ export default function CourseManager() {
     [courses],
   );
 
-  const makeTableProps = (
-    courseList?: CourseDto[],
-  ): Partial<TableOptions<CourseDto>> => ({
-    onRowSelectionChange: getOnRowSelectionChange(-1, (index) => {
-      if (courseList?.[index]) {
-        navigate(`/admin/course-details/${courseList[index].id}`);
-      }
-    }),
-  });
-
-  const [courseEventDrawerOpen, setCourseEventDrawerOpen] = useState(false);
-
   return (
     <>
       <PageHeader>Course Manager</PageHeader>
@@ -89,19 +99,28 @@ export default function CourseManager() {
           </CardHeader>
           <CardContent>
             <DataTable
-              columns={courseDefPresets.table}
+              columns={courseTableDefs}
               data={activeCourses}
-              table={makeTableProps(activeCourses)}
+              table={{
+                enableRowSelection: false,
+              }}
             />
           </CardContent>
           <div className="flex px-4">
-            <Button
-              className="flex-1"
-              size="lg"
-              onClick={() => setCourseEventDrawerOpen(true)}
-            >
-              + Create New Course
-            </Button>
+            <EditDrawer
+              item={emptyCourse}
+              columns={courseFormDefs}
+              onSave={async (updates) => {
+                createCourseMut.mutateAsync({
+                  ...updates
+                })
+              }}
+              drawer={{
+                title: "New Course",
+                buttonText: "+ Add New Course from Scratch",
+                description: "Create new course from scratch.",
+              }}
+            />
           </div>
         </Card>
 
@@ -114,7 +133,9 @@ export default function CourseManager() {
             <DataTable
               columns={courseDefPresets.table}
               data={pastCourses}
-              table={makeTableProps(pastCourses)}
+              table={{
+                enableRowSelection: false,
+              }}
             />
           </CardContent>
         </Card>
@@ -128,7 +149,9 @@ export default function CourseManager() {
             <DataTable
               columns={courseDefPresets.table}
               data={deletedCourses}
-              table={makeTableProps(deletedCourses)}
+              table={{
+                enableRowSelection: false,
+              }}
             />
           </CardContent>
         </Card>
