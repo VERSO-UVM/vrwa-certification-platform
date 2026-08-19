@@ -2,12 +2,13 @@ import type { CourseDto } from "@backend/database/dtos";
 import { createColumnHelper, type ColumnDef } from "@tanstack/react-table";
 import { Link } from "react-router";
 import { courseStartDate, dateFormat } from "../utils";
+import { intInputEditor, textInputEditor } from "../field-editors";
 
 export const courseFieldHelper = createColumnHelper<CourseDto>();
 
 export const courseDefs = {
   courseName: courseFieldHelper.accessor("courseName", {
-    header: "Course",
+    header: "Title",
     cell: ({ row, getValue }) => (
       <Link
         to={`/admin/course-details/${row.original.id}`}
@@ -16,6 +17,9 @@ export const courseDefs = {
         {getValue() as string}
       </Link>
     ),
+    meta: {
+      editor: textInputEditor(),
+    },
   }),
 
   description: courseFieldHelper.accessor("description", {
@@ -23,15 +27,24 @@ export const courseDefs = {
     cell: ({ getValue }) => (
       <div className="text-muted-foreground">{String(getValue())}</div>
     ),
+    meta: {
+      editor: textInputEditor(),
+    },
   }),
 
   creditHours: courseFieldHelper.accessor("creditHours", {
     header: "Credit Hours",
+    meta: {
+      editor: textInputEditor({ type: "number", step: 0.1 }),
+    },
   }),
 
   priceCents: courseFieldHelper.accessor("priceCents", {
     header: "Fee",
     cell: ({ getValue }) => `$${(Number(getValue()) / 100).toFixed(2)}`,
+    meta: {
+      editor: intInputEditor({ step: 0.01 }),
+    },
   }),
 
   upcomingClasses: courseFieldHelper.accessor(
@@ -40,6 +53,13 @@ export const courseDefs = {
       header: "Sessions",
     },
   ),
+
+  seats: courseFieldHelper.accessor("seats", {
+    header: "Seats",
+    meta: {
+      editor: intInputEditor({ step: 0.01 }),
+    },
+  }),
 
   spots: courseFieldHelper.accessor("spotsFilled", {
     header: "Filled",
