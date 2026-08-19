@@ -43,7 +43,7 @@ export function profileFullName(
 
 export function courseStartDate(course: CourseDto) {
   // sessions field should always be in chronological order
-  return course.sessions?.[0]?.classStartDatetime;
+  return course.sessions?.[0]?.classStartDatetime ?? null;
 }
 
 export function dateFormat(date: Date) {

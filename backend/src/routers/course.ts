@@ -20,10 +20,7 @@ const updateSchema = createUpdateSchema(course, {
   status: z.enum(CourseStatus),
 });
 
-const insertSchema = createInsertSchema(course, {
-  status: z.enum(CourseStatus),
-  creditHourCategories: z.array(z.enum(CreditHourCategory)).optional(),
-});
+const insertSchema = createInsertSchema(course);
 
 export type CourseUpdate = z.infer<typeof updateSchema>;
 export type CourseInsert = z.infer<typeof insertSchema>;
