@@ -111,6 +111,7 @@ export default function CourseDetails({
 
   //what percentage of trainees enrolled have paid their fees
   function percentagePaid() {
+    if (roster.length == 0) return 0;
     let paid = 0;
     for (let i = 0; i < roster.length; i++) {
       if (roster[i]?.paymentStatus == "paid") paid++;
@@ -230,7 +231,7 @@ export default function CourseDetails({
           <CardContent className="p-6 flex items-center gap-4">
             <CreditCard className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
-              <p className="text-sm text-muted-foreground">Tution Paid</p>
+              <p className="text-sm text-muted-foreground">Tuition Paid</p>
               <p className="text-3xl font-bold">
                 {percentagePaid().toFixed(0)}%
               </p>
