@@ -1,10 +1,15 @@
 import type { CourseDto } from "@backend/database/dtos";
-import { createColumnHelper, type ColumnDef } from "@tanstack/react-table";
+import { createColumnHelper } from "@tanstack/react-table";
 import { Link } from "react-router";
-import { courseStartDate, dateFormat } from "../utils";
+import { courseStartDate } from "../utils";
 import { intInputEditor, textInputEditor } from "../field-editors";
+import type { Course } from "@backend/database/schema";
+import type { CourseInsert } from "@backend/routers/course";
 
-export const courseFieldHelper = createColumnHelper<CourseDto>();
+export const courseFieldHelper = createColumnHelper<
+  CourseDto | Course | CourseInsert
+>();
+export const courseDtoFieldHelper = createColumnHelper<CourseDto>();
 
 export const courseDefs = {
   courseName: courseFieldHelper.accessor("courseName", {
@@ -47,7 +52,7 @@ export const courseDefs = {
     },
   }),
 
-  upcomingClasses: courseFieldHelper.accessor(
+  upcomingClasses: courseDtoFieldHelper.accessor(
     (course) => course.sessions.length,
     {
       header: "Sessions",
@@ -70,7 +75,7 @@ export const courseDefs = {
     ),
   }),
 
-  startDate: courseFieldHelper.accessor(courseStartDate, {
+  startDate: courseDtoFieldHelper.accessor(courseStartDate, {
     header: "Start Date",
     sortingFn: "datetime",
     cell: ({ getValue }) => {
@@ -84,7 +89,6 @@ export const courseDefs = {
 export const courseDefPresets = {
   table: [
     courseDefs.courseName,
-    courseDefs.startDate,
     courseDefs.creditHours,
     courseDefs.upcomingClasses,
     courseDefs.spots,
