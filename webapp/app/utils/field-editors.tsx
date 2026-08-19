@@ -7,11 +7,12 @@
  *
  * - [ ] Checkbox
  * - [ ] Radio
- * - [ ] Date input
+ * - [x] Date input
  */
 
 import type { CellContext } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
+import { Calendar } from "~/components/ui/calendar";
 import { Input } from "~/components/ui/input";
 import {
   NativeSelect,
@@ -177,6 +178,33 @@ export function selectOptionsEditor<T, U extends { toString: () => string }>({
           </NativeSelectOption>
         ))}
       </NativeSelect>
+    );
+  };
+}
+
+export function dateEditor<T>(): FieldEditor<T, Date | null> {
+  return ({ overrides, onChange, onBlur, ctx: { getValue } }) => {
+    const [value, setValue] = useState(getValue() ?? new Date());
+    // if the value's been taken out from under us
+    useEffect(() => {
+      const value = getValue();
+      if (value) setValue(value);
+    }, [getValue()]);
+    return (
+      <Calendar
+        selected={value}
+        defaultMonth={value}
+        captionLayout="dropdown"
+        onSelect={(val) => {
+          if (val) {
+            setValue(val);
+            onChange(val);
+          }
+        }}
+        onDayBlur={() => onBlur(value)}
+        mode="single"
+        {...overrides}
+      />
     );
   };
 }
