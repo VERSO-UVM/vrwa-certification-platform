@@ -75,7 +75,7 @@ export function CloneCourse({ course }: { course: CourseDto }) {
           <Button className="w-full" onClick={() => cloneCourse()}>
             Next
           </Button>
-          <DrawerClose>
+          <DrawerClose asChild>
             <Button variant="cancel_button" className="w-full">
               Cancel
             </Button>
