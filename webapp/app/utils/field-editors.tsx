@@ -32,6 +32,7 @@ import {
   InputGroupInput,
 } from "~/components/ui/input-group";
 import { isValidDate } from "./utils";
+import { Textarea } from "~/components/ui/textarea";
 
 /**
  * I didn't see a built-in interface for props for generic form fields that exist
@@ -127,6 +128,34 @@ export function _genericInputEditor<U extends HasToString>(
         className="user-invalid:border-pink-500 focus:user-invalid:ring-pink-400"
         onChange={(event) => {
           const val = parse(event.target.value);
+          setValue(val);
+          onChange(val);
+        }}
+        onBlur={() => onBlur(value)}
+        // Default to required, can be overriden
+        required
+        {...props}
+        {...overrides}
+      />
+    );
+  };
+}
+
+/**
+ * Generic input editor.
+ */
+export function textAreaEditor(
+  props?: React.ComponentProps<typeof Textarea>,
+): FieldEditor<unknown, string> {
+  return ({ overrides, onChange, onBlur, value: orig }) => {
+    const [value, setValue] = useState(orig);
+    // if the value's been taken out from under us
+    useEffect(() => setValue(orig), [orig]);
+    return (
+      <Textarea
+        value={value?.toString() ?? ""}
+        onChange={(event) => {
+          const val = event.target.value;
           setValue(val);
           onChange(val);
         }}
