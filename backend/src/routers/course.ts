@@ -6,7 +6,6 @@ import {
   CourseStatus,
   CreditHourCategory,
 } from "~/database/schema";
-import type { Course } from "~/database/schema";
 import { adminProcedure, instructorProcedure, router } from "~/utils/trpc";
 import { z } from "zod";
 import { createInsertSchema, createUpdateSchema } from "drizzle-orm/zod";
@@ -18,10 +17,12 @@ import { addMilliseconds } from "date-fns";
 const updateSchema = createUpdateSchema(course, {
   id: z.string(),
   status: z.enum(CourseStatus),
+  creditHourCategories: z.optional(z.array(z.enum(CreditHourCategory))),
 });
 
 const insertSchema = createInsertSchema(course, {
   creditHourCategories: z.array(z.enum(CreditHourCategory)),
+  status: z.enum(CourseStatus),
 });
 
 export type CourseUpdate = z.infer<typeof updateSchema>;
@@ -35,13 +36,8 @@ export const courseRouter = router({
 
     get: adminProcedure
       .input(z.object({ id: z.string() }))
-      .query(async ({ input }): Promise<Course | null> => {
-        const found = await db.client
-          .select()
-          .from(course)
-          .where(eq(course.id, input.id))
-          .limit(1);
-        return found[0] ?? null;
+      .query(async ({ input }): Promise<CourseDto | null> => {
+        return (await courseFindFirst(input.id)) ?? null;
       }),
 
     create: adminProcedure.input(insertSchema).mutation(async ({ input }) => {
