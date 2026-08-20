@@ -93,11 +93,20 @@ export function textInputEditor(
 
 export function intInputEditor<T>(
   props?: React.ComponentProps<typeof Input>,
-): FieldEditor<T, number | null> {
-  return _genericInputEditor<number>(parseInt, {
+): FieldEditor<T, number> {
+  const NumberInput = _genericInputEditor<number>(parseInt, {
     type: "number",
     ...props,
   });
+  return ({ onChange, onBlur, ...rest }) => {
+    return (
+      <NumberInput
+        {...rest}
+        onChange={(val) => onChange(val ?? 0)}
+        onBlur={(val) => onBlur(val ?? 0)}
+      />
+    );
+  };
 }
 
 /**

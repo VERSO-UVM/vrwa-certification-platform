@@ -14,7 +14,7 @@ import { Label } from "../ui/label";
  * Generate an edit form using column defs!
  */
 export type EditFormProps<T> = {
-  item: T;
+  item: T|null;
   columns: ColumnDef<T, any>[]; // any: see comment in data-table.tsx
   onSave: (updated: Partial<T>) => void;
   submitButton?: Partial<{
@@ -34,7 +34,7 @@ export function EditForm<T extends object>({
   submitButton.disabledFn ??= (original, updates) =>
     shallowEqual({ ...original, ...updates }, original);
 
-  const data = useMemo(() => [item], [item]);
+  const data = useMemo(() => item ? [item] : [], [item]);
   const [updates, setUpdates] = useState<Partial<T>>({});
   // If data is swiped out from under us
   useEffect(() => setUpdates({}), [data]);

@@ -3,7 +3,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { Link } from "react-router";
 import { courseStartDate } from "../utils";
 import {
-  _textInputEditor,
+  _genericInputEditor,
   intInputEditor,
   priceCentsEditor,
   textInputEditor,
