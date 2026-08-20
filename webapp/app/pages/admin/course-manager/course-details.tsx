@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { PaymentStatus } from "@backend/database/schema";
-import type { ProfileDto } from "@backend/database/dtos";
+import type { CourseDto, ProfileDto } from "@backend/database/dtos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { PageHeader } from "~/components/page-header";
 import {
@@ -51,10 +51,28 @@ import {
 } from "~/utils/field-defs/reservation";
 import { EditForm } from "~/components/entry-views/edit-form";
 import { courseEventDefs } from "~/utils/field-defs/course-event";
+import { courseDefPresets, courseDefs } from "~/utils/field-defs/course";
+import type { ColumnDef } from "@tanstack/react-table";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
 }
+
+const courseEventFormDefs = [
+  courseEventDefs.courseDate,
+  courseEventDefs.duration,
+  courseEventDefs.courseLocationType,
+  courseEventDefs.virtualLink,
+  courseEventDefs.address,
+  courseEventDefs.town,
+  courseEventDefs.venue,
+];
+
+const courseFormDefs = [
+  courseDefs.courseName,
+  courseDefs.priceCents,
+  courseDefs.creditHours,
+] as ColumnDef<CourseDto>[];
 
 export default function CourseDetails({
   params: { courseId },
@@ -72,7 +90,7 @@ export default function CourseDetails({
     }),
   );
 
-  const course = useQuery(
+  const { data: course } = useQuery(
     trpc.courses.admin.get.queryOptions({ id: courseId! }),
   );
 
@@ -109,7 +127,7 @@ export default function CourseDetails({
     });
   }
 
-  const seats = course.data?.seats ?? 0;
+  const seats = course?.seats ?? 0;
   const classFull = roster.length >= seats;
 
   //what percentage of trainees enrolled have paid their fees
@@ -171,16 +189,6 @@ export default function CourseDetails({
     [],
   );
 
-  const courseEventFormDefs = useMemo(() => ([
-    courseEventDefs.courseDate,
-    courseEventDefs.duration,
-    courseEventDefs.courseLocationType,
-    courseEventDefs.virtualLink,
-    courseEventDefs.address,
-    courseEventDefs.town,
-    courseEventDefs.venue,
-  ]), [])
-
   if (courseDeleted) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -202,7 +210,7 @@ export default function CourseDetails({
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Courses
         </Link>
       </Button>
-      <PageHeader>{course.data?.courseName}</PageHeader>
+      <PageHeader>{course?.courseName}</PageHeader>
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-3">
         <Card className="@xl:col-span-1" variant="green">
           <CardContent className="p-6 flex items-center gap-4">
@@ -270,23 +278,21 @@ export default function CourseDetails({
                   <dt className="font-medium text-muted-foreground">
                     Description
                   </dt>
-                  <dd>{course.data?.description}</dd>
+                  <dd>{course?.description}</dd>
                 </div>
 
                 <div>
                   <dt className="font-medium text-muted-foreground">
                     Enrollment Fee
                   </dt>
-                  <dd>
-                    ${course.data?.priceCents && course.data?.priceCents / 100}
-                  </dd>
+                  <dd>${course?.priceCents && course?.priceCents / 100}</dd>
                 </div>
 
                 <div>
                   <dt className="font-medium text-muted-foreground">
                     Credit Hours
                   </dt>
-                  <dd>{course.data?.creditHours}</dd>
+                  <dd>{course?.creditHours}</dd>
                 </div>
               </dl>
               <div className="flex justify-end mb-4 pr-4">
@@ -305,7 +311,7 @@ export default function CourseDetails({
                     <div className="no-scrollbar overflow-y-auto px-4">
                       <NewCourseForm
                         key={courseId}
-                        course={course.data}
+                        course={course}
                         onCreate={async (data) => {
                           await client.courses.admin.update.mutate({
                             ...data,
@@ -324,16 +330,13 @@ export default function CourseDetails({
                 </Drawer>
               </div>
               <div>
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  className="w-full"
-                  onClick={() => {
-                    setCourseDrawerOpen(true);
+                <EditForm
+                  item={course ?? null}
+                  onSave={function (updated: object): void {
+                    throw new Error("Function not implemented.");
                   }}
-                >
-                  Update Details
-                </Button>
+                  columns={courseFormDefs}
+                />
               </div>
               <div></div>
             </div>
@@ -441,7 +444,7 @@ export default function CourseDetails({
                       await client.reservations.admin.create.mutate({
                         profileId: selectedTrainee,
                         courseId: courseId,
-                        creditHours: course.data?.creditHours ?? "0",
+                        creditHours: course?.creditHours ?? "0",
                         paymentStatus: PaymentStatus.Draft,
                       });
 
