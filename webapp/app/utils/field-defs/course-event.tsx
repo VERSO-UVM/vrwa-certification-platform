@@ -10,8 +10,9 @@ import {
   textInputEditor,
   TimeInput,
 } from "../field-editors";
-import { add, differenceInMinutes } from "date-fns";
+import { add, addMinutes, differenceInMinutes } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
+import { Label } from "~/components/ui/label";
 
 export const courseEventFieldHelper = createColumnHelper<CourseEventDto>();
 
@@ -116,7 +117,53 @@ export const courseEventDefs = {
   duration: courseEventFieldHelper.accessor("durationMinutes", {
     header: "Duration (minutes)",
     meta: {
-      editor: intInputEditor(),
+      editor: (() => {
+        const MinutesInput = intInputEditor();
+        return ({ value, getRow, onChange, onBlur, overrides }) => {
+          const [duration, setDuration] = useState(value);
+          const startDate = getRow().classStartDatetime;
+          const endDate = useMemo(
+            () => (startDate ? addMinutes(startDate, duration ?? 0) : null),
+            [startDate, duration],
+          );
+
+          return (
+            <div className="grid grid-cols-2 gap-4">
+              <MinutesInput
+                value={duration}
+                onChange={(newMinutes) => {
+                  setDuration(newMinutes);
+                }}
+                onBlur={() => onBlur(duration)}
+                getRow={getRow}
+                overrides={overrides}
+              />
+              <TimeInput
+                value={endDate}
+                onBlur={() => onBlur(duration)}
+                overrides={{}}
+                getRow={() => {}}
+                onChange={(newDate) => {
+                  if (startDate == null) {
+                    onChange(duration);
+                    return;
+                  }
+                  if (newDate == null) {
+                    setDuration(0);
+                    onChange(0);
+                    return;
+                  }
+                  const newDuration = differenceInMinutes(newDate, startDate);
+                  if (newDuration >= 0) {
+                    setDuration(newDuration);
+                    onChange(newDuration);
+                  }
+                }}
+              />
+            </div>
+          );
+        };
+      })(),
     },
   }),
 } as const;

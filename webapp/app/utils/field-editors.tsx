@@ -1,7 +1,8 @@
 /**
  * Customizable generic editors to use in the meta.editor ColumnDef
- * property.
- * The idea is for these functions to be highly re-usable and we don't need many.
+ * property. The idea is for these functions to be highly re-usable. They
+ * have no direct dependencies on any React-Table things, so they may be
+ * used in other contexts.
  *
  * Currently still missing:
  *
@@ -30,6 +31,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "~/components/ui/input-group";
+import { isValidDate } from "./utils";
 
 /**
  * I didn't see a built-in interface for props for generic form fields that exist
@@ -73,13 +75,13 @@ interface HasToString {
   toString(): string;
 }
 
-/**l
- * Can override `props` for, e.g. type="number".
+/**
+ * refactor: rename to stringInputEditor
  */
 export function textInputEditor(
   props?: React.ComponentProps<typeof Input>,
 ): FieldEditor<unknown, string> {
-  const NullableTextInput = _textInputEditor((x) => x, props);
+  const NullableTextInput = _genericInputEditor((x) => x, props);
   return ({ onChange, onBlur, ...rest }) => (
     <NullableTextInput
       onChange={(x) => onChange(x ?? "")}
@@ -92,7 +94,7 @@ export function textInputEditor(
 export function intInputEditor<T>(
   props?: React.ComponentProps<typeof Input>,
 ): FieldEditor<T, number | null> {
-  return _textInputEditor<number>(parseInt, {
+  return _genericInputEditor<number>(parseInt, {
     type: "number",
     ...props,
   });
@@ -101,7 +103,7 @@ export function intInputEditor<T>(
 /**
  * Generic input editor.
  */
-export function _textInputEditor<U extends HasToString>(
+export function _genericInputEditor<U extends HasToString>(
   parse: (x: string) => U,
   props?: React.ComponentProps<typeof Input>,
 ): FieldEditor<unknown, U | null> {
@@ -129,6 +131,10 @@ export function _textInputEditor<U extends HasToString>(
   };
 }
 
+/**
+ * Specialized editor to make sure there is no funny business
+ * with price amounts.
+ */
 export function priceCentsEditor(
   props?: React.ComponentProps<typeof Input>,
 ): FieldEditor<unknown, number> {
@@ -171,7 +177,10 @@ export function priceCentsEditor(
   };
 }
 
-export function selectOptionsEditor<U extends { toString: () => string }>({
+/**
+ * Highly extensible select options.
+ */
+export function selectOptionsEditor<U extends HasToString>({
   options,
   props,
 }: {
@@ -220,6 +229,7 @@ export function dateEditor(): FieldEditor<unknown, Date | null> {
 
 /**
  * Date and time picker.
+ * Adapted from shadcn/ui example.
  */
 export function DatetimeEditor({
   value: date,
@@ -248,11 +258,14 @@ export function DatetimeEditor({
             value={dateString}
             placeholder="June 01, 2025"
             onChange={(e) => {
-              const date = new Date(e.target.value);
+              const newDate = new Date(e.target.value);
+              newDate.setHours(date.getHours());
+              newDate.setMinutes(date.getMinutes());
+
               setDateString(e.target.value);
-              if (isValidDate(date)) {
-                setMonth(date);
-                onChange(date);
+              if (isValidDate(newDate)) {
+                setMonth(newDate);
+                onChange(newDate);
               }
             }}
             onKeyDown={(e) => {
@@ -261,13 +274,7 @@ export function DatetimeEditor({
                 setOpen(true);
               }
             }}
-            onBlur={() => {
-              const date = new Date(dateString);
-              if (isValidDate(date)) {
-                setDateString(formatDate(date));
-                onBlur(date);
-              }
-            }}
+            onBlur={() => onBlur(date)}
           />
           <InputGroupAddon align="inline-end">
             <Popover open={open} onOpenChange={setOpen}>
@@ -331,9 +338,7 @@ export function DatetimeEditor({
             setTimeString(event.target.value);
             onChange(updatedDate);
           }}
-          onBlur={() => {
-            onBlur(date);
-          }}
+          onBlur={() => onBlur(date)}
         />
       </Field>
     </FieldGroup>
@@ -341,14 +346,11 @@ export function DatetimeEditor({
 }
 
 export function TimeInput({
-  date,
+  value: date,
   onChange,
   onBlur,
-}: {
-  date: Date;
-  onChange: (date: Date) => void;
-  onBlur: (date: Date) => void;
-}) {
+  overrides,
+}: FieldEditorProps<unknown, Date | null>) {
   const [timeString, setTimeString] = useState(formatTimeForInput(date));
   // if the value's been taken out from under us
   useEffect(() => {
@@ -371,7 +373,7 @@ export function TimeInput({
           if (hours == null || minutes == null) return;
           setTimeString(event.target.value);
 
-          const updatedDate = new Date(date);
+          const updatedDate = date ? new Date(date) : new Date();
           updatedDate.setHours(hours);
           updatedDate.setMinutes(minutes);
           updatedDate.setSeconds(0);
@@ -381,12 +383,14 @@ export function TimeInput({
         onBlur={() => {
           onBlur(date);
         }}
+        {...overrides}
       />
     </Field>
   );
 }
 
-const formatTimeForInput = (date: Date): string => {
+const formatTimeForInput = (date: Date | null): string => {
+  if (!date) return "00:00";
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
   return `${hours}:${minutes}`;
@@ -402,11 +406,4 @@ function formatDate(date: Date | undefined) {
     month: "long",
     year: "numeric",
   });
-}
-
-function isValidDate(date: Date | undefined) {
-  if (!date) {
-    return false;
-  }
-  return !isNaN(date.getTime());
 }

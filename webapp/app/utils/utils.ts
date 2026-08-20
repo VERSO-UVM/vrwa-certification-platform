@@ -53,3 +53,10 @@ export function dateFormat(date: Date) {
 export function timeFormat(date: Date) {
   return format(date, "p");
 }
+
+export function isValidDate(date: Date | undefined) {
+  if (!date) {
+    return false;
+  }
+  return !isNaN(date.getTime());
+}
