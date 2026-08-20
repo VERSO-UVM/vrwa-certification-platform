@@ -81,6 +81,40 @@ export const courseEventRouter = router({
         return updatedEvent;
       }),
 
+    clone: adminProcedure
+      .input(
+        z.object({
+          courseEventId: z.string(),
+        }),
+      )
+      .mutation(async ({ input: { courseEventId } }) => {
+        const original = await db.client.query.courseEvent.findFirst({
+          where: { id: courseEventId },
+        });
+        if (!original) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "CourseEvent not found.",
+          });
+        }
+
+        const [newCourseEvent] = await db.client
+          .insert(courseEvent)
+          .values({
+            ...original,
+            id: undefined,
+          })
+          .returning();
+        if (!newCourseEvent) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create course.",
+          });
+        }
+
+        return newCourseEvent;
+      }),
+
     delete: adminProcedure
       .input(
         z.object({

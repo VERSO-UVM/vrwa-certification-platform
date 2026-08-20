@@ -33,14 +33,6 @@ import {
 import { Badge } from "~/components/ui/badge";
 import { Link } from "react-router";
 import { Users, CreditCard, Calendar, Trash, ArrowLeft } from "lucide-react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-} from "~/components/ui/drawer";
-import { NewCourseForm } from "~/pages/admin/course-manager/course-form";
 import type { Route } from "./+types/course-details";
 import { EditTraineeReservation } from "../trainee-manager/edit-reservation";
 import { AddCourseEventButton as UpdateCourseEventButton } from "./add-course-event-button";
@@ -51,7 +43,7 @@ import {
 } from "~/utils/field-defs/reservation";
 import { EditForm } from "~/components/entry-views/edit-form";
 import { courseEventDefs } from "~/utils/field-defs/course-event";
-import { courseDefPresets, courseDefs } from "~/utils/field-defs/course";
+import { courseDefs } from "~/utils/field-defs/course";
 import type { ColumnDef } from "@tanstack/react-table";
 
 export function meta() {
@@ -82,11 +74,31 @@ export default function CourseDetails({
   const trpc = useTRPC();
   const client = useTRPCClient();
   const queryClient = useQueryClient();
-  const updateMutation = useMutation(
+  const courseEventUpdateMut = useMutation(
     trpc.courseEvents.admin.update.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: trpc.courseEvents.admin.listCourse.queryKey(),
+        });
+      },
+    }),
+  );
+
+  const courseEventCloneMut = useMutation(
+    trpc.courseEvents.admin.clone.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.courseEvents.admin.listCourse.queryKey(),
+        });
+      },
+    }),
+  );
+
+  const courseUpdateMut = useMutation(
+    trpc.courses.admin.update.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.courses.admin.pathKey(),
         });
       },
     }),
@@ -155,11 +167,6 @@ export default function CourseDetails({
   const availableTrainees =
     trainees.data?.filter((t) => !rosterIds.has(t.id)) ?? [];
 
-  //editing a course
-  const [courseDrawerOpen, setCourseDrawerOpen] = useState<boolean | false>(
-    false,
-  );
-
   //Data Table
   const rosterTableDef = useMemo(
     () => [
@@ -212,8 +219,8 @@ export default function CourseDetails({
         </Link>
       </Button>
       <PageHeader>{course?.courseName}</PageHeader>
-      <div className="grid gap-4 grid-cols-1 @xl:grid-cols-3">
-        <Card className="@xl:col-span-1" variant="green">
+      <div className="grid gap-4 grid-cols-6">
+        <Card className="col-span-full @xl:col-span-2" variant="green">
           <CardContent className="p-6 flex items-center gap-4">
             <Users className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
@@ -222,7 +229,7 @@ export default function CourseDetails({
             </div>
           </CardContent>
         </Card>
-        <Card className="@xl:col-span-1" variant="yellow">
+        <Card className="col-span-full @xl:col-span-2" variant="yellow">
           <CardContent className="p-6 flex items-center gap-4">
             <CreditCard className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
@@ -233,7 +240,7 @@ export default function CourseDetails({
             </div>
           </CardContent>
         </Card>
-        <Card className="@xl:col-span-1" variant="blue">
+        <Card className="col-span-full @xl:col-span-2" variant="blue">
           <CardContent className="p-6 flex items-center gap-4">
             <Calendar className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
@@ -242,97 +249,119 @@ export default function CourseDetails({
             </div>
           </CardContent>
         </Card>
-        <div className="col-span-full grid grid-cols-1 @7xl:grid-cols-2 gap-4">
-          <Card variant="orange">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-xl flex justify-between">
-                <div className="font-semibold underline">Course Overview</div>
+        <Card className="col-span-full @7xl:col-span-3" variant="orange">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-xl flex justify-between">
+              <div className="font-semibold underline">Course Overview</div>
+              <Button
+                variant="destructive"
+                size="lg"
+                className=""
+                onClick={async () => {
+                  if (
+                    confirm(
+                      "Are you sure you want to delete this course? All course information and reservations will be lost.",
+                    )
+                  ) {
+                    await client.courses.admin.delete.mutate({
+                      id: courseId!,
+                    });
+                    await queryClient.invalidateQueries({
+                      queryKey: trpc.courses.admin.list.queryKey(),
+                    });
+                    setCourseDeleted(true);
+                  } else {
+                    return;
+                  }
+                }}
+              >
+                <Trash /> Delete Course
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {course != null && (
+              <EditForm
+                item={course}
+                onSave={function (updates): void {
+                  if (!course) return;
+                  courseUpdateMut.mutate({
+                    ...course,
+                    ...updates,
+                  });
+                }}
+                columns={courseFormDefs}
+              />
+            )}
+          </CardContent>
+        </Card>
+        <Card className="col-span-full @7xl:col-span-3" variant="green">
+          <CardHeader>
+            <CardTitle>Training Sessions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs
+              value={selectedTab ?? eventIds[0] ?? ""}
+              onValueChange={setSelectedTab}
+            >
+              <div className="flex justify-between">
+                <TabsList variant="line">
+                  {courseEvents.data?.map((event) => {
+                    const date = event.classStartDatetime
+                      ? new Date(event.classStartDatetime)
+                      : null;
+                    return (
+                      <TabsTrigger key={event.id} value={event.id}>
+                        {date ? date.toLocaleDateString() : "-"}
+                      </TabsTrigger>
+                    );
+                  })}
+                </TabsList>
                 <Button
-                  variant="destructive"
-                  size="lg"
-                  className=""
-                  onClick={async () => {
-                    if (
-                      confirm(
-                        "Are you sure you want to delete this course? All course information and reservations will be lost.",
-                      )
-                    ) {
-                      await client.courses.admin.delete.mutate({
-                        id: courseId!,
-                      });
-                      await queryClient.invalidateQueries({
-                        queryKey: trpc.courses.admin.list.queryKey(),
-                      });
-                      setCourseDeleted(true);
-                    } else {
+                  variant="default"
+                  onClick={() => {
+                    if (!selectedTab) {
+                      // No course event selected
                       return;
                     }
+                    courseEventCloneMut.mutate(
+                      {
+                        courseEventId: selectedTab,
+                      },
+                      {
+                        onSuccess: (newEvent) => {
+                          setSelectedTab(newEvent.id);
+                        },
+                      },
+                    );
                   }}
                 >
-                  <Trash /> Delete Course
+                  + Add Training Sesssion
                 </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div>
-                <EditForm
-                  item={course ?? null}
-                  onSave={function (updated: object): void {
-                    throw new Error("Function not implemented.");
-                  }}
-                  columns={courseFormDefs}
-                />
               </div>
-            </CardContent>
-          </Card>
-          <Card variant="green">
-            <CardHeader>
-              <CardTitle>Training Sessions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Tabs
-                value={selectedTab ?? eventIds[0] ?? ""}
-                onValueChange={setSelectedTab}
-              >
-                <div className="flex justify-between">
-                  <TabsList variant="line">
-                    {courseEvents.data?.map((event) => {
-                      const date = event.classStartDatetime
-                        ? new Date(event.classStartDatetime)
-                        : null;
-                      return (
-                        <TabsTrigger key={event.id} value={event.id}>
-                          {date ? date.toLocaleDateString() : "-"}
-                        </TabsTrigger>
-                      );
-                    })}
-                  </TabsList>
-                  <UpdateCourseEventButton />
-                </div>
-                {courseEvents.data?.map((event) => (
-                  <TabsContent key={event.id} value={event.id}>
-                    <EditForm
-                      key={event?.courseId}
-                      item={event}
-                      columns={courseEventFormDefs}
-                      onSave={async (data) => {
-                        if (event) {
-                          await updateMutation.mutateAsync({
-                            id: event.id,
-                            ...data,
-                          });
-                          await queryClient.invalidateQueries({
-                            queryKey: trpc.courseEvents.admin.pathKey(),
-                          });
-                        }
-                      }}
-                    />
-                  </TabsContent>
-                ))}
-              </Tabs>
-            </CardContent>
-          </Card>
-        </div>
+              {courseEvents.data?.map((event) => (
+                <TabsContent key={event.id} value={event.id}>
+                  <EditForm
+                    key={event?.courseId}
+                    item={event}
+                    columns={courseEventFormDefs}
+                    onSave={async (data) => {
+                      if (event) {
+                        await courseEventUpdateMut.mutateAsync({
+                          id: event.id,
+                          ...data,
+                        });
+                        await queryClient.invalidateQueries({
+                          queryKey: trpc.courseEvents.admin.pathKey(),
+                        });
+                      }
+                    }}
+                  />
+                </TabsContent>
+              ))}
+            </Tabs>
+          </CardContent>
+        </Card>
         <Card variant="yellow" className="col-span-full">
           <CardHeader className="pb-3">
             <CardTitle>
