@@ -309,7 +309,7 @@ async function seedCourseEventsPerCourse(courseIds: string[]): Promise<number> {
             min: anchor.toISOString(),
             max: end.toISOString(),
           }),
-          duration: funcs.interval(),
+          durationMinutes: funcs.int({ minValue: 30, maxValue: 300 }),
         },
       },
     }));
