@@ -69,9 +69,11 @@ const courseEventFormDefs = [
 ];
 
 const courseFormDefs = [
+  courseDefs.status,
   courseDefs.courseName,
-  courseDefs.priceCents,
+  courseDefs.description,
   courseDefs.creditHours,
+  courseDefs.priceCents,
 ] as ColumnDef<CourseDto>[];
 
 export default function CourseDetails({
@@ -110,7 +112,6 @@ export default function CourseDetails({
 
   //grouping reservations by courseEventId to easily access rosters
   const roster = reservations.data ?? [];
-  const events = courseEvents.data ?? [];
 
   //getting courseEvents for tabs
   const eventIds = courseEvents.data?.map((e) => e.id) ?? [];
@@ -241,94 +242,38 @@ export default function CourseDetails({
             </div>
           </CardContent>
         </Card>
-        <Card className="col-span-full" variant="orange">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-xl flex justify-between">
-              <div className="font-semibold underline">Course Overview</div>
-              <Button
-                variant="destructive"
-                size="lg"
-                className=""
-                onClick={async () => {
-                  if (
-                    confirm(
-                      "Are you sure you want to delete this course? All course information and reservations will be lost.",
-                    )
-                  ) {
-                    await client.courses.admin.delete.mutate({
-                      id: courseId!,
-                    });
-                    await queryClient.invalidateQueries({
-                      queryKey: trpc.courses.admin.list.queryKey(),
-                    });
-                    setCourseDeleted(true);
-                  } else {
-                    return;
-                  }
-                }}
-              >
-                <Trash /> Delete Course
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <dl className="space-y-3">
-                <div>
-                  <dt className="font-medium text-muted-foreground">
-                    Description
-                  </dt>
-                  <dd>{course?.description}</dd>
-                </div>
-
-                <div>
-                  <dt className="font-medium text-muted-foreground">
-                    Enrollment Fee
-                  </dt>
-                  <dd>${course?.priceCents && course?.priceCents / 100}</dd>
-                </div>
-
-                <div>
-                  <dt className="font-medium text-muted-foreground">
-                    Credit Hours
-                  </dt>
-                  <dd>{course?.creditHours}</dd>
-                </div>
-              </dl>
-              <div className="flex justify-end mb-4 pr-4">
-                <Drawer
-                  direction="right"
-                  open={courseDrawerOpen}
-                  onOpenChange={setCourseDrawerOpen}
+        <div className="col-span-full grid grid-cols-1 @7xl:grid-cols-2 gap-4">
+          <Card variant="orange">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-xl flex justify-between">
+                <div className="font-semibold underline">Course Overview</div>
+                <Button
+                  variant="destructive"
+                  size="lg"
+                  className=""
+                  onClick={async () => {
+                    if (
+                      confirm(
+                        "Are you sure you want to delete this course? All course information and reservations will be lost.",
+                      )
+                    ) {
+                      await client.courses.admin.delete.mutate({
+                        id: courseId!,
+                      });
+                      await queryClient.invalidateQueries({
+                        queryKey: trpc.courses.admin.list.queryKey(),
+                      });
+                      setCourseDeleted(true);
+                    } else {
+                      return;
+                    }
+                  }}
                 >
-                  <DrawerContent>
-                    <DrawerHeader>
-                      <DrawerTitle>Update Course Details</DrawerTitle>
-                      <DrawerDescription>
-                        Edit an existing event
-                      </DrawerDescription>
-                    </DrawerHeader>
-                    <div className="no-scrollbar overflow-y-auto px-4">
-                      <NewCourseForm
-                        key={courseId}
-                        course={course}
-                        onCreate={async (data) => {
-                          await client.courses.admin.update.mutate({
-                            ...data,
-                            id: courseId,
-                          });
-                          await queryClient.invalidateQueries({
-                            queryKey: trpc.courses.admin.get.queryKey({
-                              id: courseId,
-                            }),
-                          });
-                          setCourseDrawerOpen(false);
-                        }}
-                      />
-                    </div>
-                  </DrawerContent>
-                </Drawer>
-              </div>
+                  <Trash /> Delete Course
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
               <div>
                 <EditForm
                   item={course ?? null}
@@ -338,58 +283,57 @@ export default function CourseDetails({
                   columns={courseFormDefs}
                 />
               </div>
-              <div></div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card variant="green" className="col-span-full">
-          <CardHeader>
-            <CardTitle>Training Sessions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs
-              value={selectedTab ?? eventIds[0] ?? ""}
-              onValueChange={setSelectedTab}
-            >
-              <div className="flex justify-between">
-                <TabsList variant="line">
-                  {courseEvents.data?.map((event) => {
-                    const date = event.classStartDatetime
-                      ? new Date(event.classStartDatetime)
-                      : null;
-                    return (
-                      <TabsTrigger key={event.id} value={event.id}>
-                        {date ? date.toLocaleDateString() : "-"}
-                      </TabsTrigger>
-                    );
-                  })}
-                </TabsList>
-                <UpdateCourseEventButton />
-              </div>
-              {courseEvents.data?.map((event) => (
-                <TabsContent key={event.id} value={event.id}>
-                  <EditForm
-                    key={event?.courseId}
-                    item={event}
-                    columns={courseEventFormDefs}
-                    onSave={async (data) => {
-                      if (event) {
-                        await updateMutation.mutateAsync({
-                          id: event.id,
-                          ...data,
-                        });
-                        await queryClient.invalidateQueries({
-                          queryKey: trpc.courseEvents.admin.pathKey(),
-                        });
-                      }
-                    }}
-                  />
-                </TabsContent>
-              ))}
-            </Tabs>
-          </CardContent>
-        </Card>
-        <Card className="col-span-full" variant="yellow">
+            </CardContent>
+          </Card>
+          <Card variant="green">
+            <CardHeader>
+              <CardTitle>Training Sessions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs
+                value={selectedTab ?? eventIds[0] ?? ""}
+                onValueChange={setSelectedTab}
+              >
+                <div className="flex justify-between">
+                  <TabsList variant="line">
+                    {courseEvents.data?.map((event) => {
+                      const date = event.classStartDatetime
+                        ? new Date(event.classStartDatetime)
+                        : null;
+                      return (
+                        <TabsTrigger key={event.id} value={event.id}>
+                          {date ? date.toLocaleDateString() : "-"}
+                        </TabsTrigger>
+                      );
+                    })}
+                  </TabsList>
+                  <UpdateCourseEventButton />
+                </div>
+                {courseEvents.data?.map((event) => (
+                  <TabsContent key={event.id} value={event.id}>
+                    <EditForm
+                      key={event?.courseId}
+                      item={event}
+                      columns={courseEventFormDefs}
+                      onSave={async (data) => {
+                        if (event) {
+                          await updateMutation.mutateAsync({
+                            id: event.id,
+                            ...data,
+                          });
+                          await queryClient.invalidateQueries({
+                            queryKey: trpc.courseEvents.admin.pathKey(),
+                          });
+                        }
+                      }}
+                    />
+                  </TabsContent>
+                ))}
+              </Tabs>
+            </CardContent>
+          </Card>
+        </div>
+        <Card variant="yellow" className="col-span-full">
           <CardHeader className="pb-3">
             <CardTitle>
               Class Roster{" "}

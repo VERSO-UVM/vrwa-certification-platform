@@ -6,9 +6,11 @@ import {
   _genericInputEditor,
   intInputEditor,
   priceCentsEditor,
+  selectOptionsEditor,
+  textAreaEditor,
   textInputEditor,
 } from "../field-editors";
-import type { Course } from "@backend/database/schema";
+import { CourseStatus, type Course } from "@backend/database/schema";
 import type { CourseInsert } from "@backend/routers/course";
 
 export const courseFieldHelper = createColumnHelper<
@@ -38,7 +40,7 @@ export const courseDefs = {
       <div className="text-muted-foreground">{String(getValue())}</div>
     ),
     meta: {
-      editor: textInputEditor(),
+      editor: textAreaEditor(),
     },
   }),
 
@@ -89,6 +91,19 @@ export const courseDefs = {
       return value.toLocaleDateString();
     },
   }),
+
+  status: courseFieldHelper.accessor("status", {
+    header: "Status",
+    meta: {
+      editor: selectOptionsEditor({
+        options: [
+          { label: "Active", value: CourseStatus.Active },
+          { label: "Canceled", value: CourseStatus.Canceled },
+          { label: "Deleted", value: CourseStatus.Deleted },
+        ]
+      })
+    }
+  })
 };
 
 export const courseDefPresets = {
