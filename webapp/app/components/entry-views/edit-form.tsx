@@ -62,7 +62,6 @@ export function EditForm<T extends object>({
               if (header == null) return null;
               if (cell.column.columnDef.meta?.editor == null) return null;
               const htmlId = cell.column.id + "_input";
-              const ctx = cell.getContext();
               return (
                 <div key={cell.id}>
                   <Label htmlFor={htmlId} className="text-sm font-semibold">
@@ -72,7 +71,8 @@ export function EditForm<T extends object>({
                     )}
                   </Label>
                   {cell.column.columnDef.meta.editor({
-                    ctx: cell.getContext(),
+                    value: cell.getContext().getValue(),
+                    getRow: () => ({ ...row.original, ...updates }),
                     overrides: {
                       id: htmlId,
                     },

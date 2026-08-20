@@ -5,7 +5,7 @@ import { courseStartDate } from "../utils";
 import {
   _textInputEditor,
   intInputEditor,
-  priceCentsInputEditor,
+  priceCentsEditor,
   textInputEditor,
 } from "../field-editors";
 import type { Course } from "@backend/database/schema";
@@ -53,7 +53,7 @@ export const courseDefs = {
     header: "Fee ($)",
     cell: ({ getValue }) => `$${(Number(getValue()) / 100).toFixed(2)}`,
     meta: {
-      editor: priceCentsInputEditor(),
+      editor: priceCentsEditor(),
     },
   }),
 

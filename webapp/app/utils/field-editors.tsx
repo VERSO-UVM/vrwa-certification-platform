@@ -10,7 +10,6 @@
  * - [x] Date input
  */
 
-import type { CellContext } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { Calendar } from "~/components/ui/calendar";
 import { Input } from "~/components/ui/input";
@@ -18,6 +17,19 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "~/components/ui/native-select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { Field, FieldGroup } from "~/components/ui/field";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "~/components/ui/input-group";
 
 /**
  * I didn't see a built-in interface for props for generic form fields that exist
@@ -28,11 +40,17 @@ export interface FormFieldProps {
   required: boolean;
 }
 
-export type FieldEditor<TData, TValue> = (item: {
+export interface FieldEditorProps<TData, TValue> {
   /**
-   * `ctx` is the same as the object pass to table `cell` ColumnDef funciton.
+   * Get current value of the field.
    */
-  ctx: CellContext<TData, TValue>;
+  value: TValue;
+
+  /**
+   * If an editor does not need to see other values, use
+   * FieldEditor<unknown, TValue>.
+   */
+  getRow: () => TData;
 
   overrides: Partial<FormFieldProps>;
 
@@ -45,42 +63,56 @@ export type FieldEditor<TData, TValue> = (item: {
    * typing.
    */
   onBlur: (value: TValue) => void;
-}) => React.ReactNode;
+}
+
+export type FieldEditor<TData, TValue> = (
+  item: FieldEditorProps<TData, TValue>,
+) => React.ReactNode;
 
 interface HasToString {
   toString(): string;
 }
 
-/**
+/**l
  * Can override `props` for, e.g. type="number".
  */
-export function textInputEditor<T>(
+export function textInputEditor(
   props?: React.ComponentProps<typeof Input>,
-): FieldEditor<T, string> {
-  return _textInputEditor((x) => x, props);
+): FieldEditor<unknown, string> {
+  const NullableTextInput = _textInputEditor((x) => x, props);
+  return ({ onChange, onBlur, ...rest }) => (
+    <NullableTextInput
+      onChange={(x) => onChange(x ?? "")}
+      onBlur={(x) => onBlur(x ?? "")}
+      {...rest}
+    />
+  );
 }
 
 export function intInputEditor<T>(
   props?: React.ComponentProps<typeof Input>,
-): FieldEditor<T, number> {
-  return _textInputEditor<T, number>(parseInt, {
+): FieldEditor<T, number | null> {
+  return _textInputEditor<number>(parseInt, {
     type: "number",
     ...props,
   });
 }
 
-export function _textInputEditor<T, U extends HasToString>(
+/**
+ * Generic input editor.
+ */
+export function _textInputEditor<U extends HasToString>(
   parse: (x: string) => U,
   props?: React.ComponentProps<typeof Input>,
-): FieldEditor<T, U> {
-  return ({ overrides, onChange, onBlur, ctx: { getValue } }) => {
-    const [value, setValue] = useState(getValue());
+): FieldEditor<unknown, U | null> {
+  return ({ overrides, onChange, onBlur, value: orig }) => {
+    const [value, setValue] = useState(orig);
     // if the value's been taken out from under us
-    useEffect(() => setValue(getValue()), [getValue()]);
+    useEffect(() => setValue(orig), [orig]);
     return (
       <Input
         value={value?.toString() ?? ""}
-        type="text"
+        type="text" /* Can be overriden with props */
         className="user-invalid:border-pink-500 focus:user-invalid:ring-pink-400"
         onChange={(event) => {
           const val = parse(event.target.value);
@@ -97,16 +129,16 @@ export function _textInputEditor<T, U extends HasToString>(
   };
 }
 
-export function priceCentsInputEditor<T>(
+export function priceCentsEditor(
   props?: React.ComponentProps<typeof Input>,
-): FieldEditor<T, number> {
-  return ({ overrides, onChange, onBlur, ctx: { getValue } }) => {
-    const toDisplay = (cents: number) => (cents / 100).toFixed(2).toString();
-    const toCents = (s: string) => Math.round(parseFloat(s) * 100);
+): FieldEditor<unknown, number> {
+  const toDisplay = (cents: number) => (cents / 100).toFixed(2).toString();
+  const toCents = (s: string) => Math.round(parseFloat(s) * 100);
 
-    const [display, setDisplay] = useState(toDisplay(getValue()));
+  return ({ overrides, onChange, onBlur, value }) => {
+    const [display, setDisplay] = useState(toDisplay(value));
     // if the value's been taken out from under us
-    useEffect(() => setDisplay(toDisplay(getValue())), [getValue()]);
+    useEffect(() => setDisplay(toDisplay(value)), [value]);
 
     return (
       <Input
@@ -139,21 +171,21 @@ export function priceCentsInputEditor<T>(
   };
 }
 
-export function selectOptionsEditor<T, U extends { toString: () => string }>({
+export function selectOptionsEditor<U extends { toString: () => string }>({
   options,
   props,
 }: {
   options: { label: string; value: U; selected?: boolean }[];
   props?: React.ComponentProps<typeof NativeSelect>;
-}): FieldEditor<T, U> {
+}): FieldEditor<unknown, U> {
   // Native <select> requires string values, but we want this function to be generic
   const stringToValue = Object.fromEntries(
     options.map(({ value }) => [value.toString(), value]),
   );
-  return ({ overrides, onChange, onBlur, ctx: { getValue } }) => {
-    const [value, _setValue] = useState(getValue());
+  return ({ overrides, onChange, onBlur, value: orig }) => {
+    const [value, _setValue] = useState(orig);
     // if the value's been taken out from under us
-    useEffect(() => _setValue(getValue()), [getValue()]);
+    useEffect(() => _setValue(orig), [orig]);
     const setValue = (value: U) => {
       _setValue(value);
       onChange(value);
@@ -182,29 +214,199 @@ export function selectOptionsEditor<T, U extends { toString: () => string }>({
   };
 }
 
-export function dateEditor<T>(): FieldEditor<T, Date | null> {
-  return ({ overrides, onChange, onBlur, ctx: { getValue } }) => {
-    const [value, setValue] = useState(getValue() ?? new Date());
-    // if the value's been taken out from under us
-    useEffect(() => {
-      const value = getValue();
-      if (value) setValue(value);
-    }, [getValue()]);
-    return (
-      <Calendar
-        selected={value}
-        defaultMonth={value}
-        captionLayout="dropdown"
-        onSelect={(val) => {
-          if (val) {
-            setValue(val);
-            onChange(val);
-          }
+export function dateEditor(): FieldEditor<unknown, Date | null> {
+  return DatetimeEditor;
+}
+
+/**
+ * Date and time picker.
+ */
+export function DatetimeEditor({
+  value: date,
+  onChange,
+  onBlur,
+  overrides,
+}: FieldEditorProps<unknown, Date | null>) {
+  date ??= new Date();
+  const [open, setOpen] = useState(false);
+  const [month, setMonth] = useState<Date | undefined>(date);
+  const [dateString, setDateString] = useState(formatDate(date));
+  const [timeString, setTimeString] = useState(formatTimeForInput(date));
+  // If value is taken out from under us
+  useEffect(() => {
+    setMonth(date);
+    setDateString(formatDate(date));
+    setTimeString(formatTimeForInput(date));
+  }, [date]);
+
+  return (
+    <FieldGroup className="mx-auto flex-row">
+      <Field>
+        <InputGroup>
+          <InputGroupInput
+            {...overrides}
+            value={dateString}
+            placeholder="June 01, 2025"
+            onChange={(e) => {
+              const date = new Date(e.target.value);
+              setDateString(e.target.value);
+              if (isValidDate(date)) {
+                setMonth(date);
+                onChange(date);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setOpen(true);
+              }
+            }}
+            onBlur={() => {
+              const date = new Date(dateString);
+              if (isValidDate(date)) {
+                setDateString(formatDate(date));
+                onBlur(date);
+              }
+            }}
+          />
+          <InputGroupAddon align="inline-end">
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <InputGroupButton
+                  variant="ghost"
+                  size="icon-xs"
+                  aria-label="Select date"
+                >
+                  <CalendarIcon />
+                  <span className="sr-only">Select date</span>
+                </InputGroupButton>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-auto overflow-hidden p-0"
+                align="end"
+                alignOffset={-8}
+                sideOffset={10}
+              >
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  captionLayout="dropdown"
+                  month={month}
+                  onMonthChange={setMonth}
+                  onSelect={(date) => {
+                    setOpen(false);
+                    if (date) {
+                      setDateString(formatDate(date));
+                      onChange(date);
+                      onBlur(date);
+                    }
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
+          </InputGroupAddon>
+        </InputGroup>
+      </Field>
+      <Field>
+        <Input
+          aria-label="time"
+          type="time"
+          step="60"
+          value={timeString}
+          className=""
+          onChange={(event) => {
+            const timeString = event.target.value; // Expected format: "HH:mm"
+            if (!timeString) return;
+
+            const [hours, minutes] = timeString.split(":").map(Number);
+            if (hours == null || minutes == null) return;
+
+            // Create a new Date instance based on the current state to preserve the day/month/year
+            const updatedDate = new Date(date);
+            updatedDate.setHours(hours);
+            updatedDate.setMinutes(minutes);
+            updatedDate.setSeconds(0);
+            updatedDate.setMilliseconds(0);
+
+            setTimeString(event.target.value);
+            onChange(updatedDate);
+          }}
+          onBlur={() => {
+            onBlur(date);
+          }}
+        />
+      </Field>
+    </FieldGroup>
+  );
+}
+
+export function TimeInput({
+  date,
+  onChange,
+  onBlur,
+}: {
+  date: Date;
+  onChange: (date: Date) => void;
+  onBlur: (date: Date) => void;
+}) {
+  const [timeString, setTimeString] = useState(formatTimeForInput(date));
+  // if the value's been taken out from under us
+  useEffect(() => {
+    if (date) setTimeString(formatTimeForInput(date));
+  }, [date]);
+
+  return (
+    <Field>
+      <Input
+        aria-label="time"
+        type="time"
+        step="60"
+        value={timeString}
+        className=""
+        onChange={(event) => {
+          const timeString = event.target.value; // Expected format: "HH:mm"
+          if (!timeString) return;
+
+          const [hours, minutes] = timeString.split(":").map(Number);
+          if (hours == null || minutes == null) return;
+          setTimeString(event.target.value);
+
+          const updatedDate = new Date(date);
+          updatedDate.setHours(hours);
+          updatedDate.setMinutes(minutes);
+          updatedDate.setSeconds(0);
+          updatedDate.setMilliseconds(0);
+          onChange(updatedDate);
         }}
-        onDayBlur={() => onBlur(value)}
-        mode="single"
-        {...overrides}
+        onBlur={() => {
+          onBlur(date);
+        }}
       />
-    );
-  };
+    </Field>
+  );
+}
+
+const formatTimeForInput = (date: Date): string => {
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+};
+
+function formatDate(date: Date | undefined) {
+  if (!date) {
+    return "";
+  }
+
+  return date.toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function isValidDate(date: Date | undefined) {
+  if (!date) {
+    return false;
+  }
+  return !isNaN(date.getTime());
 }
