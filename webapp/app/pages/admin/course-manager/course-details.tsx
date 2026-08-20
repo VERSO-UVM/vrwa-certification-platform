@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { PaymentStatus } from "@backend/database/schema";
-import { type ColumnDef } from "@tanstack/react-table";
-import type { ProfileDto, ReservationDto } from "@backend/database/dtos";
+import type { ProfileDto } from "@backend/database/dtos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { PageHeader } from "~/components/page-header";
 import {
@@ -31,7 +30,6 @@ import {
   SelectItem,
   SelectGroup,
 } from "~/components/ui/select";
-import { PaymentStatusBadge } from "~/components/payment-status-badge";
 import { Badge } from "~/components/ui/badge";
 import { Link } from "react-router";
 import { Users, CreditCard, Calendar, Trash, ArrowLeft } from "lucide-react";
@@ -45,9 +43,14 @@ import {
 import { NewCourseForm } from "~/pages/admin/course-manager/course-form";
 import type { Route } from "./+types/course-details";
 import { EditTraineeReservation } from "../trainee-manager/edit-reservation";
-import { CourseEventForm } from "./course-event-form";
 import { AddCourseEventButton as UpdateCourseEventButton } from "./add-course-event-button";
 import { ButtonGroup } from "~/components/ui/button-group";
+import {
+  reservationDefs,
+  reservationFieldHelper,
+} from "~/utils/field-defs/reservation";
+import { EditForm } from "~/components/entry-views/edit-form";
+import { courseEventDefs } from "~/utils/field-defs/course-event";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
@@ -128,10 +131,7 @@ export default function CourseDetails({
   const [traineePopupOpen, setTraineePopupOpen] = useState<boolean | false>(
     false,
   );
-  const activeEventId = selectedTab ?? eventIds[0] ?? "";
 
-  const selectedEvent =
-    events.find((event) => event.id == activeEventId) || null;
   const rosterIds = new Set(roster.map((r) => r.profileId));
   const availableTrainees =
     trainees.data?.filter((t) => !rosterIds.has(t.id)) ?? [];
@@ -142,38 +142,14 @@ export default function CourseDetails({
   );
 
   //Data Table
-  const rosterTableDef: ColumnDef<ReservationDto>[] = useMemo(
+  const rosterTableDef = useMemo(
     () => [
-      {
-        accessorKey: "lastName",
-        header: "Last Name",
-      },
-      {
-        accessorKey: "firstName",
-        header: "First Name",
-      },
-      {
-        accessorKey: "creditHours",
-        header: "Awarded Hours",
-      },
-      {
-        accessorKey: "isMember",
-        header: "Member Status",
-        cell: ({ getValue }) =>
-          getValue() == true ? (
-            <Badge variant="member"> Member</Badge>
-          ) : (
-            <Badge variant="not_member"> Non-Member</Badge>
-          ),
-      },
-      {
-        accessorKey: "paymentStatus",
-        header: "Payment Status",
-        cell: ({ getValue }) => (
-          <PaymentStatusBadge value={getValue() as PaymentStatus} />
-        ),
-      },
-      {
+      reservationDefs.lastName,
+      reservationDefs.firstName,
+      reservationDefs.creditHours,
+      reservationDefs.isMember,
+      reservationDefs.paymentStatus,
+      reservationFieldHelper.display({
         id: "actions",
         cell: ({ row }) => {
           return (
@@ -190,10 +166,20 @@ export default function CourseDetails({
             </ButtonGroup>
           );
         },
-      },
+      }),
     ],
     [],
   );
+
+  const courseEventFormDefs = useMemo(() => ([
+    courseEventDefs.courseDate,
+    courseEventDefs.duration,
+    courseEventDefs.courseLocationType,
+    courseEventDefs.virtualLink,
+    courseEventDefs.address,
+    courseEventDefs.town,
+    courseEventDefs.venue,
+  ]), [])
 
   if (courseDeleted) {
     return (
@@ -379,18 +365,18 @@ export default function CourseDetails({
               </div>
               {courseEvents.data?.map((event) => (
                 <TabsContent key={event.id} value={event.id}>
-                  <CourseEventForm
-                    key={selectedEvent?.courseId ?? "new"}
-                    event={selectedEvent}
-                    onCreate={async (data) => {
-                      console.log("heyyy", selectedEvent, data);
-                      if (selectedEvent) {
-                        updateMutation.mutate({
-                          id: selectedEvent.id,
+                  <EditForm
+                    key={event?.courseId}
+                    item={event}
+                    columns={courseEventFormDefs}
+                    onSave={async (data) => {
+                      if (event) {
+                        await updateMutation.mutateAsync({
+                          id: event.id,
                           ...data,
                         });
                         await queryClient.invalidateQueries({
-                          queryKey: trpc.courseEvents.admin.list.queryKey(),
+                          queryKey: trpc.courseEvents.admin.pathKey(),
                         });
                       }
                     }}

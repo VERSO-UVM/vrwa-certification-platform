@@ -9,7 +9,7 @@ const fields = [
   userFieldHelper.accessor("email", {
     header: "Email",
     meta: {
-      editor: ({ ctx: { renderValue } }) => renderValue(),
+      editor: ({ value }) => value,
     },
   }),
   userDefs.profiles,

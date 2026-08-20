@@ -8,7 +8,6 @@ import { FieldSet, FieldGroup, Field } from "~/components/ui/field";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { shallowEqual } from "~/utils/utils";
-import { DrawerClose } from "~/components/ui/drawer";
 import { Label } from "../ui/label";
 
 /**

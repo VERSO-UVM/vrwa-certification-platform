@@ -57,7 +57,7 @@ export const userDefs = {
         ));
       },
       meta: {
-        editor: ({ ctx }) => flexRender(ctx.cell.column.columnDef.cell, ctx),
+        editor: ({ value }) => <div className="whitespace-pre-line">{value}</div>,
       },
     },
   ),
