@@ -32,7 +32,7 @@ import {
 } from "~/components/ui/select";
 import { Badge } from "~/components/ui/badge";
 import { Link } from "react-router";
-import { Users, CreditCard, Calendar, Trash, ArrowLeft } from "lucide-react";
+import { Users, CreditCard, Calendar, Trash, ArrowLeft, X } from "lucide-react";
 import type { Route } from "./+types/course-details";
 import { EditTraineeReservation } from "../trainee-manager/edit-reservation";
 import { AddCourseEventButton as UpdateCourseEventButton } from "./add-course-event-button";
@@ -86,6 +86,16 @@ export default function CourseDetails({
 
   const courseEventCloneMut = useMutation(
     trpc.courseEvents.admin.clone.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.courseEvents.admin.listCourse.queryKey(),
+        });
+      },
+    }),
+  );
+
+  const courseEventDeleteMut = useMutation(
+    trpc.courseEvents.admin.delete.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: trpc.courseEvents.admin.listCourse.queryKey(),
@@ -317,27 +327,64 @@ export default function CourseDetails({
                     );
                   })}
                 </TabsList>
-                <Button
-                  variant="default"
-                  onClick={() => {
-                    if (!selectedTab) {
-                      // No course event selected
-                      return;
-                    }
-                    courseEventCloneMut.mutate(
-                      {
-                        courseEventId: selectedTab,
-                      },
-                      {
-                        onSuccess: (newEvent) => {
-                          setSelectedTab(newEvent.id);
+                <ButtonGroup>
+                  <Button
+                    variant="default"
+                    disabled={courseEvents.data == null}
+                    onClick={() => {
+                      if (!selectedTab) {
+                        // No course event selected
+                        return;
+                      }
+                      courseEventCloneMut.mutate(
+                        {
+                          courseEventId: selectedTab,
                         },
-                      },
-                    );
-                  }}
-                >
-                  + Add Training Sesssion
-                </Button>
+                        {
+                          onSuccess: (newEvent) => {
+                            setSelectedTab(newEvent.id);
+                          },
+                        },
+                      );
+                    }}
+                  >
+                    + Add Training Sesssion
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    disabled={(courseEvents.data ?? []).length < 2}
+                    onClick={() => {
+                      if (selectedTab) {
+                        // Select previous tab afterwards
+                        const selectedIndex = courseEvents.data?.findIndex(
+                          (event) => event.id == selectedTab,
+                        );
+                        let newTabIndex = 0;
+                        if (selectedIndex == 0) {
+                          newTabIndex = courseEvents.data?.length ?? 0;
+                        } else if (selectedIndex) {
+                          newTabIndex = selectedIndex - 1;
+                        }
+                        const newTabId = courseEvents.data?.[newTabIndex]?.id;
+
+                        courseEventDeleteMut.mutate(
+                          {
+                            id: selectedTab,
+                          },
+                          {
+                            onSuccess: () => {
+                              if (newTabId) {
+                                setSelectedTab(newTabId);
+                              }
+                            },
+                          },
+                        );
+                      }
+                    }}
+                  >
+                    <X /> Remove
+                  </Button>
+                </ButtonGroup>
               </div>
               {courseEvents.data?.map((event) => (
                 <TabsContent key={event.id} value={event.id}>
