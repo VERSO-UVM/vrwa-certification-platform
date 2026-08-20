@@ -12,14 +12,10 @@ import type { CourseEventDto } from "~/database/dtos";
 import { courseEventQuery } from "~/database/queries";
 import { TRPCError } from "@trpc/server";
 import { isFutureClass } from "~/database/filters";
+import { createUpdateSchema } from "drizzle-orm/zod";
 
-export const courseEventUpdateSchema = z.object({
+export const courseEventUpdateSchema = createUpdateSchema(courseEvent, {
   id: z.string(),
-  classStartDatetime: z.coerce.date().optional().nullable(),
-  seats: z.number().int().positive().nullable().optional(),
-  locationType: z.enum(["in-person", "virtual", "hybrid"]).optional(),
-  physicalAddress: z.string().nullable().optional(),
-  virtualLink: z.url().optional().nullable(),
 });
 
 export type CourseEventUpdateDto = z.infer<typeof courseEventUpdateSchema>;
