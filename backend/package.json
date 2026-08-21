@@ -37,14 +37,14 @@
     "nestjs-zod": "^5.5.0",
     "pg": "^8.23.0",
     "pure-rand": "^8.4.2",
-    "react": "^19.2.8",
-    "superjson": "^2.2.6",
+    "react": "catalog:",
+    "superjson": "catalog:",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^25.9.5",
     "auth": "catalog:",
     "drizzle-seed": "^1.0.0-rc.4",
-    "typescript": "^5.9.3"
+    "typescript": "catalog:"
   }
 }
