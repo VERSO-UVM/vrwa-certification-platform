@@ -57,6 +57,8 @@ export interface FieldEditorProps<TData, TValue> {
 
   overrides: Partial<FormFieldProps>;
 
+  reset: {};
+
   onChange: (value: TValue) => void;
 
   /**
@@ -117,10 +119,10 @@ export function _genericInputEditor<U extends HasToString>(
   parse: (x: string) => U,
   props?: React.ComponentProps<typeof Input>,
 ): FieldEditor<unknown, U | null> {
-  return ({ overrides, onChange, onBlur, value: orig }) => {
+  return ({ overrides, onChange, onBlur, reset, value: orig }) => {
     const [value, setValue] = useState(orig);
     // if the value's been taken out from under us
-    useEffect(() => setValue(orig), [orig]);
+    useEffect(() => setValue(orig), [reset]);
     return (
       <Input
         value={value?.toString() ?? ""}
@@ -147,10 +149,10 @@ export function _genericInputEditor<U extends HasToString>(
 export function textAreaEditor(
   props?: React.ComponentProps<typeof Textarea>,
 ): FieldEditor<unknown, string> {
-  return ({ overrides, onChange, onBlur, value: orig }) => {
+  return ({ overrides, onChange, onBlur, reset, value: orig }) => {
     const [value, setValue] = useState(orig);
     // if the value's been taken out from under us
-    useEffect(() => setValue(orig), [orig]);
+    useEffect(() => setValue(orig), [reset]);
     return (
       <Textarea
         value={value?.toString() ?? ""}
@@ -179,10 +181,10 @@ export function priceCentsEditor(
   const toDisplay = (cents: number) => (cents / 100).toFixed(2).toString();
   const toCents = (s: string) => Math.round(parseFloat(s) * 100);
 
-  return ({ overrides, onChange, onBlur, value }) => {
+  return ({ overrides, onChange, onBlur, reset, value }) => {
     const [display, setDisplay] = useState(toDisplay(value));
     // if the value's been taken out from under us
-    useEffect(() => setDisplay(toDisplay(value)), [value]);
+    useEffect(() => setDisplay(toDisplay(value)), [reset]);
 
     return (
       <Input
@@ -229,10 +231,10 @@ export function selectOptionsEditor<U extends HasToString>({
   const stringToValue = Object.fromEntries(
     options.map(({ value }) => [value.toString(), value]),
   );
-  return ({ overrides, onChange, onBlur, value: orig }) => {
+  return ({ overrides, onChange, onBlur, reset, value: orig }) => {
     const [value, _setValue] = useState(orig);
     // if the value's been taken out from under us
-    useEffect(() => _setValue(orig), [orig]);
+    useEffect(() => _setValue(orig), [reset]);
     const setValue = (value: U) => {
       _setValue(value);
       onChange(value);

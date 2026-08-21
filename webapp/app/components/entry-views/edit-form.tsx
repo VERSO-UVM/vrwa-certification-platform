@@ -9,6 +9,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { shallowEqual } from "~/utils/utils";
 import { Label } from "../ui/label";
+import { ButtonGroup } from "../ui/button-group";
+import { Undo } from "lucide-react";
 
 /**
  * Generate an edit form using column defs!
@@ -33,8 +35,9 @@ export function EditForm<T extends object>({
   submitButton.title ??= "Save changes";
   submitButton.disabledFn ??= (original, updates) =>
     shallowEqual({ ...original, ...updates }, original);
+  const [dirty, setDirty] = useState({});
 
-  const data = useMemo(() => [item], [item]);
+  const data = useMemo(() => [item], [item, dirty]);
   const [updates, setUpdates] = useState<Partial<T>>({});
   // If data is swiped out from under us
   useEffect(() => setUpdates({}), [data]);
@@ -59,8 +62,9 @@ export function EditForm<T extends object>({
             {row.getVisibleCells().map((cell) => {
               const header = headers.find((x) => x.column.id == cell.column.id);
               if (header == null) return null;
-              if (cell.column.columnDef.meta?.editor == null) return null;
               const htmlId = cell.column.id + "_input";
+              const Editor = cell.column.columnDef.meta?.editor;
+              if (Editor == null) return null;
               return (
                 <div key={cell.id}>
                   <Label htmlFor={htmlId} className="text-sm font-semibold">
@@ -69,30 +73,45 @@ export function EditForm<T extends object>({
                       header.getContext(),
                     )}
                   </Label>
-                  {cell.column.columnDef.meta.editor({
-                    value: cell.getContext().getValue(),
-                    getRow: () => ({ ...row.original, ...updates }),
-                    overrides: {
-                      id: htmlId,
-                    },
-                    onBlur: (_value) => {},
-                    onChange: (value) =>
-                      setUpdates({
-                        ...updates,
-                        [cell.column.id]: value,
-                      }),
-                  })}
+                  <Editor
+                    {...{
+                      value: cell.getContext().getValue(),
+                      getRow: () => ({ ...row.original, ...updates }),
+                      overrides: {
+                        id: htmlId,
+                      },
+                      onBlur: (_value) => {},
+                      reset: dirty,
+                      onChange: (value) =>
+                        setUpdates({
+                          ...updates,
+                          [cell.column.id]: value,
+                        }),
+                    }}
+                  />
                 </div>
               );
             })}
           </Field>
         </FieldGroup>
-        <Button
-          disabled={submitButton.disabledFn(row.original, updates)}
-          {...submitButton.props}
-        >
-          {submitButton.title}
-        </Button>
+        <ButtonGroup>
+          <Button
+            disabled={submitButton.disabledFn(row.original, updates)}
+            {...submitButton.props}
+          >
+            {submitButton.title}
+          </Button>
+          <Button
+            variant="edit"
+            disabled={Object.keys(updates).length === 0}
+            onClick={() => {
+              setUpdates({});
+              setDirty({});
+            }}
+          >
+            <Undo /> Reset
+          </Button>
+        </ButtonGroup>
       </FieldSet>
     </form>
   );
