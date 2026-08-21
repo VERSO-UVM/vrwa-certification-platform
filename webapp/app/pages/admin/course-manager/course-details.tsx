@@ -35,7 +35,6 @@ import { Link } from "react-router";
 import { Users, CreditCard, Calendar, Trash, ArrowLeft, X } from "lucide-react";
 import type { Route } from "./+types/course-details";
 import { EditTraineeReservation } from "../trainee-manager/edit-reservation";
-import { AddCourseEventButton as UpdateCourseEventButton } from "./add-course-event-button";
 import { ButtonGroup } from "~/components/ui/button-group";
 import {
   reservationDefs,
@@ -74,6 +73,10 @@ export default function CourseDetails({
   const trpc = useTRPC();
   const client = useTRPCClient();
   const queryClient = useQueryClient();
+  const courseEvents = useQuery(
+    trpc.courseEvents.admin.listCourse.queryOptions({ courseId }),
+  );
+
   const courseEventUpdateMut = useMutation(
     trpc.courseEvents.admin.update.mutationOptions({
       onSuccess: () => {
@@ -115,22 +118,16 @@ export default function CourseDetails({
   );
 
   const { data: course } = useQuery(
-    trpc.courses.admin.get.queryOptions({ id: courseId! }),
+    trpc.courses.admin.get.queryOptions({ id: courseId }),
   );
 
   const reservations = useQuery(
     trpc.reservations.admin.listCourse.queryOptions({
-      courseId: courseId!,
+      courseId,
     }),
   );
 
   const trainees = useQuery(trpc.profiles.admin.listTrainees.queryOptions());
-
-  const courseEvents = useQuery(
-    trpc.courseEvents.admin.listCourse.queryOptions({
-      courseId: courseId!,
-    }),
-  );
 
   //grouping reservations by courseEventId to easily access rosters
   const roster = reservations.data ?? [];
@@ -330,7 +327,9 @@ export default function CourseDetails({
                 <ButtonGroup>
                   <Button
                     variant="default"
-                    disabled={courseEvents.data == null}
+                    disabled={
+                      courseEvents.isLoading
+                    }
                     onClick={() => {
                       if (!selectedTab) {
                         // No course event selected
@@ -352,7 +351,9 @@ export default function CourseDetails({
                   </Button>
                   <Button
                     variant="destructive"
-                    disabled={(courseEvents.data ?? []).length < 2}
+                    disabled={
+                      courseEvents.isLoading
+                    }
                     onClick={() => {
                       if (selectedTab) {
                         // Select previous tab afterwards
