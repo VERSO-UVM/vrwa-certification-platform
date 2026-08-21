@@ -48,6 +48,7 @@ export interface FieldEditorProps<TData, TValue> {
    * Get current value of the field.
    */
   value: TValue;
+  reset: unknown;
 
   /**
    * If an editor does not need to see other values, use
@@ -56,8 +57,6 @@ export interface FieldEditorProps<TData, TValue> {
   getRow: () => TData;
 
   overrides: Partial<FormFieldProps>;
-
-  reset: {};
 
   onChange: (value: TValue) => void;
 

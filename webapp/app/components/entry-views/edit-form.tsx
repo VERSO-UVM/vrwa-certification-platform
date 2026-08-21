@@ -35,7 +35,7 @@ export function EditForm<T extends object>({
   submitButton.title ??= "Save changes";
   submitButton.disabledFn ??= (original, updates) =>
     shallowEqual({ ...original, ...updates }, original);
-  const [dirty, setDirty] = useState({});
+  const [dirty, setDirty] = useState(true);
 
   const data = useMemo(() => [item], [item, dirty]);
   const [updates, setUpdates] = useState<Partial<T>>({});
@@ -74,20 +74,20 @@ export function EditForm<T extends object>({
                     )}
                   </Label>
                   <Editor
-                    {...{
-                      value: cell.getContext().getValue(),
-                      getRow: () => ({ ...row.original, ...updates }),
-                      overrides: {
-                        id: htmlId,
-                      },
-                      onBlur: (_value) => {},
-                      reset: dirty,
-                      onChange: (value) =>
-                        setUpdates({
-                          ...updates,
-                          [cell.column.id]: value,
-                        }),
+                    key={Number(dirty)}
+                    value={cell.getContext().getValue()}
+                    getRow={() => ({ ...row.original, ...updates })}
+                    overrides={{
+                      id: htmlId,
                     }}
+                    onBlur={(_value) => {}}
+                    reset={0}
+                    onChange={(value) =>
+                      setUpdates({
+                        ...updates,
+                        [cell.column.id]: value,
+                      })
+                    }
                   />
                 </div>
               );
@@ -106,7 +106,7 @@ export function EditForm<T extends object>({
             disabled={Object.keys(updates).length === 0}
             onClick={() => {
               setUpdates({});
-              setDirty({});
+              setDirty(!dirty);
             }}
           >
             <Undo /> Reset
