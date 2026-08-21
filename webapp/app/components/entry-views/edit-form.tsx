@@ -17,7 +17,7 @@ import { Undo } from "lucide-react";
  */
 export type EditFormProps<T> = {
   item: T;
-  columns: ColumnDef<T, any>[]; // any: see comment in data-table.tsx
+  columns: ColumnDef<T, unknown>[]; // any: see comment in data-table.tsx
   onSave: (updates: Partial<T>) => void;
   submitButton?: Partial<{
     title: string;
@@ -35,9 +35,8 @@ export function EditForm<T extends object>({
   submitButton.title ??= "Save changes";
   submitButton.disabledFn ??= (original, updates) =>
     shallowEqual({ ...original, ...updates }, original);
-  const [dirty, setDirty] = useState(true);
 
-  const data = useMemo(() => [item], [item, dirty]);
+  const data = useMemo(() => [item], [item]);
   const [updates, setUpdates] = useState<Partial<T>>({});
   // If data is swiped out from under us
   useEffect(() => setUpdates({}), [data]);
@@ -65,6 +64,7 @@ export function EditForm<T extends object>({
               const htmlId = cell.column.id + "_input";
               const Editor = cell.column.columnDef.meta?.editor;
               if (Editor == null) return null;
+              const value = cell.getContext().getValue();
               return (
                 <div key={cell.id}>
                   <Label htmlFor={htmlId} className="text-sm font-semibold">
@@ -74,7 +74,8 @@ export function EditForm<T extends object>({
                     )}
                   </Label>
                   <Editor
-                    key={Number(dirty)}
+                    // Complete re-mount when value changes
+                    key={value == null ? cell.id : value.toString()}
                     value={cell.getContext().getValue()}
                     getRow={() => ({ ...row.original, ...updates })}
                     overrides={{
@@ -94,24 +95,12 @@ export function EditForm<T extends object>({
             })}
           </Field>
         </FieldGroup>
-        <ButtonGroup>
-          <Button
-            disabled={submitButton.disabledFn(row.original, updates)}
-            {...submitButton.props}
-          >
-            {submitButton.title}
-          </Button>
-          <Button
-            variant="edit"
-            disabled={Object.keys(updates).length === 0}
-            onClick={() => {
-              setUpdates({});
-              setDirty(!dirty);
-            }}
-          >
-            <Undo /> Reset
-          </Button>
-        </ButtonGroup>
+        <Button
+          disabled={submitButton.disabledFn(row.original, updates)}
+          {...submitButton.props}
+        >
+          {submitButton.title}
+        </Button>
       </FieldSet>
     </form>
   );

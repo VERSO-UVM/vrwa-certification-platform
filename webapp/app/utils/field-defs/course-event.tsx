@@ -139,6 +139,7 @@ export const courseEventDefs = {
                 overrides={overrides}
               />
               <TimeInput
+                key={endDate?.toString()}
                 value={endDate}
                 onBlur={() => onBlur(duration)}
                 overrides={{}}

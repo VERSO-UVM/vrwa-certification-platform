@@ -48,7 +48,6 @@ export interface FieldEditorProps<TData, TValue> {
    * Get current value of the field.
    */
   value: TValue;
-  reset: unknown;
 
   /**
    * If an editor does not need to see other values, use
@@ -120,8 +119,6 @@ export function _genericInputEditor<U extends HasToString>(
 ): FieldEditor<unknown, U | null> {
   return ({ overrides, onChange, onBlur, reset, value: orig }) => {
     const [value, setValue] = useState(orig);
-    // if the value's been taken out from under us
-    useEffect(() => setValue(orig), [reset]);
     return (
       <Input
         value={value?.toString() ?? ""}
@@ -148,10 +145,8 @@ export function _genericInputEditor<U extends HasToString>(
 export function textAreaEditor(
   props?: React.ComponentProps<typeof Textarea>,
 ): FieldEditor<unknown, string> {
-  return ({ overrides, onChange, onBlur, reset, value: orig }) => {
+  return ({ overrides, onChange, onBlur, value: orig }) => {
     const [value, setValue] = useState(orig);
-    // if the value's been taken out from under us
-    useEffect(() => setValue(orig), [reset]);
     return (
       <Textarea
         value={value?.toString() ?? ""}
@@ -281,12 +276,6 @@ export function DatetimeEditor({
   const [month, setMonth] = useState<Date | undefined>(date);
   const [dateString, setDateString] = useState(formatDate(date));
   const [timeString, setTimeString] = useState(formatTimeForInput(date));
-  // If value is taken out from under us
-  useEffect(() => {
-    setMonth(date);
-    setDateString(formatDate(date));
-    setTimeString(formatTimeForInput(date));
-  }, [date]);
 
   return (
     <FieldGroup className="mx-auto flex-row">
@@ -391,11 +380,6 @@ export function TimeInput({
   overrides,
 }: FieldEditorProps<unknown, Date | null>) {
   const [timeString, setTimeString] = useState(formatTimeForInput(date));
-  // if the value's been taken out from under us
-  useEffect(() => {
-    if (date) setTimeString(formatTimeForInput(date));
-  }, [date]);
-
   return (
     <Field>
       <Input
