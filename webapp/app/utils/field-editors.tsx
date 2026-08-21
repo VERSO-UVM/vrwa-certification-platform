@@ -78,52 +78,6 @@ export interface HasToString {
 }
 
 
-/**
- * Highly extensible select options.
- */
-export function selectOptionsEditor<U extends HasToString>({
-  options,
-  props,
-}: {
-  options: { label: string; value: U; selected?: boolean }[];
-  props?: React.ComponentProps<typeof NativeSelect>;
-}): FieldEditor<unknown, U> {
-  // Native <select> requires string values, but we want this function to be generic
-  const stringToValue = Object.fromEntries(
-    options.map(({ value }) => [value.toString(), value]),
-  );
-  return ({ overrides, onChange, onBlur, value: orig }) => {
-    const [value, _setValue] = useState(orig);
-    // if the value's been taken out from under us
-    useEffect(() => _setValue(orig), [reset]);
-    const setValue = (value: U) => {
-      _setValue(value);
-      onChange(value);
-    };
-    return (
-      <NativeSelect
-        onBlur={() => onBlur(value)}
-        value={value?.toString()}
-        onChange={(event) =>
-          setValue(stringToValue[event.target.value] ?? value)
-        }
-        {...props}
-        {...overrides}
-      >
-        {options.map(({ label, value, ...rest }) => (
-          <NativeSelectOption
-            value={value.toString()}
-            key={value.toString()}
-            {...rest}
-          >
-            {label}
-          </NativeSelectOption>
-        ))}
-      </NativeSelect>
-    );
-  };
-}
-
 export function dateEditor(): FieldEditor<unknown, Date | null> {
   return DatetimeEditor;
 }
