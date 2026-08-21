@@ -32,7 +32,8 @@ import {
   InputGroupInput,
 } from "~/components/ui/input-group";
 import { isValidDate } from "./utils";
-import { Textarea } from "~/components/ui/textarea";
+
+export { textAreaEditor } from "~/components/field-editors/text-area";
 
 /**
  * I didn't see a built-in interface for props for generic form fields that exist
@@ -72,118 +73,10 @@ export type FieldEditor<TData, TValue> = (
   item: FieldEditorProps<TData, TValue>,
 ) => React.ReactNode;
 
-interface HasToString {
+export interface HasToString {
   toString(): string;
 }
 
-/**
- * refactor: rename to stringInputEditor
- */
-export function textInputEditor(
-  props?: React.ComponentProps<typeof Input>,
-): FieldEditor<unknown, string> {
-  const NullableTextInput = _genericInputEditor((x) => x, props);
-  return ({ onChange, onBlur, ...rest }) => (
-    <NullableTextInput
-      onChange={(x) => onChange(x ?? "")}
-      onBlur={(x) => onBlur(x ?? "")}
-      {...rest}
-    />
-  );
-}
-
-export function intInputEditor<T>(
-  props?: React.ComponentProps<typeof Input>,
-): FieldEditor<T, number> {
-  const NumberInput = _genericInputEditor<number>(parseInt, {
-    type: "number",
-    ...props,
-  });
-  return ({ onChange, onBlur, ...rest }) => {
-    return (
-      <NumberInput
-        {...rest}
-        onChange={(val) => onChange(val ?? 0)}
-        onBlur={(val) => onBlur(val ?? 0)}
-      />
-    );
-  };
-}
-
-/**
- * Generic input editor.
- */
-export function _genericInputEditor<U extends HasToString>(
-  parse: (x: string) => U,
-  props?: React.ComponentProps<typeof Input>,
-): FieldEditor<unknown, U | null> {
-  return ({ overrides, onChange, onBlur, reset, value: orig }) => {
-    const [value, setValue] = useState(orig);
-    return (
-      <Input
-        value={value?.toString() ?? ""}
-        type="text" /* Can be overriden with props */
-        className="user-invalid:border-pink-500 focus:user-invalid:ring-pink-400"
-        onChange={(event) => {
-          const val = parse(event.target.value);
-          setValue(val);
-          onChange(val);
-        }}
-        onBlur={() => onBlur(value)}
-        // Default to required, can be overriden
-        required
-        {...props}
-        {...overrides}
-      />
-    );
-  };
-}
-
-/**
- * Specialized editor to make sure there is no funny business
- * with price amounts.
- */
-export function priceCentsEditor(
-  props?: React.ComponentProps<typeof Input>,
-): FieldEditor<unknown, number> {
-  const toDisplay = (cents: number) => (cents / 100).toFixed(2).toString();
-  const toCents = (s: string) => Math.round(parseFloat(s) * 100);
-
-  return ({ overrides, onChange, onBlur, reset, value }) => {
-    const [display, setDisplay] = useState(toDisplay(value));
-    // if the value's been taken out from under us
-    useEffect(() => setDisplay(toDisplay(value)), [reset]);
-
-    return (
-      <Input
-        value={display ?? ""}
-        type="number"
-        className="user-invalid:border-pink-500 focus:user-invalid:ring-pink-400"
-        onChange={(event) => {
-          setDisplay(event.target.value);
-          const val = toCents(event.target.value);
-          // Only set when it is actually valid
-          if (!isNaN(val)) {
-            onChange(val);
-          }
-        }}
-        onBlur={() => {
-          const cents = toCents(display);
-          if (!isNaN(cents)) {
-            // Blur: change input to show actual value
-            setDisplay(toDisplay(cents));
-          }
-          onBlur(cents);
-        }}
-        // Default to required, can be overriden
-        required
-        step={0.01}
-        {...props}
-        {...overrides}
-      />
-    );
-  };
-}
 
 /**
  * Highly extensible select options.
@@ -199,7 +92,7 @@ export function selectOptionsEditor<U extends HasToString>({
   const stringToValue = Object.fromEntries(
     options.map(({ value }) => [value.toString(), value]),
   );
-  return ({ overrides, onChange, onBlur, reset, value: orig }) => {
+  return ({ overrides, onChange, onBlur, value: orig }) => {
     const [value, _setValue] = useState(orig);
     // if the value's been taken out from under us
     useEffect(() => _setValue(orig), [reset]);
