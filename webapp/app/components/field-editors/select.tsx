@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { FieldEditor, HasToString } from "~/utils/field-editors";
 import { NativeSelect, NativeSelectOption } from "../ui/native-select";
 
