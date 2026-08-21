@@ -140,32 +140,6 @@ export function _genericInputEditor<U extends HasToString>(
 }
 
 /**
- * Generic input editor.
- */
-export function textAreaEditor(
-  props?: React.ComponentProps<typeof Textarea>,
-): FieldEditor<unknown, string> {
-  return ({ overrides, onChange, onBlur, value: orig }) => {
-    const [value, setValue] = useState(orig);
-    return (
-      <Textarea
-        value={value?.toString() ?? ""}
-        onChange={(event) => {
-          const val = event.target.value;
-          setValue(val);
-          onChange(val);
-        }}
-        onBlur={() => onBlur(value)}
-        // Default to required, can be overriden
-        required
-        {...props}
-        {...overrides}
-      />
-    );
-  };
-}
-
-/**
  * Specialized editor to make sure there is no funny business
  * with price amounts.
  */
