@@ -17,7 +17,7 @@ import { Undo } from "lucide-react";
  */
 export type EditFormProps<T> = {
   item: T;
-  columns: ColumnDef<T, unknown>[]; // any: see comment in data-table.tsx
+  columns: ColumnDef<T, any>[]; // any: see comment in data-table.tsx
   onSave: (updates: Partial<T>) => void;
   submitButton?: Partial<{
     title: string;
@@ -82,7 +82,6 @@ export function EditForm<T extends object>({
                       id: htmlId,
                     }}
                     onBlur={(_value) => {}}
-                    reset={0}
                     onChange={(value) =>
                       setUpdates({
                         ...updates,

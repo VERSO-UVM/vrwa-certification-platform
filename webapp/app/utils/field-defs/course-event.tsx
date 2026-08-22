@@ -10,9 +10,8 @@ import {
   textInputEditor,
   TimeInput,
 } from "../field-editors";
-import { add, addMinutes, differenceInMinutes } from "date-fns";
-import { useEffect, useMemo, useState } from "react";
-import { Label } from "~/components/ui/label";
+import { addMinutes, differenceInMinutes } from "date-fns";
+import { useMemo, useState } from "react";
 
 export const courseEventFieldHelper = createColumnHelper<CourseEventDto>();
 

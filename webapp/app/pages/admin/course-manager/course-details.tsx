@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { PaymentStatus } from "@backend/database/schema";
-import type { CourseDto, ProfileDto } from "@backend/database/dtos";
+import type { CourseDto, CourseEventDto, ProfileDto } from "@backend/database/dtos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { PageHeader } from "~/components/page-header";
 import {
@@ -50,7 +50,6 @@ export function meta() {
 }
 
 const courseEventFormDefs = [
-  courseEventDefs.courseDate,
   courseEventDefs.duration,
   courseEventDefs.courseLocationType,
   courseEventDefs.virtualLink,
@@ -391,7 +390,7 @@ export default function CourseDetails({
                 <TabsContent key={event.id} value={event.id}>
                   <EditForm
                     key={event?.courseId}
-                    item={event}
+                    item={event as CourseEventDto}
                     columns={courseEventFormDefs}
                     onSave={async (data) => {
                       if (event) {
