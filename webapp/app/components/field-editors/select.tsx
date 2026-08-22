@@ -1,6 +1,10 @@
 import { useState } from "react";
 import type { FieldEditor, HasToString } from "~/utils/field-editors";
 import { NativeSelect, NativeSelectOption } from "../ui/native-select";
+import { Field, FieldGroup, FieldLabel } from "../ui/field";
+import React from "react";
+import { Checkbox } from "../ui/checkbox";
+import { Label } from "../ui/label";
 
 /**
  * Highly extensible select options.
@@ -42,6 +46,45 @@ export function selectOptionsEditor<U extends HasToString>({
           </NativeSelectOption>
         ))}
       </NativeSelect>
+    );
+  };
+}
+
+/**
+ * Highly extensible select options.
+ */
+export function multiSelectCheckboxEditor<U extends HasToString>({
+  options,
+}: {
+  options: { label: string; value: U; fieldProps?: React.ComponentProps<typeof Field> }[];
+}): FieldEditor<unknown, U[]> {
+  return ({ overrides, onChange, onBlur, value: orig }) => {
+    const [items, setItems] = useState(orig);
+    return (
+      <FieldGroup className="gap-3 p-3">
+        {options.map((option) => {
+          const id = (overrides.id ?? "") + option.label;
+          return (
+            <Field orientation="horizontal" {...option.fieldProps}>
+              <Checkbox
+                id={id}
+                checked={items.includes(option.value)}
+                onCheckedChange={(checked) => {
+                  const add = checked ? [option.value] : [];
+                  const newItems = [
+                    ...items.filter((x) => x !== option.value),
+                    ...add,
+                  ];
+                  setItems(newItems);
+                  onChange(newItems);
+                }}
+                onBlur={() => onBlur(items)}
+              />
+              <FieldLabel htmlFor={id}>{option.label}</FieldLabel>
+            </Field>
+          );
+        })}
+      </FieldGroup>
     );
   };
 }

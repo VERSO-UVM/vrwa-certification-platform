@@ -4,12 +4,17 @@ import { Link } from "react-router";
 import { courseStartDate } from "../utils";
 import {
   intInputEditor,
+  multiSelectCheckboxEditor,
   priceCentsEditor,
   selectOptionsEditor,
   textAreaEditor,
   textInputEditor,
 } from "../field-editors";
-import { CourseStatus, type Course } from "@backend/database/schema";
+import {
+  CourseStatus,
+  CreditHourCategory,
+  type Course,
+} from "@backend/database/schema";
 import type { CourseInsert } from "@backend/routers/course";
 import { MultiComboboxEditor } from "~/components/field-editors/combobox";
 import { queryOptions, useQuery } from "@tanstack/react-query";
@@ -130,6 +135,20 @@ export const courseDefs = {
 
   creditCategories: courseFieldHelper.accessor("creditHourCategories", {
     header: "Credit Types",
+    meta: {
+      editor: multiSelectCheckboxEditor({
+        options: [
+          { label: "Water", value: CreditHourCategory.Water },
+          { label: "Water Category 1", value: CreditHourCategory.WaterC1, fieldProps: { className: "pl-4"} },
+          { label: "Water Category 2", value: CreditHourCategory.WaterC2, fieldProps: { className: "pl-4"} },
+          { label: "Water Category 3", value: CreditHourCategory.WaterC3, fieldProps: { className: "pl-4"} },
+          { label: "Water Distribution 1", value: CreditHourCategory.WaterD1, fieldProps: { className: "pl-4"} },
+          { label: "Water Distribution 2", value: CreditHourCategory.WaterD2, fieldProps: { className: "pl-4"} },
+          { label: "Water Distribution 3", value: CreditHourCategory.WaterD3, fieldProps: { className: "pl-4"} },
+          { label: "Wastewater", value: CreditHourCategory.Wastewater },
+        ],
+      }),
+    },
   }),
 };
 
