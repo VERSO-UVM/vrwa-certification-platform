@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Combobox as ComboboxPrimitive } from "@base-ui/react";
-import type { FieldEditor } from "~/utils/field-editors";
+import type { FieldEditorProps } from "~/utils/field-editors";
 import {
   Combobox,
   ComboboxChip,
@@ -10,6 +9,7 @@ import {
   ComboboxEmpty,
   ComboboxItem,
   ComboboxList,
+  ComboboxSeparator,
   ComboboxValue,
   useComboboxAnchor,
 } from "~/components/ui/combobox";
@@ -18,83 +18,78 @@ import {
  * Multiselect combobox that allows selecting from suggestions and creating
  * custom values. For free-form string[] fields.
  */
-export function multiComboboxEditor({
+export function MultiComboboxEditor({
+  overrides,
+  onChange,
+  onBlur,
+  value: orig,
   options = [],
-  props,
-}: {
-  options?: string[];
-  props?: React.ComponentProps<typeof Combobox>;
-} = {}): FieldEditor<unknown, string[]> {
-  return ({ overrides, onChange, onBlur, value: orig }) => {
-    const [value, setValue] = useState(orig ?? []);
-    const [query, setQuery] = useState("");
-    const anchor = useComboboxAnchor();
-    const filter = ComboboxPrimitive.useFilter({ sensitivity: "base" });
+}: FieldEditorProps<unknown, string[]> & { options?: string[] }) {
+  const [value, setValue] = useState(orig ?? []);
+  const [search, setSearch] = useState("");
+  const anchor = useComboboxAnchor();
 
-    const trimmedQuery = query.trim();
-    const queryExists = options.some(
-      (option) => option.toLowerCase() === trimmedQuery.toLowerCase(),
-    );
-    const canCreate = trimmedQuery.length > 0 && !queryExists;
+  const items = useMemo(
+    () => options.filter((option) => !value.includes(option)),
+    [options, value],
+  );
 
-    const visibleItems = useMemo(() => {
-      const filtered = options.filter(
-        (option) => !value.includes(option) && filter.contains(option, query),
-      );
-      if (canCreate && !value.includes(trimmedQuery)) {
-        return [trimmedQuery, ...filtered];
-      }
-      return filtered;
-    }, [options, value, filter, query, canCreate, trimmedQuery]);
+  const trimmedQuery = search.trim().toLowerCase();
+  const matchesItem =
+    options.some((o) => o.toLowerCase() === trimmedQuery) ||
+    value.some((v) => v.toLowerCase() === trimmedQuery);
+  const canCreate = trimmedQuery.length > 0 && !matchesItem;
 
-    return (
-      <Combobox
-        multiple
-        autoHighlight
-        items={visibleItems}
-        // Filtering is handled externally so the creatable query item stays visible.
-        filter={null}
-        value={value}
-        inputValue={query}
-        onValueChange={(next) => {
-          const nextValue = (next ?? []) as string[];
-          setValue(nextValue);
-          setQuery("");
-          onChange(nextValue);
-        }}
-        onInputValueChange={(next) => setQuery(next)}
-        {...props}
-        {...overrides}
+  return (
+    <Combobox
+      multiple
+      autoHighlight
+      items={items}
+      value={value}
+      inputValue={search}
+      onValueChange={(next) => {
+        const nextValue = next ?? [];
+        setValue(nextValue);
+        setSearch("");
+        onChange(nextValue);
+      }}
+      onInputValueChange={(next) => setSearch(next)}
+      {...overrides}
+    >
+      <ComboboxChips
+        ref={anchor}
+        className="w-full"
+        onBlur={() => onBlur(value)}
       >
-        <ComboboxChips
-          ref={anchor}
-          className="w-full"
-          onBlur={() => onBlur(value)}
-        >
-          <ComboboxValue>
-            {(values: string[]) => (
-              <React.Fragment>
-                {values.map((tag) => (
-                  <ComboboxChip key={tag}>{tag}</ComboboxChip>
-                ))}
-                <ComboboxChipsInput placeholder="Add tag..." />
-              </React.Fragment>
-            )}
-          </ComboboxValue>
-        </ComboboxChips>
-        <ComboboxContent anchor={anchor}>
-          <ComboboxEmpty>Type to add a new value.</ComboboxEmpty>
-          <ComboboxList>
-            {(item: string) => (
-              <ComboboxItem key={item} value={item}>
-                {canCreate && item === trimmedQuery
-                  ? `Create "${item}"`
-                  : item}
-              </ComboboxItem>
-            )}
-          </ComboboxList>
-        </ComboboxContent>
-      </Combobox>
-    );
-  };
+        <ComboboxValue>
+          {(values: string[]) => (
+            <React.Fragment>
+              {values.map((tag) => (
+                <ComboboxChip key={tag}>{tag}</ComboboxChip>
+              ))}
+              <ComboboxChipsInput placeholder="Add..." />
+            </React.Fragment>
+          )}
+        </ComboboxValue>
+      </ComboboxChips>
+      <ComboboxContent anchor={anchor}>
+        <ComboboxEmpty>No items found.</ComboboxEmpty>
+        <ComboboxList>
+          {(item: string) => (
+            <ComboboxItem key={item} value={item}>
+              {item}
+            </ComboboxItem>
+          )}
+        </ComboboxList>
+        {canCreate && (
+          <>
+            <ComboboxSeparator />
+            <ComboboxItem value={search.trim()} className="hover:bg-accent m-1">
+              {`Add "${search.trim()}"`}
+            </ComboboxItem>
+          </>
+        )}
+      </ComboboxContent>
+    </Combobox>
+  );
 }

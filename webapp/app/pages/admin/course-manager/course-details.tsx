@@ -65,6 +65,7 @@ const courseFormDefs = [
   courseDefs.description,
   courseDefs.creditHours,
   courseDefs.priceCents,
+  courseDefs.tags,
 ] as ColumnDef<CourseDto>[];
 
 export default function CourseDetails({

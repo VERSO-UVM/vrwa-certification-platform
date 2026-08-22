@@ -11,6 +11,9 @@ import {
 } from "../field-editors";
 import { CourseStatus, type Course } from "@backend/database/schema";
 import type { CourseInsert } from "@backend/routers/course";
+import { MultiComboboxEditor } from "~/components/field-editors/combobox";
+import { queryOptions, useQuery } from "@tanstack/react-query";
+import { useTRPC } from "../trpc";
 
 export const courseFieldHelper = createColumnHelper<
   CourseDto | Course | CourseInsert
@@ -99,10 +102,35 @@ export const courseDefs = {
           { label: "Active", value: CourseStatus.Active },
           { label: "Canceled", value: CourseStatus.Canceled },
           { label: "Deleted", value: CourseStatus.Deleted },
-        ]
-      })
-    }
-  })
+        ],
+      }),
+    },
+  }),
+
+  tags: courseFieldHelper.accessor("tags", {
+    header: "Tags",
+    meta: {
+      editor: (() => {
+        return (props) => {
+          const trpc = useTRPC();
+          const optionsQuery = useQuery(
+            trpc.courses.admin.listTags.queryOptions(),
+          );
+          return (
+            <MultiComboboxEditor
+              {...props}
+              value={props.value ?? []}
+              options={optionsQuery?.data ?? []}
+            />
+          );
+        };
+      })(),
+    },
+  }),
+
+  creditCategories: courseFieldHelper.accessor("creditHourCategories", {
+    header: "Credit Types",
+  }),
 };
 
 export const courseDefPresets = {

@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import db from "~/database";
 import {
   course,
@@ -32,6 +32,13 @@ export const courseRouter = router({
   admin: router({
     list: adminProcedure.query((): Promise<CourseDto[]> => {
       return courseFindMany();
+    }),
+
+    listTags: adminProcedure.query(async (): Promise<string[]> => {
+      const items = await db.client
+        .selectDistinct({ tag: sql<string>`unnest(${course.tags})` })
+        .from(course);
+      return items.map((item) => item.tag);
     }),
 
     get: adminProcedure
