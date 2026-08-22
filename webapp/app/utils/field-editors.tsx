@@ -12,7 +12,12 @@
  */
 
 export * from "~/components/field-editors/text-area";
-export { intInputEditor, priceCentsEditor, stringInputEditor as textInputEditor, genericInputEditor} from "~/components/field-editors/input";
+export {
+  intInputEditor,
+  priceCentsEditor,
+  stringInputEditor as textInputEditor,
+  genericInputEditor,
+} from "~/components/field-editors/input";
 export * from "~/components/field-editors/select";
 export * from "~/components/field-editors/date";
 
@@ -21,11 +26,16 @@ export * from "~/components/field-editors/date";
  * in <input>, <select>, etc. This can be updated with any of those.
  */
 export interface FormFieldProps {
-  id: string; /* To match <label> `for` attribute */
-  required: boolean;
+  id?: string; /* To match <label> `for` attribute */
+  required?: boolean;
 }
 
-export interface FieldEditorProps<TData, TValue> {
+export interface FieldEditorProps<
+  TData,
+  TValue,
+  /* Properties of form field. */
+  TFieldProps extends FormFieldProps = FormFieldProps,
+> {
   /**
    * Get current value of the field.
    */
@@ -37,7 +47,7 @@ export interface FieldEditorProps<TData, TValue> {
    */
   getRow: () => TData;
 
-  overrides: Partial<FormFieldProps>;
+  overrides: Partial<TFieldProps>;
 
   onChange: (value: TValue) => void;
 
