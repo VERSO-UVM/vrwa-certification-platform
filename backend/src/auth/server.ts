@@ -23,8 +23,6 @@ export const auth = betterAuth({
   }),
   advanced: {
     database: {
-      joins: true,
-
       generateId: (options) => {
         switch (options.model) {
           // The redundancy is for typescript
@@ -68,7 +66,7 @@ export const auth = betterAuth({
   databaseHooks: {
     session: {
       create: {
-        before: async (session) => {
+        before: async (session, ctx) => {
           const profiles = await db.client
             .select()
             .from(schema.profile)
@@ -96,6 +94,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  experimental: { joins: true },
 });
 
 export type Session = typeof auth.$Infer.Session;
