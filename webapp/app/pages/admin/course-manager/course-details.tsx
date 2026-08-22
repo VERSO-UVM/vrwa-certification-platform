@@ -50,6 +50,7 @@ export function meta() {
 }
 
 const courseEventFormDefs = [
+  courseEventDefs.courseDate,
   courseEventDefs.duration,
   courseEventDefs.courseLocationType,
   courseEventDefs.virtualLink,
@@ -255,7 +256,7 @@ export default function CourseDetails({
             </div>
           </CardContent>
         </Card>
-        <Card className="col-span-full @7xl:col-span-3" variant="orange">
+        <Card className="col-span-full @6xl:col-span-3" variant="orange">
           <CardHeader className="pb-3">
             <CardTitle className="text-xl flex justify-between">
               <div className="font-semibold underline">Course Overview</div>
@@ -285,7 +286,7 @@ export default function CourseDetails({
               </Button>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-col h-full">
             {course != null && (
               <EditForm
                 item={course}
@@ -301,7 +302,7 @@ export default function CourseDetails({
             )}
           </CardContent>
         </Card>
-        <Card className="col-span-full @7xl:col-span-3" variant="green">
+        <Card className="col-span-full @6xl:col-span-3" variant="green">
           <CardHeader>
             <CardTitle>Training Sessions</CardTitle>
           </CardHeader>
@@ -310,8 +311,8 @@ export default function CourseDetails({
               value={selectedTab ?? eventIds[0] ?? ""}
               onValueChange={setSelectedTab}
             >
-              <div className="flex justify-between">
-                <TabsList variant="line">
+              <div className="flex justify-between flex-wrap">
+                <TabsList variant="line" className="overflow-x-scroll pb-3">
                   {courseEvents.data?.map((event) => {
                     const date = event.classStartDatetime
                       ? new Date(event.classStartDatetime)
@@ -323,7 +324,7 @@ export default function CourseDetails({
                     );
                   })}
                 </TabsList>
-                <ButtonGroup>
+                <ButtonGroup className="ml-auto">
                   <Button
                     variant="default"
                     disabled={
@@ -351,7 +352,7 @@ export default function CourseDetails({
                   <Button
                     variant="destructive"
                     disabled={
-                      courseEvents.isLoading
+                      courseEvents.isLoading || (courseEvents.data ?? []).length <= 1
                     }
                     onClick={() => {
                       if (selectedTab) {
