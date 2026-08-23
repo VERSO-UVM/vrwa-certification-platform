@@ -7,7 +7,7 @@ import {
 import { FieldSet, FieldGroup, Field } from "~/components/ui/field";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
-import { shallowEqual } from "~/utils/utils";
+import { deepEqual } from "~/utils/utils";
 import { Label } from "../ui/label";
 import { ButtonGroup } from "../ui/button-group";
 import { Undo } from "lucide-react";
@@ -34,7 +34,7 @@ export function EditForm<T extends object>({
 }: EditFormProps<T>) {
   submitButton.title ??= "Save changes";
   submitButton.disabledFn ??= (original, updates) =>
-    shallowEqual({ ...original, ...updates }, original);
+    deepEqual({ ...original, ...updates }, original);
 
   const data = useMemo(() => [item], [item]);
   const [updates, setUpdates] = useState<Partial<T>>({});
