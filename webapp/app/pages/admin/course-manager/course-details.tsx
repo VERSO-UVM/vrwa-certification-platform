@@ -1,7 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { PaymentStatus } from "@backend/database/schema";
-import type { CourseDto, CourseEventDto, ProfileDto } from "@backend/database/dtos";
+import type {
+  CourseDto,
+  CourseEventDto,
+  ProfileDto,
+} from "@backend/database/dtos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { PageHeader } from "~/components/page-header";
 import {
@@ -44,6 +48,7 @@ import { EditForm } from "~/components/entry-views/edit-form";
 import { courseEventDefs } from "~/utils/field-defs/course-event";
 import { courseDefs } from "~/utils/field-defs/course";
 import type { ColumnDef } from "@tanstack/react-table";
+import { add } from "date-fns";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
@@ -167,7 +172,12 @@ export default function CourseDetails({
 
   //for adding to roster
   const [selectedTrainee, setSelectedTrainee] = useState<string | null>(null);
-  const [selectedTab, setSelectedTab] = useState<string | null>(null);
+  const [selectedTab, setSelectedTab] = useState<string | null>(
+    eventIds[0] ?? null,
+  );
+  if (!selectedTab && eventIds[0] != null) {
+    setSelectedTab(eventIds[0]);
+  }
   const [traineePopupOpen, setTraineePopupOpen] = useState<boolean | false>(
     false,
   );
@@ -289,19 +299,17 @@ export default function CourseDetails({
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col h-full">
-            {course != null && (
-              <EditForm
-                item={course}
-                onSave={function (updates): void {
-                  if (!course) return;
-                  courseUpdateMut.mutate({
-                    ...course,
-                    ...updates,
-                  });
-                }}
-                columns={courseFormDefs}
-              />
-            )}
+            <EditForm
+              item={course ?? undefined}
+              onSave={function (updates): void {
+                if (!course) return;
+                courseUpdateMut.mutate({
+                  ...course,
+                  ...updates,
+                });
+              }}
+              columns={courseFormDefs}
+            />
           </CardContent>
         </Card>
         <Card className="col-span-full @6xl:col-span-3" variant="green">
@@ -309,10 +317,7 @@ export default function CourseDetails({
             <CardTitle>Training Sessions</CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs
-              value={selectedTab ?? eventIds[0] ?? ""}
-              onValueChange={setSelectedTab}
-            >
+            <Tabs value={selectedTab ?? ""} onValueChange={setSelectedTab}>
               <div className="flex justify-between flex-wrap">
                 <TabsList variant="line" className="overflow-x-scroll pb-3">
                   {courseEvents.data?.map((event) => {
@@ -329,17 +334,21 @@ export default function CourseDetails({
                 <ButtonGroup className="ml-auto">
                   <Button
                     variant="default"
-                    disabled={
-                      courseEvents.isLoading
-                    }
+                    disabled={courseEvents.isLoading}
                     onClick={() => {
                       if (!selectedTab) {
                         // No course event selected
                         return;
                       }
+                      const selectedEvent = courseEvents.data?.find(
+                        (e) => e.id == selectedTab,
+                      )?.classStartDatetime;
                       courseEventCloneMut.mutate(
                         {
                           courseEventId: selectedTab,
+                          classStartDatetime: selectedEvent
+                            ? add(selectedEvent, { days: 1 })
+                            : undefined,
                         },
                         {
                           onSuccess: (newEvent) => {
@@ -354,17 +363,18 @@ export default function CourseDetails({
                   <Button
                     variant="destructive"
                     disabled={
-                      courseEvents.isLoading || (courseEvents.data ?? []).length <= 1
+                      courseEvents.isLoading ||
+                      (courseEvents.data ?? []).length <= 1
                     }
                     onClick={() => {
-                      if (selectedTab) {
+                      if (selectedTab && courseEvents.data) {
                         // Select previous tab afterwards
-                        const selectedIndex = courseEvents.data?.findIndex(
+                        const selectedIndex = courseEvents.data.findIndex(
                           (event) => event.id == selectedTab,
                         );
                         let newTabIndex = 0;
                         if (selectedIndex == 0) {
-                          newTabIndex = courseEvents.data?.length ?? 0;
+                          newTabIndex = 1;
                         } else if (selectedIndex) {
                           newTabIndex = selectedIndex - 1;
                         }
@@ -408,7 +418,11 @@ export default function CourseDetails({
                     }}
                   />
                 </TabsContent>
-              ))}
+              )) || (
+                <TabsContent value="">
+                  <EditForm columns={courseEventFormDefs} onSave={() => {}} />
+                </TabsContent>
+              )}
             </Tabs>
           </CardContent>
         </Card>

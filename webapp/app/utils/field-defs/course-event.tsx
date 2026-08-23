@@ -129,9 +129,10 @@ export const courseEventDefs = {
           return (
             <div className="grid grid-cols-2 gap-4">
               <MinutesInput
-                value={duration ?? 0}
+                value={duration}
                 onChange={(newMinutes) => {
                   setDuration(newMinutes);
+                  onChange(newMinutes);
                 }}
                 onBlur={() => onBlur(duration)}
                 getRow={getRow}
@@ -145,7 +146,6 @@ export const courseEventDefs = {
                 getRow={() => {}}
                 onChange={(newDate) => {
                   if (startDate == null) {
-                    onChange(duration);
                     return;
                   }
                   if (newDate == null) {

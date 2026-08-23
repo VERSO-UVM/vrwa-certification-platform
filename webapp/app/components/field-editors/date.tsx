@@ -164,7 +164,7 @@ export function TimeInput({
   );
 }
 
-function formatTimeForInput(date: Date | null): string {
+function formatTimeForInput(date: Date | null | undefined): string {
   if (!date) return "00:00";
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");

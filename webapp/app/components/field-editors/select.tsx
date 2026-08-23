@@ -4,7 +4,6 @@ import { NativeSelect, NativeSelectOption } from "../ui/native-select";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import React from "react";
 import { Checkbox } from "../ui/checkbox";
-import { Label } from "../ui/label";
 
 /**
  * Highly extensible select options.
@@ -24,6 +23,7 @@ export function selectOptionsEditor<U extends HasToString>({
     const [value, setValue] = useState(orig);
     return (
       <NativeSelect
+        disabled={orig == null}
         onBlur={() => onBlur(value)}
         value={value?.toString()}
         onChange={(event) => {
@@ -59,7 +59,7 @@ export function multiSelectCheckboxEditor<U extends HasToString>({
   options: { label: string; value: U; fieldProps?: React.ComponentProps<typeof Field> }[];
 }): FieldEditor<unknown, U[]> {
   return ({ overrides, onChange, onBlur, value: orig }) => {
-    const [items, setItems] = useState(orig);
+    const [items, setItems] = useState(orig ?? []);
     return (
       <FieldGroup className="gap-3 p-3">
         {options.map((option) => {

@@ -2,21 +2,21 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
+  type AccessorFnColumnDef,
+  type AccessorKeyColumnDef,
   type ColumnDef,
 } from "@tanstack/react-table";
 import { FieldSet, FieldGroup, Field } from "~/components/ui/field";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { deepEqual } from "~/utils/utils";
 import { Label } from "../ui/label";
-import { ButtonGroup } from "../ui/button-group";
-import { Undo } from "lucide-react";
 
 /**
  * Generate an edit form using column defs!
  */
 export type EditFormProps<T> = {
-  item: T;
+  item?: T;
   columns: ColumnDef<T, any>[]; // any: see comment in data-table.tsx
   onSave: (updates: Partial<T>) => void;
   submitButton?: Partial<{
@@ -36,48 +36,65 @@ export function EditForm<T extends object>({
   submitButton.disabledFn ??= (original, updates) =>
     deepEqual({ ...original, ...updates }, original);
 
-  const data = useMemo(() => [item], [item]);
   const [updates, setUpdates] = useState<Partial<T>>({});
-  // If data is swiped out from under us
-  useEffect(() => setUpdates({}), [data]);
+
+  // If item changed from underneath us, reset updates
+  // (this method is funky but avoids a useEffect)
+  const [prevItem, setPrevItem] = useState(item);
+  if (item !== prevItem) {
+    setPrevItem(item);
+    setUpdates({});
+  }
+
   const onSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     onSave(updates);
   };
-
-  const table = useReactTable<T>({
-    columns,
-    data,
-    getCoreRowModel: getCoreRowModel(),
-  });
-  const row = table.getRow("0");
-  const headers = table.getFlatHeaders();
 
   return (
     <form onSubmit={onSubmit}>
       <FieldSet className="pb-2">
         <FieldGroup>
           <Field>
-            {row.getVisibleCells().map((cell) => {
-              const header = headers.find((x) => x.column.id == cell.column.id);
-              if (header == null) return null;
-              const htmlId = cell.column.id + "_input";
-              const Editor = cell.column.columnDef.meta?.editor;
+            {columns.map((column) => {
+              const accessorKey = (column as AccessorKeyColumnDef<T>)
+                ?.accessorKey;
+              const accessorFn = (column as AccessorFnColumnDef<T>)?.accessorFn;
+              if (!accessorFn && !accessorKey) {
+                throw new Error(
+                  `Column missing both accessorKey and accessorColumn: ${column}`,
+                );
+              }
+              const val =
+                item == null
+                  ? undefined
+                  : accessorKey
+                    ? item?.[accessorKey as keyof T]
+                    : accessorFn(item, 0);
+              const id = accessorKey.toString() ?? column.id;
+
+              if (!id) throw new Error("Column missing ID");
+
+              if (typeof column.header !== "string") {
+                throw new Error(
+                  `EditForm: ${column.id}: only string columns supported now`,
+                );
+              }
+
+              const htmlId = column.id + "_input";
+              const Editor = column.meta?.editor;
               if (Editor == null) return null;
-              const value = cell.getContext().getValue();
+
               return (
-                <div key={cell.id}>
+                <div key={id}>
                   <Label htmlFor={htmlId} className="text-sm font-semibold">
-                    {flexRender(
-                      cell.column.columnDef.header,
-                      header.getContext(),
-                    )}
+                    {column.header}
                   </Label>
                   <Editor
                     // Complete re-mount when value changes
-                    key={value == null ? cell.id : value.toString()}
-                    value={cell.getContext().getValue()}
-                    getRow={() => ({ ...row.original, ...updates })}
+                    key={val == null ? id : val.toString()}
+                    value={val}
+                    getRow={() => ({ ...item, ...updates })}
                     overrides={{
                       id: htmlId,
                     }}
@@ -85,7 +102,7 @@ export function EditForm<T extends object>({
                     onChange={(value) =>
                       setUpdates({
                         ...updates,
-                        [cell.column.id]: value,
+                        [id]: value,
                       })
                     }
                   />
@@ -95,7 +112,7 @@ export function EditForm<T extends object>({
           </Field>
         </FieldGroup>
         <Button
-          disabled={submitButton.disabledFn(row.original, updates)}
+          disabled={submitButton.disabledFn(item, updates)}
           {...submitButton.props}
         >
           {submitButton.title}

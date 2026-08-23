@@ -22,15 +22,16 @@ export function stringInputEditor(
 
 export function intInputEditor<T>(
   props?: React.ComponentProps<typeof Input>,
-): FieldEditor<T, number> {
+): FieldEditor<T, number | undefined> {
   const NumberInput = genericInputEditor<number>(parseInt, {
     type: "number",
     ...props,
   });
-  return ({ onChange, onBlur, ...rest }) => {
+  return ({ onChange, onBlur, value, ...rest }) => {
     return (
       <NumberInput
         {...rest}
+        value={value ?? NaN}
         onChange={(val) => onChange(val ?? 0)}
         onBlur={(val) => onBlur(val ?? 0)}
       />
@@ -78,11 +79,12 @@ export function priceCentsEditor(
   const toCents = (s: string) => Math.round(parseFloat(s) * 100);
 
   return ({ overrides, onChange, onBlur, value }) => {
-    const [display, setDisplay] = useState(toDisplay(value) ?? "");
+    const [display, setDisplay] = useState(value ? toDisplay(value) : "");
 
     return (
       <Input
         value={display}
+        disabled={value == null}
         type="number"
         className="user-invalid:border-pink-500 focus:user-invalid:ring-pink-400"
         onChange={(event) => {

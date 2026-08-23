@@ -4,7 +4,6 @@ import { Link } from "react-router";
 import { courseStartDate } from "../utils";
 import {
   intInputEditor,
-  multiSelectCheckboxEditor,
   priceCentsEditor,
   selectOptionsEditor,
   textAreaEditor,
@@ -17,7 +16,7 @@ import {
 } from "@backend/database/schema";
 import type { CourseInsert } from "@backend/routers/course";
 import { MultiComboboxEditor } from "~/components/field-editors/combobox";
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "../trpc";
 import {
   FieldDescription,
@@ -25,15 +24,12 @@ import {
   Field,
   FieldGroup,
   FieldSet,
-  FieldLegend,
   FieldContent,
   FieldTitle,
 } from "~/components/ui/field";
-import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
 import { useState } from "react";
-import { checkboxSelectorColumn } from "./extra";
 
 export const courseFieldHelper = createColumnHelper<
   CourseDto | Course | CourseInsert
@@ -152,7 +148,7 @@ export const courseDefs = {
     header: "Credit Types",
     meta: {
       editor: ({ value, onChange, onBlur, overrides }) => {
-        const [categories, setCategories] = useState(value);
+        const [categories, setCategories] = useState(value ?? []);
         // For labels
         const idBase = overrides.id ?? "credit_types_select_";
 

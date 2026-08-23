@@ -85,9 +85,10 @@ export const courseEventRouter = router({
       .input(
         z.object({
           courseEventId: z.string(),
+          classStartDatetime: z.date().optional(),
         }),
       )
-      .mutation(async ({ input: { courseEventId } }) => {
+      .mutation(async ({ input: { courseEventId, classStartDatetime } }) => {
         const original = await db.client.query.courseEvent.findFirst({
           where: { id: courseEventId },
         });
@@ -103,6 +104,8 @@ export const courseEventRouter = router({
           .values({
             ...original,
             id: undefined,
+            classStartDatetime:
+              classStartDatetime ?? original.classStartDatetime,
           })
           .returning();
         if (!newCourseEvent) {

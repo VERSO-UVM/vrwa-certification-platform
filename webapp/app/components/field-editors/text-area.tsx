@@ -12,7 +12,7 @@ export function textAreaEditor(props?: React.ComponentProps<typeof Textarea>) {
   return (ctx: TextAreaEditorProps) => (
     <TextAreaEditor
       {...ctx}
-      key={ctx.value.toString() ?? ""}
+      key={ctx.value?.toString() ?? ""}
       overrides={{ ...props, ...ctx.overrides }}
     />
   );
@@ -24,10 +24,10 @@ function TextAreaEditor({
   onBlur,
   value: orig,
 }: TextAreaEditorProps) {
-  const [value, setValue] = useState(orig);
+  const [value, setValue] = useState(orig ?? "");
   return (
     <Textarea
-      value={value?.toString() ?? ""}
+      value={value}
       onChange={(e) => {
         setValue(e.target.value);
         onChange(e.target.value);
