@@ -19,6 +19,21 @@ import type { CourseInsert } from "@backend/routers/course";
 import { MultiComboboxEditor } from "~/components/field-editors/combobox";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { useTRPC } from "../trpc";
+import {
+  FieldDescription,
+  FieldLabel,
+  Field,
+  FieldGroup,
+  FieldSet,
+  FieldLegend,
+  FieldContent,
+  FieldTitle,
+} from "~/components/ui/field";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import { Checkbox } from "~/components/ui/checkbox";
+import { Label } from "~/components/ui/label";
+import { useState } from "react";
+import { checkboxSelectorColumn } from "./extra";
 
 export const courseFieldHelper = createColumnHelper<
   CourseDto | Course | CourseInsert
@@ -136,22 +151,99 @@ export const courseDefs = {
   creditCategories: courseFieldHelper.accessor("creditHourCategories", {
     header: "Credit Types",
     meta: {
-      editor: multiSelectCheckboxEditor({
-        options: [
-          { label: "Water", value: CreditHourCategory.Water },
-          { label: "Water Category 1", value: CreditHourCategory.WaterC1, fieldProps: { className: "pl-4"} },
-          { label: "Water Category 2", value: CreditHourCategory.WaterC2, fieldProps: { className: "pl-4"} },
-          { label: "Water Category 3", value: CreditHourCategory.WaterC3, fieldProps: { className: "pl-4"} },
-          { label: "Water Distribution 1", value: CreditHourCategory.WaterD1, fieldProps: { className: "pl-4"} },
-          { label: "Water Distribution 2", value: CreditHourCategory.WaterD2, fieldProps: { className: "pl-4"} },
-          { label: "Water Distribution 3", value: CreditHourCategory.WaterD3, fieldProps: { className: "pl-4"} },
-          { label: "Wastewater", value: CreditHourCategory.Wastewater },
-        ],
-      }),
+      editor: ({ value, onChange, onBlur, overrides }) => {
+        const [categories, setCategories] = useState(value);
+        // For labels
+        const idBase = overrides.id ?? "credit_types_select_";
+
+        const includesWater = categories.includes(CreditHourCategory.Water);
+        const waterCategories = [
+          { label: "Water Category 1", value: CreditHourCategory.WaterC1 },
+          { label: "Water Category 2", value: CreditHourCategory.WaterC2 },
+          { label: "Water Category 3", value: CreditHourCategory.WaterC3 },
+          { label: "Water Distribution 1", value: CreditHourCategory.WaterD1 },
+          { label: "Water Distribution 2", value: CreditHourCategory.WaterD2 },
+          { label: "Water Distribution 3", value: CreditHourCategory.WaterD3 },
+        ];
+
+        const change = (checked: unknown, value: CreditHourCategory) => {
+          const add = Boolean(checked) ? [value] : [];
+          let newItems = [...categories.filter((x) => x !== value), ...add];
+          setCategories(newItems);
+          const normalized = normalizeCreditHourCategories(newItems);
+          onChange(normalized);
+          onBlur(normalized);
+        };
+
+        return (
+          <FieldGroup className="w-full pt-3">
+            <FieldSet className="gap-3">
+              <FieldLabel
+                htmlFor={idBase + CreditHourCategory.Water}
+                className={
+                  !includesWater ? "border-transparent! bg-transparent!" : ""
+                }
+              >
+                <Field orientation="horizontal">
+                  <FieldContent>
+                    <FieldTitle>Water</FieldTitle>
+                    <FieldDescription>Water categories.</FieldDescription>
+                    {waterCategories.map((cat) => (
+                      <div className="flex gap-2" key={cat.value}>
+                        <Checkbox
+                          id={idBase + cat.value}
+                          checked={categories.includes(cat.value)}
+                          disabled={!includesWater}
+                          onCheckedChange={(x) => change(x, cat.value)}
+                        />
+                        <Label htmlFor={idBase + cat.value}>{cat.label}</Label>
+                      </div>
+                    ))}
+                  </FieldContent>
+                  <Checkbox
+                    checked={categories.includes(CreditHourCategory.Water)}
+                    onCheckedChange={(x) => {
+                      change(x, CreditHourCategory.Water);
+                    }}
+                    id={idBase + "water"}
+                  />
+                </Field>
+              </FieldLabel>
+              <FieldLabel htmlFor={idBase + "wastewater"}>
+                <Field orientation="horizontal">
+                  <FieldContent>
+                    <FieldTitle>Wastewater</FieldTitle>
+                    <FieldDescription>Wastewater categories.</FieldDescription>
+                  </FieldContent>
+                  <Checkbox
+                    checked={categories.includes(CreditHourCategory.Wastewater)}
+                    onCheckedChange={(x) =>
+                      change(x, CreditHourCategory.Wastewater)
+                    }
+                    id={idBase + "wastewater"}
+                  />
+                </Field>
+              </FieldLabel>
+            </FieldSet>
+          </FieldGroup>
+        );
+      },
     },
   }),
 };
 
+function normalizeCreditHourCategories(categories: CreditHourCategory[]) {
+  for (const category of [
+    CreditHourCategory.Water,
+    CreditHourCategory.Wastewater,
+  ]) {
+    const includes = categories.includes(category);
+    if (!includes) {
+      categories = categories.filter((x) => !x.startsWith(category + ":"));
+    }
+  }
+  return categories;
+}
 export const courseDefPresets = {
   table: [
     courseDefs.courseName,
