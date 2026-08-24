@@ -12,6 +12,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Calendar } from "../ui/calendar";
 import { Input } from "../ui/input";
+import { format, set } from "date-fns";
 
 export function dateEditor(): FieldEditor<unknown, Date | null> {
   return DatetimeEditor;
@@ -22,16 +23,16 @@ export function dateEditor(): FieldEditor<unknown, Date | null> {
  * Adapted from shadcn/ui example.
  */
 export function DatetimeEditor({
-  value: date,
+  value: orig,
   onChange,
   onBlur,
   overrides,
+  ...rest
 }: FieldEditorProps<unknown, Date | null>) {
-  date ??= new Date();
+  const [date, setDate] = useState(orig ?? new Date());
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState<Date | undefined>(date);
   const [dateString, setDateString] = useState(formatDate(date));
-  const [timeString, setTimeString] = useState(formatTimeForInput(date));
 
   return (
     <FieldGroup className="mx-auto flex-row">
@@ -42,14 +43,16 @@ export function DatetimeEditor({
             value={dateString}
             placeholder="June 01, 2025"
             onChange={(e) => {
-              const newDate = new Date(e.target.value);
-              newDate.setHours(date.getHours());
-              newDate.setMinutes(date.getMinutes());
+              const newDate = set(new Date(e.target.value), {
+                hours: date.getHours(),
+                minutes: date.getMinutes(),
+              });
 
               setDateString(e.target.value);
               if (isValidDate(newDate)) {
                 setMonth(newDate);
                 onChange(newDate);
+                setDate(newDate);
               }
             }}
             onKeyDown={(e) => {
@@ -90,6 +93,7 @@ export function DatetimeEditor({
                       setDateString(formatDate(date));
                       onChange(date);
                       onBlur(date);
+                      setDate(date);
                     }
                   }}
                 />
@@ -99,30 +103,12 @@ export function DatetimeEditor({
         </InputGroup>
       </Field>
       <Field>
-        <Input
-          aria-label="time"
-          type="time"
-          step="60"
-          value={timeString}
-          className=""
-          onChange={(event) => {
-            const timeString = event.target.value; // Expected format: "HH:mm"
-            if (!timeString) return;
-
-            const [hours, minutes] = timeString.split(":").map(Number);
-            if (hours == null || minutes == null) return;
-
-            // Create a new Date instance based on the current state to preserve the day/month/year
-            const updatedDate = new Date(date);
-            updatedDate.setHours(hours);
-            updatedDate.setMinutes(minutes);
-            updatedDate.setSeconds(0);
-            updatedDate.setMilliseconds(0);
-
-            setTimeString(event.target.value);
-            onChange(updatedDate);
-          }}
+        <TimeInput
+          value={date}
+          onChange={onChange}
           onBlur={() => onBlur(date)}
+          overrides={overrides}
+          {...rest}
         />
       </Field>
     </FieldGroup>
@@ -144,16 +130,16 @@ export function TimeInput({
       onChange={(event) => {
         const timeString = event.target.value; // Expected format: "HH:mm"
         if (!timeString) return;
-
         const [hours, minutes] = timeString.split(":").map(Number);
         if (hours == null || minutes == null) return;
         setTimeString(event.target.value);
 
-        const updatedDate = date ? new Date(date) : new Date();
-        updatedDate.setHours(hours);
-        updatedDate.setMinutes(minutes);
-        updatedDate.setSeconds(0);
-        updatedDate.setMilliseconds(0);
+        const updatedDate = set(date ?? new Date(), {
+          hours,
+          minutes,
+          seconds: 0,
+          milliseconds: 0,
+        });
         onChange(updatedDate);
       }}
       onBlur={() => {
@@ -166,9 +152,7 @@ export function TimeInput({
 
 function formatTimeForInput(date: Date | null | undefined): string {
   if (!date) return "00:00";
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  return `${hours}:${minutes}`;
+  return format(date, "hh:mm");
 }
 
 function formatDate(date: Date | undefined) {
