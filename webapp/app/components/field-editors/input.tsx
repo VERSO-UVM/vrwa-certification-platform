@@ -22,7 +22,7 @@ export function stringInputEditor(
 
 export function intInputEditor<T>(
   props?: React.ComponentProps<typeof Input>,
-): FieldEditor<T, number | undefined> {
+): FieldEditor<T, number> {
   const NumberInput = genericInputEditor<number>(parseInt, {
     type: "number",
     ...props,

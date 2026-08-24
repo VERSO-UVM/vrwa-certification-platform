@@ -129,7 +129,7 @@ export const courseEventDefs = {
           return (
             <div className="grid grid-cols-2 gap-4">
               <MinutesInput
-                value={duration}
+                value={duration ?? NaN}
                 onChange={(newMinutes) => {
                   setDuration(newMinutes);
                   onChange(newMinutes);

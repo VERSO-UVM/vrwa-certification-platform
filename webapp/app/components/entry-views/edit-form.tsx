@@ -1,13 +1,10 @@
 import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
   type AccessorFnColumnDef,
   type AccessorKeyColumnDef,
   type ColumnDef,
 } from "@tanstack/react-table";
 import { FieldSet, FieldGroup, Field } from "~/components/ui/field";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { deepEqual } from "~/utils/utils";
 import { Label } from "../ui/label";
@@ -112,7 +109,7 @@ export function EditForm<T extends object>({
           </Field>
         </FieldGroup>
         <Button
-          disabled={submitButton.disabledFn(item, updates)}
+          disabled={item == null || submitButton.disabledFn(item, updates)}
           {...submitButton.props}
         >
           {submitButton.title}
