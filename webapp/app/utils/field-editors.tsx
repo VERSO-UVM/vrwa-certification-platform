@@ -40,7 +40,7 @@ export interface FieldEditorProps<
   /**
    * Get current value of the field.
    */
-  value: TValue|undefined;
+  value: TValue | undefined;
 
   /**
    * If an editor does not need to see other values, use
@@ -58,7 +58,7 @@ export interface FieldEditorProps<
    * I loathe when apps show me error messages before I've finished
    * typing.
    */
-  onBlur: (value: TValue|undefined) => void;
+  onBlur: (value: TValue | undefined) => void;
 }
 
 export type FieldEditor<TData, TValue> = (

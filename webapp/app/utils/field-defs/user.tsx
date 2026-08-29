@@ -57,7 +57,9 @@ export const userDefs = {
         ));
       },
       meta: {
-        editor: ({ value }) => <div className="whitespace-pre-line">{value}</div>,
+        editor: ({ value }) => (
+          <div className="whitespace-pre-line">{value}</div>
+        ),
       },
     },
   ),

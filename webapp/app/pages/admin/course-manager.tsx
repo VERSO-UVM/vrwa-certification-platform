@@ -44,6 +44,7 @@ const courseFormDefs = [
   courseDefs.priceCents,
   courseDefs.creditHours,
   courseDefs.seats,
+  courseDefs.creditCategories,
 ];
 
 export default function CourseManager() {
@@ -96,10 +97,21 @@ export default function CourseManager() {
           </CardContent>
           <div className="flex px-4">
             <CreateDrawer
-              columns={courseFormDefs as ColumnDef<CourseInsert>[]}
-              onSave={async (courseFields) => {
+              columns={courseFormDefs as ColumnDef<CourseDto>[]}
+              required={
+                [
+                  "courseName",
+                  "description",
+                  "priceCents",
+                  "creditHours",
+                  "seats",
+                  "creditHourCategories",
+                ] as const
+              }
+              onSave={async (values) => {
                 const newCourse = await createCourseMut.mutateAsync({
-                  ...courseFields,
+                  ...values,
+                  status: CourseStatus.Active,
                 });
                 if (newCourse) {
                   navigate(`/admin/course-details/${newCourse.id}`);

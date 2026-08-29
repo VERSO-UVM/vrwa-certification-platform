@@ -1,34 +1,60 @@
-import {
-  type ColumnDef,
-} from "@tanstack/react-table";
+import { type ColumnDef } from "@tanstack/react-table";
 import { EditForm } from "./edit-form";
 
-/**
- * Generate an edit form using column defs!
- */
-export type CreateFormProps<T> = {
-  columns: ColumnDef<T, any>[]; // any: see comment in data-table.tsx
-  onSave: (newItem: T) => void;
+/* Make not-required fields optional like Partial<> and
+ * required fields required. */
+export type RequiredFields<T, R extends keyof T> = {
+  [K in keyof T]: K extends R ? T[K] : T[K] | undefined;
 };
 
-export function CreateForm<T extends object>({
+export function satisfiesRequiredFields<T, R extends keyof T>(
+  item: Partial<T>,
+  required: R[],
+): item is RequiredFields<T, R> {
+  for (const k of required) {
+    if (!(k in item)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Generate a ¨Create¨ / "Add" form using ColumnDefs.
+ */
+export type CreateFormProps<T, R extends keyof T> = {
+  columns: ColumnDef<T, any>[]; // any: see comment in data-table.tsx
+
+  /* Should be passed with `as const` so that R is inferred correctly,
+   * rather than getting generalized to string[] */
+  required: R[];
+
+  onSave: (values: RequiredFields<T, R>) => Promise<void>;
+};
+
+export function CreateForm<T extends object, R extends keyof T>({
   columns,
+  required,
   onSave,
-}: CreateFormProps<T>) {
+}: CreateFormProps<T, R>) {
   return (
     <EditForm
       columns={columns}
-      onSave={(updates: Partial<T>) => onSave(updates as T)}
+      onSave={(updates) => {
+        if (!satisfiesRequiredFields(updates, required)) {
+          // Required field not supplied
+          return false;
+        }
+        onSave(updates);
+      }}
       item={{} as T}
       submitButton={{
         title: "Save",
         props: {
-          /* Fix button to bottom of drawer */
-          className:
-            "flex flex-col items-center justify-center fixed bottom-15 left-4 right-4",
+          className: "flex flex-col items-center justify-center mt-auto",
         },
         disabledFn: (_, updates) => {
-          return false;
+          return !satisfiesRequiredFields(updates, required);
         },
       }}
     />

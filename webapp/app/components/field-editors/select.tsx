@@ -23,7 +23,6 @@ export function selectOptionsEditor<U extends HasToString>({
     const [value, setValue] = useState(orig);
     return (
       <NativeSelect
-        disabled={orig == null}
         onBlur={() => onBlur(value)}
         value={value?.toString()}
         onChange={(event) => {
@@ -56,7 +55,11 @@ export function selectOptionsEditor<U extends HasToString>({
 export function multiSelectCheckboxEditor<U extends HasToString>({
   options,
 }: {
-  options: { label: string; value: U; fieldProps?: React.ComponentProps<typeof Field> }[];
+  options: {
+    label: string;
+    value: U;
+    fieldProps?: React.ComponentProps<typeof Field>;
+  }[];
 }): FieldEditor<unknown, U[]> {
   return ({ overrides, onChange, onBlur, value: orig }) => {
     const [items, setItems] = useState(orig ?? []);

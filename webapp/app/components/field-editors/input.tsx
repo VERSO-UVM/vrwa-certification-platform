@@ -84,7 +84,6 @@ export function priceCentsEditor(
     return (
       <Input
         value={display}
-        disabled={value == null}
         type="number"
         className="user-invalid:border-pink-500 focus:user-invalid:ring-pink-400"
         onChange={(event) => {

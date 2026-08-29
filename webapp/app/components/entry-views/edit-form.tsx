@@ -49,8 +49,8 @@ export function EditForm<T extends object>({
   };
 
   return (
-    <form onSubmit={onSubmit}>
-      <FieldSet className="pb-2">
+    <form onSubmit={onSubmit} className="flex-1 flex flex-col">
+      <FieldSet className="flex-1 flex flex-col">
         <FieldGroup>
           <Field>
             {columns.map((column) => {
