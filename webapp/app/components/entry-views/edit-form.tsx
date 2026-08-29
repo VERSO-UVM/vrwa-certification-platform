@@ -109,7 +109,7 @@ export function EditForm<T extends object>({
           </Field>
         </FieldGroup>
         <Button
-          disabled={item == null || submitButton.disabledFn(item, updates)}
+          disabled={item === null || submitButton.disabledFn(item, updates)}
           {...submitButton.props}
         >
           {submitButton.title}

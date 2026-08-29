@@ -12,7 +12,7 @@ export function satisfiesRequiredFields<T, R extends keyof T>(
   required: R[],
 ): item is RequiredFields<T, R> {
   for (const k of required) {
-    if (!(k in item)) {
+    if (!(k in item && item[k])) {
       return false;
     }
   }
@@ -47,7 +47,7 @@ export function CreateForm<T extends object, R extends keyof T>({
         }
         onSave(updates);
       }}
-      item={{} as T}
+      item={undefined}
       submitButton={{
         title: "Save",
         props: {

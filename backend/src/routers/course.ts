@@ -21,7 +21,7 @@ const updateSchema = createUpdateSchema(course, {
 });
 
 const insertSchema = createInsertSchema(course, {
-  creditHourCategories: z.array(z.enum(CreditHourCategory)),
+  creditHourCategories: z.array(z.enum(CreditHourCategory)).optional(),
   status: z.enum(CourseStatus),
 });
 

@@ -105,7 +105,6 @@ export default function CourseManager() {
                   "priceCents",
                   "creditHours",
                   "seats",
-                  "creditHourCategories",
                 ] as const
               }
               onSave={async (values) => {
