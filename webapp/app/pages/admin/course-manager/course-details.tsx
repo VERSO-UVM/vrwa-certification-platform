@@ -1,8 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { PaymentStatus } from "@backend/database/schema";
-import { type ColumnDef } from "@tanstack/react-table";
-import type { ProfileDto, ReservationDto } from "@backend/database/dtos";
+import type {
+  CourseDto,
+  CourseEventDto,
+  ProfileDto,
+} from "@backend/database/dtos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { PageHeader } from "~/components/page-header";
 import {
@@ -31,27 +34,45 @@ import {
   SelectItem,
   SelectGroup,
 } from "~/components/ui/select";
-import { PaymentStatusBadge } from "~/components/payment-status-badge";
 import { Badge } from "~/components/ui/badge";
 import { Link } from "react-router";
-import { Users, CreditCard, Calendar, Trash, ArrowLeft } from "lucide-react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-} from "~/components/ui/drawer";
-import { NewCourseForm } from "~/pages/admin/course-manager/course-form";
+import { Users, CreditCard, Calendar, Trash, ArrowLeft, X } from "lucide-react";
 import type { Route } from "./+types/course-details";
 import { EditTraineeReservation } from "../trainee-manager/edit-reservation";
-import { CourseEventForm } from "./course-event-form";
-import { AddCourseEventButton as UpdateCourseEventButton } from "./add-course-event-button";
 import { ButtonGroup } from "~/components/ui/button-group";
+import {
+  reservationDefs,
+  reservationFieldHelper,
+} from "~/utils/field-defs/reservation";
+import { EditForm } from "~/components/entry-views/edit-form";
+import { courseEventDefs } from "~/utils/field-defs/course-event";
+import { courseDefs } from "~/utils/field-defs/course";
+import type { ColumnDef } from "@tanstack/react-table";
+import { add } from "date-fns";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
 }
+
+const courseEventFormDefs = [
+  courseEventDefs.courseDate,
+  courseEventDefs.duration,
+  courseEventDefs.courseLocationType,
+  courseEventDefs.virtualLink,
+  courseEventDefs.address,
+  courseEventDefs.town,
+  courseEventDefs.venue,
+];
+
+const courseFormDefs = [
+  courseDefs.status,
+  courseDefs.courseName,
+  courseDefs.description,
+  courseDefs.creditHours,
+  courseDefs.priceCents,
+  courseDefs.tags,
+  courseDefs.creditCategories,
+] as ColumnDef<CourseDto>[];
 
 export default function CourseDetails({
   params: { courseId },
@@ -59,7 +80,11 @@ export default function CourseDetails({
   const trpc = useTRPC();
   const client = useTRPCClient();
   const queryClient = useQueryClient();
-  const updateMutation = useMutation(
+  const courseEvents = useQuery(
+    trpc.courseEvents.admin.listCourse.queryOptions({ courseId }),
+  );
+
+  const courseEventUpdateMut = useMutation(
     trpc.courseEvents.admin.update.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
@@ -69,27 +94,50 @@ export default function CourseDetails({
     }),
   );
 
-  const course = useQuery(
-    trpc.courses.admin.get.queryOptions({ id: courseId! }),
+  const courseEventCloneMut = useMutation(
+    trpc.courseEvents.admin.clone.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.courseEvents.admin.listCourse.queryKey(),
+        });
+      },
+    }),
+  );
+
+  const courseEventDeleteMut = useMutation(
+    trpc.courseEvents.admin.delete.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.courseEvents.admin.listCourse.queryKey(),
+        });
+      },
+    }),
+  );
+
+  const courseUpdateMut = useMutation(
+    trpc.courses.admin.update.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.courses.admin.pathKey(),
+        });
+      },
+    }),
+  );
+
+  const { data: course } = useQuery(
+    trpc.courses.admin.get.queryOptions({ id: courseId }),
   );
 
   const reservations = useQuery(
     trpc.reservations.admin.listCourse.queryOptions({
-      courseId: courseId!,
+      courseId,
     }),
   );
 
   const trainees = useQuery(trpc.profiles.admin.listTrainees.queryOptions());
 
-  const courseEvents = useQuery(
-    trpc.courseEvents.admin.listCourse.queryOptions({
-      courseId: courseId!,
-    }),
-  );
-
   //grouping reservations by courseEventId to easily access rosters
   const roster = reservations.data ?? [];
-  const events = courseEvents.data ?? [];
 
   //getting courseEvents for tabs
   const eventIds = courseEvents.data?.map((e) => e.id) ?? [];
@@ -106,11 +154,12 @@ export default function CourseDetails({
     });
   }
 
-  const seats = course.data?.seats ?? 0;
+  const seats = course?.seats ?? 0;
   const classFull = roster.length >= seats;
 
   //what percentage of trainees enrolled have paid their fees
   function percentagePaid() {
+    if (roster.length == 0) return 0;
     let paid = 0;
     for (let i = 0; i < roster.length; i++) {
       if (roster[i]?.paymentStatus == "paid") paid++;
@@ -123,56 +172,29 @@ export default function CourseDetails({
 
   //for adding to roster
   const [selectedTrainee, setSelectedTrainee] = useState<string | null>(null);
-  const [selectedTab, setSelectedTab] = useState<string | null>(null);
+  const [selectedTab, setSelectedTab] = useState<string | null>(
+    eventIds[0] ?? null,
+  );
+  if (!selectedTab && eventIds[0] != null) {
+    setSelectedTab(eventIds[0]);
+  }
   const [traineePopupOpen, setTraineePopupOpen] = useState<boolean | false>(
     false,
   );
-  const activeEventId = selectedTab ?? eventIds[0] ?? "";
 
-  const selectedEvent =
-    events.find((event) => event.id == activeEventId) || null;
   const rosterIds = new Set(roster.map((r) => r.profileId));
   const availableTrainees =
     trainees.data?.filter((t) => !rosterIds.has(t.id)) ?? [];
 
-  //editing a course
-  const [courseDrawerOpen, setCourseDrawerOpen] = useState<boolean | false>(
-    false,
-  );
-
   //Data Table
-  const rosterTableDef: ColumnDef<ReservationDto>[] = useMemo(
+  const rosterTableDef = useMemo(
     () => [
-      {
-        accessorKey: "lastName",
-        header: "Last Name",
-      },
-      {
-        accessorKey: "firstName",
-        header: "First Name",
-      },
-      {
-        accessorKey: "creditHours",
-        header: "Awarded Hours",
-      },
-      {
-        accessorKey: "isMember",
-        header: "Member Status",
-        cell: ({ getValue }) =>
-          getValue() == true ? (
-            <Badge variant="member"> Member</Badge>
-          ) : (
-            <Badge variant="not_member"> Non-Member</Badge>
-          ),
-      },
-      {
-        accessorKey: "paymentStatus",
-        header: "Payment Status",
-        cell: ({ getValue }) => (
-          <PaymentStatusBadge value={getValue() as PaymentStatus} />
-        ),
-      },
-      {
+      reservationDefs.lastName,
+      reservationDefs.firstName,
+      reservationDefs.creditHours,
+      reservationDefs.isMember,
+      reservationDefs.paymentStatus,
+      reservationFieldHelper.display({
         id: "actions",
         cell: ({ row }) => {
           return (
@@ -189,7 +211,7 @@ export default function CourseDetails({
             </ButtonGroup>
           );
         },
-      },
+      }),
     ],
     [],
   );
@@ -215,9 +237,9 @@ export default function CourseDetails({
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Courses
         </Link>
       </Button>
-      <PageHeader>{course.data?.courseName}</PageHeader>
-      <div className="grid gap-4 grid-cols-1 @xl:grid-cols-3">
-        <Card className="@xl:col-span-1" variant="green">
+      <PageHeader>{course?.courseName}</PageHeader>
+      <div className="grid gap-4 grid-cols-6">
+        <Card className="col-span-full @xl:col-span-2" variant="green">
           <CardContent className="p-6 flex items-center gap-4">
             <Users className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
@@ -226,18 +248,18 @@ export default function CourseDetails({
             </div>
           </CardContent>
         </Card>
-        <Card className="@xl:col-span-1" variant="yellow">
+        <Card className="col-span-full @xl:col-span-2" variant="yellow">
           <CardContent className="p-6 flex items-center gap-4">
             <CreditCard className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
-              <p className="text-sm text-muted-foreground">Tution Paid</p>
+              <p className="text-sm text-muted-foreground">Tuition Paid</p>
               <p className="text-3xl font-bold">
                 {percentagePaid().toFixed(0)}%
               </p>
             </div>
           </CardContent>
         </Card>
-        <Card className="@xl:col-span-1" variant="blue">
+        <Card className="col-span-full @xl:col-span-2" variant="blue">
           <CardContent className="p-6 flex items-center gap-4">
             <Calendar className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
@@ -246,7 +268,7 @@ export default function CourseDetails({
             </div>
           </CardContent>
         </Card>
-        <Card className="col-span-full" variant="orange">
+        <Card className="col-span-full @6xl:col-span-3" variant="orange">
           <CardHeader className="pb-3">
             <CardTitle className="text-xl flex justify-between">
               <div className="font-semibold underline">Course Overview</div>
@@ -276,93 +298,29 @@ export default function CourseDetails({
               </Button>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <dl className="space-y-3">
-                <div>
-                  <dt className="font-medium text-muted-foreground">
-                    Description
-                  </dt>
-                  <dd>{course.data?.description}</dd>
-                </div>
-
-                <div>
-                  <dt className="font-medium text-muted-foreground">
-                    Enrollment Fee
-                  </dt>
-                  <dd>
-                    ${course.data?.priceCents && course.data?.priceCents / 100}
-                  </dd>
-                </div>
-
-                <div>
-                  <dt className="font-medium text-muted-foreground">
-                    Credit Hours
-                  </dt>
-                  <dd>{course.data?.creditHours}</dd>
-                </div>
-              </dl>
-              <div className="flex justify-end mb-4 pr-4">
-                <Drawer
-                  direction="right"
-                  open={courseDrawerOpen}
-                  onOpenChange={setCourseDrawerOpen}
-                >
-                  <DrawerContent>
-                    <DrawerHeader>
-                      <DrawerTitle>Update Course Details</DrawerTitle>
-                      <DrawerDescription>
-                        Edit an existing event
-                      </DrawerDescription>
-                    </DrawerHeader>
-                    <div className="no-scrollbar overflow-y-auto px-4">
-                      <NewCourseForm
-                        key={courseId}
-                        course={course.data}
-                        onCreate={async (data) => {
-                          await client.courses.admin.update.mutate({
-                            ...data,
-                            id: courseId,
-                          });
-                          await queryClient.invalidateQueries({
-                            queryKey: trpc.courses.admin.get.queryKey({
-                              id: courseId,
-                            }),
-                          });
-                          setCourseDrawerOpen(false);
-                        }}
-                      />
-                    </div>
-                  </DrawerContent>
-                </Drawer>
-              </div>
-              <div>
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  className="w-full"
-                  onClick={() => {
-                    setCourseDrawerOpen(true);
-                  }}
-                >
-                  Update Details
-                </Button>
-              </div>
-              <div></div>
-            </div>
+          <CardContent className="flex flex-col h-full">
+            <EditForm
+              item={course ?? undefined}
+              onSave={(updates) => {
+                if (!course) return Promise.reject("Course not found");
+                return courseUpdateMut.mutateAsync({
+                  ...course,
+                  ...updates,
+                  status: course.status,
+                });
+              }}
+              columns={courseFormDefs}
+            />
           </CardContent>
         </Card>
-        <Card variant="green" className="col-span-full">
+        <Card className="col-span-full @6xl:col-span-3" variant="green">
           <CardHeader>
             <CardTitle>Training Sessions</CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs
-              value={selectedTab ?? eventIds[0] ?? ""}
-              onValueChange={setSelectedTab}
-            >
-              <div className="flex justify-between">
-                <TabsList variant="line">
+            <Tabs value={selectedTab ?? ""} onValueChange={setSelectedTab}>
+              <div className="flex justify-between flex-wrap">
+                <TabsList variant="line" className="overflow-x-scroll pb-3">
                   {courseEvents.data?.map((event) => {
                     const date = event.classStartDatetime
                       ? new Date(event.classStartDatetime)
@@ -374,32 +332,102 @@ export default function CourseDetails({
                     );
                   })}
                 </TabsList>
-                <UpdateCourseEventButton />
+                <ButtonGroup className="ml-auto">
+                  <Button
+                    variant="default"
+                    disabled={courseEvents.isLoading}
+                    onClick={() => {
+                      if (!selectedTab) {
+                        // No course event selected
+                        return;
+                      }
+                      const selectedEvent = courseEvents.data?.find(
+                        (e) => e.id == selectedTab,
+                      )?.classStartDatetime;
+                      courseEventCloneMut.mutate(
+                        {
+                          courseEventId: selectedTab,
+                          classStartDatetime: selectedEvent
+                            ? add(selectedEvent, { days: 1 })
+                            : undefined,
+                        },
+                        {
+                          onSuccess: (newEvent) => {
+                            setSelectedTab(newEvent.id);
+                          },
+                        },
+                      );
+                    }}
+                  >
+                    + Add Training Sesssion
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    disabled={
+                      courseEvents.isLoading ||
+                      (courseEvents.data ?? []).length <= 1
+                    }
+                    onClick={() => {
+                      if (selectedTab && courseEvents.data) {
+                        // Select previous tab afterwards
+                        const selectedIndex = courseEvents.data.findIndex(
+                          (event) => event.id == selectedTab,
+                        );
+                        let newTabIndex = 0;
+                        if (selectedIndex == 0) {
+                          newTabIndex = 1;
+                        } else if (selectedIndex) {
+                          newTabIndex = selectedIndex - 1;
+                        }
+                        const newTabId = courseEvents.data?.[newTabIndex]?.id;
+
+                        courseEventDeleteMut.mutate(
+                          {
+                            id: selectedTab,
+                          },
+                          {
+                            onSuccess: () => {
+                              if (newTabId) {
+                                setSelectedTab(newTabId);
+                              }
+                            },
+                          },
+                        );
+                      }
+                    }}
+                  >
+                    <X /> Remove
+                  </Button>
+                </ButtonGroup>
               </div>
               {courseEvents.data?.map((event) => (
                 <TabsContent key={event.id} value={event.id}>
-                  <CourseEventForm
-                    key={selectedEvent?.courseId ?? "new"}
-                    event={selectedEvent}
-                    onCreate={async (data) => {
-                      console.log("heyyy", selectedEvent, data);
-                      if (selectedEvent) {
-                        updateMutation.mutate({
-                          id: selectedEvent.id,
+                  <EditForm
+                    key={event?.courseId}
+                    item={event as CourseEventDto}
+                    columns={courseEventFormDefs}
+                    onSave={async (data) => {
+                      if (event) {
+                        await courseEventUpdateMut.mutateAsync({
+                          id: event.id,
                           ...data,
                         });
                         await queryClient.invalidateQueries({
-                          queryKey: trpc.courseEvents.admin.list.queryKey(),
+                          queryKey: trpc.courseEvents.admin.pathKey(),
                         });
                       }
                     }}
                   />
                 </TabsContent>
-              ))}
+              )) || (
+                <TabsContent value="">
+                  <EditForm columns={courseEventFormDefs} onSave={Promise.reject} />
+                </TabsContent>
+              )}
             </Tabs>
           </CardContent>
         </Card>
-        <Card className="col-span-full" variant="yellow">
+        <Card variant="yellow" className="col-span-full">
           <CardHeader className="pb-3">
             <CardTitle>
               Class Roster{" "}
@@ -454,7 +482,7 @@ export default function CourseDetails({
                       await client.reservations.admin.create.mutate({
                         profileId: selectedTrainee,
                         courseId: courseId,
-                        creditHours: course.data?.creditHours ?? "0",
+                        creditHours: course?.creditHours ?? "0",
                         paymentStatus: PaymentStatus.Draft,
                       });
 

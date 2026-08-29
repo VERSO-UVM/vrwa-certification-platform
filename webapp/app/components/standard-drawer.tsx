@@ -43,7 +43,9 @@ export function StandardDrawer({
           </DrawerClose>
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
-        <div className="overflow-y-auto px-4">{children}</div>
+        <div className="overflow-y-auto px-2 pb-3 flex-1 flex flex-col gap-2">
+          {children}
+        </div>
       </DrawerContent>
     </Drawer>
   );

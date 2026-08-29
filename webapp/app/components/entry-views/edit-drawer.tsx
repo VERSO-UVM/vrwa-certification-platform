@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { SquarePen } from "lucide-react";
 import { DrawerClose } from "../ui/drawer";
-import { shallowEqual } from "~/utils/utils";
+import { deepEqual } from "~/utils/utils";
 
 export interface EditDrawerProps<T> {
   item: T;

@@ -52,8 +52,6 @@ export const attendanceFieldDefs = [
       const item = row.original;
       const [creditHours, setCreditHours] = useState(item.creditHours);
       const creditHoursUpdate = useCreditHoursUpdate(item.courseId);
-      // Sync actual credit hours with input
-      useEffect(() => setCreditHours(item.creditHours), [item.creditHours]);
       return (
         <Input
           type="number"
