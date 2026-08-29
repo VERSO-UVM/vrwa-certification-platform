@@ -40,12 +40,12 @@ export default function CreateProfile() {
     }),
   );
 
-  const handleOnSave = (updates: Partial<Profile>) => {
-    createProfile.mutate({
+  const handleOnSave = async (updates: Partial<Profile>) => {
+    await createProfile.mutateAsync({
       ...emptyProfile,
       ...updates,
     } as Profile);
-    navigate("/profile-select");
+    await navigate("/profile-select");
   };
 
   return (

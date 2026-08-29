@@ -2,12 +2,12 @@ import { StandardDrawer } from "../standard-drawer";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { DrawerClose } from "../ui/drawer";
-import { CreateForm, type CreateFormProps } from "./create-form";
+import { EditForm, type EditFormProps } from "./edit-form";
 
-export interface CreateDrawerProps<
+export interface CreateDrawerProps<T, R extends keyof T> extends EditFormProps<
   T,
-  R extends keyof T,
-> extends CreateFormProps<T, R> {
+  R
+> {
   drawer: {
     buttonText: string;
     title: string;
@@ -16,7 +16,7 @@ export interface CreateDrawerProps<
 }
 
 /**
- * Similar to EditForm.
+ * Similar to EditDrawer.
  */
 export function CreateDrawer<T extends object, R extends keyof T>({
   columns,
@@ -33,7 +33,7 @@ export function CreateDrawer<T extends object, R extends keyof T>({
       open={open}
       onOpenChange={setOpen}
     >
-      <CreateForm
+      <EditForm
         columns={columns}
         required={required}
         onSave={(updates) => onSave(updates).then(() => setOpen(false))}

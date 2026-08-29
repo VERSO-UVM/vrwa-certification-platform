@@ -301,11 +301,12 @@ export default function CourseDetails({
           <CardContent className="flex flex-col h-full">
             <EditForm
               item={course ?? undefined}
-              onSave={function (updates): void {
-                if (!course) return;
-                courseUpdateMut.mutate({
+              onSave={(updates) => {
+                if (!course) return Promise.reject("Course not found");
+                return courseUpdateMut.mutateAsync({
                   ...course,
                   ...updates,
+                  status: course.status,
                 });
               }}
               columns={courseFormDefs}
@@ -420,7 +421,7 @@ export default function CourseDetails({
                 </TabsContent>
               )) || (
                 <TabsContent value="">
-                  <EditForm columns={courseEventFormDefs} onSave={() => {}} />
+                  <EditForm columns={courseEventFormDefs} onSave={Promise.reject} />
                 </TabsContent>
               )}
             </Tabs>
