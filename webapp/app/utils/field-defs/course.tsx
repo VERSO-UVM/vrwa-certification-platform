@@ -30,6 +30,7 @@ import {
 import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
 import { useState } from "react";
+import type { RequiredFields } from "~/components/entry-views/edit-form";
 
 export const courseFieldHelper = createColumnHelper<
   CourseDto | Course | CourseInsert
@@ -248,3 +249,11 @@ export const courseDefPresets = {
     courseDefs.spots,
   ],
 };
+
+export const courseRequiredFields = {
+  courseName: "",
+  description: "",
+  priceCents: 0,
+  creditHours: "",
+  seats: 0,
+} satisfies Partial<Course>;

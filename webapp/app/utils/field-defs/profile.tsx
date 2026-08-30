@@ -8,6 +8,7 @@
  * object manipulations.
  */
 import type { ProfileDto } from "@backend/database/dtos";
+import type { Profile } from "@backend/database/schema";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Badge } from "~/components/ui/badge";
 import { textInputEditor, selectOptionsEditor } from "~/utils/field-editors";
@@ -84,18 +85,12 @@ export const profileDefPresets = {
   all: Object.values(profileDefs),
 };
 
-// Initial state when creating new profile
-export const emptyProfile: ProfileDto = {
-  isMember: false,
+export const profileRequiredFields = {
   postalCode: "",
   address: "",
   city: "",
   phoneNumber: "",
   lastName: "",
   firstName: "",
-  id: "",
-  userId: "",
-  state: "VT",
-  association: "",
-  memberGroupId: null,
-};
+  state: "",
+} satisfies Partial<Profile>;

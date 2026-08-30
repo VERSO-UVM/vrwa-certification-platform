@@ -1,5 +1,5 @@
 import type { CourseEventDto } from "@backend/database/dtos";
-import { CourseLocation } from "@backend/database/schema";
+import { CourseLocation, type CourseEvent } from "@backend/database/schema";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Link } from "react-router";
 import { LocationTypeBadge } from "~/components/location-type-badge";
@@ -177,3 +177,7 @@ export const courseEventDefPresets = {
     courseEventDefs.seats,
   ],
 };
+
+export const courseEventRequiredFields = {
+  locationType: CourseLocation.InPerson,
+} satisfies Partial<CourseEvent>;

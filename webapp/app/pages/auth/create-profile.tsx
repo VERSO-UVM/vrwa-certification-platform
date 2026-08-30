@@ -9,7 +9,7 @@ import { Link, useNavigate } from "react-router";
 import { Undo2 } from "lucide-react";
 import { EditForm } from "~/components/entry-views/edit-form";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { emptyProfile, profileDefs } from "~/utils/field-defs/profile";
+import { profileDefs, profileRequiredFields } from "~/utils/field-defs/profile";
 import { useTRPC } from "~/utils/trpc";
 
 const columnDefs = [
@@ -40,23 +40,18 @@ export default function CreateProfile() {
     }),
   );
 
-  const handleOnSave = async (updates: Partial<Profile>) => {
-    await createProfile.mutateAsync({
-      ...emptyProfile,
-      ...updates,
-    } as Profile);
-    await navigate("/profile-select");
-  };
-
   return (
     <Card className="p-4 w-xl self-center">
       <CardHeader>
         <CardTitle className="text-center">Create a Profile</CardTitle>
         <CardContent className="flex flex-col space-y-4 w-lg m-auto">
           <EditForm
-            item={emptyProfile}
+            required={profileRequiredFields}
             columns={columnDefs}
-            onSave={handleOnSave}
+            onSave={async (values) => {
+              await createProfile.mutateAsync(values);
+              await navigate("/profile-select");
+            }}
           />
           <Link to="/profile-select">
             <Undo2 className="inline" /> Back

@@ -1,7 +1,11 @@
 import type { UserDto } from "@backend/database/dtos";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { EditDrawer } from "~/components/entry-views/edit-drawer";
-import { userDefs, userFieldHelper } from "~/utils/field-defs/user";
+import {
+  userDefs,
+  userFieldHelper,
+  userRequiredFields,
+} from "~/utils/field-defs/user";
 import { useTRPC } from "~/utils/trpc";
 
 const fields = [
@@ -37,6 +41,7 @@ export function EditUserButton({ user }: { user: UserDto }) {
       }}
       item={user}
       columns={fields}
+      required={userRequiredFields}
       onSave={async (changes) => {
         await updateQuery.mutateAsync({
           ...changes,

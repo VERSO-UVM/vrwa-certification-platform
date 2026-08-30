@@ -1,7 +1,7 @@
 import type { ReservationDto } from "@backend/database/dtos";
 import { createColumnHelper } from "@tanstack/react-table";
 import { selectOptionsEditor, textInputEditor } from "../field-editors";
-import { PaymentStatus } from "@backend/database/schema";
+import { PaymentStatus, type Reservation } from "@backend/database/schema";
 import { PaymentStatusBadge } from "~/components/payment-status-badge";
 
 export const reservationFieldHelper = createColumnHelper<ReservationDto>();
@@ -59,6 +59,10 @@ export const reservationDefs = {
   }),
 };
 
+export const reservationRequiredFields = {
+  creditHours: "",
+} satisfies Partial<Reservation>;
+
 export const reservationDefPresets = {
   all: Object.values(reservationDefs),
   basic: [
@@ -67,4 +71,8 @@ export const reservationDefPresets = {
     reservationDefs.creditHours,
     reservationDefs.paymentStatus,
   ],
+  editor: {
+    columns: [reservationDefs.creditHours, reservationDefs.paymentStatus],
+    required: reservationRequiredFields,
+  },
 };

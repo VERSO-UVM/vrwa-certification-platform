@@ -14,6 +14,7 @@ import {
   courseDefPresets,
   courseDefs,
   courseDtoFieldHelper,
+  courseRequiredFields,
 } from "~/utils/field-defs/course";
 import { courseStartDate } from "~/utils/utils";
 import { CourseStatus } from "@backend/database/schema";
@@ -98,15 +99,7 @@ export default function CourseManager() {
           <div className="flex px-4">
             <CreateDrawer
               columns={courseFormDefs as ColumnDef<CourseDto>[]}
-              required={
-                [
-                  "courseName",
-                  "description",
-                  "priceCents",
-                  "creditHours",
-                  "seats",
-                ] as const
-              }
+              required={courseRequiredFields}
               onSave={async (values) => {
                 const newCourse = await createCourseMut.mutateAsync({
                   ...values,

@@ -4,6 +4,7 @@ import type { UserDto } from "@backend/database/dtos";
 import { RoleBadge } from "~/components/role-badge";
 import type { Role } from "@backend/auth/permissions";
 import { profileFullName } from "../utils";
+import type { User } from "@backend/database/schema";
 
 export const userFieldHelper = createColumnHelper<UserDto>();
 
@@ -68,3 +69,7 @@ export const userDefs = {
 export const userDefPresets = {
   all: [userDefs.email, userDefs.role],
 };
+
+export const userRequiredFields = {
+  role: "",
+} satisfies Partial<User>;

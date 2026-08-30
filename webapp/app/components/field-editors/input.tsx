@@ -32,8 +32,8 @@ export function intInputEditor<T>(
       <NumberInput
         {...rest}
         value={value ?? NaN}
-        onChange={(val) => onChange(val ?? 0)}
-        onBlur={(val) => onBlur(val ?? 0)}
+        onChange={(val) => onChange(val ?? NaN)}
+        onBlur={(val) => onBlur(val ?? NaN)}
       />
     );
   };
@@ -89,10 +89,7 @@ export function priceCentsEditor(
         onChange={(event) => {
           setDisplay(event.target.value);
           const val = toCents(event.target.value);
-          // Only set when it is actually valid
-          if (!isNaN(val)) {
-            onChange(val);
-          }
+          onChange(val);
         }}
         onBlur={() => {
           const cents = toCents(display);

@@ -7,17 +7,26 @@ import {
 import { FieldSet, FieldGroup, Field, FieldLabel } from "~/components/ui/field";
 import React, { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
-import { deepEqual } from "~/utils/utils";
+import {
+  deepEqual,
+  isInputUnset,
+  without,
+} from "~/utils/utils";
 
 /* Make not-required fields optional like Partial<> and
  * required fields required. */
 export type RequiredFields<T, R extends keyof T> = Partial<T> & Pick<T, R>;
 
+/**
+ * Refine the more general Partial<T> into the more specific RequiredFields<T, R>.
+ */
 export function satisfiesRequiredFields<T, R extends keyof T>(
   item: Partial<T>,
-  required: R[],
+  required: {
+    [K in R]: {};
+  },
 ): item is RequiredFields<T, R> {
-  for (const k of required) {
+  for (const k in required) {
     if (!(k in item && item[k])) {
       return false;
     }
@@ -28,33 +37,50 @@ export function satisfiesRequiredFields<T, R extends keyof T>(
 /**
  * Generate an edit form using column defs!
  */
-export type EditFormProps<T, R extends keyof T> = {
+export interface EditFormProps<T, R extends keyof T> {
+  /**
+   * The original item we are editing, or `undefined` if there is no original.
+   */
   item?: T;
-  columns: ColumnDef<T, any>[]; // any: see comment in data-table.tsx
-  onSave: (updates: RequiredFields<T, R>) => Promise<unknown>;
 
-  /* Should be passed with `as const` so that R is inferred correctly,
-   * rather than getting generalized to string[] */
-  required?: R[];
+  /**
+   * ColumnDefs that can be the same as the ones past to the DataTable
+   * component, but they all must have a meta.editor field that define
+   * an input component.
+   */
+  columns: ColumnDef<T, any>[]; // any: see comment in data-table.tsx
+
+  /**
+   * All fields set with `required` are guaranteed to be set.
+   */
+  onSave: (
+    changes: Partial<T>,
+    newItem: RequiredFields<T, R>,
+  ) => Promise<unknown>;
+
+  /* Define required fields. This is what is used to infer
+   * generic R, so non-required fields are just unset. */
+  required: {
+    [L in R]: {};
+  };
 
   submitButton?: Partial<{
-    title: string;
-    disabledFn: (original: T | undefined, updates: Partial<T>) => boolean;
+    title: string | React.ReactNode;
+    disabledFn: (changes: Partial<T>, newItem: Partial<T>) => boolean;
     props: React.ComponentProps<typeof Button>;
   }>;
-};
+}
 
-export function EditForm<T extends object, R extends keyof T = never>({
+export function EditForm<T extends object, R extends keyof T>({
   item,
   columns,
   onSave,
-  required = [],
+  required,
   submitButton = {},
 }: EditFormProps<T, R>) {
   submitButton.title ??= "Save changes";
-  submitButton.disabledFn ??= (original, updates) =>
-    deepEqual({ ...original, ...updates }, original) ||
-    !satisfiesRequiredFields(updates, required);
+  submitButton.disabledFn ??= (updates, _) =>
+    Object.entries(updates).length === 0;
   submitButton.props ??= {};
   submitButton.props.className ??=
     "flex flex-col items-center justify-center mt-auto";
@@ -77,10 +103,16 @@ export function EditForm<T extends object, R extends keyof T = never>({
     setUpdates({});
   }
 
+  const newItem = { ...item, ...updates };
+
   const onSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
-    // cast: disabledFn should handle this check
-    onSave(updates as RequiredFields<T, R>);
+    if (!satisfiesRequiredFields(newItem, required)) {
+      throw new Error(
+        "Should not have been able to submit without required field.",
+      );
+    }
+    onSave(updates, newItem);
   };
 
   return (
@@ -114,7 +146,7 @@ export function EditForm<T extends object, R extends keyof T = never>({
                         className="text-sm font-semibold gap-1"
                       >
                         {flexRender(column.header, header.getContext())}
-                        {(required as string[]).includes(id) ? (
+                        {id in required ? (
                           <span className="text-destructive">*</span>
                         ) : null}
                       </FieldLabel>
@@ -125,14 +157,24 @@ export function EditForm<T extends object, R extends keyof T = never>({
                         getRow={() => ({ ...item, ...updates })}
                         overrides={{
                           id: htmlId,
+                          required: id in required,
                         }}
                         onBlur={(_value) => {}}
-                        onChange={(value) =>
-                          setUpdates({
-                            ...updates,
-                            [id]: value,
-                          })
-                        }
+                        onChange={(value) => {
+                          const k = id as keyof T;
+                          if (item?.[k] == null && isInputUnset(value)) {
+                            // Original value was unset and new input is unset.
+                            setUpdates(without(updates, k));
+                          } else if (deepEqual(value, item?.[k])) {
+                            // Value matches original
+                            setUpdates(without(updates, k));
+                          } else {
+                            setUpdates({
+                              ...updates,
+                              [id]: value,
+                            });
+                          }
+                        }}
                       />
                     </Field>
                   );
@@ -142,7 +184,7 @@ export function EditForm<T extends object, R extends keyof T = never>({
           })}
         </FieldGroup>
         <Button
-          disabled={item === null || submitButton.disabledFn(item, updates)}
+          disabled={item === null || submitButton.disabledFn(updates, newItem)}
           {...submitButton.props}
         >
           {submitButton.title}

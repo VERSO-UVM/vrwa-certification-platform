@@ -45,8 +45,11 @@ import {
   reservationFieldHelper,
 } from "~/utils/field-defs/reservation";
 import { EditForm } from "~/components/entry-views/edit-form";
-import { courseEventDefs } from "~/utils/field-defs/course-event";
-import { courseDefs } from "~/utils/field-defs/course";
+import {
+  courseEventDefs,
+  courseEventRequiredFields,
+} from "~/utils/field-defs/course-event";
+import { courseDefs, courseRequiredFields } from "~/utils/field-defs/course";
 import type { ColumnDef } from "@tanstack/react-table";
 import { add } from "date-fns";
 
@@ -301,6 +304,7 @@ export default function CourseDetails({
           <CardContent className="flex flex-col h-full">
             <EditForm
               item={course ?? undefined}
+              required={courseRequiredFields}
               onSave={(updates) => {
                 if (!course) return Promise.reject("Course not found");
                 return courseUpdateMut.mutateAsync({
@@ -405,6 +409,7 @@ export default function CourseDetails({
                   <EditForm
                     key={event?.courseId}
                     item={event as CourseEventDto}
+                    required={courseEventRequiredFields}
                     columns={courseEventFormDefs}
                     onSave={async (data) => {
                       if (event) {
@@ -421,7 +426,11 @@ export default function CourseDetails({
                 </TabsContent>
               )) || (
                 <TabsContent value="">
-                  <EditForm columns={courseEventFormDefs} onSave={Promise.reject} />
+                  <EditForm
+                    required={courseEventRequiredFields}
+                    columns={courseEventFormDefs}
+                    onSave={Promise.reject}
+                  />
                 </TabsContent>
               )}
             </Tabs>

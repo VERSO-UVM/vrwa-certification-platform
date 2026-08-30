@@ -1,16 +1,15 @@
-import type { ColumnDef } from "@tanstack/react-table";
 import { StandardDrawer } from "../standard-drawer";
-import { EditForm } from "./edit-form";
+import { EditForm, type EditFormProps } from "./edit-form";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { SquarePen } from "lucide-react";
 import { DrawerClose } from "../ui/drawer";
-import { deepEqual } from "~/utils/utils";
 
-export interface EditDrawerProps<T> {
+export interface EditDrawerProps<T, R extends keyof T> extends EditFormProps<
+  T,
+  R
+> {
   item: T;
-  columns: ColumnDef<T, any>[]; // See comment in data-table.tsx
-  onSave: (updates: Partial<T>) => Promise<void>;
   drawer: {
     buttonText: string;
     title: string;
@@ -24,12 +23,13 @@ export interface EditDrawerProps<T> {
  * should be async (to know it is saved successfully when Promise
  * resolves)
  */
-export function EditDrawer<T extends object>({
+export function EditDrawer<T extends object, R extends keyof T>({
   item,
   columns,
   onSave,
+  required,
   drawer: { buttonText, ...drawer },
-}: EditDrawerProps<T>) {
+}: EditDrawerProps<T, R>) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -46,10 +46,9 @@ export function EditDrawer<T extends object>({
     >
       <EditForm
         item={item}
+        required={required}
         columns={columns}
-        onSave={(updates: Partial<T>) =>
-          onSave(updates).then(() => setOpen(false))
-        }
+        onSave={(updates) => onSave(updates).then(() => setOpen(false))}
         submitButton={{
           title: "Save changes",
           props: {
@@ -59,7 +58,7 @@ export function EditDrawer<T extends object>({
           },
         }}
       />
-      <DrawerClose>
+      <DrawerClose asChild>
         <Button
           variant="cancel_button"
           className="flex flex-col items-center justify-center fixed bottom-4 left-4 right-4"

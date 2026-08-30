@@ -6,7 +6,6 @@ import type {
 import type { Profile } from "@backend/database/schema";
 import clsx, { type ClassValue } from "clsx";
 import { format, isEqual } from "date-fns";
-import SuperJSON from "superjson";
 import { twMerge } from "tailwind-merge";
 
 export function shallowEqual<T extends object>(a: T, b: T) {
@@ -29,6 +28,53 @@ export function shallowEqual<T extends object>(a: T, b: T) {
     return false;
   }
   return true;
+}
+
+/**
+ * If user-entered input value is considered the same as empty/unset
+ * for its appropriate react state. This is more of a convention to
+ * follow.
+ */
+export function isInputUnset(x: unknown) {
+  if (x == null) {
+    // null or undefined
+    return true;
+  }
+  if (typeof x === "string") {
+    // empty text input
+    return x === "";
+  }
+  if (typeof x === "number") {
+    // empty type=number text input
+    return isNaN(x);
+  }
+  if (Array.isArray(x)) {
+    // empty array
+    return x.length == 0;
+  }
+  if (typeof x === "object") {
+    // empty object
+    return isEmptyObject(x);
+  }
+  return false;
+}
+
+export function isEmptyArray(x: unknown) {
+  return Array.isArray(x) && x.length === 0;
+}
+
+export function isEmptyObject(x: unknown) {
+  return typeof x === "object" && x !== null && Object.entries(x).length == 0;
+}
+
+/**
+ * Drop a field from an object.
+ */
+export function without<T>(item: Partial<T>, key: keyof T): Partial<T> {
+  // `delete` modifies the original object and setting to `undefined`
+  // is different from removing the field.
+  const { [key]: _, ...rest } = item;
+  return rest as Partial<T>;
 }
 
 export function deepEqual<T>(a: T, b: T) {
