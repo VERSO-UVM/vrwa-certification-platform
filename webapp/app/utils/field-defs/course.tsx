@@ -30,7 +30,6 @@ import {
 import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
 import { useState } from "react";
-import type { RequiredFields } from "~/components/entry-views/edit-form";
 
 export const courseFieldHelper = createColumnHelper<
   CourseDto | Course | CourseInsert

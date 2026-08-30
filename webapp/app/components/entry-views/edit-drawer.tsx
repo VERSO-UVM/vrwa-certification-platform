@@ -48,7 +48,9 @@ export function EditDrawer<T extends object, R extends keyof T>({
         item={item}
         required={required}
         columns={columns}
-        onSave={(updates) => onSave(updates).then(() => setOpen(false))}
+        onSave={(updates, item) =>
+          onSave(updates, item).then(() => setOpen(false))
+        }
         submitButton={{
           title: "Save changes",
           props: {

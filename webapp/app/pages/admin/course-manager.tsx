@@ -100,7 +100,7 @@ export default function CourseManager() {
             <CreateDrawer
               columns={courseFormDefs as ColumnDef<CourseDto>[]}
               required={courseRequiredFields}
-              onSave={async (values) => {
+              onSave={async (_, values) => {
                 const newCourse = await createCourseMut.mutateAsync({
                   ...values,
                   status: CourseStatus.Active,

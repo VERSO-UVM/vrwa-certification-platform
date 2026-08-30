@@ -48,7 +48,7 @@ export default function CreateProfile() {
           <EditForm
             required={profileRequiredFields}
             columns={columnDefs}
-            onSave={async (values) => {
+            onSave={async (_, values) => {
               await createProfile.mutateAsync(values);
               await navigate("/profile-select");
             }}

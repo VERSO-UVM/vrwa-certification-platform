@@ -36,7 +36,9 @@ export function CreateDrawer<T extends object, R extends keyof T>({
       <EditForm
         columns={columns}
         required={required}
-        onSave={(updates) => onSave(updates).then(() => setOpen(false))}
+        onSave={(updates, item) =>
+          onSave(updates, item).then(() => setOpen(false))
+        }
       />
       <DrawerClose asChild>
         <Button variant="cancel_button">Cancel</Button>
