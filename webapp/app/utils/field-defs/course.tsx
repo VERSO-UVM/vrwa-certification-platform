@@ -30,6 +30,7 @@ import {
 import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
 import { useState } from "react";
+import { BadgeDollarSign, Book, Droplet, GraduationCap, Info, MessageSquareText, Star, Tag, Tags, Trophy, Users } from "lucide-react";
 
 export const courseFieldHelper = createColumnHelper<
   CourseDto | Course | CourseInsert
@@ -38,7 +39,7 @@ export const courseDtoFieldHelper = createColumnHelper<CourseDto>();
 
 export const courseDefs = {
   courseName: courseFieldHelper.accessor("courseName", {
-    header: "Title",
+    header: () => <><Book /> Title</>,
     cell: ({ row, getValue }) => (
       <Link
         to={`/admin/course-details/${row.original.id}`}
@@ -53,7 +54,7 @@ export const courseDefs = {
   }),
 
   description: courseFieldHelper.accessor("description", {
-    header: "Class Description",
+    header: () => <><MessageSquareText /> Class Description</>,
     cell: ({ getValue }) => (
       <div className="text-muted-foreground">{String(getValue())}</div>
     ),
@@ -63,14 +64,14 @@ export const courseDefs = {
   }),
 
   creditHours: courseFieldHelper.accessor("creditHours", {
-    header: "Credit Hours",
+    header: () => <><GraduationCap /> Credit Hours</>,
     meta: {
       editor: textInputEditor({ type: "number", step: 0.1 }),
     },
   }),
 
   priceCents: courseFieldHelper.accessor("priceCents", {
-    header: "Fee ($)",
+    header: () => <><BadgeDollarSign /> Fee</>,
     cell: ({ getValue }) => `$${(Number(getValue()) / 100).toFixed(2)}`,
     meta: {
       editor: priceCentsEditor(),
@@ -85,7 +86,7 @@ export const courseDefs = {
   ),
 
   seats: courseFieldHelper.accessor("seats", {
-    header: "Seats",
+    header: () => <><Users /> Seats</>,
     meta: {
       editor: intInputEditor({ step: 1 }),
     },
@@ -111,7 +112,7 @@ export const courseDefs = {
   }),
 
   status: courseFieldHelper.accessor("status", {
-    header: "Status",
+    header: () => <><Info /> Status</>,
     meta: {
       editor: selectOptionsEditor({
         options: [
@@ -124,7 +125,7 @@ export const courseDefs = {
   }),
 
   tags: courseFieldHelper.accessor("tags", {
-    header: "Tags",
+    header: () => <><Tags /> Tags</>,
     meta: {
       editor: (() => {
         return (props) => {
@@ -145,7 +146,7 @@ export const courseDefs = {
   }),
 
   creditCategories: courseFieldHelper.accessor("creditHourCategories", {
-    header: "Credit Types",
+    header: () => <><Droplet /> Credit Types</>,
     meta: {
       editor: ({ value, onChange, onBlur, overrides }) => {
         const [categories, setCategories] = useState(value ?? []);
@@ -172,7 +173,7 @@ export const courseDefs = {
         };
 
         return (
-          <FieldGroup className="w-full pt-3">
+          <FieldGroup className="w-full">
             <FieldSet className="gap-3">
               <FieldLabel
                 htmlFor={idBase + CreditHourCategory.Water}

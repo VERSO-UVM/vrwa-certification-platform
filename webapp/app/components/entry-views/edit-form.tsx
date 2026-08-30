@@ -143,7 +143,7 @@ export function EditForm<T extends object, R extends keyof T>({
                     <Field key={id}>
                       <FieldLabel
                         htmlFor={htmlId}
-                        className="text-sm font-semibold gap-1"
+                        className="text-sm font-semibold gap-2"
                       >
                         {flexRender(column.header, header.getContext())}
                         {id in required ? (
