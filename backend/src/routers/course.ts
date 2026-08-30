@@ -16,8 +16,8 @@ import { addMilliseconds } from "date-fns";
 
 const updateSchema = createUpdateSchema(course, {
   id: z.string(),
-  status: z.enum(CourseStatus),
-  creditHourCategories: z.optional(z.array(z.enum(CreditHourCategory))),
+  status: z.enum(CourseStatus).optional(),
+  creditHourCategories: z.array(z.enum(CreditHourCategory)).optional(),
 });
 
 const insertSchema = createInsertSchema(course, {

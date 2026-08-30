@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { PaymentStatus } from "@backend/database/schema";
+import { CourseStatus, PaymentStatus } from "@backend/database/schema";
 import type {
   CourseDto,
   CourseEventDto,
@@ -36,7 +36,14 @@ import {
 } from "~/components/ui/select";
 import { Badge } from "~/components/ui/badge";
 import { Link } from "react-router";
-import { Users, CreditCard, Calendar, Trash, ArrowLeft, X } from "lucide-react";
+import {
+  Users,
+  CreditCard,
+  Calendar,
+  Trash,
+  ArrowLeft,
+  X,
+} from "lucide-react";
 import type { Route } from "./+types/course-details";
 import { EditTraineeReservation } from "../trainee-manager/edit-reservation";
 import { ButtonGroup } from "~/components/ui/button-group";
@@ -275,30 +282,47 @@ export default function CourseDetails({
           <CardHeader className="pb-3">
             <CardTitle className="text-xl flex justify-between">
               <div className="font-semibold underline">Course Overview</div>
-              <Button
-                variant="destructive"
-                size="lg"
-                className=""
-                onClick={async () => {
-                  if (
-                    confirm(
-                      "Are you sure you want to delete this course? All course information and reservations will be lost.",
-                    )
-                  ) {
-                    await client.courses.admin.delete.mutate({
-                      id: courseId!,
-                    });
-                    await queryClient.invalidateQueries({
-                      queryKey: trpc.courses.admin.list.queryKey(),
-                    });
-                    setCourseDeleted(true);
-                  } else {
-                    return;
+              {course && (
+                <Button
+                  variant={
+                    course.status == CourseStatus.Deleted
+                      ? "destructive"
+                      : "edit"
                   }
-                }}
-              >
-                <Trash /> Delete Course
-              </Button>
+                  size="lg"
+                  onClick={async () => {
+                    if (!course) return Promise.reject("Course not found");
+                    if (course.status === CourseStatus.Deleted) {
+                      if (
+                        confirm(
+                          "Are you sure you want to delete this course? All course information and reservations will be lost.",
+                        )
+                      ) {
+                        await client.courses.admin.delete.mutate({
+                          id: courseId!,
+                        });
+                        await queryClient.invalidateQueries({
+                          queryKey: trpc.courses.admin.list.queryKey(),
+                        });
+                        setCourseDeleted(true);
+                      } else {
+                        return;
+                      }
+                    } else {
+                      // Mark as deleted
+                      courseUpdateMut.mutateAsync({
+                        status: CourseStatus.Deleted,
+                        id: course.id,
+                      });
+                    }
+                  }}
+                >
+                  <Trash />
+                  {course.status === CourseStatus.Deleted
+                    ? "Delete permanently"
+                    : "Mark as deleted"}
+                </Button>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col h-full">
@@ -308,9 +332,8 @@ export default function CourseDetails({
               onSave={(updates) => {
                 if (!course) return Promise.reject("Course not found");
                 return courseUpdateMut.mutateAsync({
-                  ...course,
                   ...updates,
-                  status: course.status,
+                  id: course.id,
                 });
               }}
               columns={courseFormDefs}
