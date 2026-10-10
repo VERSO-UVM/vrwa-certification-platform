@@ -36,14 +36,7 @@ import {
 } from "~/components/ui/select";
 import { Badge } from "~/components/ui/badge";
 import { Link } from "react-router";
-import {
-  Users,
-  CreditCard,
-  Calendar,
-  Trash,
-  ArrowLeft,
-  X,
-} from "lucide-react";
+import { Users, CreditCard, Calendar, Trash, ArrowLeft, X } from "lucide-react";
 import type { Route } from "./+types/course-details";
 import { EditTraineeReservation } from "../trainee-manager/edit-reservation";
 import { ButtonGroup } from "~/components/ui/button-group";
@@ -59,6 +52,8 @@ import {
 import { courseDefs, courseRequiredFields } from "~/utils/field-defs/course";
 import type { ColumnDef } from "@tanstack/react-table";
 import { add } from "date-fns";
+import { profileDefPresets } from "~/utils/field-defs/profile";
+import { RosterManager } from "./roster-manager";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
@@ -473,68 +468,51 @@ export default function CourseDetails({
           </CardHeader>
           <CardContent>
             <DataTable columns={rosterTableDef} data={roster} />
-            <div className="flex justify-end mt-4 pr-4">
-              <Dialog
-                open={traineePopupOpen}
-                onOpenChange={setTraineePopupOpen}
+            <div className="flex">
+              <Select
+                required
+                onValueChange={(value) => setSelectedTrainee(value)}
               >
-                <DialogTrigger asChild>
-                  <Button variant="secondary" size="lg">
-                    + Add Trainee To Roster
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>New Enrollment</DialogTitle>
-                  </DialogHeader>
-                  <DialogDescription>
-                    select a trainee to add to the roster
-                  </DialogDescription>
-                  <Select
-                    required
-                    onValueChange={(value) => setSelectedTrainee(value)}
-                  >
-                    <SelectTrigger id="trainees" className="w-full max-w-48">
-                      <SelectValue placeholder="Select a Trainee" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {availableTrainees.map((trainee: ProfileDto) => (
-                          <SelectItem key={trainee.id} value={trainee.id}>
-                            {trainee.firstName} {trainee.lastName}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    onClick={async () => {
-                      if (!selectedTrainee) return;
+                <SelectTrigger id="trainees" className="w-full max-w-48">
+                  <SelectValue placeholder="Select a Trainee" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {availableTrainees.map((trainee: ProfileDto) => (
+                      <SelectItem key={trainee.id} value={trainee.id}>
+                        {trainee.firstName} {trainee.lastName}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <Button
+                onClick={async () => {
+                  if (!selectedTrainee) return;
 
-                      await client.reservations.admin.create.mutate({
-                        profileId: selectedTrainee,
-                        courseId: courseId,
-                        creditHours: course?.creditHours ?? "0",
-                        paymentStatus: PaymentStatus.Draft,
-                      });
+                  await client.reservations.admin.create.mutate({
+                    profileId: selectedTrainee,
+                    courseId: courseId,
+                    creditHours: course?.creditHours ?? "0",
+                    paymentStatus: PaymentStatus.Draft,
+                  });
 
-                      await queryClient.invalidateQueries({
-                        queryKey: trpc.reservations.admin.listCourse.queryKey({
-                          courseId: courseId,
-                        }),
-                      });
+                  await queryClient.invalidateQueries({
+                    queryKey: trpc.reservations.admin.listCourse.queryKey({
+                      courseId: courseId,
+                    }),
+                  });
 
-                      setTraineePopupOpen(false);
-                    }}
-                    disabled={classFull}
-                  >
-                    add to roster
-                  </Button>
-                </DialogContent>
-              </Dialog>
+                  setTraineePopupOpen(false);
+                }}
+                disabled={classFull}
+              >
+                add to roster
+              </Button>
             </div>
           </CardContent>
         </Card>
+        <RosterManager courseId={courseId} />
       </div>
     </div>
   );
