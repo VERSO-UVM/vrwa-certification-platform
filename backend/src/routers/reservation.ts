@@ -194,7 +194,7 @@ export const reservationRouter = router({
               eq(reservation.profileId, ctx.session.activeProfileId),
             ),
           )
-          .orderBy(asc(courseEvent.classStartDatetime));
+          .orderBy(asc(courseStartQuery.courseStart));
       },
     ),
 
@@ -214,7 +214,7 @@ export const reservationRouter = router({
               eq(reservation.profileId, ctx.session.activeProfileId),
             ),
           )
-          .orderBy(desc(courseEvent.classStartDatetime));
+          .orderBy(desc(courseStartQuery.courseStart));
       },
     ),
   }),
