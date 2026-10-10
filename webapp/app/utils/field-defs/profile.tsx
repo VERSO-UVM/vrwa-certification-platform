@@ -76,6 +76,9 @@ export const profileDefs = {
       }
     },
   }),
+  association: profileFieldHelper.accessor("association", {
+    header: "Association"
+  })
 };
 
 export const profileDefPresets = {
