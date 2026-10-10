@@ -147,21 +147,6 @@ export default function CourseDetails({
   //getting courseEvents for tabs
   const eventIds = courseEvents.data?.map((e) => e.id) ?? [];
 
-  async function deleteRow(profileId: string, courseId: string) {
-    await client.reservations.admin.delete.mutate({
-      profileId,
-      courseId,
-    });
-    await queryClient.invalidateQueries({
-      queryKey: trpc.reservations.admin.listCourse.queryKey({
-        courseId: courseId!,
-      }),
-    });
-  }
-
-  const seats = course?.seats ?? 0;
-  const classFull = roster.length >= seats;
-
   //what percentage of trainees enrolled have paid their fees
   function percentagePaid() {
     if (roster.length == 0) return 0;
@@ -190,36 +175,6 @@ export default function CourseDetails({
   const rosterIds = new Set(roster.map((r) => r.profileId));
   const availableTrainees =
     trainees.data?.filter((t) => !rosterIds.has(t.id)) ?? [];
-
-  //Data Table
-  const rosterTableDef = useMemo(
-    () => [
-      reservationDefs.lastName,
-      reservationDefs.firstName,
-      reservationDefs.creditHours,
-      reservationDefs.isMember,
-      reservationDefs.paymentStatus,
-      reservationFieldHelper.display({
-        id: "actions",
-        cell: ({ row }) => {
-          return (
-            <ButtonGroup>
-              <EditTraineeReservation reservation={row.original} />
-              <Button
-                variant="destructive"
-                onClick={() =>
-                  deleteRow(row.original.profileId, row.original.courseId)
-                }
-              >
-                Unenroll
-              </Button>
-            </ButtonGroup>
-          );
-        },
-      }),
-    ],
-    [],
-  );
 
   if (courseDeleted) {
     return (
@@ -451,22 +406,6 @@ export default function CourseDetails({
                 </TabsContent>
               )}
             </Tabs>
-          </CardContent>
-        </Card>
-        <Card variant="yellow" className="col-span-full">
-          <CardHeader className="pb-3">
-            <CardTitle>
-              Class Roster{" "}
-              {
-                <Badge variant={classFull ? "destructive" : "outline"}>
-                  {classFull ? "Full" : "Open"}
-                </Badge>
-              }
-            </CardTitle>
-            <CardDescription></CardDescription>
-          </CardHeader>
-          <CardContent>
-            <DataTable columns={rosterTableDef} data={roster} />
           </CardContent>
         </Card>
         <RosterManager courseId={courseId} />
