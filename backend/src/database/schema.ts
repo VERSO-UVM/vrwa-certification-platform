@@ -159,7 +159,7 @@ export const courseEvent = pgTable("courseEvent", {
   venue: text(),
   // refactor: rename to startDate or startsAt
   classStartDatetime: timestamp({ withTimezone: true, mode: "date" }),
-  duration: interval(),
+  durationMinutes: integer(),
 });
 
 /**
