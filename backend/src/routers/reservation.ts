@@ -53,6 +53,22 @@ export const reservationRouter = router({
         .returning();
     }),
 
+    get: adminProcedure
+      .input(
+        z.object({
+          courseId: z.string(),
+          profileId: z.string(),
+        }),
+      )
+      .query(({ input }) =>
+        reservationQuery().where(
+          and(
+            eq(reservation.profileId, input.profileId),
+            eq(reservation.courseId, input.courseId),
+          ),
+        ),
+      ),
+
     list: adminProcedure.query(() =>
       reservationQuery().orderBy(
         desc(courseStartQuery.courseStart),
