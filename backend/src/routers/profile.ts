@@ -19,6 +19,10 @@ const insertSchema = createInsertSchema(profile).omit({
   id: true,
 });
 
+const adminInsertSchema = createInsertSchema(profile).omit({
+  id: true,
+});
+
 export const profileRouter = router({
   admin: router({
     /**
@@ -36,13 +40,25 @@ export const profileRouter = router({
         .returning();
     }),
 
+    /**
+     * Create a new profile associated with a user.
+     */
+    create: adminProcedure
+      .input(adminInsertSchema)
+      .mutation(({ ctx, input }) => {
+        const { ...fields } = input;
+        return db.client.insert(profile).values({
+          ...fields,
+        });
+      }),
+
     listTrainees: adminProcedure.query((): Promise<ProfileDto[]> => {
       return profilesQuery().where(eq(user.role, "user"));
     }),
   }),
 
   /**
-   * Create a new profile associated with a user.
+   * Create a new profile associated with the active user.
    */
   create: protectedProcedure.input(insertSchema).mutation(({ ctx, input }) => {
     const { ...fields } = input;

@@ -1,14 +1,23 @@
 import { eq } from "drizzle-orm";
-import { createUpdateSchema } from "drizzle-orm/zod";
+import { createInsertSchema, createUpdateSchema } from "drizzle-orm/zod";
 import z from "zod";
 import db from "~/database";
 import { user } from "~/database/schema";
 import type { UserDto } from "~/database/dtos";
 import { adminProcedure, router } from "~/utils/trpc";
 import { usersWithProfilesQuery } from "~/database/queries";
+import { Roles } from "~/auth/permissions";
+import { generatePrefixedId } from "~/utils/id";
 
 const updateSchema = createUpdateSchema(user, {
   id: z.string(),
+});
+
+const insertSchema = createInsertSchema(user, {
+  role: z.enum(Roles),
+}).pick({
+  email: true,
+  role: true,
 });
 
 // Note: we may want to use the Better-Auth Admin plugin instead
@@ -29,5 +38,20 @@ export const userRouter = router({
       })
       .where(eq(user.id, id))
       .returning();
+  }),
+
+  admin: router({
+    create: adminProcedure.input(insertSchema).mutation(({ input }) => {
+      const { email, role } = input;
+      return db.client
+        .insert(user)
+        .values({
+          id: generatePrefixedId("user"),
+          name: email,
+          email: email,
+          role: role,
+        })
+        .returning();
+    }),
   }),
 });

@@ -18,6 +18,7 @@ export default [
       "course-details/:courseId",
       "pages/admin/course-manager/course-details.tsx",
     ),
+    route("create-profile", "pages/admin/create-profile.tsx")
   ]),
   route("trainee", "layouts/trainee.tsx", [
     index("pages/trainee/home.tsx"),

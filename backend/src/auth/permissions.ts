@@ -52,3 +52,9 @@ export const roles = {
 } as const;
 
 export type Role = keyof typeof roles;
+
+export enum Roles {
+  Admin = "admin",
+  User = "user",
+  Instructor = "instructor",
+}
