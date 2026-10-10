@@ -8,8 +8,11 @@
  * is where a user may manage *their own* profiles.
  */
 
+import type { Roles } from "@backend/auth/permissions";
+import { PaymentStatus } from "@backend/database/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useSearchParams } from "react-router";
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 import { EditForm } from "~/components/entry-views/edit-form";
 import {
   Card,
@@ -37,7 +40,7 @@ const userFieldDefs = [
   userDefs.role,
 ];
 
-const fieldDefs = [
+const profileFieldDefs = [
   profileDefs.user,
   profileDefs.firstName,
   profileDefs.lastName,
@@ -55,11 +58,31 @@ export default function CreateProfile() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
+  const [addedUserId, setAddedUserId] = useState<string | undefined>();
+
   const createUser = useMutation(
     trpc.users.admin.create.mutationOptions({
-      onSuccess: async () => {
+      onSuccess: async (users) => {
         await queryClient.invalidateQueries({
           queryKey: trpc.users.pathKey(),
+        });
+        const user = users[0];
+        if (user) {
+          setAddedUserId(user.id);
+        }
+      },
+    }),
+  );
+
+  const navigate = useNavigate();
+
+  const createReservation = useMutation(
+    trpc.reservations.admin.create.mutationOptions({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: trpc.reservations.admin.listCourse.queryKey({
+            courseId: enrollIn ?? undefined,
+          }),
         });
       },
     }),
@@ -67,7 +90,7 @@ export default function CreateProfile() {
 
   const createProfile = useMutation(
     trpc.profiles.admin.create.mutationOptions({
-      onSuccess: async () => {
+      onSuccess: async (profiles) => {
         await queryClient.invalidateQueries({
           queryKey: trpc.profiles.list.queryKey(),
         });
@@ -86,9 +109,16 @@ export default function CreateProfile() {
         </CardHeader>
         <CardContent className="flex flex-col space-y-2 w-lg m-auto">
           <EditForm
-            required={{}}
+            required={{
+              email: true,
+              role: true,
+            }}
             columns={userFieldDefs}
-            onSave={async (_, values) => {}}
+            onSave={async (_, { email, role }) => {
+              if (email != null && role != null) {
+                createUser.mutate({ email, role: role as Roles });
+              }
+            }}
           />
         </CardContent>
       </Card>
@@ -100,10 +130,29 @@ export default function CreateProfile() {
         <CardContent className="flex flex-col space-y-4 w-lg m-auto">
           <EditForm
             required={profileRequiredFields}
-            columns={fieldDefs}
+            initialChanges={{
+              userId: addedUserId,
+            }}
+            key={addedUserId}
+            columns={profileFieldDefs}
             onSave={async (_, values) => {
-              await createProfile.mutateAsync(values);
-              await navigate("/profile-select");
+              const profiles = await createProfile.mutateAsync(values);
+              const profile = profiles[0];
+              if (profile == null) {
+                /* No profile created */
+                return;
+              }
+              if (enrollIn) {
+                /* Also want to make reservation */
+                await createReservation.mutateAsync({
+                  profileId: profile.id,
+                  courseId: enrollIn,
+                  creditHours: "0",
+                  paymentStatus: PaymentStatus.Draft,
+                });
+
+                await navigate(`/admin/course-details/${enrollIn}`)
+              }
             }}
           />
         </CardContent>

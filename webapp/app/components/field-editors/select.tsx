@@ -12,7 +12,7 @@ export function selectOptionsEditor<U extends HasToString>({
   options,
   props,
 }: {
-  options: { label: string; value: U; selected?: boolean }[];
+  options: { label: string; value: U }[];
   props?: React.ComponentProps<typeof NativeSelect>;
 }): FieldEditor<unknown, U> {
   // Native <select> requires string values, but we want this function to be generic
@@ -35,9 +35,9 @@ export function selectOptionsEditor<U extends HasToString>({
         {...props}
         {...overrides}
       >
-          <NativeSelectOption disabled selected value="">
+        <NativeSelectOption disabled selected value="">
           -- select an option --
-          </NativeSelectOption>
+        </NativeSelectOption>
         {options.map(({ label, value, ...rest }) => (
           <NativeSelectOption
             value={value.toString()}

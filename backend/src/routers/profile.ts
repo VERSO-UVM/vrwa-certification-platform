@@ -49,7 +49,7 @@ export const profileRouter = router({
         const { ...fields } = input;
         return db.client.insert(profile).values({
           ...fields,
-        });
+        }).returning();
       }),
 
     listTrainees: adminProcedure.query((): Promise<ProfileDto[]> => {

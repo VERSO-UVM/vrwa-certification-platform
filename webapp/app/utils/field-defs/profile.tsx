@@ -95,9 +95,13 @@ export const profileDefs = {
         return (props) => {
           const trpc = useTRPC();
           const usersQuery = useQuery(trpc.users.getUsers.queryOptions());
+          console.log("VAL", props.value);
           return (
             <ComboboxEditor
               {...props}
+              value={
+                usersQuery?.data?.find((user) => user.id === props.value)?.email
+              }
               options={(usersQuery?.data ?? []).map((user) => user.email)}
               onChange={(val) => {
                 const user = usersQuery?.data?.find(
