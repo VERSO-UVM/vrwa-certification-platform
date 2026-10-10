@@ -7,6 +7,7 @@ import {
   ComboboxChipsInput,
   ComboboxContent,
   ComboboxEmpty,
+  ComboboxInput,
   ComboboxItem,
   ComboboxList,
   ComboboxSeparator,
@@ -89,6 +90,48 @@ export function MultiComboboxEditor({
             </ComboboxItem>
           </>
         )}
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+/**
+ * Single-select combobox editor.
+ */
+export function ComboboxEditor({
+  overrides,
+  onChange,
+  onBlur,
+  value: orig,
+  options = [],
+}: FieldEditorProps<unknown, string> & { options?: string[] }) {
+  const [value, setValue] = useState(orig ?? null);
+
+  return (
+    <Combobox
+      value={value}
+      onValueChange={(val) => {
+        if (val != null) {
+          setValue(val);
+          onChange(val);
+          onBlur(val);
+        }
+      }}
+      items={options}
+      autoHighlight
+      {...overrides}
+    >
+      <ComboboxInput placeholder="" />
+      <ComboboxContent>
+        <ComboboxEmpty>No items found.</ComboboxEmpty>
+
+        <ComboboxList>
+          {(item: string) => (
+            <ComboboxItem key={item} value={item}>
+              {item}
+            </ComboboxItem>
+          )}
+        </ComboboxList>
       </ComboboxContent>
     </Combobox>
   );

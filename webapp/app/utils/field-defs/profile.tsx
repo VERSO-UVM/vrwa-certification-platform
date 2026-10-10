@@ -11,7 +11,15 @@ import type { ProfileDto } from "@backend/database/dtos";
 import type { Profile } from "@backend/database/schema";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Badge } from "~/components/ui/badge";
-import { textInputEditor, selectOptionsEditor } from "~/utils/field-editors";
+import {
+  textInputEditor,
+  selectOptionsEditor,
+  multiSelectCheckboxEditor,
+  ComboboxEditor,
+} from "~/utils/field-editors";
+import { useTRPC } from "../trpc";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 
 // createColumnHelper just provides a stronger typed API to define ColumnDefs
 // Note that assigning the result type becomes difficult https://github.com/TanStack/table/issues/4382
@@ -77,8 +85,42 @@ export const profileDefs = {
     },
   }),
   association: profileFieldHelper.accessor("association", {
-    header: "Association"
-  })
+    header: "Association",
+  }),
+
+  user: profileFieldHelper.accessor("userId", {
+    header: "Account",
+    meta: {
+      editor: (() => {
+        return (props) => {
+          const trpc = useTRPC();
+          const usersQuery = useQuery(trpc.users.getUsers.queryOptions());
+          return (
+            <ComboboxEditor
+              {...props}
+              options={(usersQuery?.data ?? []).map((user) => user.email)}
+              onChange={(val) => {
+                const user = usersQuery?.data?.find(
+                  (user) => user.email === val,
+                );
+                if (user) {
+                  props.onChange(user.id);
+                }
+              }}
+              onBlur={(val) => {
+                const user = usersQuery?.data?.find(
+                  (user) => user.email === val,
+                );
+                if (user) {
+                  props.onBlur(user.id);
+                }
+              }}
+            />
+          );
+        };
+      })(),
+    },
+  }),
 };
 
 export const profileDefPresets = {
