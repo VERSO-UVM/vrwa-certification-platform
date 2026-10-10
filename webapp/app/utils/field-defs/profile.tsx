@@ -55,7 +55,7 @@ export const profileDefs = {
     meta: {
       editor: selectOptionsEditor({
         options: [
-          { label: "VT", value: "VT", selected: true },
+          { label: "VT", value: "VT" },
           { label: "Non-VT", value: "Non-VT" },
         ],
       }),
@@ -138,4 +138,5 @@ export const profileRequiredFields = {
   lastName: "",
   firstName: "",
   state: "",
+  userId: "",
 } satisfies Partial<Profile>;

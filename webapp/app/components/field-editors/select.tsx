@@ -24,7 +24,7 @@ export function selectOptionsEditor<U extends HasToString>({
     return (
       <NativeSelect
         onBlur={() => onBlur(value)}
-        value={value?.toString()}
+        value={value?.toString() ?? ""}
         onChange={(event) => {
           const newVal = stringToValue[event.target.value];
           if (newVal) {
@@ -35,6 +35,9 @@ export function selectOptionsEditor<U extends HasToString>({
         {...props}
         {...overrides}
       >
+          <NativeSelectOption disabled selected value="">
+          -- select an option --
+          </NativeSelectOption>
         {options.map(({ label, value, ...rest }) => (
           <NativeSelectOption
             value={value.toString()}
