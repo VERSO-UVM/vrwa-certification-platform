@@ -4,7 +4,6 @@ import {
   route,
   layout,
 } from "@react-router/dev/routes";
-import { redirect } from "react-router";
 
 export default [
   index("pages/home.tsx"),
