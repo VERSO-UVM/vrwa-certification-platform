@@ -57,8 +57,6 @@ export default function CreateProfile() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  const [addedUserId, setAddedUserId] = useState<string | undefined>();
-
   const createUser = useMutation(
     trpc.users.admin.create.mutationOptions({
       onSuccess: async (users) => {
@@ -129,10 +127,6 @@ export default function CreateProfile() {
         <CardContent className="flex flex-col space-y-4 w-lg m-auto">
           <EditForm
             required={profileRequiredFields}
-            initialChanges={{
-              userId: addedUserId,
-            }}
-            key={addedUserId}
             columns={profileFieldDefs}
             onSave={async (_, values) => {
               const profiles = await createProfile.mutateAsync(values);

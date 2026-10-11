@@ -64,9 +64,6 @@ export interface EditFormProps<T, R extends keyof T> {
     [L in R]: {};
   };
 
-  /* Set custom values that are different from the saved values. */
-  initialChanges?: Partial<T>;
-
   submitButton?: Partial<{
     title: string | React.ReactNode;
     disabledFn: (changes: Partial<T>, newItem: Partial<T>) => boolean;
@@ -75,11 +72,10 @@ export interface EditFormProps<T, R extends keyof T> {
 }
 
 export function EditForm<T extends object, R extends keyof T>({
-  item: _item,
+  item,
   columns,
   onSave,
   required,
-  initialChanges = {},
   submitButton = {},
 }: EditFormProps<T, R>) {
   submitButton.title ??= "Save changes";
@@ -89,11 +85,7 @@ export function EditForm<T extends object, R extends keyof T>({
   submitButton.props.className ??=
     "flex flex-col items-center justify-center mt-auto";
 
-  const [updates, setUpdates] = useState<Partial<T>>(initialChanges);
-
-  const item = useMemo(() => ({ ..._item, ...initialChanges }), [_item]);
-  console.log(item)
-
+  const [updates, setUpdates] = useState<Partial<T>>({});
 
   /* Create an empty table to render from */
   const tableData = useMemo(() => [], []);
@@ -145,7 +137,7 @@ export function EditForm<T extends object, R extends keyof T>({
                       `Column missing both accessorKey and accessorColumn: ${column}`,
                     );
                   }
-                  const val = item == null ? undefined : accessorFn(item as T, 0);
+                  const val = item == null ? undefined : accessorFn(item, 0);
 
                   return (
                     <Field key={id}>
