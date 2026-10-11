@@ -5,7 +5,7 @@ import {
   type ColumnDef,
 } from "@tanstack/react-table";
 import { FieldSet, FieldGroup, Field, FieldLabel } from "~/components/ui/field";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { deepEqual, isInputUnset, without } from "~/utils/utils";
 
@@ -110,6 +110,10 @@ export function EditForm<T extends object, R extends keyof T>({
     }
     onSave(updates, newItem);
   };
+
+  useEffect(() => {
+    console.log("EditForm UPDATES", updates)
+  }, [updates])
 
   return (
     <form onSubmit={onSubmit} className="flex-1 flex flex-col">

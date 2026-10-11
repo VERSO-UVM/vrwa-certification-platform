@@ -35,7 +35,7 @@ export function DatetimeEditor({
   const [dateString, setDateString] = useState(formatDate(date));
 
   return (
-    <FieldGroup className="mx-auto flex-row">
+    <FieldGroup className="flex flex-row gap-4">
       <Field>
         <InputGroup>
           <InputGroupInput
@@ -122,28 +122,32 @@ export function TimeInput({
   overrides,
 }: FieldEditorProps<unknown, Date | null>) {
   const [timeString, setTimeString] = useState(formatTimeForInput(date));
+
+  const calcNewDate = (timeString: string) => {
+    if (!timeString) return null;
+    const [hours, minutes] = timeString.split(":").map(Number);
+    if (hours == null || minutes == null) return null;
+    setTimeString(timeString);
+
+    return set(date ?? new Date(), {
+      hours,
+      minutes,
+      seconds: 0,
+      milliseconds: 0,
+    });
+  };
   return (
     <Input
       type="time"
       step="60"
       value={timeString}
       onChange={(event) => {
-        const timeString = event.target.value; // Expected format: "HH:mm"
-        if (!timeString) return;
-        const [hours, minutes] = timeString.split(":").map(Number);
-        if (hours == null || minutes == null) return;
-        setTimeString(event.target.value);
-
-        const updatedDate = set(date ?? new Date(), {
-          hours,
-          minutes,
-          seconds: 0,
-          milliseconds: 0,
-        });
-        onChange(updatedDate);
+        const newDate = calcNewDate(event.target.value);
+        if (newDate) onChange(newDate);
       }}
-      onBlur={() => {
-        onBlur(date);
+      onBlur={(event) => {
+        const newDate = calcNewDate(event.target.value);
+        if (newDate) onBlur(newDate);
       }}
       {...overrides}
     />
@@ -153,7 +157,7 @@ export function TimeInput({
 function formatTimeForInput(date: Date | null | undefined): string {
   if (!date) return "00:00";
   if (!isValid(date)) return "00:00";
-  return format(date, "hh:mm");
+  return format(date, "HH:mm");
 }
 
 function formatDate(date: Date | undefined) {

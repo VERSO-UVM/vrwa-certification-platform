@@ -11,7 +11,7 @@ import {
   TimeInput,
 } from "../field-editors";
 import { addMinutes, differenceInMinutes } from "date-fns";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export const courseEventFieldHelper = createColumnHelper<CourseEventDto>();
 
@@ -119,29 +119,50 @@ export const courseEventDefs = {
       editor: (() => {
         const MinutesInput = intInputEditor();
         return ({ value, getRow, onChange, onBlur, overrides }) => {
-          const [duration, setDuration] = useState(value);
+          const [minutes, setMinutes] = useState(value);
           const startDate = getRow().classStartDatetime;
           const endDate = useMemo(
-            () => (startDate ? addMinutes(startDate, duration ?? 0) : null),
-            [startDate, duration],
+            () =>
+              startDate
+                ? addMinutes(
+                    startDate,
+                    !minutes ? /* NaN or Null or 0 */ 0 : minutes,
+                  )
+                : null,
+            [startDate, minutes],
           );
+
+          /*
+           * Being dirty means we want the component to be remounted. The true/false
+           * isn't whether or not it's dirty, but a state to toggle so it becomes dirty
+           * whenever it is changed.
+           */
+          const [dirtyMinutes, setDirtyMinutes] = useState(false);
+          const [dirtyTime, setDirtyTime] = useState(false);
 
           return (
             <div className="grid grid-cols-2 gap-4">
               <MinutesInput
-                value={duration ?? NaN}
+                key={"minutes" + dirtyMinutes.toString()}
+                value={minutes ?? NaN}
                 onChange={(newMinutes) => {
-                  setDuration(newMinutes);
-                  onChange(newMinutes);
+                  setMinutes(newMinutes);
+                  onChange(newMinutes ? newMinutes : 0);
+                  /* Sync end time */
+                  setDirtyTime(!dirtyTime);
                 }}
-                onBlur={() => onBlur(duration)}
+                onBlur={(newMinutes) => onBlur(minutes)}
                 getRow={getRow}
                 overrides={overrides}
               />
               <TimeInput
-                key={endDate?.toString()}
+                key={"time" + startDate?.toString() + dirtyTime.toString()}
                 value={endDate}
-                onBlur={() => onBlur(duration)}
+                onBlur={() => {
+                  onBlur(minutes);
+                  /* If invalid time (before start time), reset on blur */
+                  setDirtyTime(!dirtyTime);
+                }}
                 overrides={{}}
                 getRow={() => {}}
                 onChange={(newDate) => {
@@ -149,14 +170,16 @@ export const courseEventDefs = {
                     return;
                   }
                   if (newDate == null) {
-                    setDuration(0);
+                    setMinutes(0);
                     onChange(0);
                     return;
                   }
                   const newDuration = differenceInMinutes(newDate, startDate);
                   if (newDuration >= 0) {
-                    setDuration(newDuration);
                     onChange(newDuration);
+                    /* Sync to minutes field */
+                    setMinutes(newDuration);
+                    setDirtyMinutes(!dirtyMinutes);
                   }
                 }}
               />
