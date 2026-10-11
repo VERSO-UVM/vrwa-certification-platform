@@ -72,7 +72,9 @@ export default function Enrollment({
 
   return (
     <>
-      <PageHeader>{profile?.firstName} {profile?.lastName}</PageHeader>
+      <PageHeader>
+        {profile?.firstName} {profile?.lastName}
+      </PageHeader>
       {courseStatus === "success" && (
         <div className="flex">
           <Button variant="ghost" asChild>

@@ -100,18 +100,17 @@ export default function CreateProfile() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-          <Button variant="ghost" size="lg" className="w-50" asChild>
-        {enrollIn ? (
+        <Button variant="ghost" size="lg" className="w-50" asChild>
+          {enrollIn ? (
             <Link to={`/admin/course-details/${enrollIn}`}>
               <ArrowLeft /> Back to course
             </Link>
-        ) : (
-
+          ) : (
             <Link to="/admin/trainees">
               <ArrowLeft /> Trainees
             </Link>
-        )}
-          </Button>
+          )}
+        </Button>
       </div>
       <Card className="p-4 w-xl self-center">
         <CardHeader>

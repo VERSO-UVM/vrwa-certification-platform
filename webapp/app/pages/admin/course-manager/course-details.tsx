@@ -1,18 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { CourseStatus } from "@backend/database/schema";
-import type {
-  CourseDto,
-  CourseEventDto,
-} from "@backend/database/dtos";
+import type { CourseDto, CourseEventDto } from "@backend/database/dtos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { PageHeader } from "~/components/page-header";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "~/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 import { useTRPC, useTRPCClient } from "~/utils/trpc";
 import { Button } from "~/components/ui/button";
 import { Link } from "react-router";

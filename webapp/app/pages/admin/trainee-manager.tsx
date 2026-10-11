@@ -55,9 +55,11 @@ export default function TraineeManager() {
     <div className="flex-1">
       <PageHeader className="flex gap-2">
         Trainees
-          <Button size="lg" variant="link" asChild>
-            <Link to="/admin/create-profile"><Plus /> Add Trainee</Link>
-          </Button>
+        <Button size="lg" variant="link" asChild>
+          <Link to="/admin/create-profile">
+            <Plus /> Add Trainee
+          </Link>
+        </Button>
       </PageHeader>
 
       <div className="flex flex-col space-y-1">
