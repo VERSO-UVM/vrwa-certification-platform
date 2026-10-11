@@ -179,6 +179,6 @@ export const courseEventDefPresets = {
 };
 
 export const courseEventRequiredFields = {
-  classStartDatetime: null,
+  classStartDatetime: new Date(),
   locationType: CourseLocation.InPerson,
 } satisfies Partial<CourseEvent>;

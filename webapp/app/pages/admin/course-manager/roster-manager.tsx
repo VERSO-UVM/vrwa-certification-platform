@@ -79,15 +79,7 @@ export function RosterManager({ courseId }: { courseId: string }) {
           } else {
             /* Not yet enrolled */
             return (
-              <Button
-                variant="default"
-                onClick={async () => {
-                  await enroll(row.original.id);
-                  await navigate(
-                    `/admin/enrollment/${courseId}/${row.original.id}`,
-                  );
-                }}
-              >
+              <Button variant="default" onClick={() => enroll(row.original.id)}>
                 Enroll
               </Button>
             );

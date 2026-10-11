@@ -1,10 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { CourseStatus, PaymentStatus } from "@backend/database/schema";
+import { useState } from "react";
+import { CourseStatus } from "@backend/database/schema";
 import type {
   CourseDto,
   CourseEventDto,
-  ProfileDto,
 } from "@backend/database/dtos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { PageHeader } from "~/components/page-header";
@@ -13,37 +12,13 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-  CardDescription,
 } from "~/components/ui/card";
 import { useTRPC, useTRPCClient } from "~/utils/trpc";
-import { DataTable } from "~/components/data-table";
 import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "~/components/ui/dialog";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-  SelectGroup,
-} from "~/components/ui/select";
-import { Badge } from "~/components/ui/badge";
 import { Link } from "react-router";
 import { Users, CreditCard, Calendar, Trash, ArrowLeft, X } from "lucide-react";
 import type { Route } from "./+types/course-details";
-import { EditTraineeReservation } from "../trainee-manager/edit-reservation";
 import { ButtonGroup } from "~/components/ui/button-group";
-import {
-  reservationDefs,
-  reservationFieldHelper,
-} from "~/utils/field-defs/reservation";
 import { EditForm } from "~/components/entry-views/edit-form";
 import {
   courseEventDefs,
@@ -52,8 +27,12 @@ import {
 import { courseDefs, courseRequiredFields } from "~/utils/field-defs/course";
 import type { ColumnDef } from "@tanstack/react-table";
 import { add } from "date-fns";
-import { profileDefPresets } from "~/utils/field-defs/profile";
 import { RosterManager } from "./roster-manager";
+import {
+  useCourseEventCloneMutation,
+  useCourseEventDeleteMutation,
+  useCourseEventUpdateMutation,
+} from "./use-course-event-mutation";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
@@ -89,35 +68,9 @@ export default function CourseDetails({
     trpc.courseEvents.admin.listCourse.queryOptions({ courseId }),
   );
 
-  const courseEventUpdateMut = useMutation(
-    trpc.courseEvents.admin.update.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.courseEvents.admin.listCourse.queryKey(),
-        });
-      },
-    }),
-  );
-
-  const courseEventCloneMut = useMutation(
-    trpc.courseEvents.admin.clone.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.courseEvents.admin.listCourse.queryKey(),
-        });
-      },
-    }),
-  );
-
-  const courseEventDeleteMut = useMutation(
-    trpc.courseEvents.admin.delete.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.courseEvents.admin.listCourse.queryKey(),
-        });
-      },
-    }),
-  );
+  const courseEventUpdateMut = useCourseEventUpdateMutation();
+  const courseEventCloneMut = useCourseEventCloneMutation();
+  const courseEventDeleteMut = useCourseEventDeleteMutation();
 
   const courseUpdateMut = useMutation(
     trpc.courses.admin.update.mutationOptions({
@@ -340,8 +293,8 @@ export default function CourseDetails({
                   <Button
                     variant="destructive"
                     disabled={
-                      courseEvents.isSuccess
-                      && (courseEvents.data ?? []).length <= 1
+                      courseEvents.isSuccess &&
+                      (courseEvents.data ?? []).length <= 1
                     }
                     onClick={() => {
                       if (selectedTab && courseEvents.data) {
@@ -388,9 +341,6 @@ export default function CourseDetails({
                         await courseEventUpdateMut.mutateAsync({
                           id: event.id,
                           ...data,
-                        });
-                        await queryClient.invalidateQueries({
-                          queryKey: trpc.courseEvents.admin.pathKey(),
                         });
                       }
                     }}

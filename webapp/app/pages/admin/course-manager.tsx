@@ -112,7 +112,7 @@ export default function CourseManager() {
               drawer={{
                 title: "New Course",
                 buttonText: "Add New Course from Scratch",
-                description: "Create new course from scratch.",
+                description: "Create new course from scratch. You can change these fields after.",
               }}
             />
           </div>

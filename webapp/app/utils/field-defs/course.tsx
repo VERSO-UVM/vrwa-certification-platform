@@ -252,7 +252,6 @@ export const courseDefPresets = {
 
 export const courseRequiredFields = {
   courseName: "",
-  description: "",
   priceCents: 0,
   creditHours: "",
   seats: 0,

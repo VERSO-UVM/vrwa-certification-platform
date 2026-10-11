@@ -151,7 +151,9 @@ export default function CreateProfile() {
                   paymentStatus: PaymentStatus.Draft,
                 });
 
-                await navigate(`/admin/course-details/${enrollIn}`)
+                await navigate(`/admin/course-details/${enrollIn}`);
+              } else {
+                await navigate(`/admin/trainees`);
               }
             }}
           />
