@@ -20,6 +20,7 @@ import {
 import { useTRPC, useTRPCClient } from "~/utils/trpc";
 import { useReservationDeleteMutation } from "./use-reservation-delete-mutation";
 import { useReservationCreateMutation } from "./use-reservation-create-mutation";
+import { ArrowRight, GraduationCap, Plus } from "lucide-react";
 
 export function RosterManager({ courseId }: { courseId: string }) {
   const navigate = useNavigate();
@@ -100,13 +101,14 @@ export function RosterManager({ courseId }: { courseId: string }) {
       reservationDefs.paymentStatus,
       reservationFieldHelper.display({
         id: "actions",
+        header: "Actions",
         cell: ({ row }) => {
           return (
-            <Button asChild>
+            <Button variant="link" asChild>
               <Link
                 to={`/admin/enrollment/${courseId}/${row.original.profileId}`}
               >
-                Manage Enrollment
+                <ArrowRight /> Manage Enrollment
               </Link>
             </Button>
           );
@@ -146,9 +148,9 @@ export function RosterManager({ courseId }: { courseId: string }) {
         <CardContent>
           <DataTable columns={defs} data={trainees?.data} />
           <div className="mt-4">
-            <Button asChild>
+            <Button variant="link" asChild>
               <Link to={`/admin/create-profile?enrollIn=${courseId}`}>
-                Create and Enroll New Profile
+                <Plus /> Create and Enroll New Profile
               </Link>
             </Button>
           </div>
