@@ -126,6 +126,22 @@ export function RosterManager({ courseId }: { courseId: string }) {
 
   return (
     <>
+      <Card variant="yellow" className="col-span-full @6xl:col-span-3">
+        <CardHeader className="pb-3">
+          <CardTitle>
+            Current Enrollment{" "}
+            {
+              <Badge variant={classFull ? "destructive" : "outline"}>
+                {classFull ? "Full" : "Open"}
+              </Badge>
+            }
+          </CardTitle>
+          <CardDescription></CardDescription>
+        </CardHeader>
+        <CardContent>
+          <DataTable columns={rosterTableDef} data={roster} />
+        </CardContent>
+      </Card>
       <Card variant="blue" className="col-span-full @6xl:col-span-3">
         <CardHeader>
           <CardTitle>All Trainees</CardTitle>
@@ -144,22 +160,6 @@ export function RosterManager({ courseId }: { courseId: string }) {
               </Link>
             </Button>
           </div>
-        </CardContent>
-      </Card>
-      <Card variant="yellow" className="col-span-full @6xl:col-span-3">
-        <CardHeader className="pb-3">
-          <CardTitle>
-            Current Enrollment{" "}
-            {
-              <Badge variant={classFull ? "destructive" : "outline"}>
-                {classFull ? "Full" : "Open"}
-              </Badge>
-            }
-          </CardTitle>
-          <CardDescription></CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DataTable columns={rosterTableDef} data={roster} />
         </CardContent>
       </Card>
     </>

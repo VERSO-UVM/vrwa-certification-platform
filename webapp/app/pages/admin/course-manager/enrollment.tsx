@@ -22,6 +22,7 @@ import { Button } from "~/components/ui/button";
 import { Link, useNavigate } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import { useReservationDeleteMutation } from "./use-reservation-delete-mutation";
+import { PageHeader } from "~/components/page-header";
 
 export function meta() {
   return [{ title: "Enrollment - VRWA" }];
@@ -49,7 +50,7 @@ export default function Enrollment({
   );
 
   const { data: profile, status: profileQuery } = useQuery(
-    trpc.profiles.admin.get.queryOptions({ id: courseId }),
+    trpc.profiles.admin.get.queryOptions({ profileId }),
   );
 
   const reservationUpdater = useMutation(
@@ -71,6 +72,7 @@ export default function Enrollment({
 
   return (
     <>
+      <PageHeader>{profile?.firstName} {profile?.lastName}</PageHeader>
       {courseStatus === "success" && (
         <div className="flex">
           <Button variant="ghost" asChild>
@@ -81,7 +83,6 @@ export default function Enrollment({
           </Button>
         </div>
       )}
-      <h1>{profile}</h1>
       {status === "error" ? (
         <>Not currently enrolled.</>
       ) : (
@@ -89,7 +90,7 @@ export default function Enrollment({
           <Card className="col-span-full @6xl:col-span-3">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                Enrollment
+                Registration
                 <Button
                   variant="destructive"
                   size="lg"
