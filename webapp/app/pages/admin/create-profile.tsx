@@ -108,7 +108,7 @@ export default function CreateProfile() {
           )}
         </Button>
       </div>
-      <Card className="p-4 w-xl self-center">
+      <Card className="p-4 w-xl self-center" variant="blue">
         <CardHeader>
           <CardTitle className="text-center">Add User Account</CardTitle>
           <CardDescription>
@@ -131,7 +131,7 @@ export default function CreateProfile() {
         </CardContent>
       </Card>
 
-      <Card className="p-4 w-xl self-center">
+      <Card className="p-4 w-xl self-center" variant="green">
         <CardHeader>
           <CardTitle className="text-center">Create a Profile</CardTitle>
         </CardHeader>

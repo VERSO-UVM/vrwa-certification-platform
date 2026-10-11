@@ -89,7 +89,7 @@ export default function Enrollment({
         <>Not currently enrolled.</>
       ) : (
         <div className="grid grid-cols-6 gap-2">
-          <Card className="col-span-full @6xl:col-span-3">
+          <Card className="col-span-full @6xl:col-span-3" variant="green">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 Registration
@@ -121,7 +121,7 @@ export default function Enrollment({
               />
             </CardContent>
           </Card>
-          <Card className="col-span-full @6xl:col-span-3">
+          <Card className="col-span-full @6xl:col-span-3" variant="blue">
             <CardHeader>
               <CardTitle>Completion</CardTitle>
               <CardDescription></CardDescription>
