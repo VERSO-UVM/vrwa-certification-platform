@@ -10,9 +10,11 @@
 
 import { PaymentStatus } from "@backend/database/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { EditForm } from "~/components/entry-views/edit-form";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -96,7 +98,21 @@ export default function CreateProfile() {
   );
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
+      <div>
+          <Button variant="ghost" size="lg" className="w-50" asChild>
+        {enrollIn ? (
+            <Link to={`/admin/course-details/${enrollIn}`}>
+              <ArrowLeft /> Back to course
+            </Link>
+        ) : (
+
+            <Link to="/admin/trainees">
+              <ArrowLeft /> Trainees
+            </Link>
+        )}
+          </Button>
+      </div>
       <Card className="p-4 w-xl self-center">
         <CardHeader>
           <CardTitle className="text-center">Add User Account</CardTitle>
