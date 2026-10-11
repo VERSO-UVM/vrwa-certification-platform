@@ -53,7 +53,7 @@ export function selectOptionsEditor<U extends HasToString>({
 }
 
 /**
- * Highly extensible select options.
+ * Checkboxes, no dropdown.
  */
 export function multiSelectCheckboxEditor<U extends HasToString>({
   options,
