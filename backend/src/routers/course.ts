@@ -3,6 +3,7 @@ import db from "~/database";
 import {
   course,
   courseEvent,
+  CourseLocation,
   CourseStatus,
   CreditHourCategory,
 } from "~/database/schema";
@@ -12,7 +13,7 @@ import { createInsertSchema, createUpdateSchema } from "drizzle-orm/zod";
 import { courseFindFirst, courseFindMany } from "~/database/queries";
 import type { CourseDto } from "~/database/dtos.ts";
 import { TRPCError } from "@trpc/server";
-import { addMilliseconds } from "date-fns";
+import { addMilliseconds, addMonths } from "date-fns";
 
 const updateSchema = createUpdateSchema(course, {
   id: z.string(),
@@ -55,6 +56,20 @@ export const courseRouter = router({
           description: input.description ?? null,
         })
         .returning();
+
+      if (!newCourse) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Unable to create course.",
+        });
+      }
+
+      /* Add starter courseEvent */
+      await db.client.insert(courseEvent).values({
+        courseId: newCourse.id,
+        classStartDatetime: addMonths(new Date(), 1),
+        locationType: CourseLocation.InPerson,
+      });
 
       return newCourse;
     }),
@@ -154,6 +169,13 @@ export const courseRouter = router({
           }));
 
           await db.client.insert(courseEvent).values(courseEventValues);
+        } else {
+          /* Add starter courseEvent */
+          await db.client.insert(courseEvent).values({
+            courseId: newCourse.id,
+            classStartDatetime: addMonths(new Date(), 1),
+            locationType: CourseLocation.InPerson,
+          });
         }
 
         return {
