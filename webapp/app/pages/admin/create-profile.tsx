@@ -8,7 +8,6 @@
  * is where a user may manage *their own* profiles.
  */
 
-import type { Roles } from "@backend/auth/permissions";
 import { PaymentStatus } from "@backend/database/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -116,7 +115,7 @@ export default function CreateProfile() {
             columns={userFieldDefs}
             onSave={async (_, { email, role }) => {
               if (email != null && role != null) {
-                createUser.mutate({ email, role: role as Roles });
+                createUser.mutate({ email, role });
               }
             }}
           />
