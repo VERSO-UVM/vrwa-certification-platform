@@ -65,10 +65,6 @@ export default function CreateProfile() {
         await queryClient.invalidateQueries({
           queryKey: trpc.users.pathKey(),
         });
-        const user = users[0];
-        if (user) {
-          setAddedUserId(user.id);
-        }
       },
     }),
   );
