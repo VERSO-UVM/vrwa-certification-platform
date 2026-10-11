@@ -12,7 +12,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Calendar } from "../ui/calendar";
 import { Input } from "../ui/input";
-import { format, set } from "date-fns";
+import { format, isValid, set } from "date-fns";
 
 export function dateEditor(): FieldEditor<unknown, Date | null> {
   return DatetimeEditor;
@@ -152,6 +152,7 @@ export function TimeInput({
 
 function formatTimeForInput(date: Date | null | undefined): string {
   if (!date) return "00:00";
+  if (!isValid(date)) return "00:00";
   return format(date, "hh:mm");
 }
 
