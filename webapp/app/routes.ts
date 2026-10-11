@@ -4,6 +4,7 @@ import {
   route,
   layout,
 } from "@react-router/dev/routes";
+import { redirect } from "react-router";
 
 export default [
   index("pages/home.tsx"),
@@ -12,13 +13,17 @@ export default [
     route("trainees", "pages/admin/trainee-manager.tsx"),
     route("instructors", "pages/admin/user-manager.tsx"),
     route("certifications", "pages/admin/certifications.tsx"),
-    route("*", "pages/admin/not-found.tsx"),
     route("course-manager", "pages/admin/course-manager.tsx"),
     route(
       "course-details/:courseId",
       "pages/admin/course-manager/course-details.tsx",
     ),
-    route("create-profile", "pages/admin/create-profile.tsx")
+    route(
+      "enrollment/:courseId/:profileId",
+      "pages/admin/course-manager/enrollment.tsx",
+    ),
+    route("create-profile", "pages/admin/create-profile.tsx"),
+    route("*", "pages/admin/not-found.tsx"),
   ]),
   route("trainee", "layouts/trainee.tsx", [
     index("pages/trainee/home.tsx"),

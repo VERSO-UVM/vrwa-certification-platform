@@ -1,11 +1,10 @@
 import { PaymentStatus } from "@backend/database/schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { DataTable } from "~/components/data-table";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { ButtonGroup } from "~/components/ui/button-group";
 import {
   Card,
   CardContent,
@@ -14,57 +13,37 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { profileDefs, profileFieldHelper } from "~/utils/field-defs/profile";
-import { reservationDefs, reservationFieldHelper } from "~/utils/field-defs/reservation";
+import {
+  reservationDefs,
+  reservationFieldHelper,
+} from "~/utils/field-defs/reservation";
 import { useTRPC, useTRPCClient } from "~/utils/trpc";
-import { EditTraineeReservation } from "../trainee-manager/edit-reservation";
+import { useReservationDeleteMutation } from "./use-reservation-delete-mutation";
+import { useReservationCreateMutation } from "./use-reservation-create-mutation";
 
 export function RosterManager({ courseId }: { courseId: string }) {
+  const navigate = useNavigate();
   const trpc = useTRPC();
-  const client = useTRPCClient();
-  const queryClient = useQueryClient();
   const trainees = useQuery(trpc.profiles.admin.listTrainees.queryOptions());
-
   const { data: course } = useQuery(
     trpc.courses.admin.get.queryOptions({ id: courseId }),
   );
-
   const reservations = useQuery(
     trpc.reservations.admin.listCourse.queryOptions({
       courseId,
     }),
   );
+  const reservationCreateMutation = useReservationCreateMutation();
+  const reservationDeleteMutation = useReservationDeleteMutation();
+
   const roster = reservations.data ?? [];
   const rosterIds = new Set(roster.map((r) => r.profileId));
 
   const seats = course?.seats ?? 0;
   const classFull = roster.length >= seats;
 
-  const reservationCreateMutation = useMutation(
-    trpc.reservations.admin.create.mutationOptions({
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: trpc.reservations.admin.listCourse.queryKey({
-            courseId: courseId,
-          }),
-        });
-      },
-    }),
-  );
-
-  const reservationDeleteMutation = useMutation(
-    trpc.reservations.admin.delete.mutationOptions({
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: trpc.reservations.admin.listCourse.queryKey({
-            courseId: courseId,
-          }),
-        });
-      },
-    }),
-  );
-
-  const enroll = (profileId: string) => {
-    reservationCreateMutation.mutate({
+  const enroll = async (profileId: string) => {
+    await reservationCreateMutation.mutateAsync({
       profileId: profileId,
       courseId: courseId,
       creditHours: "0",
@@ -72,60 +51,52 @@ export function RosterManager({ courseId }: { courseId: string }) {
     });
   };
 
-  const unenroll = (profileId: string) => {
-    reservationDeleteMutation.mutate({
+  const unenroll = async (profileId: string) => {
+    await reservationDeleteMutation.mutateAsync({
       profileId: profileId,
       courseId: courseId,
     });
   };
 
   const defs = useMemo(
-    () =>
-      [
-        profileDefs.firstName,
-        profileDefs.lastName,
-        profileDefs.association,
-        profileFieldHelper.accessor(({ id }) => rosterIds.has(id), {
-          id: "enrolled",
-          header: "Enrolled",
-          cell: ({ row }) => {
-            if (rosterIds.has(row.original.id)) {
-              return (
-                <Button
-                  variant="destructive"
-                  onClick={() => unenroll(row.original.id)}
-                >
-                  Unenroll
-                </Button>
-              );
-            } else {
-              return (
-                <Button
-                  variant="default"
-                  onClick={() => enroll(row.original.id)}
-                >
-                  Enroll
-                </Button>
-              );
-            }
-          },
-        }),
-      ]
-    ,
+    () => [
+      profileDefs.firstName,
+      profileDefs.lastName,
+      profileDefs.association,
+      profileFieldHelper.accessor(({ id }) => rosterIds.has(id), {
+        id: "enrolled",
+        header: "Enrolled",
+        cell: ({ row }) => {
+          if (rosterIds.has(row.original.id)) {
+            /* Already enrolled */
+            return (
+              <Button variant="secondary" asChild>
+                <Link to={`/admin/enrollment/${courseId}/${row.original.id}`}>
+                  Manage
+                </Link>
+              </Button>
+            );
+          } else {
+            /* Not yet enrolled */
+            return (
+              <Button
+                variant="default"
+                onClick={async () => {
+                  await enroll(row.original.id);
+                  await navigate(
+                    `/admin/enrollment/${courseId}/${row.original.id}`,
+                  );
+                }}
+              >
+                Enroll
+              </Button>
+            );
+          }
+        },
+      }),
+    ],
     [courseId, roster],
   );
-
-  async function deleteRow(profileId: string, courseId: string) {
-    await client.reservations.admin.delete.mutate({
-      profileId,
-      courseId,
-    });
-    await queryClient.invalidateQueries({
-      queryKey: trpc.reservations.admin.listCourse.queryKey({
-        courseId: courseId!,
-      }),
-    });
-  }
 
   //Data Table
   const rosterTableDef = useMemo(
@@ -139,17 +110,13 @@ export function RosterManager({ courseId }: { courseId: string }) {
         id: "actions",
         cell: ({ row }) => {
           return (
-            <ButtonGroup>
-              <EditTraineeReservation reservation={row.original} />
-              <Button
-                variant="destructive"
-                onClick={() =>
-                  deleteRow(row.original.profileId, row.original.courseId)
-                }
+            <Button asChild>
+              <Link
+                to={`/admin/enrollment/${courseId}/${row.original.profileId}`}
               >
-                Unenroll
-              </Button>
-            </ButtonGroup>
+                Manage Enrollment
+              </Link>
+            </Button>
           );
         },
       }),
@@ -157,34 +124,32 @@ export function RosterManager({ courseId }: { courseId: string }) {
     [],
   );
 
-
   return (
     <>
-      <Card variant="blue" className="col-span-full">
+      <Card variant="blue" className="col-span-full @6xl:col-span-3">
         <CardHeader>
-          <CardTitle>Direct Enrollment</CardTitle>
+          <CardTitle>All Trainees</CardTitle>
           <CardDescription>
-            Enroll trainees directly. Payment and invoices can be configured after
-            enrollment. Use "Create and Enroll a New Profile" for those not yet added to the sistem.
+            Enroll trainees directly. Payment and invoices can be configured
+            after enrollment. Use "Create and Enroll a New Profile" for those
+            not yet added to the sistem.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <DataTable columns={defs} data={trainees?.data} />
           <div className="mt-4">
             <Button asChild>
-              <Link
-                to={`/admin/create-profile?enrollIn=${courseId}`}
-              >
+              <Link to={`/admin/create-profile?enrollIn=${courseId}`}>
                 Create and Enroll New Profile
               </Link>
             </Button>
           </div>
         </CardContent>
       </Card>
-      <Card variant="yellow" className="col-span-full">
+      <Card variant="yellow" className="col-span-full @6xl:col-span-3">
         <CardHeader className="pb-3">
           <CardTitle>
-            Class Roster{" "}
+            Current Enrollment{" "}
             {
               <Badge variant={classFull ? "destructive" : "outline"}>
                 {classFull ? "Full" : "Open"}
