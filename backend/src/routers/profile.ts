@@ -40,6 +40,22 @@ export const profileRouter = router({
         .returning();
     }),
 
+    get: adminProcedure
+      .input(z.object({ profileId: z.string() }))
+      .query(async ({ input }) => {
+        const profiles = await profilesQuery().where(
+          eq(profile.id, input.profileId),
+        );
+        const p = profiles[0];
+        if (p == null) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Profile does not exist.",
+          });
+        }
+        return p;
+      }),
+
     /**
      * Create a new profile associated with a user.
      */
@@ -47,9 +63,12 @@ export const profileRouter = router({
       .input(adminInsertSchema)
       .mutation(({ ctx, input }) => {
         const { ...fields } = input;
-        return db.client.insert(profile).values({
-          ...fields,
-        }).returning();
+        return db.client
+          .insert(profile)
+          .values({
+            ...fields,
+          })
+          .returning();
       }),
 
     listTrainees: adminProcedure.query((): Promise<ProfileDto[]> => {
