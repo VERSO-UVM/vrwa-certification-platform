@@ -16,7 +16,9 @@ import { createUpdateSchema } from "drizzle-orm/zod";
 
 export const courseEventUpdateSchema = createUpdateSchema(courseEvent, {
   id: z.string(),
-});
+  virtualLink: z.url().nullable().optional(),
+  seats: z.number().int().positive().nullable().optional(),
+}).omit({ courseId: true });
 
 export type CourseEventUpdateDto = z.infer<typeof courseEventUpdateSchema>;
 
@@ -111,7 +113,7 @@ export const courseEventRouter = router({
         if (!newCourseEvent) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to create course.",
+            message: "Failed to create course event.",
           });
         }
 
