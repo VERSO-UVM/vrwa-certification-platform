@@ -135,7 +135,7 @@ export function courseFindFirst(courseId?: string) {
     },
     with: {
       sessions: {
-        orderBy: (t, { asc }) => asc(t.id),
+        orderBy: (t, { asc }) => asc(t.classStartDatetime),
       },
     },
     extras: {
