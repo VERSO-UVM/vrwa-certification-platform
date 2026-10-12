@@ -5,7 +5,7 @@ import {
   type ColumnDef,
 } from "@tanstack/react-table";
 import { FieldSet, FieldGroup, Field, FieldLabel } from "~/components/ui/field";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { deepEqual, isInputUnset, without } from "~/utils/utils";
 
@@ -23,7 +23,7 @@ export function satisfiesRequiredFields<T, R extends keyof T>(
   },
 ): item is RequiredFields<T, R> {
   for (const k in required) {
-    if (!(k in item && item[k])) {
+    if (!(k in item) || isInputUnset(item[k])) {
       return false;
     }
   }
@@ -111,10 +111,6 @@ export function EditForm<T extends object, R extends keyof T>({
     onSave(updates, newItem);
   };
 
-  useEffect(() => {
-    console.log("EditForm UPDATES", updates)
-  }, [updates])
-
   return (
     <form onSubmit={onSubmit} className="flex-1 flex flex-col">
       <FieldSet className="flex-1 flex flex-col">
@@ -184,7 +180,7 @@ export function EditForm<T extends object, R extends keyof T>({
           })}
         </FieldGroup>
         <Button
-          disabled={item === null || submitButton.disabledFn(updates, newItem)}
+          disabled={submitButton.disabledFn(updates, newItem)}
           {...submitButton.props}
         >
           {submitButton.title}
