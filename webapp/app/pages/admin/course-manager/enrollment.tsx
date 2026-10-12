@@ -13,10 +13,7 @@ import type { Route } from "./+types/enrollment";
 import { useTRPC } from "~/utils/trpc";
 import type { ReservationDto } from "@backend/database/dtos";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import {
-  reservationDefPresets,
-  reservationDefs,
-} from "~/utils/field-defs/reservation";
+import { reservationDefs } from "~/utils/field-defs/reservation";
 import { EditForm } from "~/components/entry-views/edit-form";
 import { Button } from "~/components/ui/button";
 import { Link, useNavigate } from "react-router";
@@ -49,7 +46,7 @@ export default function Enrollment({
     trpc.courses.admin.get.queryOptions({ id: courseId }),
   );
 
-  const { data: profile, status: profileQuery } = useQuery(
+  const { data: profile } = useQuery(
     trpc.profiles.admin.get.queryOptions({ profileId }),
   );
 
@@ -65,7 +62,7 @@ export default function Enrollment({
       creditHours: updates.creditHours?.toString(),
       paymentStatus: updates.paymentStatus,
     });
-    await queryClient.invalidateQueries({
+    queryClient.invalidateQueries({
       queryKey: trpc.reservations.admin.pathKey(),
     });
   };
@@ -98,6 +95,13 @@ export default function Enrollment({
                   size="lg"
                   className="w-50"
                   onClick={async () => {
+                    if (
+                      !confirm(
+                        "Are you sure you want to unenroll this trainee?",
+                      )
+                    ) {
+                      return;
+                    }
                     await reservationDeleteMutation.mutateAsync({
                       profileId,
                       courseId,
