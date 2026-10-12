@@ -8,10 +8,10 @@
  * is where a user may manage *their own* profiles.
  */
 
+import type { Role } from "@backend/auth/permissions";
 import { PaymentStatus } from "@backend/database/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { EditForm } from "~/components/entry-views/edit-form";
 import { Button } from "~/components/ui/button";
@@ -22,7 +22,10 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { profileDefs, profileRequiredFields } from "~/utils/field-defs/profile";
+import {
+  profileDefs,
+  profileAdminRequiredFields,
+} from "~/utils/field-defs/profile";
 import { userDefs, userFieldHelper } from "~/utils/field-defs/user";
 import { textInputEditor } from "~/utils/field-editors";
 import { useTRPC } from "~/utils/trpc";
@@ -53,7 +56,7 @@ const profileFieldDefs = [
 ];
 
 export default function CreateProfile() {
-  const [searchParams, _] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const enrollIn = searchParams.get("enrollIn");
 
   const trpc = useTRPC();
@@ -61,8 +64,8 @@ export default function CreateProfile() {
 
   const createUser = useMutation(
     trpc.users.admin.create.mutationOptions({
-      onSuccess: async (users) => {
-        await queryClient.invalidateQueries({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
           queryKey: trpc.users.pathKey(),
         });
       },
@@ -73,11 +76,9 @@ export default function CreateProfile() {
 
   const createReservation = useMutation(
     trpc.reservations.admin.create.mutationOptions({
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: trpc.reservations.admin.listCourse.queryKey({
-            courseId: enrollIn ?? undefined,
-          }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.reservations.admin.pathKey(),
         });
       },
     }),
@@ -85,9 +86,9 @@ export default function CreateProfile() {
 
   const createProfile = useMutation(
     trpc.profiles.admin.create.mutationOptions({
-      onSuccess: async (profiles) => {
-        await queryClient.invalidateQueries({
-          queryKey: trpc.profiles.list.queryKey(),
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.profiles.pathKey(),
         });
       },
     }),
@@ -124,7 +125,10 @@ export default function CreateProfile() {
             columns={userFieldDefs}
             onSave={async (_, { email, role }) => {
               if (email != null && role != null) {
-                createUser.mutate({ email, role });
+                await createUser.mutateAsync({
+                  email,
+                  role: role as Role,
+                });
               }
             }}
           />
@@ -137,7 +141,7 @@ export default function CreateProfile() {
         </CardHeader>
         <CardContent className="flex flex-col space-y-4 w-lg m-auto">
           <EditForm
-            required={profileRequiredFields}
+            required={profileAdminRequiredFields}
             columns={profileFieldDefs}
             onSave={async (_, values) => {
               const profiles = await createProfile.mutateAsync(values);
