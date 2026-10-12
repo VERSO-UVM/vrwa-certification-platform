@@ -3,7 +3,7 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { EditDrawer } from "~/components/entry-views/edit-drawer";
 import {
   profileDefPresets,
-  profileRequiredFields,
+  profileAdminRequiredFields,
 } from "~/utils/field-defs/profile";
 import { useTRPC } from "~/utils/trpc";
 
@@ -37,7 +37,7 @@ export function TraineeEditButton({
       }}
       item={trainee}
       columns={profileDefPresets.all}
-      required={profileRequiredFields}
+      required={profileAdminRequiredFields}
       onSave={async (changes) => {
         await updateQuery.mutateAsync({
           ...changes,

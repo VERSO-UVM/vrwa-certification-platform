@@ -10,8 +10,8 @@ import {
   textInputEditor,
   TimeInput,
 } from "../field-editors";
-import { addMinutes, differenceInMinutes } from "date-fns";
-import { useEffect, useMemo, useState } from "react";
+import { addMinutes, differenceInMinutes, set } from "date-fns";
+import { useMemo, useState } from "react";
 
 export const courseEventFieldHelper = createColumnHelper<CourseEventDto>();
 
@@ -174,7 +174,18 @@ export const courseEventDefs = {
                     onChange(0);
                     return;
                   }
-                  const newDuration = differenceInMinutes(newDate, startDate);
+
+                  /* Ensure seconds and milliseconds don't mess up calculation by 1 */
+                  const newDuration = differenceInMinutes(
+                    set(newDate, {
+                      seconds: 0,
+                      milliseconds: 0,
+                    }),
+                    set(startDate, {
+                      seconds: 0,
+                      milliseconds: 0,
+                    }),
+                  );
                   if (newDuration >= 0) {
                     onChange(newDuration);
                     /* Sync to minutes field */

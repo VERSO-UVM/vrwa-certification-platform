@@ -3,7 +3,7 @@
  */
 import type { ReservationDto } from "@backend/database/dtos";
 import type { ColumnDef } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
@@ -50,7 +50,6 @@ export const attendanceFieldDefs = [
     header: "Earned Hours",
     cell: ({ row }) => {
       const item = row.original;
-      /* key: reset when credit hours is taken out from under us */
       return <CreditHoursInput item={item} />;
     },
   }),
@@ -60,7 +59,7 @@ const CreditHoursInput = ({ item }: { item: ReservationDto }) => {
   const [creditHours, setCreditHours] = useState(item.creditHours);
 
   const [prevCreditHours, setPrevCreditHours] = useState(item.creditHours);
-  if (parseInt(prevCreditHours) !== parseInt(item.creditHours)) {
+  if (prevCreditHours !== item.creditHours) {
     setPrevCreditHours(item.creditHours);
     setCreditHours(item.creditHours);
   }

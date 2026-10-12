@@ -19,7 +19,6 @@ import {
 } from "~/utils/field-editors";
 import { useTRPC } from "../trpc";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
 
 // createColumnHelper just provides a stronger typed API to define ColumnDefs
 // Note that assigning the result type becomes difficult https://github.com/TanStack/table/issues/4382
@@ -95,13 +94,14 @@ export const profileDefs = {
         return (props) => {
           const trpc = useTRPC();
           const usersQuery = useQuery(trpc.users.getUsers.queryOptions());
-          console.log("VAL", props.value);
+          const email = usersQuery?.data?.find(
+            (user) => user.id === props.value,
+          )?.email;
           return (
             <ComboboxEditor
               {...props}
-              value={
-                usersQuery?.data?.find((user) => user.id === props.value)?.email
-              }
+              key={email}
+              value={email}
               options={(usersQuery?.data ?? []).map((user) => user.email)}
               onChange={(val) => {
                 const user = usersQuery?.data?.find(
@@ -142,5 +142,10 @@ export const profileRequiredFields = {
   lastName: "",
   firstName: "",
   state: "",
+} satisfies Partial<Profile>;
+
+/** Admins can also set the associated user */
+export const profileAdminRequiredFields = {
+  ...profileRequiredFields,
   userId: "",
 } satisfies Partial<Profile>;
