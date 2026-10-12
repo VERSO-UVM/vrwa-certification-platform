@@ -59,17 +59,9 @@ export const profileRouter = router({
     /**
      * Create a new profile associated with a user.
      */
-    create: adminProcedure
-      .input(adminInsertSchema)
-      .mutation(({ ctx, input }) => {
-        const { ...fields } = input;
-        return db.client
-          .insert(profile)
-          .values({
-            ...fields,
-          })
-          .returning();
-      }),
+    create: adminProcedure.input(adminInsertSchema).mutation(({ input }) => {
+      return db.client.insert(profile).values(input).returning();
+    }),
 
     listTrainees: adminProcedure.query((): Promise<ProfileDto[]> => {
       return profilesQuery().where(eq(user.role, "user"));

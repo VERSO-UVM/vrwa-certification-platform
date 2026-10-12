@@ -70,7 +70,7 @@ export const reservationRouter = router({
         const found = reservations[0];
         if (!found) {
           throw new TRPCError({
-            code: "BAD_REQUEST",
+            code: "NOT_FOUND",
             message: "No reservation found.",
           });
         }

@@ -7,13 +7,16 @@ import type { UserDto } from "~/database/dtos";
 import { adminProcedure, router } from "~/utils/trpc";
 import { usersWithProfilesQuery } from "~/database/queries";
 import { generatePrefixedId } from "~/utils/id";
+import { roles, type Role } from "~/auth/permissions";
 
 const updateSchema = createUpdateSchema(user, {
   id: z.string(),
 });
 
+const roleKeys = Object.keys(roles) as [Role, ...Role[]];
+
 const insertSchema = createInsertSchema(user, {
-  role: z.string(),
+  role: z.enum(roleKeys),
 }).pick({
   email: true,
   role: true,
