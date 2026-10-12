@@ -1,5 +1,5 @@
 import type { CourseDto } from "@backend/database/dtos";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addYears } from "date-fns";
 import { useState } from "react";
 import { useNavigate } from "react-router";
@@ -21,12 +21,21 @@ import { courseStartDate } from "~/utils/utils";
 export function CloneCourse({ course }: { course: CourseDto }) {
   const navigate = useNavigate();
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const originalStartDate = courseStartDate(course) ?? new Date();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     originalStartDate,
   );
   const [shouldCopySessions, setShouldCopySessions] = useState(true);
-  const cloneMutation = useMutation(trpc.courses.admin.clone.mutationOptions());
+  const cloneMutation = useMutation(
+    trpc.courses.admin.clone.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.courses.admin.pathKey(),
+        });
+      },
+    }),
+  );
 
   const cloneCourse = async () => {
     const { courseId } = await cloneMutation.mutateAsync({

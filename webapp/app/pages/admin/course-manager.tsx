@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "~/utils/trpc";
 
 import {
@@ -23,7 +23,6 @@ import { useMemo } from "react";
 import type { CourseDto } from "@backend/database/dtos";
 import { useNavigate } from "react-router";
 import type { ColumnDef } from "@tanstack/react-table";
-import type { CourseInsert } from "@backend/routers/course";
 import { CreateDrawer } from "~/components/entry-views/create-drawer";
 
 export function meta() {
@@ -50,10 +49,17 @@ const courseFormDefs = [
 
 export default function CourseManager() {
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { data: courses } = useQuery(trpc.courses.admin.list.queryOptions());
   const createCourseMut = useMutation(
-    trpc.courses.admin.create.mutationOptions(),
+    trpc.courses.admin.create.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.courses.admin.pathKey(),
+        });
+      },
+    }),
   );
 
   // Courses going on this year
