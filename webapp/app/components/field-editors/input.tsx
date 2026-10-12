@@ -79,7 +79,9 @@ export function priceCentsEditor(
   const toCents = (s: string) => Math.round(parseFloat(s) * 100);
 
   return ({ overrides, onChange, onBlur, value }) => {
-    const [display, setDisplay] = useState(value ? toDisplay(value) : "");
+    const [display, setDisplay] = useState(
+      value != null ? toDisplay(value) : "",
+    );
 
     return (
       <Input

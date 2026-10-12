@@ -27,7 +27,7 @@ export function selectOptionsEditor<U extends HasToString>({
         value={value?.toString() ?? ""}
         onChange={(event) => {
           const newVal = stringToValue[event.target.value];
-          if (newVal) {
+          if (newVal !== undefined) {
             setValue(newVal);
             onChange(newVal);
           }
@@ -35,7 +35,7 @@ export function selectOptionsEditor<U extends HasToString>({
         {...props}
         {...overrides}
       >
-        <NativeSelectOption disabled selected value="">
+        <NativeSelectOption disabled value="">
           -- select an option --
         </NativeSelectOption>
         {options.map(({ label, value, ...rest }) => (
@@ -71,7 +71,11 @@ export function multiSelectCheckboxEditor<U extends HasToString>({
         {options.map((option) => {
           const id = (overrides.id ?? "") + option.label;
           return (
-            <Field orientation="horizontal" {...option.fieldProps}>
+            <Field
+              key={option.value.toString()}
+              orientation="horizontal"
+              {...option.fieldProps}
+            >
               <Checkbox
                 id={id}
                 checked={items.includes(option.value)}

@@ -87,13 +87,17 @@ export function DatetimeEditor({
                   captionLayout="dropdown"
                   month={month}
                   onMonthChange={setMonth}
-                  onSelect={(date) => {
+                  onSelect={(selected) => {
                     setOpen(false);
-                    if (date) {
-                      setDateString(formatDate(date));
-                      onChange(date);
-                      onBlur(date);
-                      setDate(date);
+                    if (selected) {
+                      const withTime = set(selected, {
+                        hours: date.getHours(),
+                        minutes: date.getMinutes(),
+                      });
+                      setDateString(formatDate(withTime));
+                      onChange(withTime);
+                      onBlur(withTime);
+                      setDate(withTime);
                     }
                   }}
                 />
@@ -105,8 +109,13 @@ export function DatetimeEditor({
       <Field>
         <TimeInput
           value={date}
-          onChange={onChange}
-          onBlur={() => onBlur(date)}
+          onChange={(newDate) => {
+            if (newDate) {
+              setDate(newDate);
+            }
+            onChange(newDate);
+          }}
+          onBlur={(newDate) => onBlur(newDate)}
           overrides={overrides}
           {...rest}
         />
