@@ -61,7 +61,7 @@ export function RosterManager({ courseId }: { courseId: string }) {
           if (rosterIds.has(row.original.id)) {
             /* Already enrolled */
             return (
-              <Button variant="secondary" asChild>
+              <Button variant="ghost" asChild>
                 <Link to={`/admin/enrollment/${courseId}/${row.original.id}`}>
                   Manage
                 </Link>
