@@ -84,8 +84,6 @@ export default function CourseDetails({
     }),
   );
 
-  const trainees = useQuery(trpc.profiles.admin.listTrainees.queryOptions());
-
   //grouping reservations by courseEventId to easily access rosters
   const roster = reservations.data ?? [];
 
@@ -103,23 +101,14 @@ export default function CourseDetails({
   }
 
   //for if the course gets deleted
-  const [courseDeleted, setCourseDeleted] = useState<boolean | false>(false);
+  const [courseDeleted, setCourseDeleted] = useState(false);
 
-  //for adding to roster
-  const [selectedTrainee, setSelectedTrainee] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState<string | null>(
     eventIds[0] ?? null,
   );
   if (!selectedTab && eventIds[0] != null) {
     setSelectedTab(eventIds[0]);
   }
-  const [traineePopupOpen, setTraineePopupOpen] = useState<boolean | false>(
-    false,
-  );
-
-  const rosterIds = new Set(roster.map((r) => r.profileId));
-  const availableTrainees =
-    trainees.data?.filter((t) => !rosterIds.has(t.id)) ?? [];
 
   if (courseDeleted) {
     return (
@@ -169,7 +158,9 @@ export default function CourseDetails({
             <Calendar className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
               <p className="text-sm text-muted-foreground"># Sessions</p>
-              <p className="text-3xl font-bold">{roster.length}</p>
+              <p className="text-3xl font-bold">
+                {courseEvents.data?.length ?? 0}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -196,8 +187,8 @@ export default function CourseDetails({
                         await client.courses.admin.delete.mutate({
                           id: courseId!,
                         });
-                        await queryClient.invalidateQueries({
-                          queryKey: trpc.courses.admin.list.queryKey(),
+                        queryClient.invalidateQueries({
+                          queryKey: trpc.courses.admin.pathKey(),
                         });
                         setCourseDeleted(true);
                       } else {
@@ -280,7 +271,7 @@ export default function CourseDetails({
                       );
                     }}
                   >
-                    + Add Training Sesssion
+                    + Add Training Session
                   </Button>
                   <Button
                     variant="destructive"
@@ -294,13 +285,10 @@ export default function CourseDetails({
                         const selectedIndex = courseEvents.data.findIndex(
                           (event) => event.id == selectedTab,
                         );
-                        let newTabIndex = 0;
-                        if (selectedIndex == 0) {
-                          newTabIndex = 1;
-                        } else if (selectedIndex) {
-                          newTabIndex = selectedIndex - 1;
-                        }
-                        const newTabId = courseEvents.data?.[newTabIndex]?.id;
+                        if (selectedIndex < 0) return;
+                        const newTabIndex =
+                          selectedIndex === 0 ? 1 : selectedIndex - 1;
+                        const newTabId = courseEvents.data[newTabIndex]?.id;
 
                         courseEventDeleteMut.mutate(
                           {
@@ -321,31 +309,29 @@ export default function CourseDetails({
                   </Button>
                 </ButtonGroup>
               </div>
-              {courseEvents.data?.map((event) => (
-                <TabsContent key={event.id} value={event.id}>
-                  <EditForm
-                    key={event?.courseId}
-                    item={event as CourseEventDto}
-                    required={courseEventRequiredFields}
-                    columns={courseEventFormDefs}
-                    onSave={async (data) => {
-                      if (event) {
+              {courseEvents.isPending ? (
+                <p className="text-muted-foreground p-4">Loading sessions…</p>
+              ) : courseEvents.data?.length ? (
+                courseEvents.data.map((event) => (
+                  <TabsContent key={event.id} value={event.id}>
+                    <EditForm
+                      key={event.id}
+                      item={event as CourseEventDto}
+                      required={courseEventRequiredFields}
+                      columns={courseEventFormDefs}
+                      onSave={async (data) => {
                         await courseEventUpdateMut.mutateAsync({
                           id: event.id,
                           ...data,
                         });
-                      }
-                    }}
-                  />
-                </TabsContent>
-              )) || (
-                <TabsContent value="">
-                  <EditForm
-                    required={courseEventRequiredFields}
-                    columns={courseEventFormDefs}
-                    onSave={Promise.reject}
-                  />
-                </TabsContent>
+                      }}
+                    />
+                  </TabsContent>
+                ))
+              ) : (
+                <p className="text-muted-foreground p-4">
+                  No training sessions yet.
+                </p>
               )}
             </Tabs>
           </CardContent>

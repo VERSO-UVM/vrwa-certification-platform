@@ -1,7 +1,7 @@
 import { PaymentStatus } from "@backend/database/schema";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { DataTable } from "~/components/data-table";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -17,13 +17,11 @@ import {
   reservationDefs,
   reservationFieldHelper,
 } from "~/utils/field-defs/reservation";
-import { useTRPC, useTRPCClient } from "~/utils/trpc";
-import { useReservationDeleteMutation } from "./use-reservation-delete-mutation";
+import { useTRPC } from "~/utils/trpc";
 import { useReservationCreateMutation } from "./use-reservation-create-mutation";
-import { ArrowRight, GraduationCap, Plus } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 
 export function RosterManager({ courseId }: { courseId: string }) {
-  const navigate = useNavigate();
   const trpc = useTRPC();
   const trainees = useQuery(trpc.profiles.admin.listTrainees.queryOptions());
   const { data: course } = useQuery(
@@ -35,7 +33,6 @@ export function RosterManager({ courseId }: { courseId: string }) {
     }),
   );
   const reservationCreateMutation = useReservationCreateMutation();
-  const reservationDeleteMutation = useReservationDeleteMutation();
 
   const roster = reservations.data ?? [];
   const rosterIds = new Set(roster.map((r) => r.profileId));
@@ -49,13 +46,6 @@ export function RosterManager({ courseId }: { courseId: string }) {
       courseId: courseId,
       creditHours: "0",
       paymentStatus: PaymentStatus.Draft,
-    });
-  };
-
-  const unenroll = async (profileId: string) => {
-    await reservationDeleteMutation.mutateAsync({
-      profileId: profileId,
-      courseId: courseId,
     });
   };
 
@@ -115,7 +105,7 @@ export function RosterManager({ courseId }: { courseId: string }) {
         },
       }),
     ],
-    [],
+    [courseId],
   );
 
   return (
@@ -142,7 +132,7 @@ export function RosterManager({ courseId }: { courseId: string }) {
           <CardDescription>
             Enroll trainees directly. Payment and invoices can be configured
             after enrollment. Use "Create and Enroll a New Profile" for those
-            not yet added to the sistem.
+            not yet added to the system.
           </CardDescription>
         </CardHeader>
         <CardContent>
