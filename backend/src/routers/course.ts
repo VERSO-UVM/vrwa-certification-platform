@@ -13,7 +13,7 @@ import { createInsertSchema, createUpdateSchema } from "drizzle-orm/zod";
 import { courseFindFirst, courseFindMany } from "~/database/queries";
 import type { CourseDto } from "~/database/dtos.ts";
 import { TRPCError } from "@trpc/server";
-import { addMilliseconds, addMonths } from "date-fns";
+import { addMilliseconds, addMonths, set } from "date-fns";
 
 const updateSchema = createUpdateSchema(course, {
   id: z.string(),
@@ -28,6 +28,14 @@ const insertSchema = createInsertSchema(course, {
 
 export type CourseUpdate = z.infer<typeof updateSchema>;
 export type CourseInsert = z.infer<typeof insertSchema>;
+
+function placeholderClassStartDatetime() {
+  /* Arbtrarily 1 month from today */
+  return set(addMonths(new Date(), 1), {
+    seconds: 0,
+    milliseconds: 0,
+  });
+}
 
 export const courseRouter = router({
   admin: router({
@@ -49,29 +57,31 @@ export const courseRouter = router({
       }),
 
     create: adminProcedure.input(insertSchema).mutation(async ({ input }) => {
-      const [newCourse] = await db.client
-        .insert(course)
-        .values({
-          ...input,
-          description: input.description ?? null,
-        })
-        .returning();
+      return db.client.transaction(async (tx) => {
+        const [newCourse] = await tx
+          .insert(course)
+          .values({
+            ...input,
+            description: input.description ?? null,
+          })
+          .returning();
 
-      if (!newCourse) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Unable to create course.",
+        if (!newCourse) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Unable to create course.",
+          });
+        }
+
+        /* Add placeholder courseEvent */
+        await tx.insert(courseEvent).values({
+          courseId: newCourse.id,
+          classStartDatetime: placeholderClassStartDatetime(),
+          locationType: CourseLocation.InPerson,
         });
-      }
 
-      /* Add starter courseEvent */
-      await db.client.insert(courseEvent).values({
-        courseId: newCourse.id,
-        classStartDatetime: addMonths(new Date(), 1),
-        locationType: CourseLocation.InPerson,
+        return newCourse;
       });
-
-      return newCourse;
     }),
 
     delete: adminProcedure
@@ -130,57 +140,59 @@ export const courseRouter = router({
           });
         }
 
-        const [newCourse] = await db.client
-          .insert(course)
-          .values({
-            courseName: orig.courseName,
-            creditHourCategories: orig.creditHourCategories,
-            creditHours: orig.creditHours,
-            description: orig.description,
-            instructorId: orig.instructorId,
-            priceCents: orig.priceCents,
-            seats: orig.seats,
-            status: CourseStatus.Active,
-            tags: orig.tags,
-          })
-          .returning();
-        if (!newCourse) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to create course.",
-          });
-        }
+        return db.client.transaction(async (tx) => {
+          const [newCourse] = await tx
+            .insert(course)
+            .values({
+              courseName: orig.courseName,
+              creditHourCategories: orig.creditHourCategories,
+              creditHours: orig.creditHours,
+              description: orig.description,
+              instructorId: orig.instructorId,
+              priceCents: orig.priceCents,
+              seats: orig.seats,
+              status: CourseStatus.Active,
+              tags: orig.tags,
+            })
+            .returning();
+          if (!newCourse) {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Failed to create course.",
+            });
+          }
 
-        if (input.copyCourseEvents) {
-          // Keep same date relative to new course start date
-          const newStart = input.copyCourseEvents.getTime();
-          const origStart =
-            orig.sessions[0]?.classStartDatetime?.getTime() ?? newStart;
-          const difference = newStart - origStart;
+          if (input.copyCourseEvents && orig.sessions.length > 0) {
+            // Keep same date relative to new course start date
+            const newStart = input.copyCourseEvents.getTime();
+            const origStart =
+              orig.sessions[0]?.classStartDatetime?.getTime() ?? newStart;
+            const difference = newStart - origStart;
 
-          // Combine in a single insert operation
-          const courseEventValues = orig.sessions.map((session) => ({
-            ...session,
-            id: undefined, // Ensure unset so a new id is generated
+            // Combine in a single insert operation
+            const courseEventValues = orig.sessions.map((session) => ({
+              ...session,
+              id: undefined, // Ensure unset so a new id is generated
+              courseId: newCourse.id,
+              classStartDatetime: session.classStartDatetime
+                ? addMilliseconds(session.classStartDatetime, difference)
+                : null,
+            }));
+
+            await tx.insert(courseEvent).values(courseEventValues);
+          } else {
+            /* Add placeholder courseEvent */
+            await tx.insert(courseEvent).values({
+              courseId: newCourse.id,
+              classStartDatetime: placeholderClassStartDatetime(),
+              locationType: CourseLocation.InPerson,
+            });
+          }
+
+          return {
             courseId: newCourse.id,
-            classStartDatetime: session.classStartDatetime
-              ? addMilliseconds(session.classStartDatetime, difference)
-              : null,
-          }));
-
-          await db.client.insert(courseEvent).values(courseEventValues);
-        } else {
-          /* Add starter courseEvent */
-          await db.client.insert(courseEvent).values({
-            courseId: newCourse.id,
-            classStartDatetime: addMonths(new Date(), 1),
-            locationType: CourseLocation.InPerson,
-          });
-        }
-
-        return {
-          courseId: newCourse.id,
-        };
+          };
+        });
       }),
   }),
 
