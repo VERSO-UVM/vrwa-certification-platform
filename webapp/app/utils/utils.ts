@@ -48,6 +48,9 @@ export function isInputUnset(x: unknown) {
     // empty type=number text input
     return isNaN(x);
   }
+  if (x instanceof Date) {
+    return !isValidDate(x);
+  }
   if (Array.isArray(x)) {
     // empty array
     return x.length == 0;
@@ -149,7 +152,7 @@ export function courseStartDate(course: CourseDto) {
 }
 
 export function dateFormat(date: Date) {
-  return format(date, "eee, LLLL M, Y");
+  return format(date, "eee, LLLL d, y");
 }
 
 export function timeFormat(date: Date) {
