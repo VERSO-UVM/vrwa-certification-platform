@@ -1,6 +1,6 @@
 /**
  * Re-usable date and time pickers!
- * The shadcn Calendar component is fairly bairbones and needs a good ammount of
+ * The shadcn Calendar component is fairly barebones and needs a good ammount of
  * wrapper code.
  */
 
