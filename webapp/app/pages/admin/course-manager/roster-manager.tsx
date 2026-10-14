@@ -84,10 +84,8 @@ export function RosterManager({ courseId }: { courseId: string }) {
   //Data Table
   const rosterTableDef = useMemo(
     () => [
-      reservationDefs.lastName,
       reservationDefs.firstName,
-      reservationDefs.creditHours,
-      reservationDefs.isMember,
+      reservationDefs.lastName,
       reservationDefs.paymentStatus,
       reservationFieldHelper.display({
         id: "actions",
