@@ -34,6 +34,9 @@ export function shallowEqual<T extends object>(a: T, b: T) {
  * If user-entered input value is considered the same as empty/unset
  * for its appropriate react state. This is more of a convention to
  * follow.
+ *
+ * I'm not pleased that this is necessary, but it is a symptom of React BS
+ * and other things.
  */
 export function isInputUnset(x: unknown) {
   if (x == null) {

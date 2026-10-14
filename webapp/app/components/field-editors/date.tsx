@@ -20,7 +20,7 @@ export function dateEditor(): FieldEditor<unknown, Date | null> {
 
 /**
  * Date and time picker.
- * Adapted from shadcn/ui example.
+ * Adapted from shadcn/ui example: https://ui.shadcn.com/docs/components/base/date-picker
  */
 export function DatetimeEditor({
   value: orig,
