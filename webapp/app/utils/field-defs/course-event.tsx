@@ -1,15 +1,8 @@
 import type { CourseEventDto } from "@backend/database/dtos";
 import { CourseLocation, type CourseEvent } from "@backend/database/schema";
-import { createColumnHelper } from "@tanstack/react-table";
+import { createColumnHelper, type ColumnDef } from "@tanstack/react-table";
 import { Link } from "react-router";
 import { LocationTypeBadge } from "~/components/location-type-badge";
-import {
-  intInputEditor,
-  selectOptionsEditor,
-  textInputEditor,
-} from "../field-editors";
-import { addMinutes, differenceInMinutes, set } from "date-fns";
-import { useMemo, useState } from "react";
 
 export const courseEventFieldHelper = createColumnHelper<CourseEventDto>();
 
@@ -39,26 +32,15 @@ export const courseEventDefs = {
       return new Date(value).toLocaleDateString();
     },
   }),
-
-  courseLocationType: courseEventFieldHelper.accessor("locationType", {
+  courseLocationType: {
+    accessorKey: "locationType",
     header: "Format",
     cell: ({ getValue }) => (
       <LocationTypeBadge value={getValue() as CourseLocation} />
     ),
-
-    meta: {
-      editor: selectOptionsEditor({
-        options: [
-          { label: "In-Person", value: CourseLocation.InPerson },
-          { label: "Virtual", value: CourseLocation.Virtual },
-          { label: "Hybrid", value: CourseLocation.Hybrid },
-        ],
-      }),
-    },
-  }),
-
+  } satisfies ColumnDef<CourseEventDto, CourseLocation>,
   address: courseEventFieldHelper.accessor("physicalAddress", {
-    header: "Address",
+    header: "Location",
     cell: ({ row, getValue }) => (
       <div className="text-muted-foreground">
         {String(
@@ -66,46 +48,12 @@ export const courseEventDefs = {
         )}
       </div>
     ),
-
-    meta: {
-      editor: textInputEditor({
-        required: false, // Can be empty
-      }),
-    },
   }),
-
-  town: courseEventFieldHelper.accessor("town", {
-    header: "Town",
-    meta: {
-      editor: textInputEditor({
-        required: false,
-      }),
-    },
-  }),
-
-  venue: courseEventFieldHelper.accessor("venue", {
-    header: "Venue",
-    meta: {
-      editor: textInputEditor({
-        required: false,
-      }),
-    },
-  }),
-
   seats: courseEventFieldHelper.accessor("seats", {
     header: "Seats",
     cell: ({ getValue }) => (
       <div className="text-right">{String(getValue())}</div>
     ),
-  }),
-  virtualLink: courseEventFieldHelper.accessor("virtualLink", {
-    header: "Class Link",
-    cell: ({ getValue }) => (
-      <div className="text-right">{String(getValue())}</div>
-    ),
-    meta: {
-      editor: textInputEditor(),
-    },
   }),
 } as const;
 
