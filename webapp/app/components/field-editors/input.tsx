@@ -59,8 +59,6 @@ export function genericInputEditor<U extends HasToString>(
           onChange(val);
         }}
         onBlur={() => onBlur(value)}
-        // Default to required, can be overriden
-        required
         {...props}
         {...overrides}
       />
@@ -101,8 +99,6 @@ export function priceCentsEditor(
           }
           onBlur(cents);
         }}
-        // Default to required, can be overriden
-        required
         step={0.01}
         {...props}
         {...overrides}
