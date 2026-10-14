@@ -1,0 +1,149 @@
+import { PaymentStatus } from "@backend/database/schema";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { Link } from "react-router";
+import { DataTable } from "~/components/data-table";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { profileDefs, profileFieldHelper } from "~/utils/field-defs/profile";
+import {
+  reservationDefs,
+  reservationFieldHelper,
+} from "~/utils/field-defs/reservation";
+import { useTRPC } from "~/utils/trpc";
+import { useReservationCreateMutation } from "./use-reservation-create-mutation";
+import { ArrowRight, Plus } from "lucide-react";
+
+export function RosterManager({ courseId }: { courseId: string }) {
+  const trpc = useTRPC();
+  const trainees = useQuery(trpc.profiles.admin.listTrainees.queryOptions());
+  const { data: course } = useQuery(
+    trpc.courses.admin.get.queryOptions({ id: courseId }),
+  );
+  const reservations = useQuery(
+    trpc.reservations.admin.listCourse.queryOptions({
+      courseId,
+    }),
+  );
+  const reservationCreateMutation = useReservationCreateMutation();
+
+  const roster = reservations.data ?? [];
+  const rosterIds = new Set(roster.map((r) => r.profileId));
+
+  const seats = course?.seats ?? 0;
+  const classFull = roster.length >= seats;
+
+  const enroll = async (profileId: string) => {
+    await reservationCreateMutation.mutateAsync({
+      profileId: profileId,
+      courseId: courseId,
+      creditHours: "0",
+      paymentStatus: PaymentStatus.Draft,
+    });
+  };
+
+  const defs = useMemo(
+    () => [
+      profileDefs.firstName,
+      profileDefs.lastName,
+      profileDefs.association,
+      profileFieldHelper.accessor(({ id }) => rosterIds.has(id), {
+        id: "enrolled",
+        header: "Enrolled",
+        cell: ({ row }) => {
+          if (rosterIds.has(row.original.id)) {
+            /* Already enrolled */
+            return (
+              <Button variant="ghost" asChild>
+                <Link to={`/admin/enrollment/${courseId}/${row.original.id}`}>
+                  Manage
+                </Link>
+              </Button>
+            );
+          } else {
+            /* Not yet enrolled */
+            return (
+              <Button variant="default" onClick={() => enroll(row.original.id)}>
+                Enroll
+              </Button>
+            );
+          }
+        },
+      }),
+    ],
+    [courseId, roster],
+  );
+
+  //Data Table
+  const rosterTableDef = useMemo(
+    () => [
+      reservationDefs.firstName,
+      reservationDefs.lastName,
+      reservationDefs.paymentStatus,
+      reservationFieldHelper.display({
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => {
+          return (
+            <Button variant="link" asChild>
+              <Link
+                to={`/admin/enrollment/${courseId}/${row.original.profileId}`}
+              >
+                <ArrowRight /> Manage Enrollment
+              </Link>
+            </Button>
+          );
+        },
+      }),
+    ],
+    [courseId],
+  );
+
+  return (
+    <>
+      <Card variant="yellow" className="col-span-full @6xl:col-span-3">
+        <CardHeader className="pb-3">
+          <CardTitle>
+            Current Enrollment{" "}
+            {
+              <Badge variant={classFull ? "destructive" : "outline"}>
+                {classFull ? "Full" : "Open"}
+              </Badge>
+            }
+          </CardTitle>
+          <CardDescription></CardDescription>
+        </CardHeader>
+        <CardContent>
+          <DataTable columns={rosterTableDef} data={roster} />
+        </CardContent>
+      </Card>
+      <Card variant="blue" className="col-span-full @6xl:col-span-3">
+        <CardHeader>
+          <CardTitle>All Trainees</CardTitle>
+          <CardDescription>
+            Enroll trainees directly. Payment and invoices can be configured
+            after enrollment. Use "Create and Enroll a New Profile" for those
+            not yet added to the system.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <DataTable columns={defs} data={trainees?.data} />
+          <div className="mt-4">
+            <Button variant="link" asChild>
+              <Link to={`/admin/create-profile?enrollIn=${courseId}`}>
+                <Plus /> Create and Enroll New Profile
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </>
+  );
+}

@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "~/components/data-table";
 import { PageHeader } from "~/components/page-header";
+import { Link } from "react-router";
+import { Button } from "~/components/ui/button";
 import { useTRPC } from "~/utils/trpc";
 import { profileDefs, profileFieldHelper } from "~/utils/field-defs/profile";
 import {
@@ -11,6 +13,7 @@ import { Trainee } from "./trainee-manager/trainee";
 import { useHashString } from "~/hooks/use-hash-string";
 import { TraineeEditButton } from "./trainee-manager/edit-profile";
 import type { ProfileDto } from "@backend/database/dtos";
+import { Plus } from "lucide-react";
 
 const columnDefs = (() => {
   const { firstName, lastName, city, postalCode, isMember } = profileDefs;
@@ -50,7 +53,14 @@ export default function TraineeManager() {
 
   return (
     <div className="flex-1">
-      <PageHeader>Trainees</PageHeader>
+      <PageHeader className="flex gap-2">
+        Trainees
+        <Button size="lg" variant="link" asChild>
+          <Link to="/admin/create-profile">
+            <Plus /> Add Trainee
+          </Link>
+        </Button>
+      </PageHeader>
 
       <div className="flex flex-col space-y-1">
         <div className="flex-1 rounded p-3 rounded-xl vrwa-light:bg-[#5a8acc22] dark:bg-[#15338344]">
