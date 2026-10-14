@@ -1,3 +1,9 @@
+/**
+ * Re-usable date and time pickers!
+ * The shadcn Calendar component is fairly bairbones and needs a good ammount of
+ * wrapper code.
+ */
+
 import { CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import type { FieldEditor, FieldEditorProps } from "~/utils/field-editors";
@@ -43,12 +49,14 @@ export function DatetimeEditor({
             value={dateString}
             placeholder="June 01, 2025"
             onChange={(e) => {
+              /* Date being typed manually */
+              setDateString(e.target.value);
+
               const newDate = set(new Date(e.target.value), {
                 hours: date.getHours(),
                 minutes: date.getMinutes(),
               });
 
-              setDateString(e.target.value);
               if (isValidDate(newDate)) {
                 setMonth(newDate);
                 onChange(newDate);
@@ -88,6 +96,7 @@ export function DatetimeEditor({
                   month={month}
                   onMonthChange={setMonth}
                   onSelect={(selected) => {
+                    /* Date selected through calendar interface */
                     setOpen(false);
                     if (selected) {
                       const withTime = set(selected, {
@@ -163,12 +172,14 @@ export function TimeInput({
   );
 }
 
+/* Formts time in the format that the <input type="time"> component uses*/
 function formatTimeForInput(date: Date | null | undefined): string {
   if (!date) return "00:00";
   if (!isValid(date)) return "00:00";
   return format(date, "HH:mm");
 }
 
+/* Simple, readable, non-abbreviated date formatting */
 function formatDate(date: Date | undefined) {
   if (!date) {
     return "";
