@@ -14,7 +14,6 @@ export {
   genericInputEditor,
 } from "~/components/field-editors/input";
 export * from "~/components/field-editors/select";
-export * from "~/components/field-editors/date";
 
 /**
  * I didn't see a built-in interface for props for generic form fields that exist

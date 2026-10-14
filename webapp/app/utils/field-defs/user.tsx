@@ -19,7 +19,7 @@ export const userDefs = {
     header: "Role",
     cell: ({ getValue }) => <RoleBadge value={getValue() as Role} />,
     meta: {
-      editor: selectOptionsEditor({
+      editor: selectOptionsEditor<Role>({
         options: [
           { label: "Trainee", value: "user" },
           { label: "Instructor", value: "instructor" },
