@@ -4,6 +4,7 @@ import type { UserDto } from "@backend/database/dtos";
 import { RoleBadge } from "~/components/role-badge";
 import type { Role } from "@backend/auth/permissions";
 import { profileFullName } from "../utils";
+import type { User } from "@backend/database/schema";
 
 export const userFieldHelper = createColumnHelper<UserDto>();
 
@@ -57,7 +58,9 @@ export const userDefs = {
         ));
       },
       meta: {
-        editor: ({ ctx }) => flexRender(ctx.cell.column.columnDef.cell, ctx),
+        editor: ({ value }) => (
+          <div className="whitespace-pre-line">{value}</div>
+        ),
       },
     },
   ),
@@ -66,3 +69,7 @@ export const userDefs = {
 export const userDefPresets = {
   all: [userDefs.email, userDefs.role],
 };
+
+export const userRequiredFields = {
+  role: "",
+} satisfies Partial<User>;
