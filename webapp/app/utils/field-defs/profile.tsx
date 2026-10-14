@@ -11,10 +11,7 @@ import type { ProfileDto } from "@backend/database/dtos";
 import type { Profile } from "@backend/database/schema";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Badge } from "~/components/ui/badge";
-import {
-  textInputEditor,
-  selectOptionsEditor,
-} from "~/utils/field-editors";
+import { textInputEditor, selectOptionsEditor } from "~/utils/field-editors";
 
 // createColumnHelper just provides a stronger typed API to define ColumnDefs
 // Note that assigning the result type becomes difficult https://github.com/TanStack/table/issues/4382
