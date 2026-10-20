@@ -4,6 +4,7 @@ import { course, courseEvent, CourseLocation } from "~/database/schema";
 import {
   adminProcedure,
   instructorProcedure,
+  publicProcedure,
   router,
   traineeProcedure,
 } from "~/utils/trpc";
@@ -141,7 +142,8 @@ export const courseEventRouter = router({
   }),
 
   trainee: router({
-    get: traineeProcedure
+    /* Does NOT require authentication to view course details */
+    get: publicProcedure
       .input(
         z.object({
           courseEventId: z.string(),
@@ -161,7 +163,8 @@ export const courseEventRouter = router({
         return event;
       }),
 
-    listFuture: traineeProcedure.query(() => {
+    /* Does NOT require authentication to view upcoming courses */
+    listFuture: publicProcedure.query(() => {
       return courseEventQuery()
         .where(isFutureClass())
         .orderBy(asc(courseEvent.classStartDatetime));
