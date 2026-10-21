@@ -11,6 +11,10 @@ import {
 } from "~/components/ui/card";
 import { DataTable } from "~/components/data-table";
 import { reservationDefPresets } from "~/utils/field-defs/reservation";
+import { protectedLoader } from "~/utils/session";
+
+// Must be signed in to access trainee home page
+export const loader = protectedLoader("user");
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "VRWA Certifications" }];
