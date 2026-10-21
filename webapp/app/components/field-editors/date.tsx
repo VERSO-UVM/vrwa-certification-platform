@@ -1,3 +1,7 @@
+/**
+ * Date input fields. These are adapted from the shadcn/ui examples.
+ * The actual components they give us require a lot of infrastracture, as usual.
+ */
 import { CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import type { FieldEditor, FieldEditorProps } from "~/utils/field-editors";
@@ -20,7 +24,6 @@ export function dateEditor(): FieldEditor<unknown, Date | null> {
 
 /**
  * Date and time picker.
- * Adapted from shadcn/ui example.
  */
 export function DatetimeEditor({
   value: orig,
@@ -124,6 +127,9 @@ export function DatetimeEditor({
   );
 }
 
+/**
+ * Time picker.
+ */
 export function TimeInput({
   value: date,
   onChange,

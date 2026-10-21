@@ -1,3 +1,9 @@
+/**
+ * Combobox input fields. A combobox is a mix between a text input and a select.
+ * They're pretty common now and a good UX.
+ *
+ * Current issue with the shadcn/ui Combobox component: Combobox will not work perfectly inside of drawers/modals. This is not good.
+ */
 import React, { useMemo, useState } from "react";
 import type { FieldEditorProps, HasToString } from "~/utils/field-editors";
 import {
@@ -16,8 +22,9 @@ import {
 } from "~/components/ui/combobox";
 
 /**
- * Multiselect combobox that allows selecting from suggestions and creating
+ * Multiselect combobox that allows selecting from suggestions and also creating
  * custom values. For free-form string[] fields.
+ * This is based off the shadcn/ui example.
  */
 export function MultiComboboxEditor({
   overrides,
@@ -26,31 +33,36 @@ export function MultiComboboxEditor({
   value: orig,
   options = [],
 }: FieldEditorProps<unknown, string[]> & { options?: string[] }) {
-  const [value, setValue] = useState(orig ?? []);
+  /* The "selected" here is the whole string[] array */
+  const [selected, setSelected] = useState(orig ?? []);
+  /* The current text in the search box */
   const [search, setSearch] = useState("");
+  /* Needed for ComboboxChips component */
   const anchor = useComboboxAnchor();
-
-  const items = useMemo(
-    () => options.filter((option) => !value.includes(option)),
-    [options, value],
+  /* Don't allow duplicate items */
+  const unselected = useMemo(
+    () => options.filter((option) => !selected.includes(option)),
+    [options, selected],
   );
 
   const trimmedQuery = search.trim().toLowerCase();
   const matchesItem =
-    options.some((o) => o.toLowerCase() === trimmedQuery) ||
-    value.some((v) => v.toLowerCase() === trimmedQuery);
+    unselected.some((x) => x.toLowerCase() === trimmedQuery) ||
+    selected.some((x) => x.toLowerCase() === trimmedQuery);
+
+  /* Display option to add custom item? */
   const canCreate = trimmedQuery.length > 0 && !matchesItem;
 
   return (
     <Combobox
       multiple
       autoHighlight
-      items={items}
-      value={value}
+      items={unselected}
+      value={selected}
       inputValue={search}
       onValueChange={(next) => {
         const nextValue = next ?? [];
-        setValue(nextValue);
+        setSelected(nextValue);
         setSearch("");
         onChange(nextValue);
       }}
@@ -60,7 +72,7 @@ export function MultiComboboxEditor({
       <ComboboxChips
         ref={anchor}
         className="w-full"
-        onBlur={() => onBlur(value)}
+        onBlur={() => onBlur(selected)}
       >
         <ComboboxValue>
           {(values: string[]) => (
@@ -95,6 +107,9 @@ export function MultiComboboxEditor({
   );
 }
 
+/**
+ * Convience wrapper around ComboboxEditor to use in meta.editor ColumnDef.
+ */
 export function comboboxEditor<U extends HasToString>({
   options,
 }: {
@@ -106,7 +121,8 @@ export function comboboxEditor<U extends HasToString>({
 }
 
 /**
- * Single-select combobox editor.
+ * Single-select combobox input. Must select on of many options either by typing
+ * it in and hitting enter or by scrolling.
  */
 export function ComboboxEditor<U extends HasToString>({
   overrides,
@@ -117,20 +133,23 @@ export function ComboboxEditor<U extends HasToString>({
 }: FieldEditorProps<unknown, U> & {
   options: { label: string; value: U }[];
 }) {
-  const [value, setValue] = useState(options.find((opt) => opt.value === orig) ?? null);
-  const getLabel = (v: U) =>
-    options.find((opt) => opt.value === v)?.label ?? v.toString();
+  const [item, setItem] = useState(
+    options.find((opt) => opt.value === orig) ?? null,
+  );
 
   return (
     <Combobox
-      value={value}
+      value={item}
       onValueChange={(val) => {
         if (val != null) {
-          setValue(val);
+          setItem(val);
           onChange(val.value);
           onBlur(val.value);
         }
       }}
+      /* The Combobox componnt automatically recognizes items in
+       * { label, value } format, otherwise we'd need to set
+       * itemToStringLabel and itemToStringValue */
       items={options}
       autoHighlight
       {...overrides}
@@ -140,7 +159,7 @@ export function ComboboxEditor<U extends HasToString>({
         <ComboboxEmpty>No items found.</ComboboxEmpty>
 
         <ComboboxList>
-          {(item: {label: string, value: U}) => (
+          {(item: { label: string; value: U }) => (
             <ComboboxItem key={item.value.toString()} value={item}>
               {item.label}
             </ComboboxItem>
