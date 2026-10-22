@@ -2,7 +2,12 @@ import { eq } from "drizzle-orm";
 import db from "~/database";
 import { course, CourseStatus, CreditHourCategory } from "~/database/schema";
 import type { Course } from "~/database/schema";
-import { adminProcedure, instructorProcedure, router } from "~/utils/trpc";
+import {
+  adminProcedure,
+  instructorProcedure,
+  publicProcedure,
+  router,
+} from "~/utils/trpc";
 import { z } from "zod";
 import { createInsertSchema, createUpdateSchema } from "drizzle-orm/zod";
 import { courseFindFirst, courseFindMany } from "~/database/queries";
@@ -113,5 +118,15 @@ export const courseRouter = router({
       .query(({ input }) => {
         return courseFindFirst(input.courseId);
       }),
+
+    /* Does NOT require authentication to view upcoming courses */
+    listFuture: publicProcedure.query(async (): Promise<CourseDto[]> => {
+      const now = new Date();
+      const courses = await courseFindMany();
+      return courses.filter(
+        (c) =>
+          c.status === CourseStatus.Active && c.startDate && c.startDate > now,
+      );
+    }),
   }),
 });
