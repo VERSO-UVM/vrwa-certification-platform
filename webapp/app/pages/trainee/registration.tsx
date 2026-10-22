@@ -40,20 +40,20 @@ const columnHelper = createColumnHelper<CourseEventDto>();
 
 const columns = [
   columnHelper.accessor("courseName", {}),
-  columnHelper.accessor("venue", {}),
-  columnHelper.accessor("physicalAddress", {}),
-  columnHelper.accessor("town", {
-    filterFn: "equalsString",
+  columnHelper.accessor((row) => row.venue ?? "", {
+    id: "venue",
+  }),
+  columnHelper.accessor((row) => row.physicalAddress ?? "", {
+    id: "physicalAddress",
+  }),
+  columnHelper.accessor((row) => row.town ?? "", {
+    id: "town",
   }),
   columnHelper.accessor(
     (row) =>
-      row.classStartDatetime
-        ? format(row.classStartDatetime, "yyyy-MM")
-        : "",
+      row.classStartDatetime ? format(row.classStartDatetime, "yyyy-MM") : "",
     {
       id: "month",
-      filterFn: "equalsString",
-      enableGlobalFilter: false,
     },
   ),
 ];
@@ -179,14 +179,6 @@ export default function CourseRegistrationPage() {
                 : [training.physicalAddress, training.town]
                     .filter(Boolean)
                     .join(", ") || "-";
-            const credits = [
-              `${training.creditHours} hrs`,
-              training.creditHourCategories?.length
-                ? training.creditHourCategories.join(", ")
-                : null,
-            ]
-              .filter(Boolean)
-              .join(" · ");
 
             return (
               <Link to={training.id} key={training.id} className="m-4">
@@ -224,7 +216,7 @@ export default function CourseRegistrationPage() {
                       </div>
                       <div className="flex space-x-2">
                         <dt className="font-medium">Credits:</dt>
-                        <dd>{credits}</dd>
+                        <dd>{training.creditHours} hrs</dd>
                       </div>
                     </dl>
                     {/* We already have a link around the whole card, this button is just for visual indication */}
