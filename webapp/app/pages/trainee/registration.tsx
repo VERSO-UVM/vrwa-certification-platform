@@ -8,7 +8,7 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import type { CourseEventDto } from "@backend/database/dtos";
+import type { CourseDto } from "@backend/database/dtos";
 import { useTRPC } from "~/utils/trpc";
 import { PageHeader } from "~/components/page-header";
 import {
@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { courseStartDate } from "~/utils/utils";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "VRWA - Course Registration" }];
@@ -36,46 +37,50 @@ export function meta({}: Route.MetaArgs) {
 const classCardVariants = ["blue", "green", "yellow", "orange"] as const;
 const ALL_FILTER = "all";
 
-const columnHelper = createColumnHelper<CourseEventDto>();
+const columnHelper = createColumnHelper<CourseDto>();
 
 const columns = [
   columnHelper.accessor("courseName", {}),
-  columnHelper.accessor((row) => row.venue ?? "", {
+  columnHelper.accessor((row) => row?.sessions[0]?.venue ?? "", {
     id: "venue",
   }),
-  columnHelper.accessor((row) => row.physicalAddress ?? "", {
+  columnHelper.accessor((row) => row?.sessions[0]?.physicalAddress ?? "", {
     id: "physicalAddress",
   }),
-  columnHelper.accessor((row) => row.town ?? "", {
+  columnHelper.accessor((row) => row?.sessions[0]?.town ?? "", {
     id: "town",
   }),
   columnHelper.accessor(
-    (row) =>
-      row.classStartDatetime ? format(row.classStartDatetime, "yyyy-MM") : "",
+    (row) => {
+      const start = courseStartDate(row);
+      return start ? format(start, "yyyy-MM") : "";
+    },
     {
       id: "month",
+      enableGlobalFilter: false,
     },
   ),
 ];
 
 export default function CourseRegistrationPage() {
   const trpc = useTRPC();
-  const { data: courseEvents } = useQuery(
-    trpc.courseEvents.trainee.listFuture.queryOptions(),
+  const { data: courses } = useQuery(
+    trpc.courses.trainee.listFuture.queryOptions(),
   );
 
   const data = useMemo(
-    () => courseEvents?.filter((e) => e.classStartDatetime) ?? [],
-    [courseEvents],
+    () => courses?.filter((c) => courseStartDate(c) != null) ?? [],
+    [courses],
   );
 
   const monthOptions = useMemo(() => {
     const months = new Map<string, string>();
-    for (const event of data) {
-      if (!event.classStartDatetime) continue;
-      const value = format(event.classStartDatetime, "yyyy-MM");
+    for (const course of data) {
+      const start = courseStartDate(course);
+      if (!start) continue;
+      const value = format(start, "yyyy-MM");
       if (!months.has(value)) {
-        months.set(value, format(event.classStartDatetime, "LLLL yyyy"));
+        months.set(value, format(start, "LLLL yyyy"));
       }
     }
     return [...months.entries()]
@@ -85,8 +90,9 @@ export default function CourseRegistrationPage() {
 
   const cityOptions = useMemo(() => {
     const cities = new Set<string>();
-    for (const event of data) {
-      if (event.town) cities.add(event.town);
+    for (const course of data) {
+      const town = course.sessions?.[0]?.town;
+      if (town) cities.add(town);
     }
     return [...cities].sort((a, b) => a.localeCompare(b));
   }, [data]);
@@ -170,21 +176,22 @@ export default function CourseRegistrationPage() {
       ) : (
         <div className="grid grid-cols-1 @2xl:grid-cols-2 @4xl:grid-cols-3">
           {rows.map((row, i) => {
-            const training = row.original;
-            const start = training.classStartDatetime!;
+            const course = row.original;
+            const start = courseStartDate(course)!;
+            const session = course.sessions[0];
             const variant = classCardVariants[i % classCardVariants.length];
             const location =
-              training.locationType === "virtual"
+              session?.locationType === "virtual"
                 ? "Online"
-                : [training.physicalAddress, training.town]
+                : [session?.physicalAddress, session?.town]
                     .filter(Boolean)
                     .join(", ") || "-";
 
             return (
-              <Link to={training.id} key={training.id} className="m-4">
+              <Link to={course.id} key={course.id} className="m-4">
                 <Card variant={variant}>
                   <CardHeader>
-                    <CardTitle>{training.courseName}</CardTitle>
+                    <CardTitle>{course.courseName}</CardTitle>
                     <CardAction>
                       <div className="flex flex-col items-center leading-none">
                         <span className="text-2xl font-bold">
@@ -208,7 +215,7 @@ export default function CourseRegistrationPage() {
                       </div>
                       <div className="flex space-x-2">
                         <dt className="font-medium">Venue:</dt>
-                        <dd>{training.venue ?? "-"}</dd>
+                        <dd>{session?.venue ?? "-"}</dd>
                       </div>
                       <div className="flex space-x-2">
                         <dt className="font-medium">Location:</dt>
@@ -216,11 +223,13 @@ export default function CourseRegistrationPage() {
                       </div>
                       <div className="flex space-x-2">
                         <dt className="font-medium">Credits:</dt>
-                        <dd>{training.creditHours} hrs</dd>
+                        <dd>{course.creditHours} hrs</dd>
                       </div>
                     </dl>
                     {/* We already have a link around the whole card, this button is just for visual indication */}
-                    <Button variant="secondary" className="mt-3">Register</Button>
+                    <Button variant="secondary" className="mt-3">
+                      Register
+                    </Button>
                   </CardContent>
                 </Card>
               </Link>
