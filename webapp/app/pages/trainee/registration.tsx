@@ -76,22 +76,19 @@ const columns = [
   ),
 ];
 
+const NO_COURSES = [] as CourseDto[]; // Need stable reference for Tanstack Table
+
 export default function CourseRegistrationPage() {
   const trpc = useTRPC();
-  const { data: courses } = useQuery(
+  const { data: courses = NO_COURSES } = useQuery(
     trpc.courses.trainee.listFuture.queryOptions(),
-  );
-
-  const data = useMemo(
-    () => courses?.filter((c) => courseStartDate(c) != null) ?? [],
-    [courses],
   );
 
   const monthOptions = useMemo(() => {
     // Get unique month/years
     // Assume course data is already sorted
     const months = new Map<string, Date>();
-    for (const course of data) {
+    for (const course of courses) {
       const start = courseStartDate(course);
       if (!start) continue;
       // Match format in month column accessor
@@ -102,19 +99,19 @@ export default function CourseRegistrationPage() {
         .entries()
         .map(([value, date]) => ({ value, label: format(date, "LLLL yyyy") })),
     ];
-  }, [data]);
+  }, [courses]);
 
   const cityOptions = useMemo(() => {
     const cities = new Set<string>();
-    for (const course of data) {
+    for (const course of courses) {
       const town = course.sessions?.[0]?.town;
       if (town) cities.add(town);
     }
     return [...cities].sort((a, b) => a.localeCompare(b));
-  }, [data]);
+  }, [courses]);
 
   const table = useReactTable({
-    data,
+    data: courses,
     columns,
     globalFilterFn: "includesString",
     getCoreRowModel: getCoreRowModel(),
