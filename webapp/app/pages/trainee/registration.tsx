@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { courseStartDate } from "~/utils/utils";
+import { Undo } from "lucide-react";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "VRWA - Course Registration" }];
@@ -50,6 +51,19 @@ const columns = [
   columnHelper.accessor((row) => row?.sessions[0]?.town ?? "", {
     id: "town",
   }),
+
+  /* For global quick search */
+  columnHelper.accessor(
+    (row) => {
+      const start = courseStartDate(row);
+      return start ? format(start, "LLLL d, y") : "";
+    },
+    {
+      id: "date",
+    },
+  ),
+
+  /* For filtering by month using column filtering */
   columnHelper.accessor(
     (row) => {
       const start = courseStartDate(row);
@@ -74,18 +88,20 @@ export default function CourseRegistrationPage() {
   );
 
   const monthOptions = useMemo(() => {
-    const months = new Map<string, string>();
+    // Get unique month/years
+    // Assume course data is already sorted
+    const months = new Map<string, Date>();
     for (const course of data) {
       const start = courseStartDate(course);
       if (!start) continue;
-      const value = format(start, "yyyy-MM");
-      if (!months.has(value)) {
-        months.set(value, format(start, "LLLL yyyy"));
-      }
+      // Match format in month column accessor
+      months.set(format(start, "yyyy-MM"), start);
     }
-    return [...months.entries()]
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([value, label]) => ({ value, label }));
+    return [
+      ...months
+        .entries()
+        .map(([value, date]) => ({ value, label: format(date, "LLLL yyyy") })),
+    ];
   }, [data]);
 
   const cityOptions = useMemo(() => {
@@ -105,12 +121,23 @@ export default function CourseRegistrationPage() {
     getFilteredRowModel: getFilteredRowModel(),
   });
 
+  const globalFilter =
+    (table.getState().globalFilter as string | undefined) ?? "";
   const monthFilter =
     (table.getColumn("month")?.getFilterValue() as string | undefined) ??
     ALL_FILTER;
   const cityFilter =
     (table.getColumn("town")?.getFilterValue() as string | undefined) ??
     ALL_FILTER;
+  const filtersActive =
+    globalFilter.length > 0 ||
+    monthFilter !== ALL_FILTER ||
+    cityFilter !== ALL_FILTER;
+
+  function resetFilters() {
+    table.resetGlobalFilter();
+    table.resetColumnFilters();
+  }
 
   const rows = table.getRowModel().rows;
 
@@ -121,7 +148,7 @@ export default function CourseRegistrationPage() {
       <div className="flex flex-wrap items-center gap-3 px-4 pb-2">
         <Input
           placeholder="Quick search..."
-          value={table.getState().globalFilter ?? ""}
+          value={globalFilter}
           onChange={(event) =>
             table.setGlobalFilter(String(event.target.value))
           }
@@ -167,6 +194,14 @@ export default function CourseRegistrationPage() {
             ))}
           </SelectContent>
         </Select>
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={!filtersActive}
+          onClick={resetFilters}
+        >
+          <Undo /> Reset filters
+        </Button>
       </div>
 
       {rows.length === 0 ? (
@@ -207,7 +242,7 @@ export default function CourseRegistrationPage() {
                     <dl className="grid grid-cols-1 gap-1">
                       <div className="flex space-x-2">
                         <dt className="font-medium">Date:</dt>
-                        <dd>{format(start, "eeee, LLLL d")}</dd>
+                        <dd>{format(start, "LLLL d, y")}</dd>
                       </div>
                       <div className="flex space-x-2">
                         <dt className="font-medium">Time:</dt>
