@@ -8,79 +8,261 @@ import {
   Image,
   Font,
 } from "@react-pdf/renderer";
+import { fileURLToPath } from "node:url";
+import { CreditHourCategory } from "~/database/schema";
 
-//register title font
 Font.register({
   family: "Great Vibes",
   src: "http://fonts.gstatic.com/s/greatvibes/v4/6q1c0ofG6NKsEhAc2eh-3Z0EAVxt0G0biEntp43Qt6E.ttf",
 });
 
-// Create styles
+const logoSrc = fileURLToPath(new URL("./vrwa-logo.png", import.meta.url));
+
+const ACCENT_BLUE = "#6A92C4";
+const LABEL_GRAY = "#555555";
+
 const styles = StyleSheet.create({
   page: {
-    backgroundColor: "#F1E9D2",
-    orientation: "landscape",
+    backgroundColor: "#FFFFFF",
+    fontFamily: "Helvetica",
+    paddingTop: 72,
+    paddingBottom: 56,
+    paddingHorizontal: 48,
+    alignItems: "center",
+  },
+  content: {
+    width: 340,
+    alignItems: "center",
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
+    color: "#000000",
     textAlign: "center",
-    margin: 20,
+    marginBottom: 16,
+  },
+  rule: {
+    width: "100%",
+    borderBottomWidth: 2,
+    borderBottomColor: ACCENT_BLUE,
+    marginBottom: 28,
+  },
+  label: {
+    fontSize: 11,
+    color: LABEL_GRAY,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  recipient: {
+    fontSize: 18,
+    color: "#000000",
+    textAlign: "center",
+    marginBottom: 28,
+  },
+  course: {
+    fontSize: 18,
+    color: "#000000",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  tchLine: {
+    fontSize: 13,
+    color: "#000000",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  subcategoryLine: {
+    fontSize: 11,
+    color: "#000000",
+    textAlign: "center",
+    marginBottom: 28,
+  },
+  metaRow: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 28,
+  },
+  metaText: {
+    fontSize: 11,
+    color: LABEL_GRAY,
+  },
+  footer: {
+    width: 460,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 28,
+  },
+  logo: {
+    width: 230,
+    height: 55,
+    objectFit: "contain",
+  },
+  signatureBlock: {
+    width: 180,
+    alignItems: "center",
+  },
+  signature: {
     fontFamily: "Great Vibes",
+    fontSize: 24,
+    color: "#000000",
+    marginBottom: 2,
   },
-  text: {
-    fontSize: 12,
-    margin: 10,
-    fontFamily: "Times-Roman",
+  signatureRule: {
+    width: "100%",
+    borderBottomWidth: 1,
+    borderBottomColor: "#000000",
+    marginBottom: 6,
   },
-  borders: {
-    borderColor: "green",
-    borderWidth: 5,
-    borderStyle: "solid",
-    margin: 10,
-  },
-  imageContainer: {
-    position: "absolute",
-    right: 15,
-    bottom: 15,
-  },
-  image: {
-    width: 100,
-    height: 100,
+  signerTitle: {
+    fontSize: 9.5,
+    color: "#000000",
+    textAlign: "center",
   },
 });
 
-// Create props for user specfific information
-interface CertificateDocumentProps {
+function isWaterCategory(category: CreditHourCategory): boolean {
+  return (
+    category === CreditHourCategory.Water ||
+    category.startsWith(`${CreditHourCategory.Water}:`)
+  );
+}
+
+function formatDomainSuffix(
+  categories: CreditHourCategory[] | undefined,
+): string {
+  if (!categories?.length) {
+    return "";
+  }
+
+  const hasWater = categories.some(isWaterCategory);
+  const hasWastewater = categories.includes(CreditHourCategory.Wastewater);
+
+  if (hasWater && hasWastewater) {
+    return " — Water & Wastewater";
+  }
+  if (hasWater) {
+    return " — Water";
+  }
+  if (hasWastewater) {
+    return " — Wastewater";
+  }
+  return "";
+}
+
+function formatSubcategories(
+  categories: CreditHourCategory[] | undefined,
+): string | undefined {
+  if (!categories?.length) {
+    return undefined;
+  }
+
+  const labels: string[] = [];
+
+  for (const category of categories) {
+    switch (category) {
+      case CreditHourCategory.WaterC1:
+        labels.push("Water Treatment Category 1");
+        break;
+      case CreditHourCategory.WaterC2:
+        labels.push("Water Treatment Category 2");
+        break;
+      case CreditHourCategory.WaterC3:
+        labels.push("Water Treatment Category 3");
+        break;
+      case CreditHourCategory.WaterD1:
+        labels.push("Distribution Category 1");
+        break;
+      case CreditHourCategory.WaterD2:
+        labels.push("Distribution Category 2");
+        break;
+      case CreditHourCategory.WaterD3:
+        labels.push("Distribution Category 3");
+        break;
+      default:
+        break;
+    }
+  }
+
+  return labels.length > 0 ? labels.join(", ") : undefined;
+}
+
+function formatTchLine(
+  creditHours: string | number | undefined,
+  categories: CreditHourCategory[] | undefined,
+): string | undefined {
+  if (creditHours == null || creditHours === "") {
+    return undefined;
+  }
+
+  return `${creditHours} TCH${formatDomainSuffix(categories)}`;
+}
+
+export interface CertificateDocumentProps {
   name?: string;
+  course?: string;
+  creditHours?: string | number;
+  creditHourCategories?: CreditHourCategory[];
+  location?: string;
   date?: string;
-  course?: string; // not sure if certificates are course specific ?
+  signerName?: string;
+  signerTitle?: string;
 }
 
 const CertificateDocument: React.FC<CertificateDocumentProps> = ({
   name = "Name here",
-  date = "Date here",
   course = "Course here",
-}) => (
-  <Document>
-    <Page style={styles.page}>
-      <View style={styles.borders}>
-        <Text style={styles.title}>Certificate of Completion</Text>
-        <Text style={styles.text}>
-          This Certificate of Completion is Awarded To
-        </Text>
-        <Text style={{ ...styles.text, fontSize: 20, textAlign: "center" }}>
-          {name}
-        </Text>
-        <Text style={styles.text}>
-          has successfully completed {course} training.
-        </Text>
-        <Text style={styles.text}>Date: {date}</Text>
-        <View style={styles.imageContainer}>
-          <Image style={styles.image} src="completion_seal.png" />
+  creditHours,
+  creditHourCategories,
+  location,
+  date,
+  signerName = "Allison Smith",
+  signerTitle = "Training Administrator",
+}) => {
+  const tchLine = formatTchLine(creditHours, creditHourCategories);
+  const subcategoryLine = formatSubcategories(creditHourCategories);
+
+  return (
+    <Document>
+      <Page size="LETTER" style={styles.page}>
+        <View style={styles.content}>
+          <Text style={styles.title}>Certificate of Completion</Text>
+          <View style={styles.rule} />
+
+          <Text style={styles.label}>Awarded to</Text>
+          <Text style={styles.recipient}>{name}</Text>
+
+          <Text style={styles.label}>For Training in</Text>
+          <Text style={styles.course}>{course}</Text>
+
+          {tchLine ? <Text style={styles.tchLine}>{tchLine}</Text> : null}
+          {subcategoryLine ? (
+            <Text style={styles.subcategoryLine}>{subcategoryLine}</Text>
+          ) : (
+            <View style={{ marginBottom: 28 }} />
+          )}
+
+          <View style={styles.metaRow}>
+            <Text style={styles.metaText}>{location ?? ""}</Text>
+            <Text style={styles.metaText}>{date ?? ""}</Text>
+          </View>
+
+          <View style={styles.rule} />
         </View>
-      </View>
-    </Page>
-  </Document>
-);
+
+        <View style={styles.footer}>
+          <Image style={styles.logo} src={logoSrc} />
+          <View style={styles.signatureBlock}>
+            <Text style={styles.signature}>{signerName}</Text>
+            <View style={styles.signatureRule} />
+            <Text style={styles.signerTitle}>
+              {signerName}, {signerTitle}
+            </Text>
+          </View>
+        </View>
+      </Page>
+    </Document>
+  );
+};
 
 export { CertificateDocument };
