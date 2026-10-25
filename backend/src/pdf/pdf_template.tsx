@@ -128,7 +128,7 @@ function formatDomainSuffix(
     return "";
   }
 
-  const hasWater = categories.includes(CreditHourCategory.Water);;
+  const hasWater = categories.includes(CreditHourCategory.Water);
   const hasWastewater = categories.includes(CreditHourCategory.Wastewater);
 
   if (hasWater && hasWastewater) {
