@@ -99,11 +99,7 @@ export const profileDefs = {
             value: user.id,
           }));
           return (
-            <ComboboxEditor
-              {...props}
-              key={options.length}
-              options={options}
-            />
+            <ComboboxEditor {...props} key={options.length} options={options} />
           );
         };
       })(),
