@@ -1,3 +1,7 @@
+/**
+ * Certificate generation using react-pdf. react-pdf uses regular React
+ * but instead of an HTML backend, it uses a PDF backend.
+ */
 import React from "react";
 import {
   Page,
@@ -64,7 +68,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-  tchLine: {
+  creditHours: {
     fontSize: 13,
     color: "#000000",
     textAlign: "center",
@@ -180,7 +184,7 @@ function formatSubcategories(
   return labels.join(", ");
 }
 
-function formatTchLine(
+function formatCreditHours(
   creditHours: string | number | undefined,
   categories: CreditHourCategory[] | undefined,
 ): string | undefined {
@@ -212,7 +216,7 @@ const CertificateDocument: React.FC<CertificateDocumentProps> = ({
   signerName,
   signerTitle,
 }) => {
-  const tchLine = formatTchLine(creditHours, creditHourCategories);
+  const creditHoursLine = formatCreditHours(creditHours, creditHourCategories);
   const subcategoryLine = formatSubcategories(creditHourCategories);
 
   return (
@@ -228,7 +232,9 @@ const CertificateDocument: React.FC<CertificateDocumentProps> = ({
           <Text style={styles.label}>For Training in</Text>
           <Text style={styles.course}>{course}</Text>
 
-          {tchLine ? <Text style={styles.tchLine}>{tchLine}</Text> : null}
+          {creditHoursLine ? (
+            <Text style={styles.creditHours}>{creditHoursLine}</Text>
+          ) : null}
           {subcategoryLine ? (
             <Text style={styles.subcategoryLine}>{subcategoryLine}</Text>
           ) : (
