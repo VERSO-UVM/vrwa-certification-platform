@@ -121,13 +121,6 @@ const styles = StyleSheet.create({
   },
 });
 
-function isWaterCategory(category: CreditHourCategory): boolean {
-  return (
-    category === CreditHourCategory.Water ||
-    category.startsWith(`${CreditHourCategory.Water}:`)
-  );
-}
-
 function formatDomainSuffix(
   categories: CreditHourCategory[] | undefined,
 ): string {
@@ -135,7 +128,7 @@ function formatDomainSuffix(
     return "";
   }
 
-  const hasWater = categories.some(isWaterCategory);
+  const hasWater = categories.includes(CreditHourCategory.Water);;
   const hasWastewater = categories.includes(CreditHourCategory.Wastewater);
 
   if (hasWater && hasWastewater) {
@@ -184,7 +177,7 @@ function formatSubcategories(
     }
   }
 
-  return labels.length > 0 ? labels.join(", ") : undefined;
+  return labels.join(", ");
 }
 
 function formatTchLine(
@@ -199,25 +192,25 @@ function formatTchLine(
 }
 
 export interface CertificateDocumentProps {
-  name?: string;
-  course?: string;
+  name: string;
+  course: string;
   creditHours?: string | number;
   creditHourCategories?: CreditHourCategory[];
   location?: string;
   date?: string;
-  signerName?: string;
-  signerTitle?: string;
+  signerName: string;
+  signerTitle: string;
 }
 
 const CertificateDocument: React.FC<CertificateDocumentProps> = ({
-  name = "Name here",
-  course = "Course here",
+  name,
+  course,
   creditHours,
   creditHourCategories,
   location,
   date,
-  signerName = "Allison Smith",
-  signerTitle = "Training Administrator",
+  signerName,
+  signerTitle,
 }) => {
   const tchLine = formatTchLine(creditHours, creditHourCategories);
   const subcategoryLine = formatSubcategories(creditHourCategories);

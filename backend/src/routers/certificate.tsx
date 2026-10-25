@@ -62,6 +62,9 @@ const generateCertificate = async (input: {
       creditHourCategories={course.creditHourCategories}
       location={location}
       date={date}
+      /* TODO: hardcoded */
+      signerName="Allison Smith"
+      signerTitle="Training Administrator"
     />,
   ).toBlob();
 
