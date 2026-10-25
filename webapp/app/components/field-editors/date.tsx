@@ -1,3 +1,7 @@
+/**
+ * Date input fields. These are adapted from the shadcn/ui examples.
+ * The actual components they give us require a lot of infrastracture, as usual.
+ */
 import { CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import type { FieldEditor, FieldEditorProps } from "~/utils/field-editors";
@@ -20,7 +24,6 @@ export function dateEditor(): FieldEditor<unknown, Date | null> {
 
 /**
  * Date and time picker.
- * Adapted from shadcn/ui example.
  */
 export function DatetimeEditor({
   value: orig,
@@ -32,7 +35,7 @@ export function DatetimeEditor({
   const [date, setDate] = useState(orig ?? new Date());
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState<Date | undefined>(date);
-  const [dateString, setDateString] = useState(formatDate(date));
+  const [dateString, setDateString] = useState(dateToDateString(date));
 
   return (
     <FieldGroup className="flex flex-row gap-4">
@@ -94,7 +97,7 @@ export function DatetimeEditor({
                         hours: date.getHours(),
                         minutes: date.getMinutes(),
                       });
-                      setDateString(formatDate(withTime));
+                      setDateString(dateToDateString(withTime));
                       onChange(withTime);
                       onBlur(withTime);
                       setDate(withTime);
@@ -112,10 +115,10 @@ export function DatetimeEditor({
           onChange={(newDate) => {
             if (newDate) {
               setDate(newDate);
+              onChange(newDate);
             }
-            onChange(newDate);
           }}
-          onBlur={(newDate) => onBlur(newDate)}
+          onBlur={() => onBlur(date)}
           overrides={overrides}
           {...rest}
         />
@@ -124,15 +127,19 @@ export function DatetimeEditor({
   );
 }
 
+/**
+ * Time picker.
+ */
 export function TimeInput({
   value: date,
   onChange,
   onBlur,
   overrides,
 }: FieldEditorProps<unknown, Date | null>) {
-  const [timeString, setTimeString] = useState(formatTimeForInput(date));
+  const [timeString, setTimeString] = useState(dateToTimeString(date));
 
-  const calcNewDate = (timeString: string) => {
+  /* Change the time, keep the day */
+  const updateDate = (timeString: string) => {
     if (!timeString) return null;
     const [hours, minutes] = timeString.split(":").map(Number);
     if (hours == null || minutes == null) return null;
@@ -148,14 +155,14 @@ export function TimeInput({
   return (
     <Input
       type="time"
-      step="60"
+      step="60" // By the minute, not the second
       value={timeString}
       onChange={(event) => {
-        const newDate = calcNewDate(event.target.value);
+        const newDate = updateDate(event.target.value);
         if (newDate) onChange(newDate);
       }}
       onBlur={(event) => {
-        const newDate = calcNewDate(event.target.value);
+        const newDate = updateDate(event.target.value);
         if (newDate) onBlur(newDate);
       }}
       {...overrides}
@@ -163,13 +170,15 @@ export function TimeInput({
   );
 }
 
-function formatTimeForInput(date: Date | null | undefined): string {
+/* Get the input[type="time"] string equivalent for a given date */
+function dateToTimeString(date: Date | null | undefined): string {
   if (!date) return "00:00";
   if (!isValid(date)) return "00:00";
   return format(date, "HH:mm");
 }
 
-function formatDate(date: Date | undefined) {
+/* Get the human string representation of day/month/year */
+function dateToDateString(date: Date | undefined) {
   if (!date) {
     return "";
   }

@@ -34,7 +34,7 @@ export const reservationDefs = {
     header: "Payment",
     cell: ({ getValue }) => <PaymentStatusBadge value={getValue()} />,
     meta: {
-      editor: selectOptionsEditor({
+      editor: selectOptionsEditor<PaymentStatus>({
         options: [
           { label: "Paid", value: PaymentStatus.Paid },
           { label: "Draft", value: PaymentStatus.Draft },

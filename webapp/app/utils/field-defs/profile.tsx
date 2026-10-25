@@ -94,31 +94,15 @@ export const profileDefs = {
         return (props) => {
           const trpc = useTRPC();
           const usersQuery = useQuery(trpc.users.getUsers.queryOptions());
-          const email = usersQuery?.data?.find(
-            (user) => user.id === props.value,
-          )?.email;
+          const options = (usersQuery?.data ?? []).map((user) => ({
+            label: user.email,
+            value: user.id,
+          }));
           return (
             <ComboboxEditor
               {...props}
-              key={email}
-              value={email}
-              options={(usersQuery?.data ?? []).map((user) => user.email)}
-              onChange={(val) => {
-                const user = usersQuery?.data?.find(
-                  (user) => user.email === val,
-                );
-                if (user) {
-                  props.onChange(user.id);
-                }
-              }}
-              onBlur={(val) => {
-                const user = usersQuery?.data?.find(
-                  (user) => user.email === val,
-                );
-                if (user) {
-                  props.onBlur(user.id);
-                }
-              }}
+              key={options.length}
+              options={options}
             />
           );
         };

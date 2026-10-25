@@ -5,6 +5,10 @@ import { Button } from "~/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router";
 import { SkeletonCard } from "~/components/ui/skeleton";
+import { protectedLoader } from "~/utils/session";
+
+// Must be signed in to access view certificate page
+export const loader = protectedLoader("user");
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "VRWA - View Certificate" }];

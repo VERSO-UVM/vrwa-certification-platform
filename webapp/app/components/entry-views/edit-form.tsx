@@ -1,3 +1,8 @@
+/**
+ * This component is an important abstraction for rendering our Create and Update CRUD
+ * interfaces. See utils/field-editors for details.
+ */
+
 import {
   flexRender,
   getCoreRowModel,
@@ -9,30 +14,6 @@ import React, { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { deepEqual, isInputUnset, without } from "~/utils/utils";
 
-/* Make not-required fields optional like Partial<> and
- * required fields required. */
-export type RequiredFields<T, R extends keyof T> = Partial<T> & Pick<T, R>;
-
-/**
- * Refine the more general Partial<T> into the more specific RequiredFields<T, R>.
- */
-export function satisfiesRequiredFields<T, R extends keyof T>(
-  item: Partial<T>,
-  required: {
-    [K in R]: {};
-  },
-): item is RequiredFields<T, R> {
-  for (const k in required) {
-    if (!(k in item) || isInputUnset(item[k])) {
-      return false;
-    }
-  }
-  return true;
-}
-
-/**
- * Generate an edit form using column defs!
- */
 export interface EditFormProps<T, R extends keyof T> {
   /**
    * The original item we are editing, or `undefined` if there is no original.
@@ -123,17 +104,17 @@ export function EditForm<T extends object, R extends keyof T>({
                   const id = header.column.id;
                   if (!id) throw new Error("Column missing ID");
 
-                  const htmlId = id + "_input";
+                  /* Silently skip fields that don't have a meta.editor? */
                   const Editor = column.meta?.editor;
                   if (Editor == null) return null;
 
                   const accessorFn = header.column.accessorFn;
                   if (!accessorFn) {
-                    throw new Error(
-                      `Column missing both accessorKey and accessorColumn: ${column}`,
-                    );
+                    throw new Error(`Column missing accessor: ${column}`);
                   }
                   const val = item == null ? undefined : accessorFn(item, 0);
+                  /* ID to use for accessible labels */
+                  const htmlId = id + "_input";
 
                   return (
                     <Field key={id}>
@@ -155,9 +136,25 @@ export function EditForm<T extends object, R extends keyof T>({
                           id: htmlId,
                           required: id in required,
                         }}
-                        onBlur={(_value) => {}}
+                        onBlur={(_value) => {
+                          /* User has just moved focus away from the input. We
+                           * may want to do stuff on onBlur in the future.
+                           * */
+                        }}
                         onChange={(value) => {
+                          /**
+                           * We are currently assuming here that the ColumnDef is a simple key
+                           * accessor for a particular field. To support more complex accessors,
+                           * we'll need to make an interface for field editors to do different
+                           * kinds of alterations to the object.
+                           */
+
                           const k = id as keyof T;
+                          /* This checking is to handle the common form of an annoying edge
+                           * case with supporting forms that start blank. If a user types in
+                           * something into an empty field, then deletes what they typed,
+                           * shouldn't it be treated as if they hadn't typed anything at
+                           * all? */
                           if (item?.[k] == null && isInputUnset(value)) {
                             // Original value was unset and new input is unset.
                             setUpdates(without(updates, k));
@@ -188,4 +185,25 @@ export function EditForm<T extends object, R extends keyof T>({
       </FieldSet>
     </form>
   );
+}
+
+/* Make not-required fields optional like Partial<> and
+ * required fields required. */
+export type RequiredFields<T, R extends keyof T> = Partial<T> & Pick<T, R>;
+
+/**
+ * Refine the more general Partial<T> into the more specific RequiredFields<T, R>.
+ */
+export function satisfiesRequiredFields<T, R extends keyof T>(
+  item: Partial<T>,
+  required: {
+    [K in R]: {};
+  },
+): item is RequiredFields<T, R> {
+  for (const k in required) {
+    if (!(k in item) || isInputUnset(item[k])) {
+      return false;
+    }
+  }
+  return true;
 }

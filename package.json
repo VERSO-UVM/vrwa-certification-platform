@@ -17,7 +17,7 @@
     }
   },
   "scripts": {
-    "dev": "FORCE_COLOR=1 bun --elide-lines=0 --filter=\"*\" run dev",
+    "dev": "FORCE_COLOR=1 bun --elide-lines=0 --filter=\"*\" --bun run dev",
     "lint": "eslint \"{backend,webapp}/{src,app}/**/*.ts*\" --fix",
     "format": "prettier --write \"{backend,webapp}/{src,app}/**/*.ts*\"",
     "typecheck": "bun tsc -p backend; bun tsc -p webapp",

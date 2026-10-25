@@ -16,6 +16,10 @@ import {
   reservationFieldHelper,
 } from "~/utils/field-defs/reservation";
 import { Link } from "react-router";
+import { protectedLoader } from "~/utils/session";
+
+// Must be signed in to access
+export const loader = protectedLoader("user");
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "VRWA - Completed Courses" }];

@@ -33,8 +33,6 @@ function TextAreaEditor({
         onChange(e.target.value);
       }}
       onBlur={() => onBlur(value)}
-      // Default to required, can be overriden
-      required
       {...overrides}
     />
   );

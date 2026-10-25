@@ -3,14 +3,9 @@
  * property. The idea is for these functions to be highly re-usable. They
  * have no direct dependencies on any React-Table things, so they may be
  * used in other contexts.
- *
- * Currently still missing:
- *
- * - [ ] Checkbox
- * - [ ] Radio
- * - [x] Date input
  */
 
+// To simplify refactoring: we are re-exporting existing field editors here
 export * from "~/components/field-editors/text-area";
 export {
   intInputEditor,
