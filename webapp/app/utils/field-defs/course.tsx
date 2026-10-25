@@ -275,15 +275,16 @@ export const courseDefs = {
   }),
 };
 
+/**
+ * Handle invariants within CreditHourCategory list.
+ */
 function normalizeCreditHourCategories(categories: CreditHourCategory[]) {
-  for (const category of [
-    CreditHourCategory.Water,
-    CreditHourCategory.Wastewater,
-  ]) {
-    const includes = categories.includes(category);
-    if (!includes) {
-      categories = categories.filter((x) => !x.startsWith(category + ":"));
-    }
+  /* Water has 6 subcategories. So if Water is unchecked, we shouldn't
+   * allow any subcategories to be checked. */
+  if (!categories.includes(CreditHourCategory.Water)) {
+    categories = categories.filter(
+      (x) => !x.startsWith(CreditHourCategory.Water + ":"),
+    );
   }
   return categories;
 }
