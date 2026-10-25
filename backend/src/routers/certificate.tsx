@@ -1,7 +1,7 @@
 import { adminProcedure, router, traineeProcedure } from "~/utils/trpc";
 import { pdf } from "@react-pdf/renderer";
 import z from "zod";
-import { CertificateDocument } from "~/pdf/pdf_template";
+import { CertificateDocument } from "~/pdf/certificate-document";
 import db from "~/database";
 import { TRPCError } from "@trpc/server";
 import { courseFindFirst } from "~/database/queries";
