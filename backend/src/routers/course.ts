@@ -132,8 +132,9 @@ export const courseRouter = router({
       .input(
         z.object({
           courseId: z.string(),
-          /* Set to copy over all courseEvents to the set date. */
-          copyCourseEvents: z.date().optional(),
+          /* Optional: either don't copy course events or copy over all course events
+           *           with a particular start date */
+          copyCourseEventsToDate: z.date().optional(),
         }),
       )
       .mutation(async ({ input }) => {
@@ -167,9 +168,9 @@ export const courseRouter = router({
             });
           }
 
-          if (input.copyCourseEvents && orig.sessions.length > 0) {
+          if (input.copyCourseEventsToDate && orig.sessions.length > 0) {
             // Keep same date relative to new course start date
-            const newStart = input.copyCourseEvents.getTime();
+            const newStart = input.copyCourseEventsToDate.getTime();
             const origStart =
               orig.sessions[0]?.classStartDatetime?.getTime() ?? newStart;
             const difference = newStart - origStart;
