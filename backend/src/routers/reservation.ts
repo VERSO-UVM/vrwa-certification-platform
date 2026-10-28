@@ -53,6 +53,30 @@ export const reservationRouter = router({
         .returning();
     }),
 
+    get: adminProcedure
+      .input(
+        z.object({
+          courseId: z.string(),
+          profileId: z.string(),
+        }),
+      )
+      .query(async ({ input }) => {
+        const reservations = await reservationQuery().where(
+          and(
+            eq(reservation.profileId, input.profileId),
+            eq(reservation.courseId, input.courseId),
+          ),
+        );
+        const found = reservations[0];
+        if (!found) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "No reservation found.",
+          });
+        }
+        return found;
+      }),
+
     list: adminProcedure.query(() =>
       reservationQuery().orderBy(
         desc(courseStartQuery.courseStart),

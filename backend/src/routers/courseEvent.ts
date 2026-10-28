@@ -13,15 +13,13 @@ import type { CourseEventDto } from "~/database/dtos";
 import { courseEventQuery } from "~/database/queries";
 import { TRPCError } from "@trpc/server";
 import { isFutureClass } from "~/database/filters";
+import { createUpdateSchema } from "drizzle-orm/zod";
 
-export const courseEventUpdateSchema = z.object({
+export const courseEventUpdateSchema = createUpdateSchema(courseEvent, {
   id: z.string(),
-  classStartDatetime: z.coerce.date().optional().nullable(),
+  virtualLink: z.url().nullable().optional(),
   seats: z.number().int().positive().nullable().optional(),
-  locationType: z.enum(["in-person", "virtual", "hybrid"]).optional(),
-  physicalAddress: z.string().nullable().optional(),
-  virtualLink: z.url().optional().nullable(),
-});
+}).omit({ courseId: true });
 
 export type CourseEventUpdateDto = z.infer<typeof courseEventUpdateSchema>;
 
@@ -84,6 +82,43 @@ export const courseEventRouter = router({
           .returning();
 
         return updatedEvent;
+      }),
+
+    clone: adminProcedure
+      .input(
+        z.object({
+          courseEventId: z.string(),
+          classStartDatetime: z.date().optional(),
+        }),
+      )
+      .mutation(async ({ input: { courseEventId, classStartDatetime } }) => {
+        const original = await db.client.query.courseEvent.findFirst({
+          where: { id: courseEventId },
+        });
+        if (!original) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "CourseEvent not found.",
+          });
+        }
+
+        const [newCourseEvent] = await db.client
+          .insert(courseEvent)
+          .values({
+            ...original,
+            id: undefined,
+            classStartDatetime:
+              classStartDatetime ?? original.classStartDatetime,
+          })
+          .returning();
+        if (!newCourseEvent) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create course event.",
+          });
+        }
+
+        return newCourseEvent;
       }),
 
     delete: adminProcedure
