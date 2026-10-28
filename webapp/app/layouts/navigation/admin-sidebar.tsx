@@ -54,7 +54,7 @@ export function AdminSidebar() {
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link to="/admin/instructors">
+                <Link to="/admin/users">
                   <UserCog />
                   Users
                 </Link>
