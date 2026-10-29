@@ -167,23 +167,21 @@ export const courseDefs = {
       </>
     ),
     meta: {
-      // TODO: courses.admin.listTags procedure not in this branch; commenting this out for now
-      //
-      // editor: (() => {
-      //   return (props) => {
-      //     const trpc = useTRPC();
-      //     const optionsQuery = useQuery(
-      //       trpc.courses.admin.listTags.queryOptions(),
-      //     );
-      //     return (
-      //       <MultiComboboxEditor
-      //         {...props}
-      //         value={props.value ?? []}
-      //         options={optionsQuery?.data ?? []}
-      //       />
-      //     );
-      //   };
-      // })(),
+      editor: (() => {
+        return (props) => {
+          const trpc = useTRPC();
+          const optionsQuery = useQuery(
+            trpc.courses.admin.listTags.queryOptions(),
+          );
+          return (
+            <MultiComboboxEditor
+              {...props}
+              value={props.value ?? []}
+              options={optionsQuery?.data ?? []}
+            />
+          );
+        };
+      })(),
     },
   }),
 
