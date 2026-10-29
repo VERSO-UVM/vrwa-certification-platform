@@ -19,7 +19,6 @@ import {
 import { courseDefs, courseRequiredFields } from "~/utils/field-defs/course";
 import type { ColumnDef } from "@tanstack/react-table";
 import { add } from "date-fns";
-import { RosterManager } from "./roster-manager";
 import {
   useCourseEventCloneMutation,
   useCourseEventDeleteMutation,

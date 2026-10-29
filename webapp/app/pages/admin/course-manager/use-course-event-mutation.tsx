@@ -1,3 +1,8 @@
+/**
+ * Mutations for courseEvents. For the moment they invalidate ALL courseEvent queries in the
+ * background on success.
+ */
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "~/utils/trpc";
 
@@ -8,8 +13,8 @@ export function useCourseEventUpdateMutation() {
   return useMutation(
     trpc.courseEvents.admin.update.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.courseEvents.admin.pathKey(),
+        void queryClient.invalidateQueries({
+          queryKey: trpc.courseEvents.pathKey(),
         });
       },
     }),
@@ -23,8 +28,8 @@ export function useCourseEventCloneMutation() {
   return useMutation(
     trpc.courseEvents.admin.clone.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.courseEvents.admin.pathKey(),
+        void queryClient.invalidateQueries({
+          queryKey: trpc.courseEvents.pathKey(),
         });
       },
     }),
@@ -38,8 +43,8 @@ export function useCourseEventDeleteMutation() {
   return useMutation(
     trpc.courseEvents.admin.delete.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.courseEvents.admin.pathKey(),
+        void queryClient.invalidateQueries({
+          queryKey: trpc.courseEvents.pathKey(),
         });
       },
     }),
