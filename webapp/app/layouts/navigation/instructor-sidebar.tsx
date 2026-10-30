@@ -22,20 +22,16 @@ export function InstructorSidebar() {
           <SidebarGroupLabel>Instructor</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link to="/instructor">My Classes</Link>
+              <SidebarMenuButton render={<Link to="/instructor" />}>
+                My Classes
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenuButton asChild>
-          <ActiveProfileIndicator />
-        </SidebarMenuButton>
-        <SidebarMenuButton asChild>
-          <LogOutButton />
-        </SidebarMenuButton>
+        <ActiveProfileIndicator />
+        <LogOutButton />
       </SidebarFooter>
     </Sidebar>
   );

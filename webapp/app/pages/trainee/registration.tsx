@@ -153,10 +153,13 @@ export default function CourseRegistrationPage() {
         />
         <Select
           value={monthFilter}
+          items={[{ value: ALL_FILTER, label: "All months" }, ...monthOptions]}
           onValueChange={(value) =>
             table
               .getColumn("month")
-              ?.setFilterValue(value === ALL_FILTER ? undefined : value)
+              ?.setFilterValue(
+                !value || value === ALL_FILTER ? undefined : value,
+              )
           }
         >
           <SelectTrigger className="w-44">
@@ -173,10 +176,16 @@ export default function CourseRegistrationPage() {
         </Select>
         <Select
           value={cityFilter}
+          items={[
+            { value: ALL_FILTER, label: "All cities" },
+            ...cityOptions.map((city) => ({ value: city, label: city })),
+          ]}
           onValueChange={(value) =>
             table
               .getColumn("town")
-              ?.setFilterValue(value === ALL_FILTER ? undefined : value)
+              ?.setFilterValue(
+                !value || value === ALL_FILTER ? undefined : value,
+              )
           }
         >
           <SelectTrigger className="w-44">

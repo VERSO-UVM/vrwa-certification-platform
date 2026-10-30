@@ -41,6 +41,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerDescription,
+  DrawerTrigger,
 } from "~/components/ui/drawer";
 import { NewCourseForm } from "~/pages/admin/course-manager/course-form";
 import type { Route } from "./+types/course-details";
@@ -210,10 +211,13 @@ export default function CourseDetails({
 
   return (
     <div className="flex-1">
-      <Button className="p-6" variant="ghost" asChild>
-        <Link to="/admin/course-manager">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Courses
-        </Link>
+      <Button
+        className="p-6"
+        variant="ghost"
+        nativeButton={false}
+        render={<Link to="/admin/course-manager" />}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Courses
       </Button>
       <PageHeader>{course.data?.courseName}</PageHeader>
       <div className="grid gap-4 grid-cols-1 @xl:grid-cols-3">
@@ -304,10 +308,21 @@ export default function CourseDetails({
               </dl>
               <div className="flex justify-end mb-4 pr-4">
                 <Drawer
-                  direction="right"
+                  swipeDirection="right"
                   open={courseDrawerOpen}
                   onOpenChange={setCourseDrawerOpen}
                 >
+                  <DrawerTrigger
+                    render={
+                      <Button
+                        variant="secondary"
+                        size="lg"
+                        className="w-full"
+                      />
+                    }
+                  >
+                    Update Details
+                  </DrawerTrigger>
                   <DrawerContent>
                     <DrawerHeader>
                       <DrawerTitle>Update Course Details</DrawerTitle>
@@ -336,18 +351,6 @@ export default function CourseDetails({
                   </DrawerContent>
                 </Drawer>
               </div>
-              <div>
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  className="w-full"
-                  onClick={() => {
-                    setCourseDrawerOpen(true);
-                  }}
-                >
-                  Update Details
-                </Button>
-              </div>
               <div></div>
             </div>
           </CardContent>
@@ -359,7 +362,9 @@ export default function CourseDetails({
           <CardContent>
             <Tabs
               value={selectedTab ?? eventIds[0] ?? ""}
-              onValueChange={setSelectedTab}
+              onValueChange={(value) =>
+                setSelectedTab(value != null ? String(value) : null)
+              }
             >
               <div className="flex justify-between">
                 <TabsList variant="line">
@@ -418,10 +423,10 @@ export default function CourseDetails({
                 open={traineePopupOpen}
                 onOpenChange={setTraineePopupOpen}
               >
-                <DialogTrigger asChild>
-                  <Button variant="secondary" size="lg">
-                    + Add Trainee To Roster
-                  </Button>
+                <DialogTrigger
+                  render={<Button variant="secondary" size="lg" />}
+                >
+                  + Add Trainee To Roster
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
@@ -432,6 +437,11 @@ export default function CourseDetails({
                   </DialogDescription>
                   <Select
                     required
+                    value={selectedTrainee}
+                    items={availableTrainees.map((trainee) => ({
+                      value: trainee.id,
+                      label: `${trainee.firstName} ${trainee.lastName}`,
+                    }))}
                     onValueChange={(value) => setSelectedTrainee(value)}
                   >
                     <SelectTrigger id="trainees" className="w-full max-w-48">
