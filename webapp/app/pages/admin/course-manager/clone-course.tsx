@@ -1,3 +1,6 @@
+/**
+ * Drawer button to clone a course and its sessions.
+ */
 import type { CourseDto } from "@backend/database/dtos";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addYears } from "date-fns";
@@ -16,13 +19,12 @@ import {
 } from "~/components/ui/field";
 import { Label } from "~/components/ui/label";
 import { useTRPC } from "~/utils/trpc";
-import { courseStartDate } from "~/utils/utils";
 
 export function CloneCourse({ course }: { course: CourseDto }) {
   const navigate = useNavigate();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  const originalStartDate = courseStartDate(course) ?? new Date();
+  const originalStartDate = course.startDate ?? new Date();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     originalStartDate,
   );
@@ -31,7 +33,7 @@ export function CloneCourse({ course }: { course: CourseDto }) {
     trpc.courses.admin.clone.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: trpc.courses.admin.pathKey(),
+          queryKey: trpc.courses.pathKey(),
         });
       },
     }),
