@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Form } from "@radix-ui/react-form";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Button } from "~/components/ui/button";
 import { CourseStatus, type Course } from "@backend/database/schema";
@@ -58,7 +57,7 @@ export function NewCourseForm({ onCreate, course }: NewCourseFormProps) {
   }
 
   return (
-    <Form onSubmit={handleSubmit} className="space-y-6 p-4">
+    <form onSubmit={handleSubmit} className="space-y-6 p-4">
       <FieldGroup>
         <Field>
           <FieldLabel htmlFor="courseName">
@@ -116,6 +115,6 @@ export function NewCourseForm({ onCreate, course }: NewCourseFormProps) {
           </Button>
         </Field>
       </FieldGroup>
-    </Form>
+    </form>
   );
 }

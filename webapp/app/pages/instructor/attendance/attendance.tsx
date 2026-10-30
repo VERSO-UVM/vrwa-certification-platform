@@ -16,12 +16,19 @@ export default function AttendancePage({
   const [viewMode, setViewMode] = useSearchParamEntry("view", "edit");
 
   return (
-    <Tabs value={viewMode} onValueChange={setViewMode}>
+    <Tabs
+      value={viewMode}
+      onValueChange={(value) => {
+        if (value != null) setViewMode(String(value));
+      }}
+    >
       <div className="pb-6 flex items-center justify-between">
-        <Button variant="ghost" asChild>
-          <Link to="/instructor">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Classes
-          </Link>
+        <Button
+          variant="ghost"
+          nativeButton={false}
+          render={<Link to="/instructor" />}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Classes
         </Button>
         <TabsList variant="line">
           <TabsTrigger value="edit">Manage Attendance</TabsTrigger>

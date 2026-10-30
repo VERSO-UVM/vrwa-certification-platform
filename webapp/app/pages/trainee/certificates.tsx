@@ -38,8 +38,13 @@ const columnDefs = [
     header: "Actions",
     cell: ({ row }) => {
       return (
-        <Button variant="outline" className="my-4 py-4" asChild>
-          <Link to={`${row.original.courseId}`}>View Certificate</Link>
+        <Button
+          variant="outline"
+          className="my-4 py-4"
+          nativeButton={false}
+          render={<Link to={`${row.original.courseId}`} />}
+        >
+          View Certificate
         </Button>
       );
     },

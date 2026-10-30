@@ -8,7 +8,7 @@ import {
   DrawerDescription,
   DrawerClose,
 } from "./ui/drawer";
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, ReactElement } from "react";
 import { X } from "lucide-react";
 
 /**
@@ -16,7 +16,7 @@ import { X } from "lucide-react";
  * imports and the JSX.
  */
 export type StandardDrawerProps = PropsWithChildren<{
-  openButton: React.ReactNode;
+  openButton: ReactElement;
   title: string;
   // We always need a description for `aria-describedby`
   description: string;
@@ -31,15 +31,20 @@ export function StandardDrawer({
   ...props
 }: StandardDrawerProps) {
   return (
-    <Drawer direction="right" {...props}>
-      <DrawerTrigger asChild>{openButton}</DrawerTrigger>
+    <Drawer swipeDirection="right" {...props}>
+      <DrawerTrigger render={openButton} />
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>{title}</DrawerTitle>
-          <DrawerClose asChild>
-            <Button variant="cancel_icon" className="absolute top-2 right-2">
-              <X className="size-5" />
-            </Button>
+          <DrawerClose
+            render={
+              <Button
+                variant="cancel_icon"
+                className="absolute top-2 right-2"
+              />
+            }
+          >
+            <X className="size-5" />
           </DrawerClose>
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>

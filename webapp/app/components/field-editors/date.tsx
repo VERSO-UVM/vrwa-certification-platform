@@ -68,15 +68,17 @@ export function DatetimeEditor({
           />
           <InputGroupAddon align="inline-end">
             <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <InputGroupButton
-                  variant="ghost"
-                  size="icon-xs"
-                  aria-label="Select date"
-                >
-                  <CalendarIcon />
-                  <span className="sr-only">Select date</span>
-                </InputGroupButton>
+              <PopoverTrigger
+                render={
+                  <InputGroupButton
+                    variant="ghost"
+                    size="icon-xs"
+                    aria-label="Select date"
+                  />
+                }
+              >
+                <CalendarIcon />
+                <span className="sr-only">Select date</span>
               </PopoverTrigger>
               <PopoverContent
                 className="w-auto overflow-hidden p-0"

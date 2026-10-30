@@ -23,47 +23,33 @@ export function TraineeSidebar() {
           <SidebarGroupLabel>VRWA</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link to="/trainee">
-                  <Home />
-                  Home
-                </Link>
+              <SidebarMenuButton render={<Link to="/trainee" />}>
+                <Home />
+                Home
               </SidebarMenuButton>
-              <SidebarMenuButton asChild>
-                <Link to="/trainee/registration">
-                  <BookOpenText />
-                  Registration
-                </Link>
+              <SidebarMenuButton render={<Link to="/trainee/registration" />}>
+                <BookOpenText />
+                Registration
               </SidebarMenuButton>
-              <SidebarMenuButton asChild>
-                <Link to="/trainee/certificates">
-                  <Trophy />
-                  Certificates
-                </Link>
+              <SidebarMenuButton render={<Link to="/trainee/certificates" />}>
+                <Trophy />
+                Certificates
               </SidebarMenuButton>
-              <SidebarMenuButton asChild>
-                <Link to="/trainee/invoices">
-                  <Scroll />
-                  Payments
-                </Link>
+              <SidebarMenuButton render={<Link to="/trainee/invoices" />}>
+                <Scroll />
+                Payments
               </SidebarMenuButton>
-              <SidebarMenuButton asChild>
-                <Link to="/trainee/member">
-                  <Star />
-                  Member Portal
-                </Link>
+              <SidebarMenuButton render={<Link to="/trainee/member" />}>
+                <Star />
+                Member Portal
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenuButton asChild>
-          <ActiveProfileIndicator />
-        </SidebarMenuButton>
-        <SidebarMenuButton asChild>
-          <LogOutButton />
-        </SidebarMenuButton>
+        <ActiveProfileIndicator />
+        <LogOutButton />
       </SidebarFooter>
     </Sidebar>
   );
