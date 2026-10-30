@@ -18,3 +18,19 @@ export function useCourseCloneMutation() {
     }),
   );
 }
+
+export function useCourseCreateMutation() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    trpc.courses.admin.create.mutationOptions({
+      onSuccess: () => {
+        void queryClient.invalidateQueries({
+          queryKey: trpc.courses.pathKey(),
+        });
+      },
+    }),
+  );
+}
+

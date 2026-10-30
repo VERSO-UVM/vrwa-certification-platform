@@ -3,7 +3,7 @@
  * as to clone or create new courses. Other changes require visiting a course
  * details page.
  */
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "~/utils/trpc";
 
 import {
@@ -29,6 +29,7 @@ import { useNavigate } from "react-router";
 import type { ColumnDef } from "@tanstack/react-table";
 import { CreateDrawer } from "~/components/entry-views/create-drawer";
 import { isPast, startOfYear } from "date-fns";
+import { useCourseCreateMutation } from "./course-manager/use-course-mutation";
 
 export function meta() {
   return [{ title: "Course Manager - VRWA Training Database" }];
@@ -54,18 +55,9 @@ const courseCreateFormDefs = [
 
 export default function CourseManager() {
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { data: courses } = useQuery(trpc.courses.admin.list.queryOptions());
-  const createCourseMut = useMutation(
-    trpc.courses.admin.create.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.courses.admin.pathKey(),
-        });
-      },
-    }),
-  );
+  const createCourseMut = useCourseCreateMutation();
 
   /* useMemo isn't only for efficiency. It maintains a stable reference, which is
    * important because Tanstack Table re-mounts every time the table or columns
@@ -79,6 +71,7 @@ export default function CourseManager() {
     () =>
       courses?.filter((course) => {
         if (course.startDate == null) return false;
+        /* Courses from previous years, for now */
         return isPast(startOfYear(course.startDate));
       }),
     [courses],
