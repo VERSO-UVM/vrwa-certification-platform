@@ -2,10 +2,10 @@
  * Drawer button to clone a course and its sessions.
  */
 import type { CourseDto } from "@backend/database/dtos";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addYears } from "date-fns";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useCourseCloneMutation } from "./use-course-mutation";
 import { StandardDrawer } from "~/components/standard-drawer";
 import { Button } from "~/components/ui/button";
 import { Calendar } from "~/components/ui/calendar";
@@ -18,26 +18,15 @@ import {
   FieldTitle,
 } from "~/components/ui/field";
 import { Label } from "~/components/ui/label";
-import { useTRPC } from "~/utils/trpc";
 
 export function CloneCourse({ course }: { course: CourseDto }) {
   const navigate = useNavigate();
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
   const originalStartDate = course.startDate ?? new Date();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     originalStartDate,
   );
   const [shouldCopySessions, setShouldCopySessions] = useState(true);
-  const cloneMutation = useMutation(
-    trpc.courses.admin.clone.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.courses.pathKey(),
-        });
-      },
-    }),
-  );
+  const cloneMutation = useCourseCloneMutation();
 
   const cloneCourse = async () => {
     const { courseId } = await cloneMutation.mutateAsync({
