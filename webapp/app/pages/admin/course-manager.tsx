@@ -1,3 +1,8 @@
+/**
+ * The course manager landing page. This is mostly to navigate courses, as well
+ * as to clone or create new courses. Other changes require visiting a course
+ * details page.
+ */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "~/utils/trpc";
 
@@ -16,7 +21,6 @@ import {
   courseDtoFieldHelper,
   courseRequiredFields,
 } from "~/utils/field-defs/course";
-import { courseStartDate } from "~/utils/utils";
 import { CourseStatus } from "@backend/database/schema";
 import { CloneCourse } from "./course-manager/clone-course";
 import { useMemo } from "react";
@@ -24,6 +28,7 @@ import type { CourseDto } from "@backend/database/dtos";
 import { useNavigate } from "react-router";
 import type { ColumnDef } from "@tanstack/react-table";
 import { CreateDrawer } from "~/components/entry-views/create-drawer";
+import { isPast, startOfYear } from "date-fns";
 
 export function meta() {
   return [{ title: "Course Manager - VRWA Training Database" }];
@@ -38,7 +43,7 @@ const courseTableDefs = [
   }),
 ];
 
-const courseFormDefs = [
+const courseCreateFormDefs = [
   courseDefs.courseName,
   courseDefs.description,
   courseDefs.priceCents,
@@ -62,7 +67,9 @@ export default function CourseManager() {
     }),
   );
 
-  // Courses going on this year
+  /* useMemo isn't only for efficiency. It maintains a stable reference, which is
+   * important because Tanstack Table re-mounts every time the table or columns
+   * change. */
   const activeCourses = useMemo(
     () => courses?.filter((course) => course.status !== CourseStatus.Deleted),
     [courses],
@@ -71,8 +78,8 @@ export default function CourseManager() {
   const pastCourses = useMemo(
     () =>
       courses?.filter((course) => {
-        const startYear = courseStartDate(course)?.getFullYear();
-        return startYear != null && startYear < new Date().getFullYear();
+        if (course.startDate == null) return false;
+        return isPast(startOfYear(course.startDate));
       }),
     [courses],
   );
@@ -104,7 +111,7 @@ export default function CourseManager() {
           </CardContent>
           <div className="flex px-4">
             <CreateDrawer
-              columns={courseFormDefs as ColumnDef<CourseDto>[]}
+              columns={courseCreateFormDefs as ColumnDef<CourseDto>[]}
               required={courseRequiredFields}
               onSave={async (_, values) => {
                 const newCourse = await createCourseMut.mutateAsync({
