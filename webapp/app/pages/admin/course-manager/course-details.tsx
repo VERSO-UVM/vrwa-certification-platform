@@ -56,24 +56,26 @@ export default function CourseDetails({
   const trpc = useTRPC();
   const client = useTRPCClient();
   const queryClient = useQueryClient();
+
+  /* Queries */
   const courseEvents = useQuery(
     trpc.courseEvents.admin.listCourse.queryOptions({ courseId }),
   );
-
-  const courseEventUpdateMut = useCourseEventUpdateMutation();
-  const courseEventCloneMut = useCourseEventCloneMutation();
-  const courseEventDeleteMut = useCourseEventDeleteMutation();
-  const courseUpdateMut = useCourseUpdateMutation();
-
   const { data: course } = useQuery(
     trpc.courses.admin.get.queryOptions({ id: courseId }),
   );
-
   const reservations = useQuery(
     trpc.reservations.admin.listCourse.queryOptions({
       courseId,
     }),
   );
+
+  /* Mutations */
+  const courseEventUpdateMut = useCourseEventUpdateMutation();
+  const courseEventCloneMut = useCourseEventCloneMutation();
+  const courseEventDeleteMut = useCourseEventDeleteMutation();
+  const courseUpdateMut = useCourseUpdateMutation();
+
 
   //grouping reservations by courseEventId to easily access rosters
   const roster = reservations.data ?? [];
