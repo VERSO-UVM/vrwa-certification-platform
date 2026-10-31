@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTRPC } from "~/utils/trpc";
+import { Form } from "@radix-ui/react-form";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import { Calendar } from "~/components/ui/calendar";
@@ -82,7 +83,7 @@ export function CourseEventForm({ onCreate, event }: CourseEventFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 p-4">
+    <Form onSubmit={handleSubmit} className="space-y-6 p-4">
       <FieldGroup>
         <Field>
           <FieldLabel htmlFor="courses">
@@ -91,15 +92,8 @@ export function CourseEventForm({ onCreate, event }: CourseEventFormProps) {
           <Select
             required
             value={values.courseId}
-            items={
-              courses.data?.map((course: Course) => ({
-                value: course.id,
-                label: course.courseName,
-              })) ?? []
-            }
-            onValueChange={(v) => {
-              if (v != null) setValues({ ...values, courseId: v });
-            }}
+            onValueChange={(v) => setValues({ ...values, courseId: v })}
+            defaultValue={values.courseId}
           >
             <SelectTrigger id="courses" className="w-full max-w-48">
               <SelectValue placeholder="Select a course" />
@@ -137,15 +131,9 @@ export function CourseEventForm({ onCreate, event }: CourseEventFormProps) {
           </FieldLabel>
           <Select
             value={values.locationType}
-            items={[
-              { value: "in-person", label: "In Person" },
-              { value: "virtual", label: "Virtual" },
-              { value: "hybrid", label: "Hybrid" },
-            ]}
-            onValueChange={(v) => {
-              if (v != null)
-                setValues({ ...values, locationType: v as CourseLocation });
-            }}
+            onValueChange={(v) =>
+              setValues({ ...values, locationType: v as CourseLocation })
+            }
           >
             <SelectTrigger id="locationType" className="w-full">
               <SelectValue placeholder="Select a Location Type" />
@@ -216,6 +204,6 @@ export function CourseEventForm({ onCreate, event }: CourseEventFormProps) {
           </Button>
         </Field>
       </FieldGroup>
-    </form>
+    </Form>
   );
 }
