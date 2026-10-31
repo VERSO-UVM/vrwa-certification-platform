@@ -34,3 +34,17 @@ export function useCourseCreateMutation() {
   );
 }
 
+export function useCourseUpdateMutation() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    trpc.courses.admin.update.mutationOptions({
+      onSuccess: () => {
+        void queryClient.invalidateQueries({
+          queryKey: trpc.courses.pathKey(),
+        });
+      },
+    }),
+  );
+}

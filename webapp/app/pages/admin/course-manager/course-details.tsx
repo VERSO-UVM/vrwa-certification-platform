@@ -24,6 +24,7 @@ import {
   useCourseEventDeleteMutation,
   useCourseEventUpdateMutation,
 } from "./use-course-event-mutation";
+import { useCourseUpdateMutation } from "./use-course-mutation";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
@@ -62,16 +63,7 @@ export default function CourseDetails({
   const courseEventUpdateMut = useCourseEventUpdateMutation();
   const courseEventCloneMut = useCourseEventCloneMutation();
   const courseEventDeleteMut = useCourseEventDeleteMutation();
-
-  const courseUpdateMut = useMutation(
-    trpc.courses.admin.update.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.courses.admin.pathKey(),
-        });
-      },
-    }),
-  );
+  const courseUpdateMut = useCourseUpdateMutation();
 
   const { data: course } = useQuery(
     trpc.courses.admin.get.queryOptions({ id: courseId }),
