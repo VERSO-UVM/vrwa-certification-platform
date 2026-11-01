@@ -14,7 +14,7 @@ import { createTRPCClient, httpBatchStreamLink, httpLink } from "@trpc/client";
 import { useState } from "react";
 
 import "./app.css";
-import { TRPCProvider, type AppRouter } from "~/utils/trpc";
+import { makeTrpcClient, TRPCProvider, type AppRouter } from "~/utils/trpc";
 import type { Route } from "./+types/root";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { getTrpcUrl } from "./utils/env";
@@ -47,7 +47,7 @@ function makeQueryClient() {
 
 let browserQueryClient: QueryClient | undefined = undefined;
 
-function getQueryClient() {
+export function getQueryClient() {
   if (typeof window === "undefined") {
     // Server: always make a new query client
     return makeQueryClient();
@@ -70,24 +70,7 @@ const asyncStoragePersister = createAsyncStoragePersister({
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
-  const [trpcClient] = useState(() =>
-    createTRPCClient<AppRouter>({
-      links: [
-        httpBatchStreamLink({
-          url: getTrpcUrl(),
-          transformer: superjson,
-          fetch(url, options) {
-            // Use regular JS fetch() and make sure to pass
-            // all headers and credentials
-            return fetch(url, {
-              ...options,
-              credentials: "include",
-            });
-          },
-        }),
-      ],
-    }),
-  );
+  const [trpcClient] = useState(() => makeTrpcClient());
 
   return (
     <PersistQueryClientProvider
