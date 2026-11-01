@@ -1,14 +1,16 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useState } from "react";
-import { CourseStatus } from "@backend/database/schema";
+import { CourseStatus, PaymentStatus } from "@backend/database/schema";
 import type { CourseDto, CourseEventDto } from "@backend/database/dtos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { PageHeader } from "~/components/page-header";
-import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useTRPC, useTRPCClient } from "~/utils/trpc";
 import { Button } from "~/components/ui/button";
-import { Link } from "react-router";
-import { Users, CreditCard, Calendar, Trash, ArrowLeft, X } from "lucide-react";
+import { Link, useNavigate } from "react-router";
+import { ArrowLeft, Calendar, CreditCard, Trash, Users, X } from "lucide-react";
 import type { Route } from "./+types/course-details";
 import { ButtonGroup } from "~/components/ui/button-group";
 import { EditForm } from "~/components/entry-views/edit-form";
@@ -25,12 +27,14 @@ import {
   useCourseEventUpdateMutation,
 } from "./use-course-event-mutation";
 import { useCourseUpdateMutation } from "./use-course-mutation";
+import { RosterManager } from "./roster-manager";
+import { getServerTrpc } from "~/utils/trpc.server";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
 }
 
-const courseEventFormDefs = [
+const courseEventUpdateFormDefs = [
   courseEventDefs.courseDate,
   courseEventDefs.duration,
   courseEventDefs.courseLocationType,
@@ -40,7 +44,7 @@ const courseEventFormDefs = [
   courseEventDefs.venue,
 ];
 
-const courseFormDefs = [
+const courseUpdateFormDefs = [
   courseDefs.status,
   courseDefs.courseName,
   courseDefs.description,
@@ -50,25 +54,40 @@ const courseFormDefs = [
   courseDefs.creditCategories,
 ] as ColumnDef<CourseDto>[];
 
+export async function loader({
+  params: { courseId },
+  request,
+}: Route.LoaderArgs) {
+  // Do API queries on the server-side
+  const [queryClient, trpc] = getServerTrpc(request);
+  const [course, courseEvents, reservations] = await Promise.all([
+    queryClient.fetchQuery(
+      trpc.courses.admin.get.queryOptions({
+        id: courseId,
+      }),
+    ),
+    queryClient.fetchQuery(
+      trpc.courseEvents.admin.listCourse.queryOptions({ courseId }),
+    ),
+    queryClient.fetchQuery(
+      trpc.reservations.admin.listCourse.queryOptions({ courseId }),
+    ),
+  ]);
+  return {
+    course,
+    courseEvents,
+    reservations,
+  };
+}
+
 export default function CourseDetails({
   params: { courseId },
+  loaderData: { course, courseEvents, reservations },
 }: Route.ComponentProps) {
   const trpc = useTRPC();
   const client = useTRPCClient();
   const queryClient = useQueryClient();
-
-  /* Queries */
-  const courseEvents = useQuery(
-    trpc.courseEvents.admin.listCourse.queryOptions({ courseId }),
-  );
-  const { data: course } = useQuery(
-    trpc.courses.admin.get.queryOptions({ id: courseId }),
-  );
-  const reservations = useQuery(
-    trpc.reservations.admin.listCourse.queryOptions({
-      courseId,
-    }),
-  );
+  const navigate = useNavigate();
 
   /* Mutations */
   const courseEventUpdateMut = useCourseEventUpdateMutation();
@@ -76,38 +95,28 @@ export default function CourseDetails({
   const courseEventDeleteMut = useCourseEventDeleteMutation();
   const courseUpdateMut = useCourseUpdateMutation();
 
-
-  //grouping reservations by courseEventId to easily access rosters
-  const roster = reservations.data ?? [];
-
-  //getting courseEvents for tabs
-  const eventIds = courseEvents.data?.map((e) => e.id) ?? [];
-
   //what percentage of trainees enrolled have paid their fees
   function percentagePaid() {
-    if (roster.length == 0) return 0;
-    let paid = 0;
-    for (let i = 0; i < roster.length; i++) {
-      if (roster[i]?.paymentStatus == "paid") paid++;
-    }
-    return (paid / roster.length) * 100;
+    if (reservations == null) return null;
+    const paidCount = reservations.filter(
+      (r) => r.paymentStatus == PaymentStatus.Paid,
+    ).length;
+    if (reservations.length == 0) return 0; // Don't divide by zero
+    return (paidCount / reservations.length) * 100;
   }
-
-  //for if the course gets deleted
-  const [courseDeleted, setCourseDeleted] = useState(false);
 
   const [selectedTab, setSelectedTab] = useState<string | null>(
-    eventIds[0] ?? null,
+    courseEvents?.[0]?.id ?? null,
   );
-  if (!selectedTab && eventIds[0] != null) {
-    setSelectedTab(eventIds[0]);
+  if (!selectedTab && courseEvents?.[0] != null) {
+    setSelectedTab(courseEvents?.[0]?.id);
   }
 
-  if (courseDeleted) {
+  if (course == null) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <h1 className="text-2xl font-semibold">
-          This course has been deleted. Return to{" "}
+          Course not found. Return to{" "}
           <Link className="text-blue-500 underline" to="/admin/course-manager">
             {" "}
             course manager.
@@ -131,7 +140,7 @@ export default function CourseDetails({
             <Users className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
               <p className="text-sm text-muted-foreground">Total Enrollment</p>
-              <p className="text-3xl font-bold">{roster.length}</p>
+              <p className="text-3xl font-bold">{reservations?.length}</p>
             </div>
           </CardContent>
         </Card>
@@ -141,7 +150,7 @@ export default function CourseDetails({
             <div className="flex flex-col">
               <p className="text-sm text-muted-foreground">Tuition Paid</p>
               <p className="text-3xl font-bold">
-                {percentagePaid().toFixed(0)}%
+                {percentagePaid()?.toFixed(0)}%
               </p>
             </div>
           </CardContent>
@@ -152,7 +161,7 @@ export default function CourseDetails({
             <div className="flex flex-col">
               <p className="text-sm text-muted-foreground"># Sessions</p>
               <p className="text-3xl font-bold">
-                {courseEvents.data?.length ?? 0}
+                {courseEvents?.length ?? 0}
               </p>
             </div>
           </CardContent>
@@ -180,18 +189,22 @@ export default function CourseDetails({
                         await client.courses.admin.delete.mutate({
                           id: courseId!,
                         });
-                        queryClient.invalidateQueries({
+                        /* Don't wait for invalidateQueries to finish */
+                        void queryClient.invalidateQueries({
                           queryKey: trpc.courses.admin.pathKey(),
                         });
-                        setCourseDeleted(true);
+                        await navigate("/admin/course-manager");
                       } else {
                         return;
                       }
                     } else {
                       // Mark as deleted
-                      courseUpdateMut.mutateAsync({
+                      await courseUpdateMut.mutateAsync({
                         status: CourseStatus.Deleted,
                         id: course.id,
+                      });
+                      await queryClient.invalidateQueries({
+                        queryKey: trpc.courses.admin.get.queryKey(),
                       });
                     }
                   }}
@@ -215,7 +228,7 @@ export default function CourseDetails({
                   id: course.id,
                 });
               }}
-              columns={courseFormDefs}
+              columns={courseUpdateFormDefs}
             />
           </CardContent>
         </Card>
@@ -227,7 +240,7 @@ export default function CourseDetails({
             <Tabs value={selectedTab ?? ""} onValueChange={setSelectedTab}>
               <div className="flex justify-between flex-wrap">
                 <TabsList variant="line" className="overflow-x-scroll pb-3">
-                  {courseEvents.data?.map((event) => {
+                  {courseEvents?.map((event) => {
                     const date = event.classStartDatetime
                       ? new Date(event.classStartDatetime)
                       : null;
@@ -246,7 +259,7 @@ export default function CourseDetails({
                         // No course event selected
                         return;
                       }
-                      const selectedEvent = courseEvents.data?.find(
+                      const selectedEvent = courseEvents?.find(
                         (e) => e.id == selectedTab,
                       )?.classStartDatetime;
                       courseEventCloneMut.mutate(
@@ -269,19 +282,19 @@ export default function CourseDetails({
                   <Button
                     variant="destructive"
                     disabled={
-                      courseEvents.isSuccess &&
-                      (courseEvents.data ?? []).length <= 1
+                      courseEvents != null &&
+                      courseEvents.length <= 1
                     }
                     onClick={() => {
-                      if (selectedTab && courseEvents.data) {
+                      if (selectedTab && courseEvents) {
                         // Select previous tab afterwards
-                        const selectedIndex = courseEvents.data.findIndex(
+                        const selectedIndex = courseEvents.findIndex(
                           (event) => event.id == selectedTab,
                         );
                         if (selectedIndex < 0) return;
                         const newTabIndex =
                           selectedIndex === 0 ? 1 : selectedIndex - 1;
-                        const newTabId = courseEvents.data[newTabIndex]?.id;
+                        const newTabId = courseEvents[newTabIndex]?.id;
 
                         courseEventDeleteMut.mutate(
                           {
@@ -302,16 +315,16 @@ export default function CourseDetails({
                   </Button>
                 </ButtonGroup>
               </div>
-              {courseEvents.isPending ? (
+              {courseEvents == null ? (
                 <p className="text-muted-foreground p-4">Loading sessions…</p>
-              ) : courseEvents.data?.length ? (
-                courseEvents.data.map((event) => (
+              ) : courseEvents?.length ? (
+                courseEvents.map((event) => (
                   <TabsContent key={event.id} value={event.id}>
                     <EditForm
                       key={event.id}
                       item={event as CourseEventDto}
                       required={courseEventRequiredFields}
-                      columns={courseEventFormDefs}
+                      columns={courseEventUpdateFormDefs}
                       onSave={async (data) => {
                         await courseEventUpdateMut.mutateAsync({
                           id: event.id,
