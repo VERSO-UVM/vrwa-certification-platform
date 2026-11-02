@@ -28,6 +28,7 @@ import {
 } from "./use-course-mutation";
 import { RosterManager } from "./roster-manager";
 import { prefetchLoader } from "~/utils/trpc.server";
+import { prefetchClientLoader } from "~/utils/prefetch";
 import { useSuspenseQueries } from "@tanstack/react-query";
 import { useTRPC, type TRPC } from "~/utils/trpc";
 
@@ -65,11 +66,15 @@ function courseDetailsQueries(
     }),
     trpc.courseEvents.admin.listCourse.queryOptions({ courseId }),
     trpc.reservations.admin.listCourse.queryOptions({ courseId }),
+    // Also used by RosterManager so it isn't left fetching after render.
+    trpc.profiles.admin.listTrainees.queryOptions(),
   ] as const;
 }
 
 /* Prefetch all queries during SSR. */
 export const loader = prefetchLoader(courseDetailsQueries);
+/* Prefetch into the browser cache on client-side navigations. */
+export const clientLoader = prefetchClientLoader(courseDetailsQueries);
 
 export default function CourseDetails({
   params: { courseId },

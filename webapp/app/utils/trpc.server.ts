@@ -1,13 +1,13 @@
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import type { LoaderFunctionArgs, Params } from "react-router";
 import type { AppRouter } from "@backend/routers";
-import { getQueryClient } from "~/root";
-import { makeTrpcClient, type TRPC } from "./trpc";
+import { getQueryClient } from "~/utils/query-client";
 import {
-  dehydrate,
-  QueryClient,
-  type FetchQueryOptions,
-} from "@tanstack/react-query";
+  makeTrpcClient,
+  type QueryListFn,
+  type TrpcQueryOptions,
+} from "./trpc";
+import { dehydrate, QueryClient } from "@tanstack/react-query";
 
 /**
  * Access `trpc` in an incoming request on the server.
@@ -20,9 +20,6 @@ export function getServerTrpc(request: Request) {
   });
   return [queryClient, trpc] as const;
 }
-
-/* unknown doesn't work here, but we don't care about the type of query */
-type TrpcQueryOptions = FetchQueryOptions<any, any, any, any>;
 
 /*
  * To return a dehydratedState from a loader() function.
@@ -41,11 +38,12 @@ export async function prefetchQueries(
  * Create a loader() function that can be exported directly
  * for a component.
  */
-export function prefetchLoader<T extends Params>(
-  queryListFn: (trpc: TRPC, params: T) => ReadonlyArray<TrpcQueryOptions>,
-) {
+export function prefetchLoader<T extends Params>(queryListFn: QueryListFn<T>) {
   return async ({ request, params }: LoaderFunctionArgs) => {
     const [queryClient, trpc] = getServerTrpc(request);
-    return await prefetchQueries(queryClient, queryListFn(trpc, params as T));
+    return await prefetchQueries(
+      queryClient,
+      queryListFn(trpc, params as T, new URL(request.url).searchParams),
+    );
   };
 }

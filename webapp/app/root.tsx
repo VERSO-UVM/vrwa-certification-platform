@@ -8,18 +8,17 @@ import {
   useMatches,
 } from "react-router";
 import {
-  defaultShouldDehydrateQuery,
   HydrationBoundary,
-  QueryClient,
   type DehydratedState,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
-import { useState } from "react";
+import { useMemo } from "react";
 
 import "./app.css";
-import { makeTrpcClient, TRPCProvider } from "~/utils/trpc";
+import { getQueryClient } from "~/utils/query-client";
+import { getBrowserTrpcClient, makeTrpcClient, TRPCProvider } from "~/utils/trpc";
 import type { Route } from "./+types/root";
 import { TooltipProvider } from "./components/ui/tooltip";
 import superjson from "superjson";
@@ -37,43 +36,6 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
-function makeQueryClient() {
-  return new QueryClient({
-    defaultOptions: {
-      queries: {
-        // With SSR, we usually want to set some default staleTime
-        // above 0 to avoid refetching immediately on the client
-        staleTime: 60 * 1000,
-      },
-      dehydrate: {
-        serializeData: superjson.serialize,
-        shouldDehydrateQuery: (query) =>
-          defaultShouldDehydrateQuery(query) ||
-          query.state.status === "pending",
-      },
-      hydrate: {
-        deserializeData: superjson.deserialize,
-      },
-    },
-  });
-}
-
-let browserQueryClient: QueryClient | undefined = undefined;
-
-export function getQueryClient() {
-  if (typeof window === "undefined") {
-    // Server: always make a new query client
-    return makeQueryClient();
-  } else {
-    // Browser: make a new query client if we don't already have one
-    // This is very important, so we don't re-make a new client if React
-    // suspends during the initial render. This may not be needed if we
-    // have a suspense boundary BELOW the creation of the query client
-    if (!browserQueryClient) browserQueryClient = makeQueryClient();
-    return browserQueryClient;
-  }
-}
-
 const asyncStoragePersister = createAsyncStoragePersister({
   storage: typeof window !== "undefined" ? window.localStorage : undefined,
   // Serialize JavaScript types like Date correctly in caching
@@ -83,7 +45,9 @@ const asyncStoragePersister = createAsyncStoragePersister({
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
-  const [trpcClient] = useState(() => makeTrpcClient());
+  // Browser: share the singleton with clientLoaders. Server: fresh client per request.
+  const trpcClient =
+    typeof window === "undefined" ? makeTrpcClient() : getBrowserTrpcClient();
 
   return (
     <PersistQueryClientProvider
@@ -115,24 +79,33 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  // Do loader re-hydration
-  // useMatches(): Data returned from all loader() functions
+  // Merge dehydrated query state from every matched loader so layout + page
+  // prefetches both apply, and always render the same tree so Outlet doesn't remount.
   const matches = useMatches();
-  for (const match of matches) {
-    const loaderData = match?.loaderData as
-      | { dehydratedState: DehydratedState }
-      | undefined;
-    const dehydratedState = loaderData?.dehydratedState;
-    if (dehydratedState) {
-      return (
-        <HydrationBoundary state={dehydratedState}>
-          <Outlet />
-        </HydrationBoundary>
-      );
+  const dehydratedState = useMemo(() => {
+    const queries: DehydratedState["queries"] = [];
+    const mutations: DehydratedState["mutations"] = [];
+    for (const match of matches) {
+      const loaderData = match?.loaderData as
+        | { dehydratedState: DehydratedState }
+        | undefined;
+      const state = loaderData?.dehydratedState;
+      if (state) {
+        queries.push(...state.queries);
+        mutations.push(...state.mutations);
+      }
     }
-  }
+    if (queries.length === 0 && mutations.length === 0) {
+      return undefined;
+    }
+    return { queries, mutations };
+  }, [matches]);
 
-  return <Outlet />;
+  return (
+    <HydrationBoundary state={dehydratedState}>
+      <Outlet />
+    </HydrationBoundary>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
