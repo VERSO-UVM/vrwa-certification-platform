@@ -29,7 +29,7 @@ export function useReservationDeleteMutation() {
     trpc.reservations.admin.delete.mutationOptions({
       onSuccess: () => {
         void queryClient.invalidateQueries({
-          queryKey: trpc.reservations.admin.pathKey(),
+          queryKey: trpc.reservations.pathKey(),
         });
       },
     }),
