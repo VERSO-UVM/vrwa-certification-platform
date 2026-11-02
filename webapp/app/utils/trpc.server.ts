@@ -1,5 +1,3 @@
-"use server";
-
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import type { LoaderFunctionArgs, Params } from "react-router";
 import type { AppRouter } from "@backend/routers";
