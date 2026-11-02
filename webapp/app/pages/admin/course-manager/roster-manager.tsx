@@ -1,3 +1,7 @@
+/**
+ * Managing enrolled students. Currently, this is embedded within the course
+ * details page, but we may want to move it to a separate page.
+ */
 import { PaymentStatus } from "@backend/database/schema";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
@@ -49,7 +53,8 @@ export function RosterManager({ courseId }: { courseId: string }) {
     });
   };
 
-  const defs = useMemo(
+  /* For browsing and enrolling new trainees */
+  const traineesTableDefs = useMemo(
     () => [
       profileDefs.firstName,
       profileDefs.lastName,
@@ -63,7 +68,7 @@ export function RosterManager({ courseId }: { courseId: string }) {
             return (
               <Button variant="link" asChild>
                 <Link to={`/admin/enrollment/${courseId}/${row.original.id}`}>
-                   Manage
+                  Manage
                 </Link>
               </Button>
             );
@@ -81,7 +86,7 @@ export function RosterManager({ courseId }: { courseId: string }) {
     [courseId, roster],
   );
 
-  //Data Table
+  /* For showing current course roster */
   const rosterTableDef = useMemo(
     () => [
       reservationDefs.firstName,
@@ -134,7 +139,7 @@ export function RosterManager({ courseId }: { courseId: string }) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <DataTable columns={defs} data={trainees?.data} />
+          <DataTable columns={traineesTableDefs} data={trainees?.data} />
           <div className="mt-4">
             <Button variant="link" asChild>
               <Link to={`/admin/create-profile?enrollIn=${courseId}`}>
