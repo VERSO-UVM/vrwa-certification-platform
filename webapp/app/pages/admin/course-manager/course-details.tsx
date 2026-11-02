@@ -74,9 +74,6 @@ export async function loader({
       trpc.reservations.admin.listCourse.queryOptions({ courseId }),
     ),
   ]);
-  // We may to want to set up a different abstraction to pass the loader data
-  // that works with useQuery(). This is a proof of concept for doing procedure calls
-  // from the web server.
   return {
     dehydratedState: dehydrate(queryClient),
   };
