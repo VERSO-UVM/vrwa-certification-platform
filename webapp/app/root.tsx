@@ -8,6 +8,7 @@ import {
   useMatches,
 } from "react-router";
 import {
+  defaultShouldDehydrateQuery,
   HydrationBoundary,
   QueryClient,
   type DehydratedState,
@@ -15,14 +16,12 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
-import { createTRPCClient, httpBatchStreamLink, httpLink } from "@trpc/client";
 import { useState } from "react";
 
 import "./app.css";
-import { makeTrpcClient, TRPCProvider, type AppRouter } from "~/utils/trpc";
+import { makeTrpcClient, TRPCProvider } from "~/utils/trpc";
 import type { Route } from "./+types/root";
 import { TooltipProvider } from "./components/ui/tooltip";
-import { getTrpcUrl } from "./utils/env";
 import superjson from "superjson";
 
 export const links: Route.LinksFunction = () => [
@@ -45,6 +44,15 @@ function makeQueryClient() {
         // With SSR, we usually want to set some default staleTime
         // above 0 to avoid refetching immediately on the client
         staleTime: 60 * 1000,
+      },
+      dehydrate: {
+        serializeData: superjson.serialize,
+        shouldDehydrateQuery: (query) =>
+          defaultShouldDehydrateQuery(query) ||
+          query.state.status === "pending",
+      },
+      hydrate: {
+        deserializeData: superjson.deserialize,
       },
     },
   });
