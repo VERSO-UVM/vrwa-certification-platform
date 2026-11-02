@@ -1,13 +1,9 @@
-import {
-  useQueryClient,
-} from "@tanstack/react-query";
 import { useState } from "react";
 import { CourseStatus, PaymentStatus } from "@backend/database/schema";
 import type { CourseDto, CourseEventDto } from "@backend/database/dtos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { PageHeader } from "~/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { useTRPC, useTRPCClient } from "~/utils/trpc";
 import { Button } from "~/components/ui/button";
 import { Link, useNavigate } from "react-router";
 import { ArrowLeft, Calendar, CreditCard, Trash, Users, X } from "lucide-react";
@@ -26,7 +22,10 @@ import {
   useCourseEventDeleteMutation,
   useCourseEventUpdateMutation,
 } from "./use-course-event-mutation";
-import { useCourseUpdateMutation } from "./use-course-mutation";
+import {
+  useCourseDeleteMutation,
+  useCourseUpdateMutation,
+} from "./use-course-mutation";
 import { RosterManager } from "./roster-manager";
 import { getServerTrpc } from "~/utils/trpc.server";
 
@@ -73,6 +72,9 @@ export async function loader({
       trpc.reservations.admin.listCourse.queryOptions({ courseId }),
     ),
   ]);
+  // We may to want to set up a different abstraction to pass the loader data
+  // that works with useQuery(). This is a proof of concept for doing procedure calls
+  // from the web server.
   return {
     course,
     courseEvents,
@@ -84,9 +86,6 @@ export default function CourseDetails({
   params: { courseId },
   loaderData: { course, courseEvents, reservations },
 }: Route.ComponentProps) {
-  const trpc = useTRPC();
-  const client = useTRPCClient();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   /* Mutations */
@@ -94,6 +93,7 @@ export default function CourseDetails({
   const courseEventCloneMut = useCourseEventCloneMutation();
   const courseEventDeleteMut = useCourseEventDeleteMutation();
   const courseUpdateMut = useCourseUpdateMutation();
+  const courseDeleteMut = useCourseDeleteMutation();
 
   //what percentage of trainees enrolled have paid their fees
   function percentagePaid() {
@@ -160,9 +160,7 @@ export default function CourseDetails({
             <Calendar className="w-10 h-10 text-muted-foreground" />
             <div className="flex flex-col">
               <p className="text-sm text-muted-foreground"># Sessions</p>
-              <p className="text-3xl font-bold">
-                {courseEvents?.length ?? 0}
-              </p>
+              <p className="text-3xl font-bold">{courseEvents?.length ?? 0}</p>
             </div>
           </CardContent>
         </Card>
@@ -179,19 +177,14 @@ export default function CourseDetails({
                   }
                   size="lg"
                   onClick={async () => {
-                    if (!course) return Promise.reject("Course not found");
                     if (course.status === CourseStatus.Deleted) {
                       if (
                         confirm(
                           "Are you sure you want to delete this course? All course information and reservations will be lost.",
                         )
                       ) {
-                        await client.courses.admin.delete.mutate({
-                          id: courseId!,
-                        });
-                        /* Don't wait for invalidateQueries to finish */
-                        void queryClient.invalidateQueries({
-                          queryKey: trpc.courses.admin.pathKey(),
+                        await courseDeleteMut.mutateAsync({
+                          id: courseId,
                         });
                         await navigate("/admin/course-manager");
                       } else {
@@ -202,9 +195,6 @@ export default function CourseDetails({
                       await courseUpdateMut.mutateAsync({
                         status: CourseStatus.Deleted,
                         id: course.id,
-                      });
-                      await queryClient.invalidateQueries({
-                        queryKey: trpc.courses.admin.get.queryKey(),
                       });
                     }
                   }}
@@ -259,6 +249,8 @@ export default function CourseDetails({
                         // No course event selected
                         return;
                       }
+                      // Duplicate currently selected event to make it easy add new
+                      // courseEvents with similar locations or other fields
                       const selectedEvent = courseEvents?.find(
                         (e) => e.id == selectedTab,
                       )?.classStartDatetime;
@@ -281,19 +273,16 @@ export default function CourseDetails({
                   </Button>
                   <Button
                     variant="destructive"
-                    disabled={
-                      courseEvents != null &&
-                      courseEvents.length <= 1
-                    }
+                    disabled={courseEvents != null && courseEvents.length <= 1}
                     onClick={() => {
                       if (selectedTab && courseEvents) {
-                        // Select previous tab afterwards
+                        // Select previous tab after deleting this one
                         const selectedIndex = courseEvents.findIndex(
                           (event) => event.id == selectedTab,
                         );
-                        if (selectedIndex < 0) return;
+                        if (selectedIndex == -1) return;
                         const newTabIndex =
-                          selectedIndex === 0 ? 1 : selectedIndex - 1;
+                          selectedIndex == 0 ? 1 : selectedIndex - 1;
                         const newTabId = courseEvents[newTabIndex]?.id;
 
                         courseEventDeleteMut.mutate(
@@ -315,9 +304,7 @@ export default function CourseDetails({
                   </Button>
                 </ButtonGroup>
               </div>
-              {courseEvents == null ? (
-                <p className="text-muted-foreground p-4">Loading sessions…</p>
-              ) : courseEvents?.length ? (
+              {courseEvents?.length ? (
                 courseEvents.map((event) => (
                   <TabsContent key={event.id} value={event.id}>
                     <EditForm
