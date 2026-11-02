@@ -5,8 +5,13 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useMatches,
 } from "react-router";
-import { QueryClient } from "@tanstack/react-query";
+import {
+  HydrationBoundary,
+  QueryClient,
+  type DehydratedState,
+} from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
@@ -102,6 +107,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  // Do loader re-hydration
+  // useMatches(): Data returned from all loader() functions
+  const matches = useMatches();
+  for (const match of matches) {
+    const loaderData = match?.loaderData as
+      | { dehydratedState: DehydratedState }
+      | undefined;
+    const dehydratedState = loaderData?.dehydratedState;
+    if (dehydratedState) {
+      return (
+        <HydrationBoundary state={dehydratedState}>
+          <Outlet />
+        </HydrationBoundary>
+      );
+    }
+  }
+
   return <Outlet />;
 }
 

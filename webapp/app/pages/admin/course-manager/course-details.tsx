@@ -28,6 +28,8 @@ import {
 } from "./use-course-mutation";
 import { RosterManager } from "./roster-manager";
 import { getServerTrpc } from "~/utils/trpc.server";
+import { dehydrate, useSuspenseQuery } from "@tanstack/react-query";
+import { useTRPC } from "~/utils/trpc";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
@@ -59,16 +61,16 @@ export async function loader({
 }: Route.LoaderArgs) {
   // Do API queries on the server-side
   const [queryClient, trpc] = getServerTrpc(request);
-  const [course, courseEvents, reservations] = await Promise.all([
-    queryClient.fetchQuery(
+  await Promise.all([
+    queryClient.prefetchQuery(
       trpc.courses.admin.get.queryOptions({
         id: courseId,
       }),
     ),
-    queryClient.fetchQuery(
+    queryClient.prefetchQuery(
       trpc.courseEvents.admin.listCourse.queryOptions({ courseId }),
     ),
-    queryClient.fetchQuery(
+    queryClient.prefetchQuery(
       trpc.reservations.admin.listCourse.queryOptions({ courseId }),
     ),
   ]);
@@ -76,17 +78,26 @@ export async function loader({
   // that works with useQuery(). This is a proof of concept for doing procedure calls
   // from the web server.
   return {
-    course,
-    courseEvents,
-    reservations,
+    dehydratedState: dehydrate(queryClient),
   };
 }
 
 export default function CourseDetails({
   params: { courseId },
-  loaderData: { course, courseEvents, reservations },
 }: Route.ComponentProps) {
   const navigate = useNavigate();
+  const trpc = useTRPC();
+  const { data: course } = useSuspenseQuery(
+    trpc.courses.admin.get.queryOptions({
+      id: courseId,
+    }),
+  );
+  const { data: courseEvents } = useSuspenseQuery(
+    trpc.courseEvents.admin.listCourse.queryOptions({ courseId }),
+  );
+  const { data: reservations } = useSuspenseQuery(
+    trpc.reservations.admin.listCourse.queryOptions({ courseId }),
+  );
 
   /* Mutations */
   const courseEventUpdateMut = useCourseEventUpdateMutation();

@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarTrigger, SidebarInset } from "./ui/sidebar";
 import { Separator } from "./ui/separator";
 import { Link } from "react-router";
 import { User } from "lucide-react";
+import { Suspense } from "react";
 
 type SidebarLayoutProps = {
   sidebar: React.ComponentType;
@@ -39,7 +40,9 @@ export function SidebarLayout({
             {/* See https://tailwindcss.com/docs/responsive-design#container-queries
                   Inside @container we can use @sm, @md, @lg, etc */}
             <main className="flex-1 flex flex-col pl-5 pr-5 py-10 z-40 @container">
-              <Outlet />
+              <Suspense fallback={<>Loading...</>}>
+                <Outlet />
+              </Suspense>
             </main>
           </div>
         </SidebarInset>
