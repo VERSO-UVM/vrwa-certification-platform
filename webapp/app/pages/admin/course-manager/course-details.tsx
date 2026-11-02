@@ -27,9 +27,9 @@ import {
   useCourseUpdateMutation,
 } from "./use-course-mutation";
 import { RosterManager } from "./roster-manager";
-import { getServerTrpc } from "~/utils/trpc.server";
-import { dehydrate, useSuspenseQuery } from "@tanstack/react-query";
-import { useTRPC } from "~/utils/trpc";
+import { prefetchLoader } from "~/utils/trpc.server";
+import { useSuspenseQueries } from "@tanstack/react-query";
+import { useTRPC, type TRPC } from "~/utils/trpc";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
@@ -55,46 +55,30 @@ const courseUpdateFormDefs = [
   courseDefs.creditCategories,
 ] as ColumnDef<CourseDto>[];
 
-export async function loader({
-  params: { courseId },
-  request,
-}: Route.LoaderArgs) {
-  // Do API queries on the server-side
-  const [queryClient, trpc] = getServerTrpc(request);
-  await Promise.all([
-    queryClient.prefetchQuery(
-      trpc.courses.admin.get.queryOptions({
-        id: courseId,
-      }),
-    ),
-    queryClient.prefetchQuery(
-      trpc.courseEvents.admin.listCourse.queryOptions({ courseId }),
-    ),
-    queryClient.prefetchQuery(
-      trpc.reservations.admin.listCourse.queryOptions({ courseId }),
-    ),
-  ]);
-  return {
-    dehydratedState: dehydrate(queryClient),
-  };
+function courseDetailsQueries(
+  trpc: TRPC,
+  { courseId }: Route.LoaderArgs["params"],
+) {
+  return [
+    trpc.courses.admin.get.queryOptions({
+      id: courseId,
+    }),
+    trpc.courseEvents.admin.listCourse.queryOptions({ courseId }),
+    trpc.reservations.admin.listCourse.queryOptions({ courseId }),
+  ] as const;
 }
+
+/* Prefetch all queries during SSR. */
+export const loader = prefetchLoader(courseDetailsQueries);
 
 export default function CourseDetails({
   params: { courseId },
 }: Route.ComponentProps) {
   const navigate = useNavigate();
-  const trpc = useTRPC();
-  const { data: course } = useSuspenseQuery(
-    trpc.courses.admin.get.queryOptions({
-      id: courseId,
-    }),
-  );
-  const { data: courseEvents } = useSuspenseQuery(
-    trpc.courseEvents.admin.listCourse.queryOptions({ courseId }),
-  );
-  const { data: reservations } = useSuspenseQuery(
-    trpc.reservations.admin.listCourse.queryOptions({ courseId }),
-  );
+  const [{ data: course }, { data: courseEvents }, { data: reservations }] =
+    useSuspenseQueries({
+      queries: courseDetailsQueries(useTRPC(), { courseId }),
+    });
 
   /* Mutations */
   const courseEventUpdateMut = useCourseEventUpdateMutation();

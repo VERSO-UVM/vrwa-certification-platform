@@ -12,6 +12,9 @@ export const { TRPCProvider, useTRPC, useTRPCClient } =
   createTRPCContext<AppRouter>();
 export type { AppRouter };
 
+/* Handle for TRPC to do e.g. `trpc.courses.admin.get.queryOptions()`*/
+export type TRPC = ReturnType<typeof useTRPC>
+
 /**
  * Helper to ensure that server and browser tRPC clients have
  * matching configurations.
