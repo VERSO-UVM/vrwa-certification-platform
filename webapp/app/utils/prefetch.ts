@@ -5,7 +5,6 @@
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import {
   type ClientLoaderFunctionArgs,
-  type LoaderFunctionArgs,
   type Params,
   useMatches,
   type UIMatch,
@@ -18,7 +17,6 @@ import {
   type DehydratedState,
   QueryClient,
 } from "@tanstack/react-query";
-import { getServerTrpc } from "./trpc.server";
 import { useMemo } from "react";
 
 export type PrefetchLoaderResult = { dehydratedState: DehydratedState };
@@ -41,20 +39,6 @@ export type QueryListFn<P extends Params> = (
   params: P,
   searchParams: URLSearchParams,
 ) => ReadonlyArray<TrpcQueryOptions>;
-
-/**
- * Create a loader() function that can be exported directly
- * for a component.
- */
-export function prefetchLoader<T extends Params>(queryListFn: QueryListFn<T>) {
-  return async ({ request, params }: LoaderFunctionArgs) => {
-    const [queryClient, trpc] = getServerTrpc(request);
-    return await prefetchQueries(
-      queryClient,
-      queryListFn(trpc, params as T, new URL(request.url).searchParams),
-    );
-  };
-}
 
 /**
  * Create a clientLoader() that fills the browser query cache on
@@ -91,7 +75,7 @@ export function useDehydratedState() {
   function isPrefetchLoader(
     match: UIMatch<unknown>,
   ): match is UIMatch<PrefetchLoaderResult> {
-    return (match.loaderData as PrefetchLoaderResult).dehydratedState != null;
+    return (match.loaderData as PrefetchLoaderResult|undefined)?.dehydratedState != null;
   }
 
   const matches = useMatches();
