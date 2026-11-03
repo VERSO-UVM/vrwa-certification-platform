@@ -27,8 +27,7 @@ import {
   useCourseUpdateMutation,
 } from "./use-course-mutation";
 import { RosterManager } from "./roster-manager";
-import { prefetchLoader } from "~/utils/trpc.server";
-import { prefetchClientLoader } from "~/utils/prefetch";
+import { prefetchClientLoader, prefetchLoader } from "~/utils/prefetch";
 import { useSuspenseQueries } from "@tanstack/react-query";
 import { useTRPC, type TRPC } from "~/utils/trpc";
 

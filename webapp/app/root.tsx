@@ -18,7 +18,7 @@ import { useMemo } from "react";
 
 import "./app.css";
 import { getQueryClient } from "~/utils/query-client";
-import { getBrowserTrpcClient, makeTrpcClient, TRPCProvider } from "~/utils/trpc";
+import { getTrpcClient, makeTrpcClient, TRPCProvider } from "~/utils/trpc";
 import type { Route } from "./+types/root";
 import { TooltipProvider } from "./components/ui/tooltip";
 import superjson from "superjson";
@@ -45,9 +45,7 @@ const asyncStoragePersister = createAsyncStoragePersister({
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
-  // Browser: share the singleton with clientLoaders. Server: fresh client per request.
-  const trpcClient =
-    typeof window === "undefined" ? makeTrpcClient() : getBrowserTrpcClient();
+  const trpcClient = getTrpcClient();
 
   return (
     <PersistQueryClientProvider

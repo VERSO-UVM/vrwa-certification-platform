@@ -15,21 +15,11 @@ export const { TRPCProvider, useTRPC, useTRPCClient } =
   createTRPCContext<AppRouter>();
 export type { AppRouter };
 
-/* Handle for TRPC to do e.g. `trpc.courses.admin.get.queryOptions()`*/
+/* Handle for TRPC */
 export type TRPC = ReturnType<typeof useTRPC>;
 
 /* unknown doesn't work here, but we don't care about the type of query */
 export type TrpcQueryOptions = FetchQueryOptions<any, any, any, any>;
-
-/**
- * Shared query-list shape for server and client prefetch loaders.
- * Declaring only (trpc, params) still satisfies this type.
- */
-export type QueryListFn<P extends Params> = (
-  trpc: TRPC,
-  params: P,
-  searchParams: URLSearchParams,
-) => ReadonlyArray<TrpcQueryOptions>;
 
 /**
  * Helper to ensure that server and browser tRPC clients have
@@ -57,13 +47,12 @@ export const makeTrpcClient = (headers?: HTTPHeaders) => {
 
 let browserTrpcClient: TRPCClient<AppRouter> | undefined;
 
-/**
- * Singleton browser tRPC client shared by Layout and clientLoaders.
- */
-export function getBrowserTrpcClient() {
+export function getTrpcClient() {
   if (typeof window === "undefined") {
-    throw new Error("getBrowserTrpcClient() is only available in the browser");
+    // Server: fresh client on each request
+    return makeTrpcClient();
   }
+  // Browser: make a new client if we don't have one
   if (!browserTrpcClient) {
     browserTrpcClient = makeTrpcClient();
   }
