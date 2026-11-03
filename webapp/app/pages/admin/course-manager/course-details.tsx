@@ -65,7 +65,6 @@ function courseDetailsQueries(
     }),
     trpc.courseEvents.admin.listCourse.queryOptions({ courseId }),
     trpc.reservations.admin.listCourse.queryOptions({ courseId }),
-    // Also used by RosterManager so it isn't left fetching after render.
     trpc.profiles.admin.listTrainees.queryOptions(),
   ] as const;
 }
