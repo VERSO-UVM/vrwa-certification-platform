@@ -73,6 +73,7 @@ export const certificateRouter = router({
       .mutation(async ({ input }) => {
         console.log("%%%% batchEmail triggered! %%%%");
         console.log(input);
+        console.log("hello ");
       }),
   },
 
