@@ -7,10 +7,7 @@ import {
   ScrollRestoration,
   useMatches,
 } from "react-router";
-import {
-  HydrationBoundary,
-  type DehydratedState,
-} from "@tanstack/react-query";
+import { HydrationBoundary, type DehydratedState } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
@@ -22,6 +19,7 @@ import { getTrpcClient, makeTrpcClient, TRPCProvider } from "~/utils/trpc";
 import type { Route } from "./+types/root";
 import { TooltipProvider } from "./components/ui/tooltip";
 import superjson from "superjson";
+import { useDehydratedState } from "./utils/prefetch";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -77,28 +75,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  // Merge dehydrated query state from every matched loader so layout + page
-  // prefetches both apply, and always render the same tree so Outlet doesn't remount.
-  const matches = useMatches();
-  const dehydratedState = useMemo(() => {
-    const queries: DehydratedState["queries"] = [];
-    const mutations: DehydratedState["mutations"] = [];
-    for (const match of matches) {
-      const loaderData = match?.loaderData as
-        | { dehydratedState: DehydratedState }
-        | undefined;
-      const state = loaderData?.dehydratedState;
-      if (state) {
-        queries.push(...state.queries);
-        mutations.push(...state.mutations);
-      }
-    }
-    if (queries.length === 0 && mutations.length === 0) {
-      return undefined;
-    }
-    return { queries, mutations };
-  }, [matches]);
-
+  const dehydratedState = useDehydratedState();
   return (
     <HydrationBoundary state={dehydratedState}>
       <Outlet />

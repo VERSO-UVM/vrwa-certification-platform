@@ -3,19 +3,25 @@
  * the prefetched data getting out of sync with the data used in the components.
  */
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
-import type {
-  ClientLoaderFunctionArgs,
-  LoaderFunctionArgs,
-  Params,
+import {
+  type ClientLoaderFunctionArgs,
+  type LoaderFunctionArgs,
+  type Params,
+  useMatches,
+  type UIMatch,
 } from "react-router";
 import type { AppRouter } from "@backend/routers";
 import { getQueryClient } from "~/utils/query-client";
+import { getTrpcClient, type TRPC, type TrpcQueryOptions } from "./trpc";
 import {
-  type TRPC,
-  type TrpcQueryOptions,
-} from "./trpc";
-import { QueryClient, dehydrate } from "@tanstack/react-query";
+  dehydrate,
+  type DehydratedState,
+  QueryClient,
+} from "@tanstack/react-query";
 import { getServerTrpc } from "./trpc.server";
+import { useMemo } from "react";
+
+export type PrefetchLoaderResult = { dehydratedState: DehydratedState };
 
 /*
  * To return a dehydratedState from a loader() function.
@@ -23,7 +29,7 @@ import { getServerTrpc } from "./trpc.server";
 export async function prefetchQueries(
   queryClient: QueryClient,
   queries: ReadonlyArray<TrpcQueryOptions>,
-) {
+): Promise<PrefetchLoaderResult> {
   await Promise.all(queries.map((q) => queryClient.prefetchQuery(q)));
   return {
     dehydratedState: dehydrate(queryClient),
@@ -61,7 +67,7 @@ export function prefetchClientLoader<T extends Params>(
   return async ({ request, params }: ClientLoaderFunctionArgs) => {
     const queryClient = getQueryClient();
     const trpc = createTRPCOptionsProxy<AppRouter>({
-      client: getBrowserTrpcClient(),
+      client: getTrpcClient(),
       queryClient,
     });
     const queries = queryListFn(
@@ -76,4 +82,26 @@ export function prefetchClientLoader<T extends Params>(
     );
     return null;
   };
+}
+
+/**
+ * Get dehydrated queries to pass in the HydrationBoundary component.
+ */
+export function useDehydratedState() {
+  function isPrefetchLoader(
+    match: UIMatch<unknown>,
+  ): match is UIMatch<PrefetchLoaderResult> {
+    return (match.loaderData as PrefetchLoaderResult).dehydratedState != null;
+  }
+
+  const matches = useMatches();
+  return useMemo<DehydratedState>(() => {
+    const queries = matches.flatMap((match) => {
+      if (isPrefetchLoader(match) && match.loaderData?.dehydratedState) {
+        return match.loaderData.dehydratedState.queries;
+      }
+      return [];
+    });
+    return { queries, mutations: [] };
+  }, [matches]);
 }
