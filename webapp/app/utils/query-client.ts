@@ -4,7 +4,7 @@ import {
 } from "@tanstack/react-query";
 import superjson from "superjson";
 
-function makeQueryClient() {
+export function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
