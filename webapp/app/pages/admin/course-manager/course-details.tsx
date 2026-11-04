@@ -27,7 +27,10 @@ import {
   useCourseUpdateMutation,
 } from "./use-course-mutation";
 import { RosterManager } from "./roster-manager";
-import { getServerTrpc } from "~/utils/trpc.server";
+import { prefetchClientLoader } from "~/utils/prefetch";
+import { useSuspenseQueries } from "@tanstack/react-query";
+import { useTRPC, type TRPC } from "~/utils/trpc";
+import { prefetchLoader } from "~/utils/trpc.server";
 
 export function meta() {
   return [{ title: "Course Details - VRWA Training Database" }];
@@ -53,40 +56,33 @@ const courseUpdateFormDefs = [
   courseDefs.creditCategories,
 ] as ColumnDef<CourseDto>[];
 
-export async function loader({
-  params: { courseId },
-  request,
-}: Route.LoaderArgs) {
-  // Do API queries on the server-side
-  const [queryClient, trpc] = getServerTrpc(request);
-  const [course, courseEvents, reservations] = await Promise.all([
-    queryClient.fetchQuery(
-      trpc.courses.admin.get.queryOptions({
-        id: courseId,
-      }),
-    ),
-    queryClient.fetchQuery(
-      trpc.courseEvents.admin.listCourse.queryOptions({ courseId }),
-    ),
-    queryClient.fetchQuery(
-      trpc.reservations.admin.listCourse.queryOptions({ courseId }),
-    ),
-  ]);
-  // We may to want to set up a different abstraction to pass the loader data
-  // that works with useQuery(). This is a proof of concept for doing procedure calls
-  // from the web server.
-  return {
-    course,
-    courseEvents,
-    reservations,
-  };
+function courseDetailsQueries(
+  trpc: TRPC,
+  { courseId }: Route.LoaderArgs["params"],
+) {
+  return [
+    trpc.courses.admin.get.queryOptions({
+      id: courseId,
+    }),
+    trpc.courseEvents.admin.listCourse.queryOptions({ courseId }),
+    trpc.reservations.admin.listCourse.queryOptions({ courseId }),
+    trpc.profiles.admin.listTrainees.queryOptions(),
+  ] as const;
 }
+
+/* Prefetch all queries during SSR. */
+export const loader = prefetchLoader(courseDetailsQueries);
+/* Prefetch into the browser cache on client-side navigations. */
+export const clientLoader = prefetchClientLoader(courseDetailsQueries);
 
 export default function CourseDetails({
   params: { courseId },
-  loaderData: { course, courseEvents, reservations },
 }: Route.ComponentProps) {
   const navigate = useNavigate();
+  const [{ data: course }, { data: courseEvents }, { data: reservations }] =
+    useSuspenseQueries({
+      queries: courseDetailsQueries(useTRPC(), { courseId }),
+    });
 
   /* Mutations */
   const courseEventUpdateMut = useCourseEventUpdateMutation();
