@@ -3,7 +3,7 @@
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import type { Route } from "./+types/reservation";
+import type { Route } from "./+types/reservation-manager";
 import { useTRPC, type TRPC } from "~/utils/trpc";
 import type { ReservationDto } from "@backend/database/dtos";
 import { useSuspenseQueries } from "@tanstack/react-query";
@@ -38,7 +38,7 @@ const attendanceInfoDefs = [
   reservationDefs.classStartDateTime,
   reservationDefs.courseCreditHours,
 ];
-const attendanceEditform = [reservationDefs.creditHours];
+const attendanceEditForm = [reservationDefs.creditHours];
 
 function queries(trpc: TRPC, params: Route.LoaderArgs["params"]) {
   const { courseId, profileId } = params;
@@ -101,17 +101,18 @@ export default function Reservation({
                 variant="destructive"
                 size="lg"
                 className="w-50"
-                onClick={async () => {
+                onClick={() => {
                   if (
                     !confirm("Are you sure you want to unenroll this trainee?")
                   ) {
                     return;
                   }
-                  await reservationDeleteMutation.mutateAsync({
-                    profileId,
-                    courseId,
-                  });
-                  await navigate(`/admin/course-details/${courseId}`);
+                  void reservationDeleteMutation
+                    .mutateAsync({
+                      profileId,
+                      courseId,
+                    })
+                    .then(() => navigate(`/admin/course-details/${courseId}`));
                 }}
               >
                 Unenroll
@@ -143,7 +144,7 @@ export default function Reservation({
             <EditForm
               item={reservation}
               onSave={onSave}
-              columns={attendanceEditform}
+              columns={attendanceEditForm}
               required={{
                 creditHours: true,
               }}
