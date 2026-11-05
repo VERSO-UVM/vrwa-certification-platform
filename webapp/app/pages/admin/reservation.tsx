@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import type { Route } from "./+types/enrollment";
+import type { Route } from "./+types/reservation";
 import { useTRPC, type TRPC } from "~/utils/trpc";
 import type { ReservationDto } from "@backend/database/dtos";
 import {
@@ -23,7 +23,7 @@ import { DetailsDisplay } from "~/components/entry-views/details-display";
 import { Button } from "~/components/ui/button";
 import { Link, useNavigate } from "react-router";
 import { ArrowLeft } from "lucide-react";
-import { useReservationDeleteMutation } from "./use-reservation-mutation";
+import { useReservationDeleteMutation } from "./course-manager/use-reservation-mutation";
 import { PageHeader } from "~/components/page-header";
 import { prefetchClientLoader } from "~/utils/prefetch";
 import { prefetchLoader } from "~/utils/trpc.server";
@@ -66,7 +66,7 @@ export const loader = prefetchLoader(queries);
 /* Prefetch into the browser cache on client-side navigations. */
 export const clientLoader = prefetchClientLoader(queries);
 
-export default function Enrollment({
+export default function Reservation({
   params: { courseId, profileId },
 }: Route.ComponentProps) {
   const trpc = useTRPC();

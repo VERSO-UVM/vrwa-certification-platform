@@ -12,7 +12,7 @@ export default [
     route("trainees", "pages/admin/trainee-manager.tsx"),
     route("users", "pages/admin/user-manager.tsx"),
     route("certifications", "pages/admin/certifications.tsx"),
-    route("enrollment/:courseId/:profileId", "pages/admin/course-manager/enrollment.tsx"),
+    route("reservation/:courseId/:profileId", "pages/admin/reservation.tsx"),
     route("*", "pages/admin/not-found.tsx"),
     route("course-manager", "pages/admin/course-manager.tsx"),
     route(
