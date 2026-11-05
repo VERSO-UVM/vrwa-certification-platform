@@ -4,21 +4,20 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import type { Route } from "./+types/reservation-manager";
-import { useTRPC, type TRPC } from "~/utils/trpc";
+import { type TRPC, useTRPC } from "~/utils/trpc";
 import type { ReservationDto } from "@backend/database/dtos";
 import { useSuspenseQueries } from "@tanstack/react-query";
 import { reservationDefs } from "~/utils/field-defs/reservation";
 import { EditForm } from "~/components/entry-views/edit-form";
 import { DetailsDisplay } from "~/components/entry-views/details-display";
 import { Button } from "~/components/ui/button";
-import { Link, useNavigate } from "react-router";
+import { Link, type LoaderFunctionArgs, useNavigate } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import {
   useReservationDeleteMutation,
   useReservationUpdateMutation,
 } from "./course-manager/use-reservation-mutation";
 import { PageHeader } from "~/components/page-header";
-import { prefetchClientLoader } from "~/utils/prefetch";
 import { prefetchLoader } from "~/utils/trpc.server";
 
 export function meta({}: Route.MetaArgs) {
@@ -54,8 +53,8 @@ function queries(trpc: TRPC, params: Route.LoaderArgs["params"]) {
 
 /* Prefetch queries in the server */
 export const loader = prefetchLoader(queries);
-/* Refresh queries on client-side navigations */
-export const clientLoader = prefetchClientLoader(queries);
+/* Skip loader on client-side navigations */
+export const clientLoader = () => {};
 
 export default function Reservation({
   params: { courseId, profileId },
