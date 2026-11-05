@@ -19,6 +19,7 @@ import {
 } from "@tanstack/react-query";
 import { reservationDefs } from "~/utils/field-defs/reservation";
 import { EditForm } from "~/components/entry-views/edit-form";
+import { DetailsDisplay } from "~/components/entry-views/details-display";
 import { Button } from "~/components/ui/button";
 import { Link, useNavigate } from "react-router";
 import { ArrowLeft } from "lucide-react";
@@ -31,8 +32,20 @@ export function meta({}: Route.MetaArgs) {
   return [{ title: "Enrollment - VRWA" }];
 }
 
-const paymentEditFormDefs = [reservationDefs.paymentStatus];
-const registrationEditFormDefs = [reservationDefs.creditHours];
+const registrationBasicInfoDefs = [
+  reservationDefs.email,
+  reservationDefs.createdAt,
+  reservationDefs.statusUpdatedAt,
+];
+const registrationEditFormDefs = [
+  reservationDefs.reservationStatus,
+  reservationDefs.paymentStatus,
+];
+const attendanceInfoDefs = [
+  reservationDefs.classStartDateTime,
+  reservationDefs.courseCreditHours,
+];
+const attendanceEditform = [reservationDefs.creditHours];
 
 function queries(
   trpc: TRPC,
@@ -74,8 +87,7 @@ export default function Enrollment({
     await reservationUpdater.mutateAsync({
       profileId: profileId,
       courseId: courseId,
-      creditHours: updates.creditHours?.toString(),
-      paymentStatus: updates.paymentStatus,
+      ...updates,
     });
     void queryClient.invalidateQueries({
       queryKey: trpc.reservations.admin.pathKey(),
@@ -106,9 +118,7 @@ export default function Enrollment({
                 className="w-50"
                 onClick={async () => {
                   if (
-                    !confirm(
-                      "Are you sure you want to unenroll this trainee?",
-                    )
+                    !confirm("Are you sure you want to unenroll this trainee?")
                   ) {
                     return;
                   }
@@ -124,27 +134,36 @@ export default function Enrollment({
             </CardTitle>
             <CardDescription></CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-col gap-6 @md:flex-row @md:gap-8">
+            <DetailsDisplay
+              item={reservation}
+              columns={registrationBasicInfoDefs}
+            />
             <EditForm
               item={reservation}
               onSave={updateData}
-              columns={paymentEditFormDefs}
+              columns={registrationEditFormDefs}
               required={{
                 paymentStatus: true,
+                reservationStatus: true,
               }}
             />
           </CardContent>
         </Card>
         <Card className="col-span-full @6xl:col-span-3" variant="blue">
           <CardHeader>
-            <CardTitle>Completion</CardTitle>
+            <CardTitle>Attendance</CardTitle>
             <CardDescription></CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-col gap-6 @md:flex-row @md-gap-8">
+            <DetailsDisplay
+              item={reservation}
+              columns={attendanceInfoDefs}
+            />
             <EditForm
               item={reservation}
               onSave={updateData}
-              columns={registrationEditFormDefs}
+              columns={attendanceEditform}
               required={{
                 creditHours: true,
               }}
