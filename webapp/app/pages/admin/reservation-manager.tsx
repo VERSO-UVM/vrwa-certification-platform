@@ -2,28 +2,21 @@
  * Page to manage reservation of an individual user in a course.
  */
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import type { Route } from "./+types/reservation";
 import { useTRPC, type TRPC } from "~/utils/trpc";
 import type { ReservationDto } from "@backend/database/dtos";
-import {
-  useQueryClient,
-  useMutation,
-  useSuspenseQueries,
-} from "@tanstack/react-query";
+import { useSuspenseQueries } from "@tanstack/react-query";
 import { reservationDefs } from "~/utils/field-defs/reservation";
 import { EditForm } from "~/components/entry-views/edit-form";
 import { DetailsDisplay } from "~/components/entry-views/details-display";
 import { Button } from "~/components/ui/button";
 import { Link, useNavigate } from "react-router";
 import { ArrowLeft } from "lucide-react";
-import { useReservationDeleteMutation } from "./course-manager/use-reservation-mutation";
+import {
+  useReservationDeleteMutation,
+  useReservationUpdateMutation,
+} from "./course-manager/use-reservation-mutation";
 import { PageHeader } from "~/components/page-header";
 import { prefetchClientLoader } from "~/utils/prefetch";
 import { prefetchLoader } from "~/utils/trpc.server";
@@ -47,10 +40,8 @@ const attendanceInfoDefs = [
 ];
 const attendanceEditform = [reservationDefs.creditHours];
 
-function queries(
-  trpc: TRPC,
-  { profileId, courseId }: Route.LoaderArgs["params"],
-) {
+function queries(trpc: TRPC, params: Route.LoaderArgs["params"]) {
+  const { courseId, profileId } = params;
   return [
     trpc.reservations.admin.get.queryOptions({
       courseId,
@@ -61,16 +52,15 @@ function queries(
   ] as const;
 }
 
-/* Prefetch all queries during SSR. */
+/* Prefetch queries in the server */
 export const loader = prefetchLoader(queries);
-/* Prefetch into the browser cache on client-side navigations. */
+/* Refresh queries on client-side navigations */
 export const clientLoader = prefetchClientLoader(queries);
 
 export default function Reservation({
   params: { courseId, profileId },
 }: Route.ComponentProps) {
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const [{ data: reservation }, { data: course }, { data: profile }] =
@@ -78,19 +68,14 @@ export default function Reservation({
       queries: queries(trpc, { courseId, profileId }),
     });
 
-  const reservationUpdater = useMutation(
-    trpc.reservations.admin.update.mutationOptions(),
-  );
   const reservationDeleteMutation = useReservationDeleteMutation();
+  const reservationUpdateMutation = useReservationUpdateMutation();
 
-  const updateData = async (updates: Partial<ReservationDto>) => {
-    await reservationUpdater.mutateAsync({
+  const onSave = async (updates: Partial<ReservationDto>) => {
+    await reservationUpdateMutation.mutateAsync({
       profileId: profileId,
       courseId: courseId,
       ...updates,
-    });
-    void queryClient.invalidateQueries({
-      queryKey: trpc.reservations.admin.pathKey(),
     });
   };
 
@@ -132,7 +117,6 @@ export default function Reservation({
                 Unenroll
               </Button>
             </CardTitle>
-            <CardDescription></CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-6 @md:flex-row @md:gap-8">
             <DetailsDisplay
@@ -141,7 +125,7 @@ export default function Reservation({
             />
             <EditForm
               item={reservation}
-              onSave={updateData}
+              onSave={onSave}
               columns={registrationEditFormDefs}
               required={{
                 paymentStatus: true,
@@ -153,16 +137,12 @@ export default function Reservation({
         <Card className="col-span-full @6xl:col-span-3" variant="blue">
           <CardHeader>
             <CardTitle>Attendance</CardTitle>
-            <CardDescription></CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-6 @md:flex-row @md-gap-8">
-            <DetailsDisplay
-              item={reservation}
-              columns={attendanceInfoDefs}
-            />
+            <DetailsDisplay item={reservation} columns={attendanceInfoDefs} />
             <EditForm
               item={reservation}
-              onSave={updateData}
+              onSave={onSave}
               columns={attendanceEditform}
               required={{
                 creditHours: true,
