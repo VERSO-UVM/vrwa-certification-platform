@@ -3,8 +3,9 @@
  * as to clone or create new courses. Other changes require visiting a course
  * details page.
  */
-import { useQuery } from "@tanstack/react-query";
-import { useTRPC } from "~/utils/trpc";
+import { useSuspenseQueries } from "@tanstack/react-query";
+import { useTRPC, type TRPC } from "~/utils/trpc";
+import { prefetchLoader } from "~/utils/trpc.server";
 
 import {
   Card,
@@ -53,10 +54,20 @@ const courseCreateFormDefs = [
   courseDefs.creditCategories,
 ];
 
+function queries(trpc: TRPC) {
+  return [trpc.courses.admin.list.queryOptions()] as const;
+}
+
+/* Prefetch all queries during SSR. */
+export const loader = prefetchLoader(queries);
+/* Skip loader on client-side navigations */
+export const clientLoader = () => {};
+
 export default function CourseManager() {
-  const trpc = useTRPC();
   const navigate = useNavigate();
-  const { data: courses } = useQuery(trpc.courses.admin.list.queryOptions());
+  const [{ data: courses }] = useSuspenseQueries({
+    queries: queries(useTRPC()),
+  });
   const createCourseMut = useCourseCreateMutation();
 
   /* useMemo isn't only for efficiency. It maintains a stable reference, which is
