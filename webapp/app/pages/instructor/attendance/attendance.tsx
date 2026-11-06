@@ -9,6 +9,24 @@ import { Button } from "~/components/ui/button";
 import { AttendancePrintView } from "./attendance-print-view";
 import { AttendanceEditView } from "./attendance-edit-view";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { type TRPC } from "~/utils/trpc";
+import { prefetchLoader } from "~/utils/trpc.server";
+
+function queries(trpc: TRPC, { courseId }: Route.LoaderArgs["params"]) {
+  return [
+    trpc.courses.instructor.get.queryOptions({
+      courseId: courseId,
+    }),
+    trpc.reservations.instructor.listCourse.queryOptions({
+      courseId,
+    }),
+  ] as const;
+}
+
+/* Prefetch all queries during SSR. */
+export const loader = prefetchLoader(queries);
+/* Skip loader on client-side navigations */
+export const clientLoader = () => {};
 
 export default function AttendancePage({
   params: { courseId },
