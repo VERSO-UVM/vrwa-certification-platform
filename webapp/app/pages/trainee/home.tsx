@@ -1,7 +1,8 @@
 import { PageHeader } from "~/components/page-header";
-import { useTRPC } from "~/utils/trpc";
-import { useQuery } from "@tanstack/react-query";
-import type { Route } from "../+types/home";
+import { useTRPC, type TRPC } from "~/utils/trpc";
+import { prefetchLoader } from "~/utils/trpc.server";
+import { useSuspenseQueries } from "@tanstack/react-query";
+import type { Route } from "./+types/home";
 import {
   Card,
   CardContent,
@@ -11,28 +12,29 @@ import {
 } from "~/components/ui/card";
 import { DataTable } from "~/components/data-table";
 import { reservationDefPresets } from "~/utils/field-defs/reservation";
-import { protectedLoader } from "~/utils/session";
-
-// Must be signed in to access trainee home page
-export const loader = protectedLoader("user");
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "VRWA Certifications" }];
 }
 
-export default function TraineeHome() {
-  const trpc = useTRPC();
-  const activeProfileQuery = useQuery(
+function queries(trpc: TRPC) {
+  return [
     trpc.profiles.getActiveProfile.queryOptions(),
-  );
-  const profileName =
-    activeProfileQuery.data?.firstName +
-    " " +
-    activeProfileQuery.data?.lastName;
-
-  const { data: reservations } = useQuery(
     trpc.reservations.trainee.listUpcoming.queryOptions(),
-  );
+  ] as const;
+}
+
+/* Prefetch all queries during SSR. */
+export const loader = prefetchLoader(queries);
+/* Skip loader on client-side navigations */
+export const clientLoader = () => {};
+
+export default function TraineeHome() {
+  const [{ data: activeProfile }, { data: reservations }] = useSuspenseQueries({
+    queries: queries(useTRPC()),
+  });
+  const profileName =
+    (activeProfile?.firstName ?? "") + " " + (activeProfile?.lastName ?? "");
 
   return (
     <div className="flex-1">

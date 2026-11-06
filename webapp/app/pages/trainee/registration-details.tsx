@@ -1,7 +1,8 @@
 import { PageHeader } from "~/components/page-header";
 import type { Route } from "./+types/registration-details";
-import { useQuery } from "@tanstack/react-query";
-import { useTRPC } from "~/utils/trpc";
+import { useSuspenseQueries } from "@tanstack/react-query";
+import { useTRPC, type TRPC } from "~/utils/trpc";
+import { prefetchLoader } from "~/utils/trpc.server";
 import { Button } from "~/components/ui/button";
 import { Link } from "react-router";
 import { ArrowLeft } from "lucide-react";
@@ -17,13 +18,21 @@ export function meta({}: Route.MetaArgs) {
   return [{ title: "Registration Details" }];
 }
 
+function queries(trpc: TRPC, { courseId }: Route.LoaderArgs["params"]) {
+  return [trpc.courses.trainee.get.queryOptions({ courseId })] as const;
+}
+
+/* Prefetch all queries during SSR. */
+export const loader = prefetchLoader(queries);
+/* Skip loader on client-side navigations */
+export const clientLoader = () => {};
+
 export default function RegistrationDetailsPage({
   params: { courseId },
 }: Route.ComponentProps) {
-  const trpc = useTRPC();
-  const { data: courseEvent } = useQuery(
-    trpc.courses.trainee.get.queryOptions({ courseId }),
-  );
+  const [{ data: courseEvent }] = useSuspenseQueries({
+    queries: queries(useTRPC(), { courseId }),
+  });
 
   return (
     <>

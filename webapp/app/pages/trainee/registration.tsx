@@ -1,7 +1,7 @@
 import type { Route } from "./+types/registration";
 import { format } from "date-fns";
 import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQueries } from "@tanstack/react-query";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -9,7 +9,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import type { CourseDto } from "@backend/database/dtos";
-import { useTRPC } from "~/utils/trpc";
+import { useTRPC, type TRPC } from "~/utils/trpc";
+import { prefetchLoader } from "~/utils/trpc.server";
 import { PageHeader } from "~/components/page-header";
 import {
   Card,
@@ -76,13 +77,19 @@ const columns = [
   ),
 ];
 
-const NO_COURSES = [] as CourseDto[]; // Need stable reference for Tanstack Table
+function queries(trpc: TRPC) {
+  return [trpc.courses.trainee.listFuture.queryOptions()] as const;
+}
+
+/* Prefetch all queries during SSR. */
+export const loader = prefetchLoader(queries);
+/* Skip loader on client-side navigations */
+export const clientLoader = () => {};
 
 export default function CourseRegistrationPage() {
-  const trpc = useTRPC();
-  const { data: courses = NO_COURSES } = useQuery(
-    trpc.courses.trainee.listFuture.queryOptions(),
-  );
+  const [{ data: courses }] = useSuspenseQueries({
+    queries: queries(useTRPC()),
+  });
 
   const monthOptions = useMemo(() => {
     // Get unique month/years

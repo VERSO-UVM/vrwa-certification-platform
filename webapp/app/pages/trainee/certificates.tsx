@@ -1,7 +1,8 @@
 import { PageHeader } from "~/components/page-header";
 import type { Route } from "./+types/certificates";
-import { useQuery } from "@tanstack/react-query";
-import { useTRPC } from "~/utils/trpc";
+import { useSuspenseQueries } from "@tanstack/react-query";
+import { useTRPC, type TRPC } from "~/utils/trpc";
+import { prefetchLoader } from "~/utils/trpc.server";
 import {
   Card,
   CardContent,
@@ -16,10 +17,6 @@ import {
   reservationFieldHelper,
 } from "~/utils/field-defs/reservation";
 import { Link } from "react-router";
-import { protectedLoader } from "~/utils/session";
-
-// Must be signed in to access
-export const loader = protectedLoader("user");
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "VRWA - Completed Courses" }];
@@ -46,11 +43,19 @@ const columnDefs = [
   }),
 ];
 
+function queries(trpc: TRPC) {
+  return [trpc.reservations.trainee.listCompleted.queryOptions()] as const;
+}
+
+/* Prefetch all queries during SSR. */
+export const loader = prefetchLoader(queries);
+/* Skip loader on client-side navigations */
+export const clientLoader = () => {};
+
 export default function CertificatesPage() {
-  const trpc = useTRPC();
-  const { data: reservations } = useQuery(
-    trpc.reservations.trainee.listCompleted.queryOptions(),
-  );
+  const [{ data: reservations }] = useSuspenseQueries({
+    queries: queries(useTRPC()),
+  });
 
   return (
     <>
