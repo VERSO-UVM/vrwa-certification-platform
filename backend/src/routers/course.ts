@@ -224,7 +224,7 @@ export const courseRouter = router({
   }),
 
   trainee: router({
-    get: instructorProcedure
+    get: publicProcedure
       .input(
         z.object({
           courseId: z.string(),
