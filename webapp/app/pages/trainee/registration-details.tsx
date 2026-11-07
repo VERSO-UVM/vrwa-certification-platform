@@ -278,7 +278,7 @@ export default function RegistrationDetailsPage({
             <div className="flex flex-col gap-3">
               <PricingRow
                 label="Member"
-                description="Half price (honor system for now)"
+                description="Member price"
                 unitCents={unitPriceCents(course.priceCents, true)}
                 seats={seats}
                 waitlist={needsWaitlist}
