@@ -66,10 +66,15 @@ export function RosterManager({ courseId }: { courseId: string }) {
           if (rosterIds.has(row.original.id)) {
             /* Already enrolled */
             return (
-              <Button variant="link" asChild>
-                <Link to={`/admin/reservation/${courseId}/${row.original.id}`}>
-                  Manage
-                </Link>
+              <Button
+                variant="link"
+                render={
+                  <Link
+                    to={`/admin/reservation/${courseId}/${row.original.id}`}
+                  />
+                }
+              >
+                Manage
               </Button>
             );
           } else {
@@ -97,12 +102,15 @@ export function RosterManager({ courseId }: { courseId: string }) {
         header: "Actions",
         cell: ({ row }) => {
           return (
-            <Button variant="link" asChild>
-              <Link
-                to={`/admin/reservation/${courseId}/${row.original.profileId}`}
-              >
-                <ArrowRight /> Manage Enrollment
-              </Link>
+            <Button
+              variant="link"
+              render={
+                <Link
+                  to={`/admin/reservation/${courseId}/${row.original.profileId}`}
+                />
+              }
+            >
+              <ArrowRight /> Manage Enrollment
             </Button>
           );
         },
@@ -141,10 +149,13 @@ export function RosterManager({ courseId }: { courseId: string }) {
         <CardContent>
           <DataTable columns={traineesTableDefs} data={trainees?.data} />
           <div className="mt-4">
-            <Button variant="link" asChild>
-              <Link to={`/admin/create-profile?enrollIn=${courseId}`}>
-                <Plus /> Create and Enroll New Profile
-              </Link>
+            <Button
+              variant="link"
+              render={
+                <Link to={`/admin/create-profile?enrollIn=${courseId}`} />
+              }
+            >
+              <Plus /> Create and Enroll New Profile
             </Button>
           </div>
         </CardContent>
