@@ -65,28 +65,31 @@ export default function AdminDashboard() {
             <Button
               variant="ghost_lighter"
               className="justify-start h-auto py-3 px-2"
-              nativeButton={false}
-              render={<Link to="/admin/profiles" />}
+              asChild
             >
-              <Users className="mr-2 h-4 w-4" /> Allot credit hours
+              <Link to="/admin/profiles">
+                <Users className="mr-2 h-4 w-4" /> Allot credit hours
+              </Link>
             </Button>
 
             <Button
               variant="ghost_lighter"
               className="justify-start h-auto py-3 px-2"
-              nativeButton={false}
-              render={<Link to="" />}
+              asChild
             >
-              <Book className="mr-2 h-4 w-4" /> View past courses
+              <Link to="">
+                <Book className="mr-2 h-4 w-4" /> View past courses
+              </Link>
             </Button>
 
             <Button
               variant="ghost_lighter"
               className="justify-start h-auto py-3 px-2"
-              nativeButton={false}
-              render={<Link to="" />}
+              asChild
             >
-              <Trophy className="mr-2 h-4 w-4" /> Send out certificates
+              <Link to="">
+                <Trophy className="mr-2 h-4 w-4" /> Send out certificates
+              </Link>
             </Button>
           </CardContent>
         </Card>

@@ -29,46 +29,60 @@ export function AdminSidebar() {
           <SidebarGroupLabel>Admin</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton render={<Link to="/admin" />}>
-                <House />
-                Home
+              <SidebarMenuButton asChild>
+                <Link to="/admin">
+                  <House />
+                  Home
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton render={<Link to="/admin/course-manager" />}>
-                <BookOpenText />
-                Courses
+              <SidebarMenuButton asChild>
+                <Link to="/admin/course-manager">
+                  <BookOpenText />
+                  Courses
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton render={<Link to="/admin/trainees" />}>
-                <Users />
-                Trainees
+              <SidebarMenuButton asChild>
+                <Link to="/admin/trainees">
+                  <Users />
+                  Trainees
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton render={<Link to="/admin/users" />}>
-                <UserCog />
-                Users
+              <SidebarMenuButton asChild>
+                <Link to="/admin/users">
+                  <UserCog />
+                  Users
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton render={<Link to="/admin/certifications" />}>
-                <Trophy />
-                Certifications
+              <SidebarMenuButton asChild>
+                <Link to="/admin/certifications">
+                  <Trophy />
+                  Certifications
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton render={<Link to="/admin/invoices" />}>
-                <Scroll />
-                Invoices
+              <SidebarMenuButton asChild>
+                <Link to="/admin/invoices">
+                  <Scroll />
+                  Invoices
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <LogOutButton />
+        <SidebarMenuButton asChild>
+          <LogOutButton />
+        </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>
   );

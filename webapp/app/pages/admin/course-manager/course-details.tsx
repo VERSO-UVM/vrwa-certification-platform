@@ -123,12 +123,10 @@ export default function CourseDetails({
 
   return (
     <div className="flex-1">
-      <Button
-        className="p-6"
-        variant="ghost"
-        render={<Link to="/admin/course-manager" />}
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Courses
+      <Button className="p-6" variant="ghost" asChild>
+        <Link to="/admin/course-manager">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Courses
+        </Link>
       </Button>
       <PageHeader>{course?.courseName}</PageHeader>
       <div className="grid gap-4 grid-cols-6">

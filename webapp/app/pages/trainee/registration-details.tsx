@@ -28,12 +28,10 @@ export default function RegistrationDetailsPage({
   return (
     <>
       <div className="pb-6">
-        <Button
-          variant="ghost"
-          nativeButton={false}
-          render={<Link to="/trainee/registration" />}
-        >
-          <ArrowLeft className="mr-2" /> Back to Courses
+        <Button variant="ghost" asChild>
+          <Link to="/trainee/registration">
+            <ArrowLeft className="mr-2" /> Back to Courses
+          </Link>
         </Button>
       </div>
       <PageHeader></PageHeader>

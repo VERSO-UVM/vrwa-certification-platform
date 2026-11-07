@@ -27,7 +27,7 @@ function PaginationContent({
   return (
     <ul
       data-slot="pagination-content"
-      className={cn("flex items-center gap-1", className)}
+      className={cn("flex flex-row items-center gap-1", className)}
       {...props}
     />
   );
@@ -64,7 +64,6 @@ function PaginationButton({
     />
   );
 }
-
 function PaginationPrevious({
   className,
   ...props
@@ -77,7 +76,7 @@ function PaginationPrevious({
       {...props}
     >
       <ChevronLeftIcon />
-      {/* <span className="hidden sm:block">Previous</span> */}
+      {/*<span className="hidden sm:block">Previous</span>*/}
     </PaginationButton>
   );
 }
@@ -93,7 +92,7 @@ function PaginationNext({
       className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
       {...props}
     >
-      {/* <span className="hidden sm:block">Next</span> */}
+      {/*<span className="hidden sm:block">Next</span>*/}
       <ChevronRightIcon />
     </PaginationButton>
   );
@@ -107,13 +106,10 @@ function PaginationEllipsis({
     <span
       aria-hidden
       data-slot="pagination-ellipsis"
-      className={cn(
-        "flex size-9 items-center justify-center [&_svg:not([class*='size-'])]:size-4",
-        className,
-      )}
+      className={cn("flex size-9 items-center justify-center", className)}
       {...props}
     >
-      <MoreHorizontalIcon />
+      <MoreHorizontalIcon className="size-4" />
       <span className="sr-only">More pages</span>
     </span>
   );
@@ -122,9 +118,9 @@ function PaginationEllipsis({
 export {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
   PaginationButton,
-  PaginationNext,
+  PaginationItem,
   PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
 };

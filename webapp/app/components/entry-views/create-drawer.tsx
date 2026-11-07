@@ -46,8 +46,8 @@ export function CreateDrawer<T extends object, R extends keyof T>({
           onSave(updates, item).then(() => setOpen(false))
         }
       />
-      <DrawerClose render={<Button variant="cancel_button" />}>
-        Cancel
+      <DrawerClose asChild>
+        <Button variant="cancel_button">Cancel</Button>
       </DrawerClose>
     </StandardDrawer>
   );
