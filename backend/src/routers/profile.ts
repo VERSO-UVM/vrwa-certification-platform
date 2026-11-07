@@ -71,32 +71,33 @@ export const profileRouter = router({
   /**
    * Create a new profile associated with the active user.
    */
-  create: protectedProcedure.input(insertSchema).mutation(async ({ ctx, input }) => {
-    const { ...fields } = input;
-    const [created] = await db.client
-      .insert(profile)
-      .values({
-        userId: ctx.account.id,
-        ...fields,
-      })
-      .returning();
-    if (!created) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Unable to create profile.",
-      });
-    }
-    return created;
-  }),
+  create: protectedProcedure
+    .input(insertSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { ...fields } = input;
+      const [created] = await db.client
+        .insert(profile)
+        .values({
+          userId: ctx.account.id,
+          ...fields,
+        })
+        .returning();
+      if (!created) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Unable to create profile.",
+        });
+      }
+      return created;
+    }),
 
   /**
    * Get all profiles associated with the logged-in user.
    */
   list: protectedProcedure.query(async ({ ctx }) => {
-    const profiles = await db.client
-      .select()
-      .from(profile)
-      .where(eq(profile.userId, ctx.account.id));
+    const profiles = await profilesQuery().where(
+      eq(profile.userId, ctx.account.id),
+    );
     return profiles;
   }),
 
