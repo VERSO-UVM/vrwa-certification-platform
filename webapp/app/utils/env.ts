@@ -9,3 +9,7 @@ export function getBackendUrl() {
 export function getTrpcUrl() {
   return getBackendUrl() + "/trpc";
 }
+
+export function getStripePublishableKey() {
+  return import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "";
+}

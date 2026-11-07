@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -12,8 +12,8 @@ import {
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { authClient } from "~/utils/auth";
-import { useTRPC } from "~/utils/trpc";
-import { getSessionData, getUserRedirectUrl } from "~/utils/session";
+import { getSessionData } from "~/utils/session";
+import { safeRedirectPath, withRedirectParam } from "~/utils/redirect";
 
 export function meta() {
   return [{ title: "Sign-up" }];
@@ -26,7 +26,8 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const trpc = useTRPC();
+  const [searchParams] = useSearchParams();
+  const redirect = safeRedirectPath(searchParams.get("redirect"), "");
 
   async function handleSignup(e: React.SubmitEvent) {
     e.preventDefault();
@@ -62,7 +63,10 @@ export default function SignupPage() {
       // Invalidate ALL queries after logging in
       await queryClient.invalidateQueries();
 
-      navigate("/profile-create", { replace: true });
+      navigate(
+        withRedirectParam("/profile-create", redirect || null),
+        { replace: true },
+      );
     }
   }
 
@@ -110,7 +114,7 @@ export default function SignupPage() {
         <div className="text-sm text-muted-foreground">
           Have an account?{" "}
           <Link
-            to="/login"
+            to={withRedirectParam("/login", redirect || null)}
             className="text-blue-700 dark:text-blue-300 underline"
           >
             Log in
