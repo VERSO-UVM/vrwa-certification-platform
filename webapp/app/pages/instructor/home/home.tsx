@@ -2,8 +2,9 @@
  * Instructor home/dashboard page with view of upcoming classes.
  */
 import { PageHeader } from "~/components/page-header";
-import { useTRPC } from "~/utils/trpc";
-import { useQuery } from "@tanstack/react-query";
+import { useTRPC, type TRPC } from "~/utils/trpc";
+import { prefetchLoader } from "~/utils/trpc.server";
+import { useSuspenseQueries } from "@tanstack/react-query";
 import { ClassInfoCard } from "./class-info-card";
 import {
   Card,
@@ -19,7 +20,6 @@ import {
 } from "~/utils/field-defs/course-event";
 import { Link } from "react-router";
 import { useMemo } from "react";
-import { SkeletonCard } from "~/components/ui/skeleton";
 
 export function meta() {
   return [{ title: "Instructor Dashboard" }];
@@ -57,16 +57,24 @@ const columnDefs = [
   courseEventDefs.seats,
 ];
 
+function queries(trpc: TRPC) {
+  return [trpc.courseEvents.instructor.listUpcoming.queryOptions()] as const;
+}
+
+/* Prefetch all queries during SSR. */
+export const loader = prefetchLoader(queries);
+/* Skip loader on client-side navigations */
+export const clientLoader = () => {};
+
 export default function InstructorHome() {
-  const trpc = useTRPC();
-  const { data: courseEvents, isPending } = useQuery(
-    trpc.courseEvents.instructor.listUpcoming.queryOptions(),
-  );
+  const [{ data: courseEvents }] = useSuspenseQueries({
+    queries: queries(useTRPC()),
+  });
   const today = startOfToday();
 
   const pastClasses = useMemo(
     () =>
-      courseEvents?.filter(
+      courseEvents.filter(
         ({ classStartDatetime }) =>
           classStartDatetime != null && classStartDatetime < today,
       ),
@@ -74,7 +82,7 @@ export default function InstructorHome() {
   );
   const upcomingClasses = useMemo(
     () =>
-      (courseEvents ?? []).filter(({ classStartDatetime }) => {
+      courseEvents.filter(({ classStartDatetime }) => {
         // Consider a null classStartDatetime as a class which has not yet
         // been scheduled. Thus it is a future class.
         return classStartDatetime == null || classStartDatetime > today;
@@ -92,18 +100,11 @@ export default function InstructorHome() {
         {upcomingClasses.map((session, i) => (
           <ClassInfoCard key={session.id} session={session} index={i} />
         ))}
-        {upcomingClasses.length === 0 &&
-          (isPending ? (
-            <>
-              <SkeletonCard variant="blue" />
-              <SkeletonCard variant="green" />
-              <SkeletonCard variant="yellow" />
-            </>
-          ) : (
-            <div className="col-span-full py-20 text-center text-muted-foreground bg-muted/20 rounded-lg">
-              No upcoming classes right now!
-            </div>
-          ))}
+        {upcomingClasses.length === 0 && (
+          <div className="col-span-full py-20 text-center text-muted-foreground bg-muted/20 rounded-lg">
+            No upcoming classes right now!
+          </div>
+        )}
       </div>
 
       <h2 className="text-xl font-medium pt-8 pb-5">Past Classes</h2>
