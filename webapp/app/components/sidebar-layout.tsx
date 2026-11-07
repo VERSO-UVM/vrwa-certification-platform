@@ -5,6 +5,7 @@ import { Link } from "react-router";
 import { Suspense } from "react";
 import { SkeletonCard } from "./ui/skeleton";
 import { DropdownMenuAvatar } from "~/components/ui/dropdown-menu";
+import { SkeletonCard } from "./ui/skeleton";
 
 type SidebarLayoutProps = {
   sidebar: React.ComponentType;
