@@ -61,3 +61,20 @@ To start the database container: `docker compose -f compose.dev.yml up -d`. Make
 To stop the database container: `docker compose -f compose.dev.yml down`.
 
 Make sure to also apply migrations (see the DB Management Commands section above)! If you need to reset/wipe the database, use `rm -rf .tmp/db-data`.
+
+
+### Stripe development testing
+
+1. [Create a stripe account](https://dashboard.stripe.com/register) and create a *testing sandbox*
+2. From your _sandbox dashboard_, copy the "Publishable key" and the "Secret key"
+3. Update the STRIPE_PUBLIC_KEY and STRIPE_SECRET variables in your .env file in the backend project, as modeled in .env.example
+4. For certain features, you'll need to configure the webhook. Webhooks normally require a publicly accessible HTTPS URL. Running locally without a public URL, you can use the Stripe CLI to forward events to the locally running server:
+   1. [Install the Stripe CLI](https://docs.stripe.com/stripe-cli/install)
+   2. Run the local webhook forwarder in the background: `stripe listen --forward-to localhost:3000/webhook --all-thin`
+   3. It will print the secret to use. Set this as `STRIPE_WEBHOOK_SECRET` in your `.env`. Alternatively, *while the forwarder is running in the background*, you can set the webhook secret in your current shell:
+      ```bash
+      export STRIPE_WEBHOOK_SECRET=$(stripe listen --forward-to localhost:3000/webhook --all-thin --print-secret)
+      ```
+   4. The `stripe listen` process must continue in the background while the backend is running.
+
+
