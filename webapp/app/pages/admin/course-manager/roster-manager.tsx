@@ -73,6 +73,7 @@ export function RosterManager({ courseId }: { courseId: string }) {
                     to={`/admin/reservation/${courseId}/${row.original.id}`}
                   />
                 }
+                nativeButton={false}
               >
                 Manage
               </Button>
@@ -109,6 +110,7 @@ export function RosterManager({ courseId }: { courseId: string }) {
                   to={`/admin/reservation/${courseId}/${row.original.profileId}`}
                 />
               }
+              nativeButton={false}
             >
               <ArrowRight /> Manage Enrollment
             </Button>
@@ -154,6 +156,7 @@ export function RosterManager({ courseId }: { courseId: string }) {
               render={
                 <Link to={`/admin/create-profile?enrollIn=${courseId}`} />
               }
+              nativeButton={false}
             >
               <Plus /> Create and Enroll New Profile
             </Button>

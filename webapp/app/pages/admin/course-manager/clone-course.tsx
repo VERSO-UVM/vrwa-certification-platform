@@ -75,7 +75,7 @@ export function CloneCourse({ course }: { course: CourseDto }) {
               selected={selectedDate}
               onSelect={(date) => setSelectedDate(date)}
               captionLayout="dropdown"
-              className="rounded-md w-full"
+              className="rounded-md w-full bg-transparent"
               startMonth={addYears(originalStartDate, -1)}
               endMonth={addYears(originalStartDate, 4)}
             />

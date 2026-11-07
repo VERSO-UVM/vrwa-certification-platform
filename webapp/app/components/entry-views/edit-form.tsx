@@ -178,6 +178,8 @@ export function EditForm<T extends object, R extends keyof T>({
         </FieldGroup>
         <Button
           disabled={submitButton.disabledFn(updates, newItem)}
+          type="submit"
+          nativeButton={true}
           {...submitButton.props}
         >
           {submitButton.title}

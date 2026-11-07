@@ -87,6 +87,7 @@ export default function Reservation({
         <Button
           variant="ghost"
           render={<Link to={`/admin/course-details/${courseId}`} />}
+          nativeButton={false}
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Course details:{" "}
           {course.courseName}

@@ -127,6 +127,7 @@ export default function CourseDetails({
         className="p-6"
         variant="ghost"
         render={<Link to="/admin/course-manager" />}
+        nativeButton={false}
       >
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Courses
       </Button>
