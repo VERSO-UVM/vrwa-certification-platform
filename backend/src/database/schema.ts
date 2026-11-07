@@ -182,7 +182,6 @@ export const reservation = pgTable(
     reservationStatus: reservationStatusEnum().notNull(),
     statusUpdatedAt: timestamp().defaultNow().notNull(),
     paymentStatus: paymentStatusEnum().notNull(),
-    /* Honor-system member pricing; verify against memberGroup later */
     memberRate: boolean().notNull().default(false),
     stripeInvoiceId: varchar(),
     stripeCheckoutSessionId: varchar(),
