@@ -1,5 +1,9 @@
 import type { Route } from "./+types/registration-profiles";
-import { useMutation, useQueryClient, useSuspenseQueries } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQueries,
+} from "@tanstack/react-query";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { useMemo, useState } from "react";
 import { ArrowLeft, Minus, Plus, UserPlus } from "lucide-react";
@@ -39,6 +43,7 @@ function queries(trpc: TRPC, { courseId }: Route.LoaderArgs["params"]) {
     trpc.profiles.list.queryOptions(),
     trpc.profiles.listForCourse.queryOptions({ courseId }),
     trpc.courses.trainee.get.queryOptions({ courseId }),
+    trpc.profiles.getActiveProfile.queryOptions(),
   ] as const;
 }
 
@@ -66,6 +71,7 @@ export default function RegistrationProfilesPage({
     { data: profiles },
     { data: alreadyRegistered },
     { data: course },
+    { data: currentProfile },
   ] = useSuspenseQueries({
     queries: queries(trpc, { courseId }),
   });
@@ -80,7 +86,13 @@ export default function RegistrationProfilesPage({
     [alreadyRegistered],
   );
 
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const alreadyTaken = profiles.filter((p) => registeredSet.has(p.id));
+  const [selectedIds, setSelectedIds] = useState<string[]>(
+    /* Default to active profile selected */
+    currentProfile && !alreadyTaken.find((p) => p.id == currentProfile.id)
+      ? [currentProfile.id]
+      : [],
+  );
   const [addOpen, setAddOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -102,7 +114,6 @@ export default function RegistrationProfilesPage({
     (p) => !selectedIds.includes(p.id) && !registeredSet.has(p.id),
   );
   const selected = profiles.filter((p) => selectedIds.includes(p.id));
-  const alreadyTaken = profiles.filter((p) => registeredSet.has(p.id));
   const overflow = selectedIds.length > seats;
 
   function setSeats(next: number) {
@@ -165,15 +176,15 @@ export default function RegistrationProfilesPage({
           <ArrowLeft className="mr-2" /> Back to course
         </Button>
       </div>
-      <PageHeader>Select profiles</PageHeader>
+      <PageHeader>Select attendees</PageHeader>
 
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-        <Card variant="blue">
+        <Card variant="yellow">
           <CardHeader>
             <CardTitle>{course?.courseName ?? "Course"}</CardTitle>
             <CardDescription>
-              Move {seats} profile{seats === 1 ? "" : "s"} into the registration
-              list.
+              Choose <span className="font-bold">{seats}</span> attendees
+              {seats === 1 ? "" : "s"} to register for {course?.courseName}.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
@@ -226,7 +237,7 @@ export default function RegistrationProfilesPage({
                   id="available-profiles-heading"
                   className="mb-3 text-sm font-medium"
                 >
-                  Choose profiles
+                  Choose seats
                 </h3>
                 <ItemGroup
                   role="group"
@@ -267,7 +278,7 @@ export default function RegistrationProfilesPage({
                   ))}
                   {available.length === 0 && alreadyTaken.length === 0 && (
                     <p className="text-muted-foreground text-sm">
-                      No profiles yet. Add one on the right.
+                      Add a new profile on the right.
                     </p>
                   )}
                 </ItemGroup>
@@ -310,15 +321,15 @@ export default function RegistrationProfilesPage({
                   <StandardDrawer
                     open={addOpen}
                     onOpenChange={setAddOpen}
-                    title="Add new profile"
-                    description="The new profile will be selected for this registration."
+                    title="Add trainee"
+                    description="Add a new profile to register for this course."
                     openButton={
                       <Button
                         type="button"
                         variant="secondary"
                         className="w-full"
                       >
-                        <UserPlus className="mr-2" /> Add new profile
+                        <UserPlus className="mr-2" /> Add attendee
                       </Button>
                     }
                   >
@@ -351,9 +362,7 @@ export default function RegistrationProfilesPage({
               <Button
                 type="button"
                 disabled={
-                  selectedIds.length !== seats ||
-                  overflow ||
-                  register.isPending
+                  selectedIds.length !== seats || overflow || register.isPending
                 }
                 onClick={() => void handleContinue()}
               >
@@ -367,7 +376,6 @@ export default function RegistrationProfilesPage({
           </CardContent>
         </Card>
       </div>
-
     </>
   );
 }

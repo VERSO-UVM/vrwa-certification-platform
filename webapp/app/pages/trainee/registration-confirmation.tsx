@@ -68,12 +68,11 @@ export default function RegistrationConfirmationPage({
   let description = "You are registered for this course.";
   if (waitlist || allWaitlisted) {
     headline = "You are on the waitlist";
-    description =
-      "We will contact you if a seat opens. No payment is due yet.";
+    description = "We will contact you if a seat opens. No payment is due yet.";
   } else if (method === "check") {
-    headline = "Registration saved — pay by check";
+    headline = "Registration successful";
     description =
-      "Your seats are held. An invoice with mailing instructions will be emailed (coming soon).";
+      "Your seats are held. An invoice with mailing instructions will be emailed.";
   } else if (sessionId && data?.sessionPaymentStatus === "paid") {
     headline = "Payment received";
     description = "Thank you — your registration is confirmed.";
@@ -137,10 +136,9 @@ export default function RegistrationConfirmationPage({
     <>
       <PageHeader>Confirmation</PageHeader>
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
-        <Card>
+        <Card variant="green">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <CheckCircle2 className="text-green-700 dark:text-green-500" />
               {headline}
             </CardTitle>
             <CardDescription>
@@ -163,11 +161,6 @@ export default function RegistrationConfirmationPage({
                     <Badge variant="green">Accepted</Badge>
                   )}
                   <PaymentStatusBadge value={r.paymentStatus} />
-                  {r.memberRate ? (
-                    <Badge variant="member">Member rate</Badge>
-                  ) : (
-                    <Badge variant="not_member">Non-member</Badge>
-                  )}
                 </div>
               </div>
             ))}

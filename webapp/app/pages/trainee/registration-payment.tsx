@@ -63,10 +63,6 @@ export default function RegistrationPaymentPage({
 
   const [error, setError] = useState<string | null>(null);
   const [method, setMethod] = useState<"card" | "check">("card");
-  const [checkoutMounted, setCheckoutMounted] = useState(false);
-  useEffect(() => {
-    setCheckoutMounted(true);
-  }, []);
 
   const createCheckout = useMutation(
     trpc.reservations.trainee.createCheckoutSession.mutationOptions(),
@@ -146,7 +142,7 @@ export default function RegistrationPaymentPage({
       <PageHeader>Payment</PageHeader>
 
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-        <Card>
+        <Card variant="green">
           <CardHeader>
             <CardTitle>{course?.courseName ?? "Course"}</CardTitle>
             <CardDescription>
@@ -193,7 +189,7 @@ export default function RegistrationPaymentPage({
                 <TabsTrigger value="check">Pay by check</TabsTrigger>
               </TabsList>
               <TabsContent value="card" className="mt-4">
-                {method === "card" && checkoutMounted ? (
+                {method === "card" && (
                   <EmbeddedCheckoutProvider
                     stripe={stripePromise}
                     options={{
@@ -207,17 +203,11 @@ export default function RegistrationPaymentPage({
                   >
                     <EmbeddedCheckout />
                   </EmbeddedCheckoutProvider>
-                ) : (
-                  <p className="text-muted-foreground text-sm">
-                    Loading payment form…
-                  </p>
                 )}
               </TabsContent>
               <TabsContent value="check" className="mt-4 flex flex-col gap-4">
                 <p className="text-muted-foreground text-sm">
-                  We will email you an invoice with mailing instructions. Your
-                  seats are held with payment status Open until the check is
-                  received.
+                  We will email you an invoice with mailing instructions.
                 </p>
                 <Button
                   type="button"
