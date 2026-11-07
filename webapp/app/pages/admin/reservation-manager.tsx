@@ -84,11 +84,12 @@ export default function Reservation({
         {profile.firstName} {profile.lastName}
       </PageHeader>
       <div className="flex">
-        <Button variant="ghost" asChild>
-          <Link to={`/admin/course-details/${courseId}`}>
-            <ArrowLeft className="mr-2 h-4 w-4" /> Course details:{" "}
-            {course.courseName}
-          </Link>
+        <Button
+          variant="ghost"
+          render={<Link to={`/admin/course-details/${courseId}`} />}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" /> Course details:{" "}
+          {course.courseName}
         </Button>
       </div>
       <div className="grid grid-cols-6 gap-2">
