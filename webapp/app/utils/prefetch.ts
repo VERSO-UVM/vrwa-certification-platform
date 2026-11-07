@@ -47,7 +47,10 @@ export function useDehydratedState() {
   function isPrefetchLoader(
     match: UIMatch<unknown>,
   ): match is UIMatch<PrefetchLoaderResult> {
-    return (match.loaderData as PrefetchLoaderResult|undefined)?.dehydratedState != null;
+    return (
+      (match.loaderData as PrefetchLoaderResult | undefined)?.dehydratedState !=
+      null
+    );
   }
 
   const matches = useMatches();

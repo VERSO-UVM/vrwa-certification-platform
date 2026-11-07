@@ -60,13 +60,15 @@ export function EditDrawer<T extends object, R extends keyof T>({
           },
         }}
       />
-      <DrawerClose asChild>
-        <Button
-          variant="cancel_button"
-          className="flex flex-col items-center justify-center fixed bottom-4 left-4 right-4"
-        >
-          Cancel
-        </Button>
+      <DrawerClose
+        render={
+          <Button
+            variant="cancel_button"
+            className="flex flex-col items-center justify-center fixed bottom-4 left-4 right-4"
+          />
+        }
+      >
+        Cancel
       </DrawerClose>
     </StandardDrawer>
   );

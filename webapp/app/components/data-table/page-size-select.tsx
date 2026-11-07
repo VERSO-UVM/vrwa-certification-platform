@@ -71,14 +71,20 @@ export function DataTablePageSizeSelect<TData>({
         >
           Rows shown
         </FieldLabel>
-        <Select value={String(currentSize)} onValueChange={onSetPageSize}>
+        <Select
+          value={String(currentSize)}
+          items={pageSizeOptions}
+          onValueChange={(value) => {
+            if (value != null) onSetPageSize(value);
+          }}
+        >
           <SelectTrigger className="w-20" id="select-rows-per-page">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent align="start">
+          <SelectContent>
             <SelectGroup>
               {pageSizeOptions.map(({ label, value }) => (
-                <SelectItem key={value} value={value.toString()}>
+                <SelectItem key={value} value={value}>
                   {label}
                 </SelectItem>
               ))}
