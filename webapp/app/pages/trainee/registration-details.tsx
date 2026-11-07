@@ -38,15 +38,25 @@ export const loader = prefetchLoader(queries);
 /* Skip loader on client-side navigations */
 export const clientLoader = () => {};
 
+const CREDIT_SUBCATEGORY_LABELS: Partial<
+  Record<CreditHourCategory, string>
+> = {
+  [CreditHourCategory.WaterC1]: "Water Category 1",
+  [CreditHourCategory.WaterC2]: "Water Category 2",
+  [CreditHourCategory.WaterC3]: "Water Category 3",
+  [CreditHourCategory.WaterD1]: "Water Distribution 1",
+  [CreditHourCategory.WaterD2]: "Water Distribution 2",
+  [CreditHourCategory.WaterD3]: "Water Distribution 3",
+};
+
 function formatCreditCategories(categories: CreditHourCategory[]) {
   const hasWater = categories.includes(CreditHourCategory.Water);
   const hasWastewater = categories.includes(CreditHourCategory.Wastewater);
-  const codes = categories
-    .filter((c) => c.includes(":"))
-    .map((c) => c.split(":")[1]!)
-    .sort();
+  const subcategories = categories
+    .map((c) => CREDIT_SUBCATEGORY_LABELS[c])
+    .filter((label): label is string => label != null);
 
-  return { hasWater, hasWastewater, codes };
+  return { hasWater, hasWastewater, subcategories };
 }
 
 function sessionLocationLabel(session: {
@@ -91,7 +101,7 @@ export default function RegistrationDetailsPage({
 
   const seatsLeft = Math.max(0, course.seats - course.spotsFilled);
   const needsWaitlist = seats > seatsLeft;
-  const { hasWater, hasWastewater, codes } = formatCreditCategories(
+  const { hasWater, hasWastewater, subcategories } = formatCreditCategories(
     course.creditHourCategories,
   );
   const firstSession = course.sessions[0];
@@ -127,8 +137,8 @@ export default function RegistrationDetailsPage({
       </div>
       <PageHeader>{course.courseName}</PageHeader>
 
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-        <Card>
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+        <Card variant="green">
           <CardHeader>
             <CardTitle>{course.courseName}</CardTitle>
             <CardDescription>
@@ -150,14 +160,16 @@ export default function RegistrationDetailsPage({
                   {hasWastewater && (
                     <Badge variant="indigo">Wastewater</Badge>
                   )}
-                  {codes.map((code) => (
-                    <Badge key={code} variant="outline">
-                      {code}
+                  {subcategories.map((label) => (
+                    <Badge key={label} variant="outline">
+                      {label}
                     </Badge>
                   ))}
-                  {!hasWater && !hasWastewater && codes.length === 0 && (
-                    <span className="text-muted-foreground">—</span>
-                  )}
+                  {!hasWater &&
+                    !hasWastewater &&
+                    subcategories.length === 0 && (
+                      <span className="text-muted-foreground">—</span>
+                    )}
                 </dd>
               </div>
               <div className="flex gap-2 sm:col-span-2">
@@ -226,7 +238,7 @@ export default function RegistrationDetailsPage({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card variant="yellow">
           <CardHeader>
             <CardTitle>Register</CardTitle>
             <CardDescription>
@@ -287,7 +299,7 @@ export default function RegistrationDetailsPage({
               />
               <PricingRow
                 label="Non-member"
-                description="Full course price"
+                description="Normal price"
                 unitCents={unitPriceCents(course.priceCents, false)}
                 seats={seats}
                 waitlist={needsWaitlist}
