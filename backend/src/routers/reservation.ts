@@ -33,6 +33,14 @@ function isPastClass() {
 const updateSchema = createUpdateSchema(reservation, {
   courseId: z.string(),
   profileId: z.string(),
+  paymentStatus: z.enum(PaymentStatus).optional(),
+  reservationStatus: z.enum(ReservationStatus).optional(),
+}).pick({
+  courseId: true,
+  profileId: true,
+  paymentStatus: true,
+  reservationStatus: true,
+  creditHours: true,
 });
 
 export const reservationRouter = router({
@@ -41,8 +49,11 @@ export const reservationRouter = router({
       return db.client
         .update(reservation)
         .set({
-          creditHours: input.creditHours,
-          paymentStatus: input.paymentStatus as PaymentStatus,
+          ...input,
+          /* Track last time we updated reservation status */
+          ...(input.reservationStatus !== undefined && {
+            statusUpdatedAt: new Date(),
+          }),
         })
         .where(
           and(

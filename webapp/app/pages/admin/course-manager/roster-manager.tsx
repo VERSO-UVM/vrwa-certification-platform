@@ -67,7 +67,7 @@ export function RosterManager({ courseId }: { courseId: string }) {
             /* Already enrolled */
             return (
               <Button variant="link" asChild>
-                <Link to={`/admin/enrollment/${courseId}/${row.original.id}`}>
+                <Link to={`/admin/reservation/${courseId}/${row.original.id}`}>
                   Manage
                 </Link>
               </Button>
@@ -99,7 +99,7 @@ export function RosterManager({ courseId }: { courseId: string }) {
           return (
             <Button variant="link" asChild>
               <Link
-                to={`/admin/enrollment/${courseId}/${row.original.profileId}`}
+                to={`/admin/reservation/${courseId}/${row.original.profileId}`}
               >
                 <ArrowRight /> Manage Enrollment
               </Link>
