@@ -57,8 +57,15 @@ export const courseRouter = router({
 
     get: adminProcedure
       .input(z.object({ id: z.string() }))
-      .query(async ({ input }): Promise<CourseDto | null> => {
-        return (await courseFindFirst(input.id)) ?? null;
+      .query(async ({ input }): Promise<CourseDto> => {
+        const found = await courseFindFirst(input.id);
+        if (!found) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Course not found.",
+          });
+        }
+        return found;
       }),
 
     create: adminProcedure.input(insertSchema).mutation(async ({ input }) => {

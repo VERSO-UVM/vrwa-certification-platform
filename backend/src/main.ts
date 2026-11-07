@@ -11,6 +11,7 @@ import { createContext } from "~/utils/trpc/ctx";
 import type { AppRouter } from "~/routers";
 import { appRouter } from "~/routers";
 import { TRUSTED_ORIGINS } from "./constants";
+import { stripeWebhook } from "./utils/stripe";
 const app = Fastify({
   logger: true,
   routerOptions: {
@@ -80,6 +81,8 @@ app.route({
     }
   },
 });
+
+app.register(stripeWebhook);
 
 const port = parseInt(process.env.PORT || "") || 3000;
 const host = process.env.HOST || "0.0.0.0";
