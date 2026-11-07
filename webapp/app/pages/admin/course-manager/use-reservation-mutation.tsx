@@ -35,3 +35,16 @@ export function useReservationDeleteMutation() {
     }),
   );
 }
+
+export function useReservationUpdateMutation() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    trpc.reservations.admin.update.mutationOptions({
+      onSuccess: () => {
+        void queryClient.invalidateQueries(trpc.reservations.pathFilter());
+      },
+    }),
+  );
+}

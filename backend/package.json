@@ -38,6 +38,7 @@
     "pg": "^8.18.0",
     "pure-rand": "^8.4.2",
     "react": "catalog:",
+    "stripe": "^23.1.0",
     "superjson": "catalog:",
     "zod": "^4.3.6"
   },

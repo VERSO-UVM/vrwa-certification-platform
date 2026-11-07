@@ -41,34 +41,6 @@ export type QueryListFn<P extends Params> = (
 ) => ReadonlyArray<TrpcQueryOptions>;
 
 /**
- * Create a clientLoader() that fills the browser query cache on
- * client-side navigations. Uses ensureQueryData so cached data is
- * returned immediately; revalidateIfStale refreshes in the background.
- */
-export function prefetchClientLoader<T extends Params>(
-  queryListFn: QueryListFn<T>,
-) {
-  return async ({ request, params }: ClientLoaderFunctionArgs) => {
-    const queryClient = getQueryClient();
-    const trpc = createTRPCOptionsProxy<AppRouter>({
-      client: getTrpcClient(),
-      queryClient,
-    });
-    const queries = queryListFn(
-      trpc,
-      params as T,
-      new URL(request.url).searchParams,
-    );
-    await Promise.all(
-      queries.map((q) =>
-        queryClient.ensureQueryData({ ...q, revalidateIfStale: true }),
-      ),
-    );
-    return null;
-  };
-}
-
-/**
  * Get dehydrated queries to pass in the HydrationBoundary component.
  */
 export function useDehydratedState() {
