@@ -21,13 +21,8 @@ import {
   ItemGroup,
   ItemTitle,
 } from "~/components/ui/item";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
+import { DrawerClose } from "~/components/ui/drawer";
+import { StandardDrawer } from "~/components/standard-drawer";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { EditForm } from "~/components/entry-views/edit-form";
 import { profileDefs, profileRequiredFields } from "~/utils/field-defs/profile";
@@ -173,13 +168,12 @@ export default function RegistrationProfilesPage({
       <PageHeader>Select profiles</PageHeader>
 
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-        <Card>
+        <Card variant="blue">
           <CardHeader>
             <CardTitle>{course?.courseName ?? "Course"}</CardTitle>
             <CardDescription>
               Move {seats} profile{seats === 1 ? "" : "s"} into the registration
-              list ({memberRate ? "member" : "non-member"} rate
-              {waitlist ? ", waitlist" : ""}).
+              list.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
@@ -228,28 +222,40 @@ export default function RegistrationProfilesPage({
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="rounded-lg border p-3">
-                <h3 className="mb-3 text-sm font-medium">Your profiles</h3>
-                <ItemGroup>
-                  {available.map((profile) => (
-                    <Item
-                      key={profile.id}
-                      variant="outline"
-                      className="cursor-pointer"
-                      onClick={() => selectProfile(profile.id)}
-                    >
-                      <ItemContent>
-                        <ItemTitle>
-                          {profile.firstName} {profile.lastName}
-                        </ItemTitle>
-                        <ItemDescription>{profile.city}</ItemDescription>
-                      </ItemContent>
-                    </Item>
-                  ))}
+                <h3
+                  id="available-profiles-heading"
+                  className="mb-3 text-sm font-medium"
+                >
+                  Choose profiles
+                </h3>
+                <ItemGroup
+                  role="group"
+                  aria-labelledby="available-profiles-heading"
+                >
+                  {available.map((profile) => {
+                    const name = `${profile.firstName} ${profile.lastName}`;
+                    return (
+                      <Item
+                        key={profile.id}
+                        variant="outline"
+                        className="cursor-pointer text-left"
+                        render={<button type="button" />}
+                        aria-label={`Add ${name} to registration`}
+                        onClick={() => selectProfile(profile.id)}
+                      >
+                        <ItemContent>
+                          <ItemTitle>{name}</ItemTitle>
+                          <ItemDescription>{profile.city}</ItemDescription>
+                        </ItemContent>
+                      </Item>
+                    );
+                  })}
                   {alreadyTaken.map((profile) => (
                     <Item
                       key={profile.id}
                       variant="muted"
                       className="opacity-60"
+                      aria-disabled="true"
                     >
                       <ItemContent>
                         <ItemTitle>
@@ -273,31 +279,65 @@ export default function RegistrationProfilesPage({
                   overflow && "border-destructive",
                 )}
               >
-                <h3 className="mb-3 text-sm font-medium">Registering</h3>
-                <ItemGroup>
-                  {selected.map((profile) => (
-                    <Item
-                      key={profile.id}
-                      variant="outline"
-                      className="cursor-pointer"
-                      onClick={() => deselectProfile(profile.id)}
-                    >
-                      <ItemContent>
-                        <ItemTitle>
-                          {profile.firstName} {profile.lastName}
-                        </ItemTitle>
-                        <ItemDescription>Click to remove</ItemDescription>
-                      </ItemContent>
-                    </Item>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="w-full"
-                    onClick={() => setAddOpen(true)}
+                <h3
+                  id="selected-profiles-heading"
+                  className="mb-3 text-sm font-medium"
+                >
+                  Registering
+                </h3>
+                <ItemGroup
+                  role="group"
+                  aria-labelledby="selected-profiles-heading"
+                >
+                  {selected.map((profile) => {
+                    const name = `${profile.firstName} ${profile.lastName}`;
+                    return (
+                      <Item
+                        key={profile.id}
+                        variant="outline"
+                        className="cursor-pointer text-left"
+                        render={<button type="button" />}
+                        aria-label={`Remove ${name} from registration`}
+                        onClick={() => deselectProfile(profile.id)}
+                      >
+                        <ItemContent>
+                          <ItemTitle>{name}</ItemTitle>
+                          <ItemDescription>Remove</ItemDescription>
+                        </ItemContent>
+                      </Item>
+                    );
+                  })}
+                  <StandardDrawer
+                    open={addOpen}
+                    onOpenChange={setAddOpen}
+                    title="Add new profile"
+                    description="The new profile will be selected for this registration."
+                    openButton={
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className="w-full"
+                      >
+                        <UserPlus className="mr-2" /> Add new profile
+                      </Button>
+                    }
                   >
-                    <UserPlus className="mr-2" /> Add new profile
-                  </Button>
+                    <EditForm
+                      required={profileRequiredFields}
+                      columns={addProfileColumns}
+                      submitButton={{ title: "Create profile" }}
+                      onSave={async (_, values) => {
+                        const created = await createProfile.mutateAsync(values);
+                        if (created?.id) {
+                          setSelectedIds((prev) => [...prev, created.id]);
+                        }
+                        setAddOpen(false);
+                      }}
+                    />
+                    <DrawerClose render={<Button variant="cancel_button" />}>
+                      Cancel
+                    </DrawerClose>
+                  </StandardDrawer>
                 </ItemGroup>
                 {overflow && (
                   <p className="text-destructive mt-2 text-sm">
@@ -328,28 +368,6 @@ export default function RegistrationProfilesPage({
         </Card>
       </div>
 
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Add new profile</DialogTitle>
-            <DialogDescription>
-              The new profile will be selected for this registration.
-            </DialogDescription>
-          </DialogHeader>
-          <EditForm
-            required={profileRequiredFields}
-            columns={addProfileColumns}
-            submitButton={{ title: "Create profile" }}
-            onSave={async (_, values) => {
-              const created = await createProfile.mutateAsync(values);
-              if (created?.id) {
-                setSelectedIds((prev) => [...prev, created.id]);
-              }
-              setAddOpen(false);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
