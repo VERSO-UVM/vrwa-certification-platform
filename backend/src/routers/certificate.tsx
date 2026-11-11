@@ -8,6 +8,8 @@ import { courseFindFirst } from "~/database/queries";
 import nodemailer from "nodemailer";
 import { CourseLocation } from "~/database/schema";
 import { format } from "date-fns";
+import { profileEnd } from "console";
+
 
 /**
  * For now we are returning a Blob directly embedded as a base64 string
@@ -92,48 +94,57 @@ export const certificateRouter = router({
       .input(
         z.object({
           // emailSubject,
-            emailBody: z.string(),
-            emailCc: z.string(),
-            emailBcc: z.string(),
-            reservations: z.array(
+          emailBody: z.string(),
+          emailCc: z.string(),
+          emailBcc: z.string(),
+          reservations: z.array(
             z.object({
               profileId: z.string(),
               courseId: z.string(),
             }),
-        ),
+          ),
         })
-        
+
       )
       .mutation(async ({ input }) => {
-        // console.log("%%%% batchEmail triggered! %%%%");
-        // console.log(input);
+        try {
+          const profile = await db.client.query.profile.findFirst({
+            where: { id: input.reservations[0]!.profileId },
+            with: {
+              user: true
+            }
+          });
 
-      // const nodemailer = require("nodemailer");
+          console.log("Profile ID: %s", profile?.user!.id);
 
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        secure: true,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      });
+        } catch (err) {
+          console.error("ERROR: %s", err);
+        }
 
-      try {
-      const info = await transporter.sendMail({
-        from: process.env.SMTP_FROM, // sender address
-        // from: , // sender address
-        to: process.env.SMTP_USER, // TODO: figure out how to get list of emails
-        subject: "VRWA Certificate", 
-        text: "Hello world?", 
-        html: `<h1>Hello</h1>`,
-      });
+        const transporter = nodemailer.createTransport({
+          host: process.env.SMTP_HOST,
+          port: process.env.SMTP_PORT,
+          secure: false,
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+          },
+        });
 
-      console.log("Message sent: %s", nodemailer.getTestMessageUrl(info));
-    } catch (err) {
-      console.error("Error while sending mail:", err);
-    }
+        try {
+          const info = await transporter.sendMail({
+            from: process.env.SMTP_FROM, // sender address
+            // from: , // sender address
+            to: process.env.SMTP_USER, // TODO: figure out how to get list of emails
+            subject: "VRWA Certificate",
+            text: "Hello world?",
+            html: `<h1>Hello</h1>`,
+          });
+
+          console.log("Message sent: %s", nodemailer.getTestMessageUrl(info));
+        } catch (err) {
+          console.error("Error while sending mail:", err);
+        }
       }),
   },
 
