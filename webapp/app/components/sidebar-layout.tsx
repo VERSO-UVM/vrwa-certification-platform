@@ -34,7 +34,7 @@ export function SidebarLayout({
                 />
               </Link>
             </div>
-            < DropdownMenuAvatar />
+            <DropdownMenuAvatar />
           </header>
           <div className="flex-1">
             {/* See https://tailwindcss.com/docs/responsive-design#container-queries
