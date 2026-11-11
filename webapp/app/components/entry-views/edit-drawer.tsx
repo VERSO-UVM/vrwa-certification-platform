@@ -53,11 +53,6 @@ export function EditDrawer<T extends object, R extends keyof T>({
         }
         submitButton={{
           title: "Save changes",
-          props: {
-            /* Fix button to bottom of drawer */
-            className:
-              "flex flex-col items-center justify-center fixed bottom-15 left-4 right-4",
-          },
         }}
       />
       <DrawerClose
