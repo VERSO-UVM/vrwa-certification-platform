@@ -2,15 +2,16 @@
  * Form input to create a new profile.
  */
 
-import type { Profile } from "@backend/database/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { Undo2 } from "lucide-react";
 import { EditForm } from "~/components/entry-views/edit-form";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { profileDefs, profileRequiredFields } from "~/utils/field-defs/profile";
 import { useTRPC } from "~/utils/trpc";
+import { authClient } from "~/utils/auth";
+import { getSessionData } from "~/utils/session";
+import { safeRedirectPath } from "~/utils/redirect";
 
 const columnDefs = [
   profileDefs.firstName,
@@ -30,11 +31,17 @@ export default function CreateProfile() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const trpc = useTRPC();
+  const [searchParams] = useSearchParams();
+  const redirect = safeRedirectPath(
+    searchParams.get("redirect"),
+    "/profile-select",
+  );
+
   const createProfile = useMutation(
     trpc.profiles.create.mutationOptions({
       onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: trpc.profiles.list.queryKey(),
+        void queryClient.invalidateQueries({
+          queryKey: trpc.profiles.pathKey(),
         });
       },
     }),
@@ -44,13 +51,23 @@ export default function CreateProfile() {
     <Card className="p-4 w-xl self-center">
       <CardHeader>
         <CardTitle className="text-center">Create a Profile</CardTitle>
-        <CardContent className="flex flex-col space-y-4 w-lg m-auto">
+        <CardContent className="flex flex-col gap-4 w-lg m-auto">
           <EditForm
             required={profileRequiredFields}
             columns={columnDefs}
             onSave={async (_, values) => {
-              await createProfile.mutateAsync(values);
-              await navigate("/profile-select");
+              const created = await createProfile.mutateAsync(values);
+              const sessionData = await getSessionData();
+              const activeProfileId = sessionData?.session?.activeProfileId;
+              if (
+                (activeProfileId == null || activeProfileId === "") &&
+                created?.id
+              ) {
+                await authClient.updateSession({
+                  activeProfileId: created.id,
+                } as unknown as any);
+              }
+              await navigate(redirect);
             }}
           />
           <Link to="/profile-select">

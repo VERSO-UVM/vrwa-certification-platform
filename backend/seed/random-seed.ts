@@ -257,6 +257,8 @@ async function seedAppTables() {
         statusUpdatedAt: false,
         createdAt: false,
         stripeInvoiceId: funcs.valuesFromArray({ values: [null] }),
+        stripeCheckoutSessionId: funcs.valuesFromArray({ values: [null] }),
+        memberRate: funcs.valuesFromArray({ values: [true, false] }),
       },
     },
   }));

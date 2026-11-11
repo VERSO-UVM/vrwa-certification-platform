@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 
 import db from "~/database";
-import { profile, user } from "~/database/schema";
+import { profile, reservation, user } from "~/database/schema";
 import { adminProcedure, protectedProcedure, router } from "~/utils/trpc";
 
 import { createInsertSchema, createUpdateSchema } from "drizzle-orm/zod";
@@ -71,12 +71,22 @@ export const profileRouter = router({
   /**
    * Create a new profile associated with the active user.
    */
-  create: protectedProcedure.input(insertSchema).mutation(({ ctx, input }) => {
+  create: protectedProcedure.input(insertSchema).mutation(async ({ ctx, input }) => {
     const { ...fields } = input;
-    return db.client.insert(profile).values({
-      userId: ctx.account.id,
-      ...fields,
-    });
+    const [created] = await db.client
+      .insert(profile)
+      .values({
+        userId: ctx.account.id,
+        ...fields,
+      })
+      .returning();
+    if (!created) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Unable to create profile.",
+      });
+    }
+    return created;
   }),
 
   /**
@@ -89,6 +99,25 @@ export const profileRouter = router({
       .where(eq(profile.userId, ctx.account.id));
     return profiles;
   }),
+
+  /**
+   * Profile ids under this account that already have a reservation for a course.
+   */
+  listForCourse: protectedProcedure
+    .input(z.object({ courseId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const rows = await db.client
+        .select({ profileId: reservation.profileId })
+        .from(reservation)
+        .innerJoin(profile, eq(reservation.profileId, profile.id))
+        .where(
+          and(
+            eq(reservation.courseId, input.courseId),
+            eq(profile.userId, ctx.account.id),
+          ),
+        );
+      return rows.map((r) => r.profileId);
+    }),
 
   /**
    * Get the entry for the currently active profile.

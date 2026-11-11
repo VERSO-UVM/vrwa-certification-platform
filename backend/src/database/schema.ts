@@ -9,6 +9,7 @@ import {
   pgEnum,
   interval,
   unique,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { prefixedIdGenerator } from "~/utils/id";
@@ -181,7 +182,10 @@ export const reservation = pgTable(
     reservationStatus: reservationStatusEnum().notNull(),
     statusUpdatedAt: timestamp().defaultNow().notNull(),
     paymentStatus: paymentStatusEnum().notNull(),
+    /* Honor-system member pricing; verify against memberGroup later */
+    memberRate: boolean().notNull().default(false),
     stripeInvoiceId: varchar(),
+    stripeCheckoutSessionId: varchar(),
     createdAt: timestamp().defaultNow().notNull(),
 
     /* Attendance fields */
