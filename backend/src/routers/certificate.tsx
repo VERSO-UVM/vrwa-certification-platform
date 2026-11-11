@@ -5,6 +5,7 @@ import { CertificateDocument } from "~/pdf/certificate-document";
 import db from "~/database";
 import { TRPCError } from "@trpc/server";
 import { courseFindFirst } from "~/database/queries";
+import nodemailer from "nodemailer";
 import { CourseLocation } from "~/database/schema";
 import { format } from "date-fns";
 
@@ -89,17 +90,50 @@ export const certificateRouter = router({
 
     batchEmail: adminProcedure
       .input(
-        z.array(
-          z.object({
-            profileId: z.string(),
-            courseId: z.string(),
-          }),
+        z.object({
+          // emailSubject,
+            emailBody: z.string(),
+            emailCc: z.string(),
+            emailBcc: z.string(),
+            reservations: z.array(
+            z.object({
+              profileId: z.string(),
+              courseId: z.string(),
+            }),
         ),
+        })
+        
       )
       .mutation(async ({ input }) => {
-        console.log("%%%% batchEmail triggered! %%%%");
-        console.log(input);
-        console.log("hello ");
+        // console.log("%%%% batchEmail triggered! %%%%");
+        // console.log(input);
+
+      // const nodemailer = require("nodemailer");
+
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        secure: true,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+
+      try {
+      const info = await transporter.sendMail({
+        from: process.env.SMTP_FROM, // sender address
+        // from: , // sender address
+        to: process.env.SMTP_USER, // TODO: figure out how to get list of emails
+        subject: "VRWA Certificate", 
+        text: "Hello world?", 
+        html: `<h1>Hello</h1>`,
+      });
+
+      console.log("Message sent: %s", nodemailer.getTestMessageUrl(info));
+    } catch (err) {
+      console.error("Error while sending mail:", err);
+    }
       }),
   },
 
