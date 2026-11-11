@@ -9,13 +9,21 @@ import {
 } from "~/components/ui/avatar";
 
 import { Button } from "~/components/ui/button"
+import { useQuery } from "@tanstack/react-query";
+import { useTRPC } from "~/utils/trpc";
 
 function DropdownMenuAvatar() {
+    const trpc = useTRPC();
+    const activeProfileQuery = useQuery(
+        trpc.profiles.getActiveProfile.queryOptions(),
+    );
+    const first_letter = activeProfileQuery.data?.firstName?.[0];
+    const last_letter = activeProfileQuery.data?.lastName?.[0];
     return (
         <DropdownMenu>
         <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="rounded-full"><Avatar>
-            <AvatarImage src="../../app/aaron-burr.png" alt="shadcn" />
-            <AvatarFallback>LR</AvatarFallback>
+            <AvatarImage src="" alt="shadcn" />
+            <AvatarFallback className="bg-gray-300"> {first_letter}{last_letter} </AvatarFallback>
             </Avatar></Button>} />
         <DropdownMenuContent align="end">
             <DropdownMenuGroup>
