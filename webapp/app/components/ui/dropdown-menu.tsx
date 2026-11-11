@@ -1,7 +1,46 @@
 import * as React from "react";
 import { Menu as MenuPrimitive } from "@base-ui/react/menu";
 import { cn } from "~/utils/utils";
-import { ChevronRightIcon, CheckIcon } from "lucide-react";
+import { ChevronRightIcon, CheckIcon, BadgeCheckIcon, BellIcon, CreditCardIcon, LogOutIcon } from "lucide-react";
+import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+} from "~/components/ui/avatar";
+
+import { Button } from "~/components/ui/button"
+
+function DropdownMenuAvatar() {
+    return (
+        <DropdownMenu>
+        <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="rounded-full"><Avatar>
+            <AvatarImage src="../../app/aaron-burr.png" alt="shadcn" />
+            <AvatarFallback>LR</AvatarFallback>
+            </Avatar></Button>} />
+        <DropdownMenuContent align="end">
+            <DropdownMenuGroup>
+            <DropdownMenuItem>
+                <BadgeCheckIcon />
+                Account
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+                <CreditCardIcon />
+                Billing
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+                <BellIcon />
+                Notifications
+            </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+            <LogOutIcon />
+            Sign Out
+            </DropdownMenuItem>
+        </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}
 
 function DropdownMenu({ ...props }: MenuPrimitive.Root.Props) {
   return <MenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
@@ -266,4 +305,5 @@ export {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
+  DropdownMenuAvatar
 };
