@@ -10,8 +10,12 @@ export default [
   route("admin", "layouts/admin.tsx", [
     index("pages/admin/dashboard.tsx"),
     route("trainees", "pages/admin/trainee-manager.tsx"),
-    route("instructors", "pages/admin/user-manager.tsx"),
+    route("users", "pages/admin/user-manager.tsx"),
     route("certifications", "pages/admin/certifications.tsx"),
+    route(
+      "reservation/:courseId/:profileId",
+      "pages/admin/reservation-manager.tsx",
+    ),
     route("*", "pages/admin/not-found.tsx"),
     route("course-manager", "pages/admin/course-manager.tsx"),
     route(

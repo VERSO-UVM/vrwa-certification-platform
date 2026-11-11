@@ -8,9 +8,17 @@
  * object manipulations.
  */
 import type { ProfileDto } from "@backend/database/dtos";
+import type { Profile } from "@backend/database/schema";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Badge } from "~/components/ui/badge";
-import { textInputEditor, selectOptionsEditor } from "~/utils/field-editors";
+import {
+  textInputEditor,
+  selectOptionsEditor,
+  multiSelectCheckboxEditor,
+  ComboboxEditor,
+} from "~/utils/field-editors";
+import { useTRPC } from "../trpc";
+import { useQuery } from "@tanstack/react-query";
 
 // createColumnHelper just provides a stronger typed API to define ColumnDefs
 // Note that assigning the result type becomes difficult https://github.com/TanStack/table/issues/4382
@@ -46,7 +54,7 @@ export const profileDefs = {
     meta: {
       editor: selectOptionsEditor({
         options: [
-          { label: "VT", value: "VT", selected: true },
+          { label: "VT", value: "VT" },
           { label: "Non-VT", value: "Non-VT" },
         ],
       }),
@@ -75,6 +83,28 @@ export const profileDefs = {
       }
     },
   }),
+  association: profileFieldHelper.accessor("association", {
+    header: "Association",
+  }),
+
+  user: profileFieldHelper.accessor("userId", {
+    header: "Account",
+    meta: {
+      editor: (() => {
+        return (props) => {
+          const trpc = useTRPC();
+          const usersQuery = useQuery(trpc.users.getUsers.queryOptions());
+          const options = (usersQuery?.data ?? []).map((user) => ({
+            label: user.email,
+            value: user.id,
+          }));
+          return (
+            <ComboboxEditor {...props} key={options.length} options={options} />
+          );
+        };
+      })(),
+    },
+  }),
 };
 
 export const profileDefPresets = {
@@ -84,18 +114,18 @@ export const profileDefPresets = {
   all: Object.values(profileDefs),
 };
 
-// Initial state when creating new profile
-export const emptyProfile: ProfileDto = {
-  isMember: false,
+export const profileRequiredFields = {
   postalCode: "",
   address: "",
   city: "",
   phoneNumber: "",
   lastName: "",
   firstName: "",
-  id: "",
+  state: "",
+} satisfies Partial<Profile>;
+
+/** Admins can also set the associated user */
+export const profileAdminRequiredFields = {
+  ...profileRequiredFields,
   userId: "",
-  state: "VT",
-  association: "",
-  memberGroupId: null,
-};
+} satisfies Partial<Profile>;

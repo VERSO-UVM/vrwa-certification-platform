@@ -16,6 +16,10 @@ import {
   reservationFieldHelper,
 } from "~/utils/field-defs/reservation";
 import { Link } from "react-router";
+import { protectedLoader } from "~/utils/session";
+
+// Must be signed in to access
+export const loader = protectedLoader("user");
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "VRWA - Completed Courses" }];
@@ -34,8 +38,13 @@ const columnDefs = [
     header: "Actions",
     cell: ({ row }) => {
       return (
-        <Button variant="outline" className="my-4 py-4" asChild>
-          <Link to={`${row.original.courseId}`}>View Certificate</Link>
+        <Button
+          variant="outline"
+          className="my-4 py-4"
+          nativeButton={false}
+          render={<Link to={`${row.original.courseId}`} />}
+        >
+          View Certificate
         </Button>
       );
     },

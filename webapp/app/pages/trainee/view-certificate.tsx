@@ -5,6 +5,10 @@ import { Button } from "~/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router";
 import { SkeletonCard } from "~/components/ui/skeleton";
+import { protectedLoader } from "~/utils/session";
+
+// Must be signed in to access view certificate page
+export const loader = protectedLoader("user");
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "VRWA - View Certificate" }];
@@ -49,10 +53,12 @@ export default function ViewCertificate({
 function Header() {
   return (
     <div className="pb-6">
-      <Button variant="ghost" asChild>
-        <Link to="/trainee/certificates">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Certificates
-        </Link>
+      <Button
+        variant="ghost"
+        nativeButton={false}
+        render={<Link to="/trainee/certificates" />}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Certificates
       </Button>
     </div>
   );

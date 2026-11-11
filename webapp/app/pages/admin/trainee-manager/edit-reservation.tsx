@@ -35,8 +35,8 @@ export function EditTraineeReservation({
         description: "Update credit hours and payment status",
       }}
       item={reservation}
-      columns={reservationDefPresets.basic}
       onSave={updateData}
+      {...reservationDefPresets.editor}
     />
   );
 }

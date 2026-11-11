@@ -1,6 +1,7 @@
 import db from "~/database/index";
 import {
   CourseLocation,
+  CreditHourCategory,
   PaymentStatus,
   ReservationStatus,
 } from "../src/database/schema";
@@ -98,6 +99,7 @@ export async function seedDatabase() {
         priceCents: courseInfo.priceCents,
         instructorId,
         seats: Math.trunc(profileIds.length / 2),
+        creditHourCategories: [CreditHourCategory.Water, CreditHourCategory.WaterC1, CreditHourCategory.Wastewater],
       })
       .returning();
     courseIds.push(newCourse!.id);
@@ -128,6 +130,7 @@ export async function seedDatabase() {
             ? "67 Address Road"
             : null,
         classStartDatetime: thePast,
+        town: "Bennington",
       })
       .returning();
     courseEventIds.push(pastEvent!.id);

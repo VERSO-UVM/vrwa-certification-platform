@@ -28,6 +28,7 @@ export type CourseEventDto = CourseEvent & Omit<Course, "id">;
 
 export type CourseDto = Course & {
   sessions: CourseEvent[];
+  startDate: Date | null;
   spotsFilled: number;
   waitlistSize: number;
 };

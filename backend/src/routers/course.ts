@@ -1,25 +1,46 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import db from "~/database";
-import { course, CourseStatus, CreditHourCategory } from "~/database/schema";
-import type { Course } from "~/database/schema";
-import { adminProcedure, instructorProcedure, router } from "~/utils/trpc";
+import {
+  course,
+  courseEvent,
+  CourseLocation,
+  CourseStatus,
+  CreditHourCategory,
+} from "~/database/schema";
+import {
+  adminProcedure,
+  instructorProcedure,
+  publicProcedure,
+  router,
+} from "~/utils/trpc";
 import { z } from "zod";
 import { createInsertSchema, createUpdateSchema } from "drizzle-orm/zod";
 import { courseFindFirst, courseFindMany } from "~/database/queries";
 import type { CourseDto } from "~/database/dtos.ts";
+import { TRPCError } from "@trpc/server";
+import { addMilliseconds, addMonths, set } from "date-fns";
 
 const updateSchema = createUpdateSchema(course, {
   id: z.string(),
-  status: z.enum(CourseStatus),
+  status: z.enum(CourseStatus).optional(),
+  creditHourCategories: z.array(z.enum(CreditHourCategory)).optional(),
 });
 
 const insertSchema = createInsertSchema(course, {
-  status: z.enum(CourseStatus),
   creditHourCategories: z.array(z.enum(CreditHourCategory)).optional(),
+  status: z.enum(CourseStatus),
 });
 
 export type CourseUpdate = z.infer<typeof updateSchema>;
 export type CourseInsert = z.infer<typeof insertSchema>;
+
+function placeholderClassStartDatetime() {
+  /* Arbtrarily 1 month from today */
+  return set(addMonths(new Date(), 1), {
+    seconds: 0,
+    milliseconds: 0,
+  });
+}
 
 export const courseRouter = router({
   admin: router({
@@ -27,27 +48,52 @@ export const courseRouter = router({
       return courseFindMany();
     }),
 
+    listTags: adminProcedure.query(async (): Promise<string[]> => {
+      const items = await db.client
+        .selectDistinct({ tag: sql<string>`unnest(${course.tags})` })
+        .from(course);
+      return items.map((item) => item.tag);
+    }),
+
     get: adminProcedure
       .input(z.object({ id: z.string() }))
-      .query(async ({ input }): Promise<Course | null> => {
-        const found = await db.client
-          .select()
-          .from(course)
-          .where(eq(course.id, input.id))
-          .limit(1);
-        return found[0] ?? null;
+      .query(async ({ input }): Promise<CourseDto> => {
+        const found = await courseFindFirst(input.id);
+        if (!found) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Course not found.",
+          });
+        }
+        return found;
       }),
 
     create: adminProcedure.input(insertSchema).mutation(async ({ input }) => {
-      const [newCourse] = await db.client
-        .insert(course)
-        .values({
-          ...input,
-          description: input.description ?? null,
-        })
-        .returning();
+      return db.client.transaction(async (tx) => {
+        const [newCourse] = await tx
+          .insert(course)
+          .values({
+            ...input,
+            description: input.description ?? null,
+          })
+          .returning();
 
-      return newCourse;
+        if (!newCourse) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Unable to create course.",
+          });
+        }
+
+        /* Add placeholder courseEvent */
+        await tx.insert(courseEvent).values({
+          courseId: newCourse.id,
+          classStartDatetime: placeholderClassStartDatetime(),
+          locationType: CourseLocation.InPerson,
+        });
+
+        return newCourse;
+      });
     }),
 
     delete: adminProcedure
@@ -87,6 +133,80 @@ export const courseRouter = router({
 
       return updatedCourse;
     }),
+
+    /* Create a new course by cloning an older one. */
+    clone: adminProcedure
+      .input(
+        z.object({
+          courseId: z.string(),
+          /* Optional: either don't copy course events or copy over all course events
+           *           with a particular start date */
+          copyCourseEventsToDate: z.date().optional(),
+        }),
+      )
+      .mutation(async ({ input }) => {
+        const orig = await courseFindFirst(input.courseId);
+        if (!orig) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Course not found.",
+          });
+        }
+
+        return db.client.transaction(async (tx) => {
+          const [newCourse] = await tx
+            .insert(course)
+            .values({
+              courseName: orig.courseName,
+              creditHourCategories: orig.creditHourCategories,
+              creditHours: orig.creditHours,
+              description: orig.description,
+              instructorId: orig.instructorId,
+              priceCents: orig.priceCents,
+              seats: orig.seats,
+              status: CourseStatus.Active,
+              tags: orig.tags,
+            })
+            .returning();
+          if (!newCourse) {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Failed to create course.",
+            });
+          }
+
+          if (input.copyCourseEventsToDate && orig.sessions.length > 0) {
+            // Keep same date relative to new course start date
+            const newStart = input.copyCourseEventsToDate.getTime();
+            const origStart =
+              orig.sessions[0]?.classStartDatetime?.getTime() ?? newStart;
+            const difference = newStart - origStart;
+
+            // Combine in a single insert operation
+            const courseEventValues = orig.sessions.map((session) => ({
+              ...session,
+              id: undefined, // Ensure unset so a new id is generated
+              courseId: newCourse.id,
+              classStartDatetime: session.classStartDatetime
+                ? addMilliseconds(session.classStartDatetime, difference)
+                : null,
+            }));
+
+            await tx.insert(courseEvent).values(courseEventValues);
+          } else {
+            /* Add placeholder courseEvent */
+            await tx.insert(courseEvent).values({
+              courseId: newCourse.id,
+              classStartDatetime: placeholderClassStartDatetime(),
+              locationType: CourseLocation.InPerson,
+            });
+          }
+
+          return {
+            courseId: newCourse.id,
+          };
+        });
+      }),
   }),
 
   instructor: router({
@@ -113,5 +233,15 @@ export const courseRouter = router({
       .query(({ input }) => {
         return courseFindFirst(input.courseId);
       }),
+
+    /* Does NOT require authentication to view upcoming courses */
+    listFuture: publicProcedure.query(async (): Promise<CourseDto[]> => {
+      const now = new Date();
+      const courses = await courseFindMany();
+      return courses.filter(
+        (c) =>
+          c.status === CourseStatus.Active && c.startDate && c.startDate > now,
+      );
+    }),
   }),
 });

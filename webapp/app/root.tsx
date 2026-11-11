@@ -5,20 +5,21 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useMatches,
 } from "react-router";
-import { QueryClient } from "@tanstack/react-query";
+import { HydrationBoundary, type DehydratedState } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
-import { createTRPCClient, httpBatchStreamLink, httpLink } from "@trpc/client";
-import { useState } from "react";
+import { useMemo } from "react";
 
 import "./app.css";
-import { TRPCProvider, type AppRouter } from "~/utils/trpc";
+import { getQueryClient } from "~/utils/query-client";
+import { getTrpcClient, makeTrpcClient, TRPCProvider } from "~/utils/trpc";
 import type { Route } from "./+types/root";
 import { TooltipProvider } from "./components/ui/tooltip";
-import { getTrpcUrl } from "./utils/env";
 import superjson from "superjson";
+import { useDehydratedState } from "./utils/prefetch";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -33,34 +34,6 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
-function makeQueryClient() {
-  return new QueryClient({
-    defaultOptions: {
-      queries: {
-        // With SSR, we usually want to set some default staleTime
-        // above 0 to avoid refetching immediately on the client
-        staleTime: 60 * 1000,
-      },
-    },
-  });
-}
-
-let browserQueryClient: QueryClient | undefined = undefined;
-
-function getQueryClient() {
-  if (typeof window === "undefined") {
-    // Server: always make a new query client
-    return makeQueryClient();
-  } else {
-    // Browser: make a new query client if we don't already have one
-    // This is very important, so we don't re-make a new client if React
-    // suspends during the initial render. This may not be needed if we
-    // have a suspense boundary BELOW the creation of the query client
-    if (!browserQueryClient) browserQueryClient = makeQueryClient();
-    return browserQueryClient;
-  }
-}
-
 const asyncStoragePersister = createAsyncStoragePersister({
   storage: typeof window !== "undefined" ? window.localStorage : undefined,
   // Serialize JavaScript types like Date correctly in caching
@@ -70,24 +43,7 @@ const asyncStoragePersister = createAsyncStoragePersister({
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
-  const [trpcClient] = useState(() =>
-    createTRPCClient<AppRouter>({
-      links: [
-        httpBatchStreamLink({
-          url: getTrpcUrl(),
-          transformer: superjson,
-          fetch(url, options) {
-            // Use regular JS fetch() and make sure to pass
-            // all headers and credentials
-            return fetch(url, {
-              ...options,
-              credentials: "include",
-            });
-          },
-        }),
-      ],
-    }),
-  );
+  const trpcClient = getTrpcClient();
 
   return (
     <PersistQueryClientProvider
@@ -119,7 +75,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  const dehydratedState = useDehydratedState();
+  return (
+    <HydrationBoundary state={dehydratedState}>
+      <Outlet />
+    </HydrationBoundary>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

@@ -135,7 +135,7 @@ export function courseFindFirst(courseId?: string) {
     },
     with: {
       sessions: {
-        orderBy: (t, { asc }) => asc(t.id),
+        orderBy: (t, { asc }) => asc(t.classStartDatetime),
       },
     },
     extras: {
@@ -150,7 +150,7 @@ export function courseFindMany() {
   return db.client.query.course.findMany({
     with: {
       sessions: {
-        orderBy: (t, { asc }) => asc(t.id),
+        orderBy: (t, { asc }) => asc(t.classStartDatetime),
       },
     },
     extras: {

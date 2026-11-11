@@ -19,6 +19,10 @@ const insertSchema = createInsertSchema(profile).omit({
   id: true,
 });
 
+const adminInsertSchema = createInsertSchema(profile).omit({
+  id: true,
+});
+
 export const profileRouter = router({
   admin: router({
     /**
@@ -36,13 +40,36 @@ export const profileRouter = router({
         .returning();
     }),
 
+    get: adminProcedure
+      .input(z.object({ profileId: z.string() }))
+      .query(async ({ input }) => {
+        const profiles = await profilesQuery().where(
+          eq(profile.id, input.profileId),
+        );
+        const p = profiles[0];
+        if (p == null) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Profile does not exist.",
+          });
+        }
+        return p;
+      }),
+
+    /**
+     * Create a new profile associated with a user.
+     */
+    create: adminProcedure.input(adminInsertSchema).mutation(({ input }) => {
+      return db.client.insert(profile).values(input).returning();
+    }),
+
     listTrainees: adminProcedure.query((): Promise<ProfileDto[]> => {
       return profilesQuery().where(eq(user.role, "user"));
     }),
   }),
 
   /**
-   * Create a new profile associated with a user.
+   * Create a new profile associated with the active user.
    */
   create: protectedProcedure.input(insertSchema).mutation(({ ctx, input }) => {
     const { ...fields } = input;

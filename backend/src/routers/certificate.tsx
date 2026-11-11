@@ -1,10 +1,12 @@
 import { adminProcedure, router, traineeProcedure } from "~/utils/trpc";
 import { pdf } from "@react-pdf/renderer";
 import z from "zod";
-import { CertificateDocument } from "~/pdf/pdf_template";
+import { CertificateDocument } from "~/pdf/certificate-document";
 import db from "~/database";
 import { TRPCError } from "@trpc/server";
 import { courseFindFirst } from "~/database/queries";
+import { CourseLocation } from "~/database/schema";
+import { format } from "date-fns";
 
 /**
  * For now we are returning a Blob directly embedded as a base64 string
@@ -31,14 +33,38 @@ const generateCertificate = async (input: {
     return null;
   }
 
+  const reservationRow = await db.client.query.reservation.findFirst({
+    where: {
+      profileId: input.profileId,
+      courseId: input.courseId,
+    },
+  });
+
   const name = `${profile.firstName} ${profile.lastName}`;
+  const creditHours = reservationRow?.creditHours ?? course.creditHours;
+  const session = course.sessions?.[0];
+  const sessionDate = session?.classStartDatetime;
+  const date = sessionDate ? format(sessionDate, "MMMM d, yyyy") : undefined;
+
+  let location: string | undefined;
+  if (session?.town) {
+    location = `${session.town}, VT`;
+  } else if (session?.locationType === CourseLocation.Virtual) {
+    location = "Virtual";
+  }
 
   // We can't pass a blob directly into JSON
   const blob = await pdf(
     <CertificateDocument
       name={name}
-      date={course?.sessions?.[0]?.classStartDatetime?.toDateString()}
-      course={course?.id}
+      course={course.courseName}
+      creditHours={creditHours}
+      creditHourCategories={course.creditHourCategories}
+      location={location}
+      date={date}
+      /* TODO: hardcoded */
+      signerName="Allison Smith"
+      signerTitle="Training Administrator"
     />,
   ).toBlob();
 
