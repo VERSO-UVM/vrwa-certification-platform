@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarTrigger, SidebarInset } from "./ui/sidebar";
 import { Separator } from "./ui/separator";
 import { Link } from "react-router";
 import { Suspense } from "react";
+import { SkeletonCard } from "./ui/skeleton";
 import { DropdownMenuAvatar } from "~/components/ui/dropdown-menu";
 
 type SidebarLayoutProps = {
@@ -40,12 +41,7 @@ export function SidebarLayout({
             {/* See https://tailwindcss.com/docs/responsive-design#container-queries
                   Inside @container we can use @sm, @md, @lg, etc */}
             <main className="flex-1 flex flex-col pl-5 pr-5 py-10 z-40 @container">
-              <Suspense
-                fallback={
-                  /* TODO: add shadcn Spinner component */
-                  <>Loading...</>
-                }
-              >
+              <Suspense fallback={<SkeletonCard />}>
                 <Outlet />
               </Suspense>
             </main>

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQueries } from "@tanstack/react-query";
 import { DataTable } from "~/components/data-table";
 import { PageHeader } from "~/components/page-header";
 import {
@@ -6,7 +6,8 @@ import {
   userDefs,
   userFieldHelper,
 } from "~/utils/field-defs/user";
-import { useTRPC } from "~/utils/trpc";
+import { useTRPC, type TRPC } from "~/utils/trpc";
+import { prefetchLoader } from "~/utils/trpc.server";
 import { EditUserButton } from "./user-manager/edit-user-button";
 import { useSessionData } from "~/utils/session";
 import { Button } from "~/components/ui/button";
@@ -38,9 +39,19 @@ export function meta() {
   return [{ title: "Admin - Instructor Manager" }];
 }
 
+function queries(trpc: TRPC) {
+  return [trpc.users.getUsers.queryOptions()] as const;
+}
+
+/* Prefetch all queries during SSR. */
+export const loader = prefetchLoader(queries);
+/* Skip loader on client-side navigations */
+export const clientLoader = () => {};
+
 export default function UserManager() {
-  const trpc = useTRPC();
-  const { data: users } = useQuery(trpc.users.getUsers.queryOptions());
+  const [{ data: users }] = useSuspenseQueries({
+    queries: queries(useTRPC()),
+  });
   return (
     <>
       <PageHeader>Users</PageHeader>
