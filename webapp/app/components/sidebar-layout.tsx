@@ -2,8 +2,8 @@ import { Outlet } from "react-router";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "./ui/sidebar";
 import { Separator } from "./ui/separator";
 import { Link } from "react-router";
-import { User } from "lucide-react";
 import { Suspense } from "react";
+import { DropdownMenuAvatar } from "~/components/ui/dropdown-menu";
 
 type SidebarLayoutProps = {
   sidebar: React.ComponentType;
@@ -34,7 +34,7 @@ export function SidebarLayout({
                 />
               </Link>
             </div>
-            <User className="size-7 bg-gray-400 rounded-full" />
+            < DropdownMenuAvatar />
           </header>
           <div className="flex-1">
             {/* See https://tailwindcss.com/docs/responsive-design#container-queries
