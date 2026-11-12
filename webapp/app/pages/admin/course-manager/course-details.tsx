@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CourseStatus, PaymentStatus } from "@backend/database/schema";
+import { CourseStatus, PaymentStatus } from "@backend/database/enums";
 import type { CourseDto, CourseEventDto } from "@backend/database/dtos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { PageHeader } from "~/components/page-header";

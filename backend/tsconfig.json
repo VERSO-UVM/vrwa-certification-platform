@@ -2,9 +2,20 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "paths": {
-      "~/*": ["./src/*"],
-      "@webapp/*": ["../webapp/app/*"]
+      "~/*": [
+        "./src/*"
+      ],
+      "@webapp/*": [
+        "../webapp/app/*"
+      ]
     },
     "outDir": "./dist"
-  }
+  },
+  "exclude": [
+    "app.cjs",
+    "build",
+    "dist",
+    "node_modules",
+    "tool/build.mjs"
+  ]
 }

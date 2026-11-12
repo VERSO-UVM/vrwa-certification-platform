@@ -4,14 +4,15 @@
   "type": "module",
   "scripts": {
     "dev": "bun run src/main.ts --watch",
-    "start": "bun run src/main.ts",
+    "start": "node build/main.mjs",
     "typecheck": "bun tsc",
     "db:gen": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:drop": "drizzle-kit drop",
-    "db:seed": "bun run seed/complete-seed.ts",
-    "db:dev": "bun run tool/developer-database.ts"
+    "db:seed": "tsx seed/complete-seed.ts",
+    "db:dev": "bun run tool/developer-database.ts",
+    "build": "node tool/build.mjs"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",
@@ -26,7 +27,7 @@
     "@zxcvbn-ts/language-common": "^3.0.4",
     "@zxcvbn-ts/language-en": "^3.0.2",
     "argon2": "^0.44.0",
-    "better-auth": "catalog:",
+    "better-auth": "1.7.0-rc.5",
     "date-fns": "^4.1.0",
     "dotenv": "^17.3.1",
     "drizzle-kit": "^1.0.0-rc.4",
@@ -36,15 +37,17 @@
     "nanoid": "^5.1.6",
     "nestjs-zod": "^5.1.1",
     "pure-rand": "^8.4.2",
-    "react": "catalog:",
+    "react": "^19.2.4",
     "stripe": "^23.1.0",
-    "superjson": "catalog:",
+    "superjson": "^2.2.6",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "^25.3.0",
-    "auth": "catalog:",
+    "auth": "1.7.0-rc.5",
     "drizzle-seed": "^1.0.0-rc.4",
-    "typescript": "catalog:"
+    "typescript": "^5.9.3",
+    "esbuild": "^0.25.12",
+    "tsx": "^4.20.0"
   }
 }

@@ -9,11 +9,8 @@ import {
   textAreaEditor,
   textInputEditor,
 } from "../field-editors";
-import {
-  CourseStatus,
-  CreditHourCategory,
-  type Course,
-} from "@backend/database/schema";
+import { CourseStatus, CreditHourCategory } from "@backend/database/enums";
+import type { Course } from "@backend/database/schema";
 import type { CourseInsert } from "@backend/routers/course";
 import { MultiComboboxEditor } from "~/components/field-editors/combobox";
 import { useQuery } from "@tanstack/react-query";

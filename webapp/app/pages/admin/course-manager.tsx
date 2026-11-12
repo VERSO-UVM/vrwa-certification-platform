@@ -21,7 +21,7 @@ import {
   courseDtoFieldHelper,
   courseRequiredFields,
 } from "~/utils/field-defs/course";
-import { CourseStatus } from "@backend/database/schema";
+import { CourseStatus } from "@backend/database/enums";
 import { CloneCourse } from "./course-manager/clone-course";
 import { useMemo } from "react";
 import type { CourseDto } from "@backend/database/dtos";

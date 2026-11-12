@@ -2,26 +2,19 @@
   "name": "vrwa",
   "private": true,
   "type": "module",
-  "workspaces": {
-    "packages": [
-      "backend",
-      "webapp"
-    ],
-    "catalog": {
-      "react": "^19.2.4",
-      "react-dom": "^19.2.4",
-      "typescript": "^5.9.3",
-      "better-auth": "1.7.0-rc.5",
-      "auth": "1.7.0-rc.5",
-      "superjson": "^2.2.6"
-    }
-  },
+  "workspaces": [
+    "backend",
+    "webapp"
+  ],
   "scripts": {
     "dev": "FORCE_COLOR=1 bun --elide-lines=0 --filter=\"*\" --bun run dev",
     "lint": "eslint \"{backend,webapp}/{src,app}/**/*.ts*\" --fix",
     "format": "prettier --write \"{backend,webapp}/{src,app}/**/*.ts*\"",
     "typecheck": "bun tsc -p backend; bun tsc -p webapp",
-    "db:dev": "FORCE_COLOR=1 bun --elide-lines=0 --filter=backend run db:dev"
+    "db:dev": "FORCE_COLOR=1 bun --elide-lines=0 --filter=backend run db:dev",
+    "build": "npm run build -w backend && npm run build -w webapp",
+    "start:backend": "npm start -w backend",
+    "start:webapp": "npm start -w webapp"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -30,7 +23,7 @@
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.3.0",
     "prettier": "^3.8.1",
-    "typescript": "catalog:",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1"
   },
   "trustedDependencies": [

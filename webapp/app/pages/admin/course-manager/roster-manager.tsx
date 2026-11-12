@@ -2,7 +2,7 @@
  * Managing enrolled students. Currently, this is embedded within the course
  * details page, but we may want to move it to a separate page.
  */
-import { PaymentStatus } from "@backend/database/schema";
+import { PaymentStatus } from "@backend/database/enums";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Link } from "react-router";

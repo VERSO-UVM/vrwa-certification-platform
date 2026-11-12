@@ -1,8 +1,8 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import Stripe from "stripe";
 
-const stripe = new Stripe(import.meta.env.STRIPE_API_SECRET_KEY || "");
-const webhookSecret = import.meta.env.STRIPE_WEBHOOK_SECRET || "";
+const stripe = new Stripe(process.env.STRIPE_API_SECRET_KEY || "");
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
 
 export function stripeWebhook(app: FastifyInstance) {
   app.addContentTypeParser(

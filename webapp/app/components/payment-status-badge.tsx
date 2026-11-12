@@ -1,4 +1,4 @@
-import { PaymentStatus } from "@backend/database/schema";
+import { PaymentStatus } from "@backend/database/enums";
 import { Badge } from "~/components/ui/badge";
 
 export function PaymentStatusBadge({ value }: { value: PaymentStatus }) {

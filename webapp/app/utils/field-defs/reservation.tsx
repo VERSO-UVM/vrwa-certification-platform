@@ -1,11 +1,8 @@
 import type { ReservationDto } from "@backend/database/dtos";
 import { createColumnHelper } from "@tanstack/react-table";
 import { selectOptionsEditor, textInputEditor } from "../field-editors";
-import {
-  PaymentStatus,
-  ReservationStatus,
-  type Reservation,
-} from "@backend/database/schema";
+import { PaymentStatus, ReservationStatus } from "@backend/database/enums";
+import type { Reservation } from "@backend/database/schema";
 import { PaymentStatusBadge } from "~/components/payment-status-badge";
 import { Badge } from "~/components/ui/badge";
 

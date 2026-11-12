@@ -1,3 +1,4 @@
+import "dotenv/config";
 import fastifyCookie from "@fastify/cookie";
 import helmet from "@fastify/helmet";
 import cors from "@fastify/cors";
