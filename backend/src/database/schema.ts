@@ -38,6 +38,11 @@ export enum CourseLocation {
   Hybrid = "hybrid",
 }
 
+export enum PaymentRate {
+  Member = "member",
+  NonMember = "nonmember",
+}
+
 export enum PaymentStatus {
   Draft = "draft",
   Open = "open",
@@ -73,6 +78,7 @@ export enum MembershipStatus {
 // DB enums. Also has better performance than a string and support for migrations.
 export const courseStatusEnum = pgEnum("courseStatus", CourseStatus);
 export const courseLocationEnum = pgEnum("courseLocation", CourseLocation);
+export const paymentRateEnum = pgEnum("paymentRate", PaymentRate);
 export const paymentStatusEnum = pgEnum("paymentStatus", PaymentStatus);
 export const reservationStatusEnum = pgEnum(
   "reservationStatus",
@@ -181,7 +187,9 @@ export const reservation = pgTable(
     reservationStatus: reservationStatusEnum().notNull(),
     statusUpdatedAt: timestamp().defaultNow().notNull(),
     paymentStatus: paymentStatusEnum().notNull(),
+    paymentRate: paymentRateEnum().notNull().default(PaymentRate.NonMember),
     stripeInvoiceId: varchar(),
+    stripeCheckoutSessionId: varchar(),
     createdAt: timestamp().defaultNow().notNull(),
 
     /* Attendance fields */
