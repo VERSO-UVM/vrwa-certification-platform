@@ -17,16 +17,14 @@ export async function seedDatabase() {
 
   console.log("Creating organizations..");
   for (const org of data.organizations) {
-    const [newOrg] = await db.client
-      .insert(db.schema.organization)
-      .values({
-        id: generatePrefixedId("organization"),
-        name: org.orgName,
-        slug: org.orgName.toLowerCase().replace(/[^a-z0-9]/g, "-"),
-        createdAt: new Date(),
-      })
-      .returning();
-    orgIds.push(newOrg!.id);
+    const id = generatePrefixedId("organization");
+    await db.client.insert(db.schema.organization).values({
+      id,
+      name: org.orgName,
+      slug: org.orgName.toLowerCase().replace(/[^a-z0-9]/g, "-"),
+      createdAt: new Date(),
+    });
+    orgIds.push(id);
   }
 
   // create accounts + profiles
@@ -61,25 +59,23 @@ export async function seedDatabase() {
     console.log(`\t${acct.email} :: ${acct.password}`);
 
     for (const prof of acct.profiles) {
-      const [newProfile] = await db.client
-        .insert(db.schema.profile)
-        .values({
-          id: generatePrefixedId("profile"),
-          userId: newUser.id,
-          firstName: prof.firstName,
-          lastName: prof.lastName,
-          address: prof.address,
-          city: prof.city,
-          state: prof.state,
-          postalCode: prof.postalCode,
-          phoneNumber: prof.phoneNumber,
-          association: prof.association,
-        })
-        .returning();
+      const profileId = generatePrefixedId("profile");
+      await db.client.insert(db.schema.profile).values({
+        id: profileId,
+        userId: newUser.id,
+        firstName: prof.firstName,
+        lastName: prof.lastName,
+        address: prof.address,
+        city: prof.city,
+        state: prof.state,
+        postalCode: prof.postalCode,
+        phoneNumber: prof.phoneNumber,
+        association: prof.association,
+      });
       if (role == "user") {
-        profileIds.push(newProfile!.id);
+        profileIds.push(profileId);
       } else if (role == "instructor") {
-        instructorIds.push(newProfile!.id);
+        instructorIds.push(profileId);
       }
     }
   }
@@ -90,7 +86,7 @@ export async function seedDatabase() {
   //create courses
   for (const [i, courseInfo] of data.courses.entries()) {
     const instructorId = instructorIds[i % instructorIds.length]!;
-    const [newCourse] = await db.client
+    const [insertedCourse] = await db.client
       .insert(db.schema.course)
       .values({
         courseName: courseInfo.courseName,
@@ -99,10 +95,15 @@ export async function seedDatabase() {
         priceCents: courseInfo.priceCents,
         instructorId,
         seats: Math.trunc(profileIds.length / 2),
-        creditHourCategories: [CreditHourCategory.Water, CreditHourCategory.WaterC1, CreditHourCategory.Wastewater],
+        creditHourCategories: [
+          CreditHourCategory.Water,
+          CreditHourCategory.WaterC1,
+          CreditHourCategory.Wastewater,
+        ],
       })
-      .returning();
-    courseIds.push(newCourse!.id);
+      .$returningId();
+    const courseId = insertedCourse!.id;
+    courseIds.push(courseId);
   }
 
   //create course events
@@ -116,7 +117,7 @@ export async function seedDatabase() {
     const thePast = new Date(now);
     thePast.setDate(now.getDate() - num);
 
-    const [pastEvent] = await db.client
+    const [insertedPast] = await db.client
       .insert(db.schema.courseEvent)
       .values({
         courseId,
@@ -132,14 +133,15 @@ export async function seedDatabase() {
         classStartDatetime: thePast,
         town: "Bennington",
       })
-      .returning();
-    courseEventIds.push(pastEvent!.id);
+      .$returningId();
+    const pastEventId = insertedPast!.id;
+    courseEventIds.push(pastEventId);
 
     //future event
     const theFuture = new Date(now);
     theFuture.setDate(now.getDate() + num);
 
-    const [futureEvent] = await db.client
+    const [insertedFuture] = await db.client
       .insert(db.schema.courseEvent)
       .values({
         courseId,
@@ -154,8 +156,9 @@ export async function seedDatabase() {
             : null,
         classStartDatetime: theFuture,
       })
-      .returning();
-    courseEventIds.push(futureEvent!.id);
+      .$returningId();
+    const futureEventId = insertedFuture!.id;
+    courseEventIds.push(futureEventId);
     num++;
   }
 

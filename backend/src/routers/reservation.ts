@@ -3,7 +3,6 @@ import { and, asc, desc, eq, gt, lt } from "drizzle-orm";
 import db from "~/database";
 import {
   course,
-  courseEvent,
   PaymentStatus,
   profile,
   reservation,
@@ -45,8 +44,12 @@ const updateSchema = createUpdateSchema(reservation, {
 
 export const reservationRouter = router({
   admin: router({
-    update: adminProcedure.input(updateSchema).mutation(({ input }) => {
-      return db.client
+    update: adminProcedure.input(updateSchema).mutation(async ({ input }) => {
+      const where = and(
+        eq(reservation.profileId, input.profileId),
+        eq(reservation.courseId, input.courseId),
+      );
+      await db.client
         .update(reservation)
         .set({
           ...input,
@@ -55,13 +58,8 @@ export const reservationRouter = router({
             statusUpdatedAt: new Date(),
           }),
         })
-        .where(
-          and(
-            eq(reservation.profileId, input.profileId),
-            eq(reservation.courseId, input.courseId),
-          ),
-        )
-        .returning();
+        .where(where);
+      return db.client.select().from(reservation).where(where);
     }),
 
     get: adminProcedure
@@ -125,16 +123,17 @@ export const reservationRouter = router({
         }),
       )
       .mutation(async ({ input }) => {
-        const [newReservation] = await db.client
+        const [inserted] = await db.client
           .insert(reservation)
           .values({
             ...input,
             creditHours: input.creditHours,
             reservationStatus: ReservationStatus.Accepted,
           })
-          .returning();
+          .$returningId();
+        const id = inserted!.id;
 
-        return newReservation;
+        return db.client.query.reservation.findFirst({ where: { id } });
       }),
 
     delete: adminProcedure
@@ -145,15 +144,14 @@ export const reservationRouter = router({
         }),
       )
       .mutation(async ({ input }) => {
-        const deletedRows = await db.client
+        await db.client
           .delete(reservation)
           .where(
             and(
               eq(reservation.courseId, input.courseId),
               eq(reservation.profileId, input.profileId),
             ),
-          )
-          .returning();
+          );
 
         return { success: true };
       }),
@@ -181,36 +179,40 @@ export const reservationRouter = router({
         }),
       )
       .mutation(async ({ input, ctx }) => {
-        const course = await db.client.query.course.findFirst({
+        const courseRow = await db.client.query.course.findFirst({
           where: { id: input.courseId },
         });
-        if (!course || course.instructorId !== ctx.session.activeProfileId) {
+        if (
+          !courseRow ||
+          courseRow.instructorId !== ctx.session.activeProfileId
+        ) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "Unauthorized event access.",
           });
         }
 
-        const updated = await db.client
+        const where = and(
+          eq(reservation.courseId, courseRow.id),
+          eq(reservation.profileId, input.profileId),
+        );
+        const [result] = await db.client
           .update(reservation)
-          .set({
-            creditHours: input.creditHours,
-          })
-          .where(
-            and(
-              eq(reservation.courseId, course.id),
-              eq(reservation.profileId, input.profileId),
-            ),
-          )
-          .returning();
+          .set({ creditHours: input.creditHours })
+          .where(where);
 
-        if (updated.length === 0) {
+        if (result.affectedRows === 0) {
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: "Reservation not found.",
           });
         }
-        return updated[0];
+        return db.client.query.reservation.findFirst({
+          where: {
+            courseId: courseRow.id,
+            profileId: input.profileId,
+          },
+        });
       }),
   }),
   trainee: router({

@@ -1,15 +1,14 @@
 import {
   varchar,
-  pgTable,
+  mysqlTable,
   text,
-  integer,
+  int,
   timestamp,
-  primaryKey,
   decimal,
-  pgEnum,
-  interval,
+  mysqlEnum,
+  json,
   unique,
-} from "drizzle-orm/pg-core";
+} from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 import { prefixedIdGenerator } from "~/utils/id";
 
@@ -20,6 +19,9 @@ import { prefixedIdGenerator } from "~/utils/id";
 // through the instructions in the README.
 export * from "../../drizzle/auth-schema";
 import { user, type account } from "../../drizzle/auth-schema";
+
+/** Matches Better Auth generated id columns (varchar 36). */
+const idLength = 36;
 
 /*----------------*/
 /* --- Enums --- */
@@ -69,24 +71,6 @@ export enum MembershipStatus {
   Inactive = "inactive",
 }
 
-// Drizzle-posgres currently works best with inference and validation using proper
-// DB enums. Also has better performance than a string and support for migrations.
-export const courseStatusEnum = pgEnum("courseStatus", CourseStatus);
-export const courseLocationEnum = pgEnum("courseLocation", CourseLocation);
-export const paymentStatusEnum = pgEnum("paymentStatus", PaymentStatus);
-export const reservationStatusEnum = pgEnum(
-  "reservationStatus",
-  ReservationStatus,
-);
-export const membershipStatusEnum = pgEnum(
-  "membershipStatus",
-  MembershipStatus,
-);
-export const creditHourCategoryEnum = pgEnum(
-  "creditHourCategory",
-  CreditHourCategory,
-);
-
 /*----------------*/
 /* --- Tables --- */
 
@@ -95,12 +79,16 @@ export const creditHourCategoryEnum = pgEnum(
  * not tied to specific accounts. Or a single account ay be associated with
  * many profiles.
  */
-export const profile = pgTable("profile", {
-  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("profile")),
-  userId: varchar()
+export const profile = mysqlTable("profile", {
+  id: varchar({ length: idLength })
+    .primaryKey()
+    .$defaultFn(prefixedIdGenerator("profile")),
+  userId: varchar({ length: idLength })
     .notNull()
     .references(() => user.id),
-  memberGroupId: varchar().references(() => memberGroup.id),
+  memberGroupId: varchar({ length: idLength }).references(
+    () => memberGroup.id,
+  ),
   firstName: text().notNull(),
   lastName: text().notNull(),
   address: text().notNull(),
@@ -112,7 +100,7 @@ export const profile = pgTable("profile", {
    * This is user supplied. Admins can reference this when
    * they put people in actual member organizations. */
   association: text(),
-  createdAt: timestamp().defaultNow().notNull(),
+  createdAt: timestamp({ fsp: 3 }).defaultNow().notNull(),
 });
 
 /**
@@ -121,25 +109,27 @@ export const profile = pgTable("profile", {
  * is "offered" it is a *new* course; the new course can be copied
  * from a previous course, but it is a distinct course.
  */
-export const course = pgTable("course", {
-  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("course")),
+export const course = mysqlTable("course", {
+  id: varchar({ length: idLength })
+    .primaryKey()
+    .$defaultFn(prefixedIdGenerator("course")),
   courseName: text().notNull(),
   description: text(),
-  creditHours: decimal().notNull(),
-  creditHourCategories: creditHourCategoryEnum()
-    .array()
+  creditHours: decimal({ precision: 6, scale: 3 }).notNull(),
+  creditHourCategories: json()
+    .$type<CreditHourCategory[]>()
     .notNull()
-    .default(sql`ARRAY[]::${creditHourCategoryEnum}[]`),
+    .default(sql`(JSON_ARRAY())`),
   /* Round values to nearest thousandth: between 0.000 and 999.999 */
-  priceCents: integer().notNull(),
-  seats: integer().notNull(),
-  instructorId: varchar().references(() => profile.id),
-  status: courseStatusEnum().notNull().default(CourseStatus.Active),
+  priceCents: int().notNull(),
+  seats: int().notNull(),
+  instructorId: varchar({ length: idLength }).references(() => profile.id),
+  status: mysqlEnum(CourseStatus).notNull().default(CourseStatus.Active),
   /* Some courses have tags, like, "exam" */
-  tags: text()
-    .array()
+  tags: json()
+    .$type<string[]>()
     .notNull()
-    .default(sql`ARRAY[]::text[]`),
+    .default(sql`(JSON_ARRAY())`),
 });
 
 // A courseEvent is an instance where a course is being taught. `class` is a reserved keyword so it doesn't do well here
@@ -147,45 +137,49 @@ export const course = pgTable("course", {
  * Many courses may only have a single courseEvent associated with them, because they are
  * a single-day course. At VRWA, it is uncommon for courses to have more than a dozen sessions.
  */
-export const courseEvent = pgTable("courseEvent", {
-  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("courseEvent")),
-  courseId: varchar()
+export const courseEvent = mysqlTable("courseEvent", {
+  id: varchar({ length: idLength })
+    .primaryKey()
+    .$defaultFn(prefixedIdGenerator("courseEvent")),
+  courseId: varchar({ length: idLength })
     .references(() => course.id, { onDelete: "cascade" })
     .notNull(),
-  locationType: courseLocationEnum().notNull(),
+  locationType: mysqlEnum(CourseLocation).notNull(),
   virtualLink: text(),
   physicalAddress: text(),
   town: text(),
   venue: text(),
   // refactor: rename to startDate or startsAt
-  classStartDatetime: timestamp({ withTimezone: true, mode: "date" }),
-  durationMinutes: integer(),
+  classStartDatetime: timestamp({ mode: "date", fsp: 3 }),
+  durationMinutes: int(),
 });
 
 /**
  * A reservation is an instance of a trainee registering for a class.
  * That means state for waitlist and payment flows.
  */
-export const reservation = pgTable(
+export const reservation = mysqlTable(
   "reservation",
   {
-    id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("reservation")),
-    profileId: varchar("profileId")
+    id: varchar({ length: idLength })
+      .primaryKey()
+      .$defaultFn(prefixedIdGenerator("reservation")),
+    profileId: varchar("profileId", { length: idLength })
       .references(() => profile.id)
       .notNull(),
-    courseId: varchar()
+    courseId: varchar({ length: idLength })
       .references(() => course.id, { onDelete: "cascade" })
       .notNull(),
 
     /* Registration fields */
-    reservationStatus: reservationStatusEnum().notNull(),
-    statusUpdatedAt: timestamp().defaultNow().notNull(),
-    paymentStatus: paymentStatusEnum().notNull(),
-    stripeInvoiceId: varchar(),
-    createdAt: timestamp().defaultNow().notNull(),
+    reservationStatus: mysqlEnum(ReservationStatus).notNull(),
+    statusUpdatedAt: timestamp({ fsp: 3 }).defaultNow().notNull(),
+    paymentStatus: mysqlEnum(PaymentStatus).notNull(),
+    stripeInvoiceId: varchar({ length: 255 }),
+    createdAt: timestamp({ fsp: 3 }).defaultNow().notNull(),
 
     /* Attendance fields */
-    creditHours: decimal().notNull(),
+    creditHours: decimal({ precision: 6, scale: 3 }).notNull(),
   },
   // Drizzle-seed recognizes unique() but not composite primary key uniqueness.
   // May as well switch to a regular reservation id with a unique() constraint,
@@ -197,11 +191,13 @@ export const reservation = pgTable(
  * At the moment we have somewhat different needs here than what Better-Auth's
  * "organization" plugin offers, which seems to be intended for something different.
  */
-export const memberGroup = pgTable("memberGroup", {
-  id: varchar().primaryKey().$defaultFn(prefixedIdGenerator("memberGroup")),
+export const memberGroup = mysqlTable("memberGroup", {
+  id: varchar({ length: idLength })
+    .primaryKey()
+    .$defaultFn(prefixedIdGenerator("memberGroup")),
   name: text(),
-  membershipStatus: membershipStatusEnum().notNull(),
-  createdAt: timestamp().defaultNow(),
+  membershipStatus: mysqlEnum(MembershipStatus).notNull(),
+  createdAt: timestamp({ fsp: 3 }).defaultNow(),
 });
 
 export type User = typeof user.$inferSelect;

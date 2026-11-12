@@ -31,29 +31,23 @@ export const userRouter = router({
     return usersWithProfilesQuery();
   }),
 
-  update: adminProcedure.input(updateSchema).mutation(({ input }) => {
+  update: adminProcedure.input(updateSchema).mutation(async ({ input }) => {
     const { id, ...changes } = input;
-    return db.client
-      .update(user)
-      .set({
-        ...changes,
-      })
-      .where(eq(user.id, id))
-      .returning();
+    await db.client.update(user).set(changes).where(eq(user.id, id));
+    return db.client.select().from(user).where(eq(user.id, id));
   }),
 
   admin: router({
-    create: adminProcedure.input(insertSchema).mutation(({ input }) => {
+    create: adminProcedure.input(insertSchema).mutation(async ({ input }) => {
       const { email, role } = input;
-      return db.client
-        .insert(user)
-        .values({
-          id: generatePrefixedId("user"),
-          name: email,
-          email: email,
-          role: role,
-        })
-        .returning();
+      const id = generatePrefixedId("user");
+      await db.client.insert(user).values({
+        id,
+        name: email,
+        email: email,
+        role: role,
+      });
+      return db.client.select().from(user).where(eq(user.id, id));
     }),
   }),
 });

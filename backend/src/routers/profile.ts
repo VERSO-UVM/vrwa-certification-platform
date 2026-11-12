@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import db from "~/database";
 import { profile, user } from "~/database/schema";
@@ -29,15 +29,10 @@ export const profileRouter = router({
      * Update the profile information associated with a user.
      * This is an admin procedure.
      */
-    update: adminProcedure.input(updateSchema).mutation(({ input }) => {
+    update: adminProcedure.input(updateSchema).mutation(async ({ input }) => {
       const { id, ...changes } = input;
-      return db.client
-        .update(profile)
-        .set({
-          ...changes,
-        })
-        .where(and(eq(profile.id, id)))
-        .returning();
+      await db.client.update(profile).set(changes).where(eq(profile.id, id));
+      return db.client.select().from(profile).where(eq(profile.id, id));
     }),
 
     get: adminProcedure
@@ -59,9 +54,16 @@ export const profileRouter = router({
     /**
      * Create a new profile associated with a user.
      */
-    create: adminProcedure.input(adminInsertSchema).mutation(({ input }) => {
-      return db.client.insert(profile).values(input).returning();
-    }),
+    create: adminProcedure
+      .input(adminInsertSchema)
+      .mutation(async ({ input }) => {
+        const [inserted] = await db.client
+          .insert(profile)
+          .values(input)
+          .$returningId();
+        const id = inserted!.id;
+        return db.client.select().from(profile).where(eq(profile.id, id));
+      }),
 
     listTrainees: adminProcedure.query((): Promise<ProfileDto[]> => {
       return profilesQuery().where(eq(user.role, "user"));

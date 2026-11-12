@@ -16,7 +16,7 @@ import { TRUSTED_ORIGINS } from "~/constants";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db.client, {
-    provider: "pg",
+    provider: "mysql",
     schema: {
       ...schema,
     },

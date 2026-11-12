@@ -6,7 +6,6 @@ import {
   instructorProcedure,
   publicProcedure,
   router,
-  traineeProcedure,
 } from "~/utils/trpc";
 import { z } from "zod";
 import type { CourseEventDto } from "~/database/dtos";
@@ -18,7 +17,6 @@ import { createUpdateSchema } from "drizzle-orm/zod";
 export const courseEventUpdateSchema = createUpdateSchema(courseEvent, {
   id: z.string(),
   virtualLink: z.url().nullable().optional(),
-  seats: z.number().int().positive().nullable().optional(),
 }).omit({ courseId: true });
 
 export type CourseEventUpdateDto = z.infer<typeof courseEventUpdateSchema>;
@@ -44,22 +42,22 @@ export const courseEventRouter = router({
           courseId: z.string(),
           locationType: z.enum(CourseLocation),
           classStartDatetime: z.coerce.date(),
-          seats: z.number().int().positive().optional().nullable(),
           virtualLink: z.url().optional().nullable(),
           physicalAddress: z.string().nullable().optional(),
         }),
       )
       .mutation(async ({ input }) => {
-        const [newEvent] = await db.client
+        const [inserted] = await db.client
           .insert(courseEvent)
           .values({
             ...input,
             virtualLink: input.virtualLink ?? null,
             physicalAddress: input.physicalAddress ?? null,
           })
-          .returning();
+          .$returningId();
+        const id = inserted!.id;
 
-        return newEvent;
+        return db.client.query.courseEvent.findFirst({ where: { id } });
       }),
 
     update: adminProcedure
@@ -75,13 +73,12 @@ export const courseEventRouter = router({
           throw new Error("No fields provided to update");
         }
 
-        const [updatedEvent] = await db.client
+        await db.client
           .update(courseEvent)
           .set(cleanUpdate)
-          .where(eq(courseEvent.id, id))
-          .returning();
+          .where(eq(courseEvent.id, id));
 
-        return updatedEvent;
+        return db.client.query.courseEvent.findFirst({ where: { id } });
       }),
 
     clone: adminProcedure
@@ -102,7 +99,7 @@ export const courseEventRouter = router({
           });
         }
 
-        const [newCourseEvent] = await db.client
+        const [inserted] = await db.client
           .insert(courseEvent)
           .values({
             ...original,
@@ -110,7 +107,11 @@ export const courseEventRouter = router({
             classStartDatetime:
               classStartDatetime ?? original.classStartDatetime,
           })
-          .returning();
+          .$returningId();
+        const id = inserted!.id;
+        const newCourseEvent = await db.client.query.courseEvent.findFirst({
+          where: { id },
+        });
         if (!newCourseEvent) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
@@ -128,12 +129,11 @@ export const courseEventRouter = router({
         }),
       )
       .mutation(async ({ input }) => {
-        const deletedRows = await db.client
+        const [result] = await db.client
           .delete(courseEvent)
-          .where(eq(courseEvent.id, input.id))
-          .returning();
+          .where(eq(courseEvent.id, input.id));
 
-        if (deletedRows.length === 0) {
+        if (result.affectedRows === 0) {
           throw new Error("No matching Course Event found!");
         }
         return { success: true };

@@ -14,7 +14,7 @@ import {
 } from "better-auth/plugins/admin/access";
 
 const statements = {
-  certifications: ["view", "update", "assign"], // System configuration; key value table in postgres
+  certifications: ["view", "update", "assign"], // System configuration; key value table in MySQL
   invoices: ["view", "pay", "delete"],
   classes: ["register", "update"],
   roster: ["view", "update"],

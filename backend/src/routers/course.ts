@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import db from "~/database";
 import {
   course,
@@ -24,10 +24,12 @@ const updateSchema = createUpdateSchema(course, {
   id: z.string(),
   status: z.enum(CourseStatus).optional(),
   creditHourCategories: z.array(z.enum(CreditHourCategory)).optional(),
+  tags: z.array(z.string()).optional(),
 });
 
 const insertSchema = createInsertSchema(course, {
   creditHourCategories: z.array(z.enum(CreditHourCategory)).optional(),
+  tags: z.array(z.string()).optional(),
   status: z.enum(CourseStatus),
 });
 
@@ -49,10 +51,8 @@ export const courseRouter = router({
     }),
 
     listTags: adminProcedure.query(async (): Promise<string[]> => {
-      const items = await db.client
-        .selectDistinct({ tag: sql<string>`unnest(${course.tags})` })
-        .from(course);
-      return items.map((item) => item.tag);
+      const items = await db.client.select({ tags: course.tags }).from(course);
+      return [...new Set(items.flatMap((item) => item.tags ?? []))];
     }),
 
     get: adminProcedure
@@ -70,13 +70,15 @@ export const courseRouter = router({
 
     create: adminProcedure.input(insertSchema).mutation(async ({ input }) => {
       return db.client.transaction(async (tx) => {
-        const [newCourse] = await tx
+        const [inserted] = await tx
           .insert(course)
           .values({
             ...input,
             description: input.description ?? null,
           })
-          .returning();
+          .$returningId();
+        const id = inserted!.id;
+        const newCourse = await tx.query.course.findFirst({ where: { id } });
 
         if (!newCourse) {
           throw new TRPCError({
@@ -103,12 +105,11 @@ export const courseRouter = router({
         }),
       )
       .mutation(async ({ input }) => {
-        const deletedRows = await db.client
+        const [result] = await db.client
           .delete(course)
-          .where(eq(course.id, input.id))
-          .returning();
+          .where(eq(course.id, input.id));
 
-        if (deletedRows.length === 0) {
+        if (result.affectedRows === 0) {
           throw new Error("No matching Course Event found!");
         }
         return { success: true };
@@ -125,13 +126,9 @@ export const courseRouter = router({
         throw new Error("No fields provided to update");
       }
 
-      const [updatedCourse] = await db.client
-        .update(course)
-        .set(cleanUpdate)
-        .where(eq(course.id, id))
-        .returning();
+      await db.client.update(course).set(cleanUpdate).where(eq(course.id, id));
 
-      return updatedCourse;
+      return db.client.query.course.findFirst({ where: { id } });
     }),
 
     /* Create a new course by cloning an older one. */
@@ -154,7 +151,7 @@ export const courseRouter = router({
         }
 
         return db.client.transaction(async (tx) => {
-          const [newCourse] = await tx
+          const [inserted] = await tx
             .insert(course)
             .values({
               courseName: orig.courseName,
@@ -167,13 +164,8 @@ export const courseRouter = router({
               status: CourseStatus.Active,
               tags: orig.tags,
             })
-            .returning();
-          if (!newCourse) {
-            throw new TRPCError({
-              code: "INTERNAL_SERVER_ERROR",
-              message: "Failed to create course.",
-            });
-          }
+            .$returningId();
+          const newCourseId = inserted!.id;
 
           if (input.copyCourseEventsToDate && orig.sessions.length > 0) {
             // Keep same date relative to new course start date
@@ -186,7 +178,7 @@ export const courseRouter = router({
             const courseEventValues = orig.sessions.map((session) => ({
               ...session,
               id: undefined, // Ensure unset so a new id is generated
-              courseId: newCourse.id,
+              courseId: newCourseId,
               classStartDatetime: session.classStartDatetime
                 ? addMilliseconds(session.classStartDatetime, difference)
                 : null,
@@ -196,14 +188,14 @@ export const courseRouter = router({
           } else {
             /* Add placeholder courseEvent */
             await tx.insert(courseEvent).values({
-              courseId: newCourse.id,
+              courseId: newCourseId,
               classStartDatetime: placeholderClassStartDatetime(),
               locationType: CourseLocation.InPerson,
             });
           }
 
           return {
-            courseId: newCourse.id,
+            courseId: newCourseId,
           };
         });
       }),
