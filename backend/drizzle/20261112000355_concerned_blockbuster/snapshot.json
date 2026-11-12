@@ -1,7 +1,7 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "62fc3d39-fdb9-4c2d-a151-fec563209eab",
+  "id": "c95dd67b-6635-4391-9e4b-b8b19def6d92",
   "prevIds": [
     "c77d9f2e-9f44-48b3-ae5e-26a8c7681ce3"
   ],
@@ -47,6 +47,15 @@
         "inactive"
       ],
       "name": "membershipStatus",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "member",
+        "nonmember"
+      ],
+      "name": "paymentRate",
       "entityType": "enums",
       "schema": "public"
     },
@@ -679,14 +688,14 @@
       "table": "reservation"
     },
     {
-      "type": "boolean",
-      "typeSchema": null,
+      "type": "paymentRate",
+      "typeSchema": "public",
       "notNull": true,
       "dimensions": 0,
-      "default": "false",
+      "default": "'nonmember'",
       "generated": null,
       "identity": null,
-      "name": "memberRate",
+      "name": "paymentRate",
       "entityType": "columns",
       "schema": "public",
       "table": "reservation"

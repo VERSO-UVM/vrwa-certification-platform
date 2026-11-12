@@ -33,6 +33,7 @@ import { profileDefs, profileRequiredFields } from "~/utils/field-defs/profile";
 import { useTRPC, type TRPC } from "~/utils/trpc";
 import { prefetchLoader } from "~/utils/trpc.server";
 import { cn } from "~/utils/utils";
+import { PaymentRate } from "@backend/database/schema";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Select Profiles" }];
@@ -77,9 +78,11 @@ export default function RegistrationProfilesPage({
   });
 
   const seats = Math.max(1, Number(searchParams.get("seats") || "1") || 1);
-  const rate = searchParams.get("rate") === "member" ? "member" : "nonmember";
+  const paymentRate =
+    searchParams.get("rate") === PaymentRate.Member
+      ? PaymentRate.Member
+      : PaymentRate.NonMember;
   const waitlist = searchParams.get("waitlist") === "1";
-  const memberRate = rate === "member";
 
   const registeredSet = useMemo(
     () => new Set(alreadyRegistered),
@@ -137,7 +140,7 @@ export default function RegistrationProfilesPage({
       const result = await register.mutateAsync({
         courseId,
         profileIds: selectedIds,
-        memberRate,
+        paymentRate,
         waitlist,
       });
       const r = result.reservationIds.join(",");
@@ -149,7 +152,7 @@ export default function RegistrationProfilesPage({
         );
       } else {
         await navigate(
-          `/trainee/registration/${courseId}/payment?r=${encodeURIComponent(r)}&rate=${rate}`,
+          `/trainee/registration/${courseId}/payment?r=${encodeURIComponent(r)}&rate=${paymentRate}`,
         );
       }
       void queryClient.invalidateQueries({

@@ -1,3 +1,5 @@
+import { PaymentRate } from "../database/schema";
+
 /** Member registration price as a fraction of the full course price. */
 export const MEMBER_PRICE_MULTIPLIER = 0.5;
 
@@ -6,8 +8,12 @@ export const MEMBER_PRICE_MULTIPLIER = 0.5;
  */
 export function unitPriceCents(
   priceCents: number,
-  memberRate: boolean,
+  paymentRate: PaymentRate,
 ): number {
-  if (!memberRate) return priceCents;
-  return Math.round(priceCents * MEMBER_PRICE_MULTIPLIER);
+  switch (paymentRate) {
+    case PaymentRate.NonMember:
+      return priceCents;
+    case PaymentRate.Member:
+      return Math.round(priceCents * MEMBER_PRICE_MULTIPLIER);
+  }
 }

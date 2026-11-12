@@ -17,7 +17,7 @@ import { Badge } from "~/components/ui/badge";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { LocationTypeBadge } from "~/components/location-type-badge";
-import { CreditHourCategory } from "@backend/database/schema";
+import { CreditHourCategory, PaymentRate } from "@backend/database/schema";
 import { unitPriceCents } from "@backend/utils/pricing";
 import { formatCents } from "~/utils/money";
 import { useSessionData } from "~/utils/session";
@@ -291,20 +291,20 @@ export default function RegistrationDetailsPage({
               <PricingRow
                 label="Member"
                 description="Member price"
-                unitCents={unitPriceCents(course.priceCents, true)}
+                unitCents={unitPriceCents(course.priceCents, PaymentRate.Member)}
                 seats={seats}
                 waitlist={needsWaitlist}
                 seatsLeft={seatsLeft}
-                onContinue={() => goToProfiles("member", needsWaitlist)}
+                onContinue={() => goToProfiles(PaymentRate.Member, needsWaitlist)}
               />
               <PricingRow
                 label="Non-member"
                 description="Normal price"
-                unitCents={unitPriceCents(course.priceCents, false)}
+                unitCents={unitPriceCents(course.priceCents, PaymentRate.Member)}
                 seats={seats}
                 waitlist={needsWaitlist}
                 seatsLeft={seatsLeft}
-                onContinue={() => goToProfiles("nonmember", needsWaitlist)}
+                onContinue={() => goToProfiles(PaymentRate.NonMember, needsWaitlist)}
               />
             </div>
           </CardContent>

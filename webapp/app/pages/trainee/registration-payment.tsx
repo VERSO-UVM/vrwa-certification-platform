@@ -26,6 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { useTRPC, type TRPC } from "~/utils/trpc";
 import { prefetchLoader } from "~/utils/trpc.server";
+import { PaymentRate } from "@backend/database/schema";
 import { unitPriceCents } from "@backend/utils/pricing";
 import { formatCents } from "~/utils/money";
 import { getStripePublishableKey } from "~/utils/env";
@@ -58,8 +59,10 @@ export default function RegistrationPaymentPage({
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
-  const rate = searchParams.get("rate") === "member" ? "member" : "nonmember";
-  const memberRate = rate === "member";
+  const paymentRate =
+    searchParams.get("rate") === PaymentRate.Member
+      ? PaymentRate.Member
+      : PaymentRate.NonMember;
 
   const [error, setError] = useState<string | null>(null);
   const [method, setMethod] = useState<"card" | "check">("card");
@@ -79,7 +82,7 @@ export default function RegistrationPaymentPage({
   });
 
   const unitCents = course
-    ? unitPriceCents(course.priceCents, memberRate)
+    ? unitPriceCents(course.priceCents, paymentRate)
     : 0;
   const seatCount = status?.reservations.length ?? reservationIds.length;
   const totalCents = unitCents * seatCount;
@@ -146,7 +149,7 @@ export default function RegistrationPaymentPage({
           <CardHeader>
             <CardTitle>{course?.courseName ?? "Course"}</CardTitle>
             <CardDescription>
-              {memberRate ? "Member" : "Non-member"} rate · {seatCount} seat
+              {paymentRate === PaymentRate.Member ? "Member" : "Non-member"} rate · {seatCount} seat
               {seatCount === 1 ? "" : "s"}
             </CardDescription>
           </CardHeader>

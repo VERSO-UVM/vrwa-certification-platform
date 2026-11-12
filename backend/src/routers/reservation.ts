@@ -5,6 +5,7 @@ import {
   course,
   courseEvent,
   CourseStatus,
+  PaymentRate,
   PaymentStatus,
   profile,
   reservation,
@@ -277,7 +278,7 @@ export const reservationRouter = router({
         z.object({
           courseId: z.string(),
           profileIds: z.array(z.string()).min(1),
-          memberRate: z.boolean(),
+          paymentRate: z.enum(PaymentRate),
           waitlist: z.boolean(),
         }),
       )
@@ -385,7 +386,7 @@ export const reservationRouter = router({
                   : ReservationStatus.Accepted,
                 paymentStatus: PaymentStatus.Draft,
                 creditHours: "0",
-                memberRate: input.memberRate,
+                paymentRate: input.paymentRate,
               })),
             )
             .returning({ id: reservation.id });
@@ -415,15 +416,15 @@ export const reservationRouter = router({
           });
         }
 
-        const memberRate = rows[0]!.memberRate;
-        if (rows.some((r) => r.memberRate !== memberRate)) {
+        const paymentRate = rows[0]!.paymentRate;
+        if (rows.some((r) => r.paymentRate !== paymentRate)) {
           throw new TRPCError({
             code: "BAD_REQUEST",
-            message: "Reservations have inconsistent member rates.",
+            message: "Reservations have inconsistent payment rates.",
           });
         }
 
-        const unitCents = unitPriceCents(courseRow.priceCents, memberRate);
+        const unitCents = unitPriceCents(courseRow.priceCents, paymentRate);
         const webappUrl = TRUSTED_ORIGINS[0] ?? "http://localhost:5173";
         const expiresAt = Math.floor(Date.now() / 1000) + 30 * 60;
 
@@ -494,8 +495,8 @@ export const reservationRouter = router({
           });
         }
 
-        const memberRate = rows[0]!.memberRate;
-        const unitCents = unitPriceCents(courseRow.priceCents, memberRate);
+        const paymentRate = rows[0]!.paymentRate;
+        const unitCents = unitPriceCents(courseRow.priceCents, paymentRate);
 
         await db.client
           .update(reservation)
@@ -569,7 +570,7 @@ export const reservationRouter = router({
             profileId: reservation.profileId,
             reservationStatus: reservation.reservationStatus,
             paymentStatus: reservation.paymentStatus,
-            memberRate: reservation.memberRate,
+            paymentRate: reservation.paymentRate,
             stripeCheckoutSessionId: reservation.stripeCheckoutSessionId,
             firstName: profile.firstName,
             lastName: profile.lastName,
@@ -595,7 +596,7 @@ async function loadOwnedUnpaidAcceptedReservations(
       id: reservation.id,
       courseId: reservation.courseId,
       profileId: reservation.profileId,
-      memberRate: reservation.memberRate,
+      paymentRate: reservation.paymentRate,
       paymentStatus: reservation.paymentStatus,
       reservationStatus: reservation.reservationStatus,
       userId: profile.userId,
