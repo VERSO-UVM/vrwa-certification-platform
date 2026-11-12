@@ -1,0 +1,2 @@
+backend/.env filter=git-crypt diff=git-crypt
+webapp/.env filter=git-crypt diff=git-crypt
