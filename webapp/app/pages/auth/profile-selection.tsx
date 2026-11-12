@@ -1,30 +1,38 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Undo, Undo2 } from "lucide-react";
+import { useQueryClient, useSuspenseQueries } from "@tanstack/react-query";
+import { Undo } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import {
   Card,
-  CardDescription,
   CardHeader,
   CardTitle,
   CardContent,
 } from "~/components/ui/card";
-import { authClient, getSession, useSession, type Session } from "~/utils/auth";
-import { useTRPC } from "~/utils/trpc";
+import { authClient, getSession, type Session } from "~/utils/auth";
+import { useTRPC, type TRPC } from "~/utils/trpc";
+import { prefetchLoader } from "~/utils/trpc.server";
 import { getUserRedirectUrl } from "~/utils/session";
 
 export function meta() {
   return [{ title: "Profile Select" }];
 }
 
+function queries(trpc: TRPC) {
+  return [trpc.profiles.list.queryOptions()] as const;
+}
+
+/* Prefetch all queries during SSR. */
+export const loader = prefetchLoader(queries);
+/* Skip loader on client-side navigations */
+export const clientLoader = () => {};
+
 export default function ProfileSelection() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const profilesQuery = useQuery(trpc.profiles.list.queryOptions());
-  const profiles = profilesQuery.data ?? [];
-  // Sort by last name
-  profiles.sort((a, b) => a.lastName.localeCompare(b.lastName));
+  const [{ data: profiles }] = useSuspenseQueries({
+    queries: queries(trpc),
+  });
 
   const onProfileSelect = async (profileId: string) => {
     // Update active profile for the current session

@@ -1,7 +1,67 @@
 import * as React from "react";
 import { Menu as MenuPrimitive } from "@base-ui/react/menu";
 import { cn } from "~/utils/utils";
-import { ChevronRightIcon, CheckIcon } from "lucide-react";
+import {
+  ChevronRightIcon,
+  CheckIcon,
+  BadgeCheckIcon,
+  BellIcon,
+  CreditCardIcon,
+  LogOutIcon,
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+
+import { Button } from "~/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { useTRPC } from "~/utils/trpc";
+
+function DropdownMenuAvatar() {
+  const trpc = useTRPC();
+  const activeProfileQuery = useQuery(
+    trpc.profiles.getActiveProfile.queryOptions(),
+  );
+  const first_letter = activeProfileQuery.data?.firstName?.[0];
+  const last_letter = activeProfileQuery.data?.lastName?.[0];
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <Button variant="ghost" size="icon" className="rounded-full">
+            <Avatar>
+              <AvatarImage src="" alt="shadcn" />
+              <AvatarFallback className="bg-gray-300">
+                {" "}
+                {first_letter}
+                {last_letter}{" "}
+              </AvatarFallback>
+            </Avatar>
+          </Button>
+        }
+      />
+      <DropdownMenuContent align="end">
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <BadgeCheckIcon />
+            Account
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <CreditCardIcon />
+            Billing
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <BellIcon />
+            Notifications
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <LogOutIcon />
+          Sign Out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 function DropdownMenu({ ...props }: MenuPrimitive.Root.Props) {
   return <MenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
@@ -266,4 +326,5 @@ export {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
+  DropdownMenuAvatar,
 };

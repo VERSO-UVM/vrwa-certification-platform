@@ -1,5 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { useTRPC } from "~/utils/trpc";
+import { useSuspenseQueries } from "@tanstack/react-query";
+import { useTRPC, type TRPC } from "~/utils/trpc";
+import { prefetchLoader } from "~/utils/trpc.server";
 import {
   Card,
   CardContent,
@@ -19,14 +20,22 @@ export function meta() {
   return [{ title: "Admin Dashboard - VRWA Training Database" }];
 }
 
-export default function AdminDashboard() {
-  const trpc = useTRPC();
-  const { data: courseEvents } = useQuery(
+function queries(trpc: TRPC) {
+  return [
     trpc.courseEvents.admin.list.queryOptions(),
-  );
-  const { data: reservations } = useQuery(
     trpc.reservations.admin.list.queryOptions(),
-  );
+  ] as const;
+}
+
+/* Prefetch all queries during SSR. */
+export const loader = prefetchLoader(queries);
+/* Skip loader on client-side navigations */
+export const clientLoader = () => {};
+
+export default function AdminDashboard() {
+  const [{ data: courseEvents }, { data: reservations }] = useSuspenseQueries({
+    queries: queries(useTRPC()),
+  });
   const navigate = useNavigate();
 
   return (

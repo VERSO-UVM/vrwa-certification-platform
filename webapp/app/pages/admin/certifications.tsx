@@ -1,6 +1,10 @@
 import React from "react";
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useSuspenseQueries,
+} from "@tanstack/react-query";
 import type { RowSelectionState } from "@tanstack/react-table";
 import type { ReservationDto } from "@backend/database/dtos";
 import type { Course } from "@backend/database/schema";
@@ -35,7 +39,8 @@ import {
   reservationDefs,
   reservationFieldHelper,
 } from "~/utils/field-defs/reservation";
-import { useTRPC } from "~/utils/trpc";
+import { useTRPC, type TRPC } from "~/utils/trpc";
+import { prefetchLoader } from "~/utils/trpc.server";
 import { profileFullName } from "~/utils/utils";
 import { checkboxSelectorColumn } from "~/utils/field-defs/extra";
 
@@ -49,12 +54,21 @@ const traineeTableDefs = [
   }),
 ];
 
+function queries(trpc: TRPC) {
+  return [trpc.courses.admin.list.queryOptions()] as const;
+}
+
+/* Prefetch all queries during SSR. */
+export const loader = prefetchLoader(queries);
+/* Skip loader on client-side navigations */
+export const clientLoader = () => {};
+
 export default function CertificationsPage() {
   const trpc = useTRPC();
   // TODO: show only finished courses (all courseEvent in the past)
-  const { data: courses = [] } = useQuery(
-    trpc.courses.admin.list.queryOptions(),
-  );
+  const [{ data: courses }] = useSuspenseQueries({
+    queries: queries(trpc),
+  });
 
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
