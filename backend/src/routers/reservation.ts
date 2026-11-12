@@ -509,6 +509,9 @@ export const reservationRouter = router({
           );
 
         await sendCheckInvoice({
+          userId: ctx.account.id,
+          courseId,
+          paymentRate,
           reservationIds: rows.map((r) => r.id),
           email: ctx.account.email,
           courseName: courseRow.courseName,

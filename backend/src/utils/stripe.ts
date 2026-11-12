@@ -2,7 +2,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import Stripe from "stripe";
 import { and, eq, inArray, ne } from "drizzle-orm";
 import db from "~/database";
-import { PaymentStatus, reservation } from "~/database/schema";
+import { PaymentRate, PaymentStatus, reservation } from "~/database/schema";
 
 export const stripe = new Stripe(import.meta.env.STRIPE_API_SECRET_KEY || "", {
   apiVersion: "2026-10-28.endive",
@@ -10,7 +10,7 @@ export const stripe = new Stripe(import.meta.env.STRIPE_API_SECRET_KEY || "", {
 
 const webhookSecret = import.meta.env.STRIPE_WEBHOOK_SECRET || "";
 
-/** Mark reservations for a Checkout Session as Paid (idempotent). */
+/** Mark reservations for a Checkout Session as Paid. */
 export async function markReservationsPaidForSession(sessionId: string) {
   await db.client
     .update(reservation)
@@ -94,9 +94,8 @@ async function handleEventNotification(
   switch (notification.type) {
     case "v1.checkout.session.completed":
     case "v1.checkout.session.async_payment_succeeded": {
-      const session = (await notification.fetchRelatedObject()) as
-        | Stripe.Checkout.Session
-        | null;
+      const session =
+        (await notification.fetchRelatedObject()) as Stripe.Checkout.Session | null;
       if (!session?.id) return;
       // Only fulfill when payment is complete (async methods start unpaid)
       if (session.payment_status === "paid") {
@@ -105,9 +104,8 @@ async function handleEventNotification(
       break;
     }
     case "v1.checkout.session.expired": {
-      const session = (await notification.fetchRelatedObject()) as
-        | Stripe.Checkout.Session
-        | null;
+      const session =
+        (await notification.fetchRelatedObject()) as Stripe.Checkout.Session | null;
       if (!session?.id) return;
       await releaseReservationsForExpiredSession(session.id);
       break;
@@ -115,12 +113,66 @@ async function handleEventNotification(
   }
 }
 
-/** Stub for emailing a pay-by-check invoice. Wiring comes later. */
-export async function sendCheckInvoice(_args: {
+/**
+ * Email a pay-by-check invoice via Stripe Invoicing.
+ */
+export async function sendCheckInvoice({
+  userId,
+  courseId,
+  paymentRate,
+  reservationIds,
+  email,
+  courseName,
+  amountCents,
+}: {
+  userId: string;
+  courseId: string;
+  paymentRate: PaymentRate;
   reservationIds: string[];
   email: string;
   courseName: string;
   amountCents: number;
 }) {
-  // TODO: email invoice PDF / payment instructions to the account
+  const invoiceKey = `check-invoice-${userId}}-${courseId}`;
+
+  const existing = await stripe.customers.list({ email, limit: 1 });
+  const customer =
+    existing.data[0] ??
+    (await stripe.customers.create(
+      { email },
+      { idempotencyKey: `${invoiceKey}-customer` },
+    ));
+
+  const invoice = await stripe.invoices.create(
+    {
+      customer: customer.id,
+      collection_method: "send_invoice",
+      days_until_due: 30,
+      pending_invoice_items_behavior: "exclude",
+      description: `Registration for ${courseName} (pay by check)`,
+      metadata: { reservationIds: reservationIds.join(",") },
+    },
+    { idempotencyKey: `${invoiceKey}-invoice` },
+  );
+
+  await stripe.invoiceItems.create(
+    {
+      customer: customer.id,
+      invoice: invoice.id,
+      currency: "usd",
+      amount: amountCents,
+      description: `${courseName} — ${reservationIds.length} seat(s) - ${paymentRate}`,
+    },
+    { idempotencyKey: `${invoiceKey}-item` },
+  );
+
+  await stripe.invoices.finalizeInvoice(invoice.id, { auto_advance: false });
+  await stripe.invoices.sendInvoice(invoice.id);
+
+  await db.client
+    .update(reservation)
+    .set({ stripeInvoiceId: invoice.id })
+    .where(inArray(reservation.id, reservationIds));
+
+  return invoice.id;
 }
