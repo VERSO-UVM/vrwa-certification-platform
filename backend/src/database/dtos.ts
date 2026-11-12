@@ -31,6 +31,7 @@ export type CourseDto = Course & {
   startDate: Date | null;
   spotsFilled: number;
   waitlistSize: number;
+  instructor: Pick<Profile, "id" | "firstName" | "lastName"> | null;
 };
 
 export const ProfileDtoSchema = createSelectSchema(profile)
