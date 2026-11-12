@@ -137,6 +137,13 @@ export function courseFindFirst(courseId?: string) {
       sessions: {
         orderBy: (t, { asc }) => asc(t.classStartDatetime),
       },
+      instructor: {
+        columns: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
     },
     extras: {
       startDate: courseStartDate,
@@ -151,6 +158,13 @@ export function courseFindMany() {
     with: {
       sessions: {
         orderBy: (t, { asc }) => asc(t.classStartDatetime),
+      },
+      instructor: {
+        columns: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
       },
     },
     extras: {

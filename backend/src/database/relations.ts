@@ -27,6 +27,11 @@ export const relations = defineRelations(schema, (r) => ({
   course: {
     sessions: r.many.courseEvent(),
     reservations: r.many.reservation(),
+    instructor: r.one.profile({
+      from: r.course.instructorId,
+      to: r.profile.id,
+      optional: true,
+    }),
   },
 
   courseEvent: {
