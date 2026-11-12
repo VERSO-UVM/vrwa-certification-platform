@@ -14,6 +14,7 @@ import {
   CourseLocation,
   CourseStatus,
   CreditHourCategory,
+  PaymentRate,
   PaymentStatus,
   profile,
   reservation,
@@ -257,6 +258,8 @@ async function seedAppTables() {
         statusUpdatedAt: false,
         createdAt: false,
         stripeInvoiceId: funcs.valuesFromArray({ values: [null] }),
+        stripeCheckoutSessionId: funcs.valuesFromArray({ values: [null] }),
+        paymentRate: funcs.valuesFromArray({ values: Object.values(PaymentRate) }),
       },
     },
   }));
