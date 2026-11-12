@@ -9,7 +9,7 @@ import { getBackendUrl } from "./env";
 // We need to be careful how we define this to not break
 // typescript inference
 export const authClient = createAuthClient({
-  baseURL: getBackendUrl(),
+  baseURL: getBackendUrl() + "/auth",
   plugins: [inferAdditionalFields<typeof auth>()],
 }) as ReturnType<typeof createAuthClient>;
 

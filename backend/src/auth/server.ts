@@ -15,6 +15,7 @@ import { generatePrefixedId } from "~/utils/id";
 import { TRUSTED_ORIGINS } from "~/constants";
 
 export const auth = betterAuth({
+  basePath: process.env.BASE_PREFIX + "/auth",
   database: drizzleAdapter(db.client, {
     provider: "mysql",
     schema: {

@@ -35,7 +35,7 @@ app.register(helmet);
 
 // Set up tRPC
 app.register(fastifyTRPCPlugin, {
-  prefix: "/trpc",
+  prefix: process.env.BASE_PREFIX + "/trpc",
   trpcOptions: {
     router: appRouter,
     createContext,
@@ -50,7 +50,7 @@ app.register(fastifyTRPCPlugin, {
 // Source: https://better-auth.com/docs/integrations/fastify
 app.route({
   method: ["GET", "POST"],
-  url: "/api/auth/*",
+  url: process.env.BASE_PREFIX + "/auth/*",
   async handler(request, reply) {
     try {
       // Construct request URL
