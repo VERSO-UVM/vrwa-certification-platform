@@ -8,7 +8,9 @@ import { courseFindFirst } from "~/database/queries";
 import nodemailer from "nodemailer";
 import { CourseLocation } from "~/database/schema";
 import { format } from "date-fns";
-import { profileEnd } from "console";
+import { profile, profileEnd } from "console";
+import { inArray } from "drizzle-orm";
+import { id } from "zod/v4/locales";
 
 
 /**
@@ -107,19 +109,19 @@ export const certificateRouter = router({
 
       )
       .mutation(async ({ input }) => {
-        try {
-          const profile = await db.client.query.profile.findFirst({
-            where: { id: input.reservations[0]!.profileId },
-            with: {
-              user: true
-            }
-          });
+        // try { 
+        //   const profile = await db.client.query.profile.findFirst({
+        //     where: { id: input.reservations[0]!.profileId },
+        //     with: {
+        //       user: true
+        //     }
+        //   });
 
-          console.log("Profile ID: %s", profile?.user!.id);
+        //   console.log("Profile Email: %s", profile?.user!.email);
 
-        } catch (err) {
-          console.error("ERROR: %s", err);
-        }
+        // } catch (err) {
+        //   console.error("ERROR: %s", err);
+        // }
 
         const transporter = nodemailer.createTransport({
           host: process.env.SMTP_HOST,
@@ -131,20 +133,52 @@ export const certificateRouter = router({
           },
         });
 
-        try {
-          const info = await transporter.sendMail({
-            from: process.env.SMTP_FROM, // sender address
-            // from: , // sender address
-            to: process.env.SMTP_USER, // TODO: figure out how to get list of emails
-            subject: "VRWA Certificate",
-            text: "Hello world?",
-            html: `<h1>Hello</h1>`,
-          });
+        // grab all the profile ids from the list
+        const profileIds = input.reservations.map(item => item.profileId);
 
-          console.log("Message sent: %s", nodemailer.getTestMessageUrl(info));
+        try {
+          console.log("Profile Ids: %s", profileIds);
         } catch (err) {
-          console.error("Error while sending mail:", err);
+          console.error("ERROR: %s", err);
         }
+
+        const profiles = await Promise.all(profileIds.map(profileId => db.client.query.profile.findFirst({
+          where: { id: profileId },
+          with: {
+            user: true
+          }
+        })));
+        try {
+          const batch = await Promise.all(profiles.map(profile => transporter.sendMail({
+            from: process.env.SMTP_FROM,
+            to: profile?.user?.email,
+            subject: "VRWA Certificate",
+            text: "Congratulations on your certificate!",
+            html: `<h1>Certificate goes here:</h1>`,
+          })
+          )
+          );
+
+          console.log(`Sent ${batch.length} emails`);
+        } catch (err) {
+          console.error("Send failed!", err);
+        }
+        // console.log("%%%%%%EMAILS: %s%%%%%%%%", emails);
+
+        //   try {
+        //     // const emails = input.reservations.map(item => item.profileId.user.email);
+        //     const info = await transporter.sendMail({
+        //       from: process.env.SMTP_FROM,
+        //       to: process.env.SMTP_USER, 
+        //       subject: "VRWA Certificate",
+        //       text: "Congratulations on your certificate!",
+        //       html: `<h1>Certificate goes here:</h1>`,
+        //     });
+
+        //     console.log("Message sent: %s", nodemailer.getTestMessageUrl(info));
+        //   } catch (err) {
+        //     console.error("Error while sending mail:", err);
+        //   }
       }),
   },
 
