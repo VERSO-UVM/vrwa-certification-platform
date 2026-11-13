@@ -109,20 +109,6 @@ export const certificateRouter = router({
 
       )
       .mutation(async ({ input }) => {
-        // try { 
-        //   const profile = await db.client.query.profile.findFirst({
-        //     where: { id: input.reservations[0]!.profileId },
-        //     with: {
-        //       user: true
-        //     }
-        //   });
-
-        //   console.log("Profile Email: %s", profile?.user!.email);
-
-        // } catch (err) {
-        //   console.error("ERROR: %s", err);
-        // }
-
         const transporter = nodemailer.createTransport({
           host: process.env.SMTP_HOST,
           port: process.env.SMTP_PORT,
@@ -133,7 +119,6 @@ export const certificateRouter = router({
           },
         });
 
-        // grab all the profile ids from the list
         const profileIds = input.reservations.map(item => item.profileId);
 
         try {
@@ -148,6 +133,7 @@ export const certificateRouter = router({
             user: true
           }
         })));
+
         try {
           const batch = await Promise.all(profiles.map(profile => transporter.sendMail({
             from: process.env.SMTP_FROM,
@@ -163,22 +149,6 @@ export const certificateRouter = router({
         } catch (err) {
           console.error("Send failed!", err);
         }
-        // console.log("%%%%%%EMAILS: %s%%%%%%%%", emails);
-
-        //   try {
-        //     // const emails = input.reservations.map(item => item.profileId.user.email);
-        //     const info = await transporter.sendMail({
-        //       from: process.env.SMTP_FROM,
-        //       to: process.env.SMTP_USER, 
-        //       subject: "VRWA Certificate",
-        //       text: "Congratulations on your certificate!",
-        //       html: `<h1>Certificate goes here:</h1>`,
-        //     });
-
-        //     console.log("Message sent: %s", nodemailer.getTestMessageUrl(info));
-        //   } catch (err) {
-        //     console.error("Error while sending mail:", err);
-        //   }
       }),
   },
 
