@@ -134,10 +134,13 @@ export default function CertificationsPage() {
 
   const sendCertificates = () => {
     batchEmailMutation.mutate(
-      recipients.map(({ profileId, courseId }) => ({
+      {emailBody,
+      emailCc,
+      emailBcc,
+      reservations : recipients.map(({ profileId, courseId }) => ({
         profileId,
         courseId,
-      })),
+      }))},
       {
         onSuccess: () => {
           setRecipients([]);

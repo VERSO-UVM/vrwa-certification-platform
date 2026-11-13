@@ -5,8 +5,13 @@ import { CertificateDocument } from "~/pdf/certificate-document";
 import db from "~/database";
 import { TRPCError } from "@trpc/server";
 import { courseFindFirst } from "~/database/queries";
+import nodemailer from "nodemailer";
 import { CourseLocation } from "~/database/schema";
 import { format } from "date-fns";
+import { profile, profileEnd } from "console";
+import { inArray } from "drizzle-orm";
+import { id } from "zod/v4/locales";
+
 
 /**
  * For now we are returning a Blob directly embedded as a base64 string
@@ -89,16 +94,61 @@ export const certificateRouter = router({
 
     batchEmail: adminProcedure
       .input(
-        z.array(
-          z.object({
-            profileId: z.string(),
-            courseId: z.string(),
-          }),
-        ),
+        z.object({
+          // emailSubject,
+          emailBody: z.string(),
+          emailCc: z.string(),
+          emailBcc: z.string(),
+          reservations: z.array(
+            z.object({
+              profileId: z.string(),
+              courseId: z.string(),
+            }),
+          ),
+        })
+
       )
       .mutation(async ({ input }) => {
-        console.log("%%%% batchEmail triggered! %%%%");
-        console.log(input);
+        const transporter = nodemailer.createTransport({
+          host: process.env.SMTP_HOST,
+          port: process.env.SMTP_PORT,
+          secure: false,
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+          },
+        });
+
+        const profileIds = input.reservations.map(item => item.profileId);
+
+        try {
+          console.log("Profile Ids: %s", profileIds);
+        } catch (err) {
+          console.error("ERROR: %s", err);
+        }
+
+        const profiles = await Promise.all(profileIds.map(profileId => db.client.query.profile.findFirst({
+          where: { id: profileId },
+          with: {
+            user: true
+          }
+        })));
+
+        try {
+          const batch = await Promise.all(profiles.map(profile => transporter.sendMail({
+            from: process.env.SMTP_FROM,
+            to: profile?.user?.email,
+            subject: "VRWA Certificate",
+            text: "Congratulations on your certificate!",
+            html: `<h1>Certificate goes here:</h1>`,
+          })
+          )
+          );
+
+          console.log(`Sent ${batch.length} emails`);
+        } catch (err) {
+          console.error("Send failed!", err);
+        }
       }),
   },
 
