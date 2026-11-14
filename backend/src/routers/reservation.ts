@@ -269,10 +269,6 @@ export const reservationRouter = router({
       },
     ),
 
-    /**
-     * Create reservations for the caller's profiles on a course.
-     * Seats are held immediately; payment updates status afterward.
-     */
     register: traineeProcedure
       .input(
         z.object({
@@ -301,9 +297,10 @@ export const reservationRouter = router({
 
           const [startRow] = await tx
             .select({
-              courseStart: sql<Date | null>`min(${courseEvent.classStartDatetime})`.mapWith(
-                (v) => (v == null ? null : new Date(v)),
-              ),
+              courseStart:
+                sql<Date | null>`min(${courseEvent.classStartDatetime})`.mapWith(
+                  (v) => (v == null ? null : new Date(v)),
+                ),
             })
             .from(courseEvent)
             .where(eq(courseEvent.courseId, input.courseId));
@@ -358,10 +355,7 @@ export const reservationRouter = router({
               .where(
                 and(
                   eq(reservation.courseId, input.courseId),
-                  eq(
-                    reservation.reservationStatus,
-                    ReservationStatus.Accepted,
-                  ),
+                  eq(reservation.reservationStatus, ReservationStatus.Accepted),
                 ),
               );
 

@@ -63,10 +63,9 @@ export default function SignupPage() {
       // Invalidate ALL queries after logging in
       await queryClient.invalidateQueries();
 
-      navigate(
-        withRedirectParam("/profile-create", redirect || null),
-        { replace: true },
-      );
+      navigate(withRedirectParam("/profile-create", redirect || null), {
+        replace: true,
+      });
     }
   }
 

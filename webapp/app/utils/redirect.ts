@@ -1,6 +1,5 @@
 /**
- * Accept only same-origin relative paths for post-auth redirects.
- * Rejects open redirects (protocol-relative, absolute URLs, etc.).
+ * Reject redirects to other websites
  */
 export function safeRedirectPath(
   value: string | null | undefined,

@@ -81,9 +81,7 @@ export default function RegistrationPaymentPage({
     enabled: reservationIds.length > 0,
   });
 
-  const unitCents = course
-    ? unitPriceCents(course.priceCents, paymentRate)
-    : 0;
+  const unitCents = course ? unitPriceCents(course.priceCents, paymentRate) : 0;
   const seatCount = status?.reservations.length ?? reservationIds.length;
   const totalCents = unitCents * seatCount;
 
@@ -149,7 +147,8 @@ export default function RegistrationPaymentPage({
           <CardHeader>
             <CardTitle>{course?.courseName ?? "Course"}</CardTitle>
             <CardDescription>
-              {paymentRate === PaymentRate.Member ? "Member" : "Non-member"} rate · {seatCount} seat
+              {paymentRate === PaymentRate.Member ? "Member" : "Non-member"}{" "}
+              rate · {seatCount} seat
               {seatCount === 1 ? "" : "s"}
             </CardDescription>
           </CardHeader>
@@ -217,9 +216,7 @@ export default function RegistrationPaymentPage({
                   disabled={payByCheck.isPending}
                   onClick={() => void handlePayByCheck()}
                 >
-                  {payByCheck.isPending
-                    ? "Saving…"
-                    : "Confirm pay by check"}
+                  {payByCheck.isPending ? "Saving…" : "Confirm pay by check"}
                 </Button>
               </TabsContent>
             </Tabs>

@@ -3,8 +3,8 @@ import { SidebarProvider, SidebarTrigger, SidebarInset } from "./ui/sidebar";
 import { Separator } from "./ui/separator";
 import { Link } from "react-router";
 import { Suspense } from "react";
-import { DropdownMenuAvatar } from "~/components/ui/dropdown-menu";
 import { SkeletonCard } from "./ui/skeleton";
+import { DropdownMenuAvatar } from "~/components/ui/dropdown-menu";
 
 type SidebarLayoutProps = {
   sidebar: React.ComponentType;

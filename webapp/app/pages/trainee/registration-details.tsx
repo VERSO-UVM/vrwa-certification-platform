@@ -38,9 +38,7 @@ export const loader = prefetchLoader(queries);
 /* Skip loader on client-side navigations */
 export const clientLoader = () => {};
 
-const CREDIT_SUBCATEGORY_LABELS: Partial<
-  Record<CreditHourCategory, string>
-> = {
+const CREDIT_SUBCATEGORY_LABELS: Partial<Record<CreditHourCategory, string>> = {
   [CreditHourCategory.WaterC1]: "Water Category 1",
   [CreditHourCategory.WaterC2]: "Water Category 2",
   [CreditHourCategory.WaterC3]: "Water Category 3",
@@ -157,9 +155,7 @@ export default function RegistrationDetailsPage({
                 <dt className="font-medium">Type:</dt>
                 <dd className="flex flex-wrap gap-1">
                   {hasWater && <Badge variant="blue">Water</Badge>}
-                  {hasWastewater && (
-                    <Badge variant="indigo">Wastewater</Badge>
-                  )}
+                  {hasWastewater && <Badge variant="indigo">Wastewater</Badge>}
                   {subcategories.map((label) => (
                     <Badge key={label} variant="outline">
                       {label}
@@ -291,20 +287,30 @@ export default function RegistrationDetailsPage({
               <PricingRow
                 label="Member"
                 description="Member price"
-                unitCents={unitPriceCents(course.priceCents, PaymentRate.Member)}
+                unitCents={unitPriceCents(
+                  course.priceCents,
+                  PaymentRate.Member,
+                )}
                 seats={seats}
                 waitlist={needsWaitlist}
                 seatsLeft={seatsLeft}
-                onContinue={() => goToProfiles(PaymentRate.Member, needsWaitlist)}
+                onContinue={() =>
+                  goToProfiles(PaymentRate.Member, needsWaitlist)
+                }
               />
               <PricingRow
                 label="Non-member"
                 description="Normal price"
-                unitCents={unitPriceCents(course.priceCents, PaymentRate.Member)}
+                unitCents={unitPriceCents(
+                  course.priceCents,
+                  PaymentRate.Member,
+                )}
                 seats={seats}
                 waitlist={needsWaitlist}
                 seatsLeft={seatsLeft}
-                onContinue={() => goToProfiles(PaymentRate.NonMember, needsWaitlist)}
+                onContinue={() =>
+                  goToProfiles(PaymentRate.NonMember, needsWaitlist)
+                }
               />
             </div>
           </CardContent>
