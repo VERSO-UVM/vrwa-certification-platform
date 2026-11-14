@@ -18,7 +18,6 @@ export default defineConfig({
     ...(sslCaPath
       ? {
           ssl: {
-            // drizzle-kit expects string CA contents, not a Buffer
             ca: fs.readFileSync(sslCaPath, "utf8"),
             rejectUnauthorized: true,
           },

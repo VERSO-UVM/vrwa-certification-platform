@@ -28,11 +28,11 @@ bunx auth generate --config src/auth/server.ts --output drizzle/auth-schema.ts
 
 ### Database
 
-The TrainingDB uses MySQL 8 (Percona Server compatible). For local development, a Docker Compose environment is provided (`compose.dev.yml`). Production / shared hosting uses the `DATABASE_URL` in `.env`.
+The TrainingDB uses MySQL 8. For local development, a Docker Compose environment is provided (`compose.dev.yml`).
 
 #### DB Quickstart
 
-Use the command `bun db:dev` to (re)start the **local** Docker MySQL container and create/seed the database. It always uses `LOCAL_DATABASE_URL` (must be `localhost` / `127.0.0.1`) and will refuse to run against a remote host.
+Use the command `bun db:dev` to (re)start the **local** Docker MySQL container and create/seed the database. It uses `LOCAL_DATABASE_URL`.
 
 Any previous local database content will be archived in `.tmp/db-data-OLD` and a new one will be created.
 
@@ -60,10 +60,8 @@ bun db:dev
 See `.env.example`:
 
 - `DATABASE_URL` — app, `db:migrate`, `db:seed`, `db:studio` (may point at hosted MySQL such as UVM `webdb`)
-- `LOCAL_DATABASE_URL` — used only by `bun db:dev` (Docker Percona on port 13306)
-- `DATABASE_SSL_CA` — optional path to a CA cert (UVM webdb: same as `ssl-ca` in `~/.my.cnf`)
-
-Percent-encode special characters in the password (`<` → `%3C`, `)` → `%29`, etc.). A wrong or unencoded password produces `ER_ACCESS_DENIED_ERROR` even when `mariadb` works with interactively typed credentials.
+- `LOCAL_DATABASE_URL` — used only by `bun db:dev`
+- `DATABASE_SSL_CA` — optional path to a CA cert
 
 #### Starting a development database with Docker Compose
 

@@ -3,9 +3,7 @@ import { existsSync, rmSync, cpSync } from "node:fs";
 import { exit } from "node:process";
 import { styleText } from "node:util";
 
-const LOCAL_DATABASE_URL =
-  process.env.LOCAL_DATABASE_URL ??
-  "mysql://root:verso@localhost:13306/vrwa";
+const LOCAL_DATABASE_URL = process.env.LOCAL_DATABASE_URL ??;
 
 assertLocalDatabaseUrl(LOCAL_DATABASE_URL);
 

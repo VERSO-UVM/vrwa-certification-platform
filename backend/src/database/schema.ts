@@ -25,7 +25,6 @@ const idLength = 36;
 
 /*----------------*/
 /* --- Enums --- */
-// Defined in ./enums so the webapp can import them without drizzle.
 import {
   CourseStatus,
   CourseLocation,
@@ -58,9 +57,7 @@ export const profile = mysqlTable("profile", {
   userId: varchar({ length: idLength })
     .notNull()
     .references(() => user.id),
-  memberGroupId: varchar({ length: idLength }).references(
-    () => memberGroup.id,
-  ),
+  memberGroupId: varchar({ length: idLength }).references(() => memberGroup.id),
   firstName: text().notNull(),
   lastName: text().notNull(),
   address: text().notNull(),

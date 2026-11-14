@@ -7,10 +7,7 @@ import { relations } from "./relations";
 function poolOptionsFromDatabaseUrl(urlString: string): PoolOptions {
   const url = new URL(urlString);
   if (url.protocol !== "mysql:" && url.protocol !== "mysql2:") {
-    throw new Error(
-      `DATABASE_URL must use mysql:// (got ${url.protocol}). ` +
-        `URL-encode special characters in the password (e.g. < → %3C, ) → %29).`,
-    );
+    throw new Error("Expected mysql, got " + url.protocol);
   }
 
   const options: PoolOptions = {
@@ -19,11 +16,9 @@ function poolOptionsFromDatabaseUrl(urlString: string): PoolOptions {
     user: decodeURIComponent(url.username),
     password: decodeURIComponent(url.password),
     database: url.pathname.replace(/^\//, ""),
-    // Store and read TIMESTAMP values as UTC
-    timezone: "Z",
+    timezone: "Z", // UTC
   };
 
-  // Match ~/.my.cnf ssl-ca for hosted MySQL (e.g. UVM webdb)
   const sslCaPath =
     process.env.DATABASE_SSL_CA || url.searchParams.get("ssl-ca");
   if (sslCaPath) {
@@ -36,7 +31,6 @@ function poolOptionsFromDatabaseUrl(urlString: string): PoolOptions {
   return options;
 }
 
-// Use the callback-style pool: Drizzle calls .promise() and needs pool.config.
 const pool: Pool = mysql.createPool(
   poolOptionsFromDatabaseUrl(process.env.DATABASE_URL!),
 );

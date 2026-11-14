@@ -1,6 +1,4 @@
-// Bundles the backend into build/main.mjs so it can run on plain Node.js
-// (no Bun, no TS loader needed). Dependencies stay external and are loaded
-// from node_modules at runtime.
+// Bundles backend for Node.js
 import { build } from "esbuild";
 import { cpSync, mkdirSync, rmSync } from "node:fs";
 
@@ -14,8 +12,8 @@ await build({
   platform: "node",
   format: "esm",
   target: "node22",
-  packages: "external", // keep node_modules external
-  tsconfig: "tsconfig.json", // resolves the "~/" alias
+  packages: "external",
+  tsconfig: "tsconfig.json",
   jsx: "automatic",
   sourcemap: true,
   // Bundled CJS-style helpers inside an ESM bundle need require()
@@ -24,7 +22,6 @@ await build({
   },
 });
 
-// Assets referenced relative to the bundle via import.meta.url (see pdf/)
 for (const f of ["vrwa-logo.png", "completion_seal.png"]) {
   cpSync(`src/pdf/${f}`, `build/${f}`);
 }
