@@ -12,7 +12,6 @@ import { profile, profileEnd } from "console";
 import { inArray } from "drizzle-orm";
 import { id } from "zod/v4/locales";
 
-
 /**
  * For now we are returning a Blob directly embedded as a base64 string
  * within a tRPC JSON output. The "correct" way to return files is to
@@ -105,8 +104,7 @@ export const certificateRouter = router({
               courseId: z.string(),
             }),
           ),
-        })
-
+        }),
       )
       .mutation(async ({ input }) => {
         const transporter = nodemailer.createTransport({
@@ -119,7 +117,7 @@ export const certificateRouter = router({
           },
         });
 
-        const profileIds = input.reservations.map(item => item.profileId);
+        const profileIds = input.reservations.map((item) => item.profileId);
 
         try {
           console.log("Profile Ids: %s", profileIds);
@@ -127,28 +125,39 @@ export const certificateRouter = router({
           console.error("ERROR: %s", err);
         }
 
-        const profiles = await Promise.all(profileIds.map(profileId => db.client.query.profile.findFirst({
-          where: { id: profileId },
-          with: {
-            user: true
-          }
-        })));
+        const profiles = await Promise.all(
+          profileIds.map((profileId) =>
+            db.client.query.profile.findFirst({
+              where: { id: profileId },
+              with: {
+                user: true,
+              },
+            }),
+          ),
+        );
 
-        try {
-          const batch = await Promise.all(profiles.map(profile => transporter.sendMail({
-            from: process.env.SMTP_FROM,
-            to: profile?.user?.email,
-            subject: "VRWA Certificate",
-            text: "Congratulations on your certificate!",
-            html: `<h1>Certificate goes here:</h1>`,
-          })
-          )
-          );
+        const batch = await Promise.all(
+          profiles.map((profile) => {
+            const email = profile?.user?.email;
 
-          console.log(`Sent ${batch.length} emails`);
-        } catch (err) {
-          console.error("Send failed!", err);
-        }
+            if (email == null) {
+              throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Unable to send emails.",
+              });
+            }
+
+            return transporter.sendMail({
+              from: process.env.SMTP_FROM,
+              to: profile?.user?.email,
+              subject: "VRWA Certificate",
+              text: "Congratulations on your certificate!",
+              html: `<h1>Certificate goes here:</h1>`,
+            });
+          }),
+        );
+
+        console.log(`Sent ${batch.length} emails`);
       }),
   },
 

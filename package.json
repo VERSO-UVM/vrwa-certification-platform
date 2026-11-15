@@ -37,8 +37,5 @@
     "@swc/core",
     "@tailwindcss/oxide",
     "esbuild"
-  ],
-  "dependencies": {
-    "cn": "^0.5.2"
-  }
+  ]
 }
