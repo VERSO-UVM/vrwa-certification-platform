@@ -28,6 +28,18 @@ export default [
     route("registration/:courseId", "pages/trainee/registration-details.tsx"),
     layout("layouts/trainee-protected.tsx", [
       index("pages/trainee/home.tsx"),
+      route(
+        "registration/:courseId/profiles",
+        "pages/trainee/registration-profiles.tsx",
+      ),
+      route(
+        "registration/:courseId/payment",
+        "pages/trainee/registration-payment.tsx",
+      ),
+      route(
+        "registration/:courseId/confirmation",
+        "pages/trainee/registration-confirmation.tsx",
+      ),
       route("certificates", "pages/trainee/certificates.tsx"),
       route("certificates/:courseId", "pages/trainee/view-certificate.tsx"),
       route("*", "pages/trainee/not-found.tsx"),
