@@ -144,8 +144,6 @@ export default function RegistrationProfilesPage({
         waitlist,
       });
       const r = result.reservationIds.join(",");
-      // Navigate before invalidating — suspense refetch on this page would
-      // remount and cancel the transition.
       if (waitlist) {
         await navigate(
           `/trainee/registration/${courseId}/confirmation?r=${encodeURIComponent(r)}&waitlist=1`,

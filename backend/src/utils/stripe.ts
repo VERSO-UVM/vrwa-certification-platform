@@ -25,7 +25,6 @@ export async function markReservationsPaidForSession(sessionId: string) {
 
 /**
  * Release seats held by unpaid reservations when a Checkout Session expires.
- * Only deletes Draft/Open rows so Paid/Refunded rows are never touched.
  */
 export async function releaseReservationsForExpiredSession(sessionId: string) {
   await db.client
@@ -97,7 +96,7 @@ async function handleEventNotification(
       const session =
         (await notification.fetchRelatedObject()) as Stripe.Checkout.Session | null;
       if (!session?.id) return;
-      // Only fulfill when payment is complete (async methods start unpaid)
+      // Only fulfill when payment is complete
       if (session.payment_status === "paid") {
         await markReservationsPaidForSession(session.id);
       }
@@ -114,7 +113,7 @@ async function handleEventNotification(
 }
 
 /**
- * Email a pay-by-check invoice via Stripe Invoicing.
+ * For paying by check.
  */
 export async function sendCheckInvoice({
   userId,

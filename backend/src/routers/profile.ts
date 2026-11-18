@@ -102,7 +102,7 @@ export const profileRouter = router({
   }),
 
   /**
-   * Profile ids under this account that already have a reservation for a course.
+   * Profile IDs that have already registered for a course.
    */
   listForCourse: protectedProcedure
     .input(z.object({ courseId: z.string() }))
